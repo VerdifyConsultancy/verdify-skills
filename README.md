@@ -48,10 +48,11 @@ The model may recommend what should happen next. Deterministic checks and explic
 - `scripts/validate-repo.rb` — no-dependency repository validator.
 - `scripts/setup-agent-hosts.rb` — checks or repairs Codex/Claude skill links.
 - `scripts/launch-codex.sh` and `scripts/launch-claude.sh` — launch wrappers that check skill wiring before starting a session.
+- `scripts/bootstrap-agent-session.sh` — remote-first launcher that fetches this repository into an ephemeral session directory before starting Codex or Claude.
 
 ## Quick manual use
 
-1. Copy this package into or alongside the target repository.
+1. Fetch this package through a launcher, workflow engine, or managing agent before the target agent session starts.
 2. Create a sprint ID, for example `2026-06-20-a`.
 3. Start a fresh controller session and provide:
    - `COMMON_OPERATING_CONTRACT.md`
@@ -61,7 +62,41 @@ The model may recommend what should happen next. Deterministic checks and explic
 5. Start every lane worker, critic, and integration controller in a fresh session.
 6. Carry state between sessions through files, issues, pull requests, and evidence—not through hidden chat history.
 
-## Quick Codex use
+## Remote-first session bootstrap
+
+Verdify is intended to stay in its own repository. Target projects should not vendor or permanently copy the skills package. A session launcher should fetch this repository at startup, expose `skills/verdify-agentic-sprint` to the agent host, then remove the temporary clone when the session exits.
+
+From any target project:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/VerdifyConsultancy/verdify-skills/main/scripts/bootstrap-agent-session.sh \
+  | bash -s -- codex "$PWD"
+```
+
+For Claude Code:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/VerdifyConsultancy/verdify-skills/main/scripts/bootstrap-agent-session.sh \
+  | bash -s -- claude "$PWD"
+```
+
+Pin a release, tag, branch, or commit for reproducible sessions:
+
+```bash
+VERDIFY_SKILLS_REF=v0.1.0 \
+curl -fsSL https://raw.githubusercontent.com/VerdifyConsultancy/verdify-skills/main/scripts/bootstrap-agent-session.sh \
+  | bash -s -- codex "$PWD"
+```
+
+For private forks or enterprise mirrors, set `VERDIFY_SKILLS_REPO`.
+
+```bash
+VERDIFY_SKILLS_REPO=git@github.com:VerdifyConsultancy/verdify-skills.git \
+VERDIFY_SKILLS_REF=main \
+./scripts/bootstrap-agent-session.sh codex /path/to/project
+```
+
+## Local Codex development
 
 Codex scans repo-scoped skills from `.agents/skills`. This repository exposes the Verdify skill there as a symlink to the canonical package under `skills/verdify-agentic-sprint`.
 
@@ -83,7 +118,7 @@ Run repository validation before committing:
 ruby scripts/validate-repo.rb
 ```
 
-## Quick Claude Code use
+## Local Claude Code development
 
 Claude Code scans project skills from `.claude/skills`. This repository exposes the same Verdify skill there as a symlink to the canonical package under `skills/verdify-agentic-sprint`.
 

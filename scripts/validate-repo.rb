@@ -196,7 +196,12 @@ def validate_codex_metadata
 end
 
 def validate_launch_scripts
-  %w[scripts/launch-codex.sh scripts/launch-claude.sh scripts/setup-agent-hosts.rb].each do |relative_path|
+  %w[
+    scripts/bootstrap-agent-session.sh
+    scripts/launch-codex.sh
+    scripts/launch-claude.sh
+    scripts/setup-agent-hosts.rb
+  ].each do |relative_path|
     path = ROOT.join(relative_path)
     unless path.file?
       error(path, "missing launch/setup script")
