@@ -1,0 +1,97 @@
+sprint_id: 2026-06-20-a
+lane_id: runtime-health
+title: Correct and expose runtime dependency health
+objective: Make runtime health reporting truthful, observable, and safe for deployment automation.
+desired_outcome: Operators and deployment checks can distinguish healthy, degraded, and unavailable dependencies without false-positive readiness.
+non_goals:
+  - Redesign the frontend status experience
+  - Replace the cluster monitoring platform
+baseline_sha: abcdef123456
+branch: verdify/2026-06-20-a/runtime-health
+worktree: ../worktrees/2026-06-20-a-runtime-health
+issue_ids:
+  - GH-412
+  - GH-418
+issue_urls:
+  - https://github.com/verdify/example-repo/issues/412
+  - https://github.com/verdify/example-repo/issues/418
+spec_or_change_ids:
+  - add-runtime-dependency-health
+decision_ids:
+  - DEC-014
+ownership:
+  domains:
+    - runtime health
+    - backend observability
+  owned_paths:
+    - runtime/**
+    - tests/runtime/**
+  prohibited_paths:
+    - installer/**
+    - frontend/**
+  coordination_required_paths:
+    - api/openapi.yaml
+  owned_interfaces:
+    - runtime internal health model
+  runtime_resources:
+    - deployment/runtime
+    - service/runtime
+    - route/runtime-health
+dependencies:
+  hard:
+    - lane_id: api-health-contract
+      required_output: Approved OpenAPI health response contract
+  soft: []
+constraints:
+  - Preserve backward compatibility for the existing liveness endpoint.
+  - Readiness must fail only when a dependency required for serving traffic is unavailable.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: The health endpoint reports dependency-specific degraded and unavailable states.
+    evidence_required:
+      - unit tests
+      - integration test with simulated dependency failure
+  - id: LANE-AC-02
+    statement: Existing liveness behavior remains backward compatible.
+    evidence_required:
+      - regression test
+validation_commands:
+  - id: runtime-lint
+    command: make lint-runtime
+    purpose: Validate runtime source style and static checks.
+    required: true
+  - id: runtime-tests
+    command: make test-runtime
+    purpose: Run runtime unit and integration tests.
+    required: true
+required_evidence:
+  - Full command output or CI link at lane HEAD
+  - Diff review against API contract
+  - Runtime probe in a non-production environment
+record_updates:
+  issues: true
+  pull_request: true
+  specifications: true
+  documentation: true
+  decisions: false
+git_policy:
+  commit_style: Conventional commits with focused changes
+  push_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+  pull_request_required: true
+  github_ci_required: true
+escalation_conditions:
+  - A public API change beyond the approved health contract is required.
+  - A database or persistent-state migration is discovered.
+  - A prohibited path must be edited.
+  - Readiness semantics would change for an existing client.
+agent_profile: backend-worker
+critic_profile: reliability-critic
+definition_of_done:
+  - Every acceptance criterion passes with linked evidence.
+  - Assigned issues and specification tasks are accurate.
+  - PR is open, linked to assigned issues, and branch is pushed.
+  - Required GitHub CI checks are passing or explicitly documented as pending before critic review.
+  - Worktree is clean.
+  - Independent critic has not yet run; lane is READY_FOR_CRITIC.

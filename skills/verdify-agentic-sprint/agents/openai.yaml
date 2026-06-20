@@ -1,0 +1,7 @@
+interface:
+  display_name: "Verdify Agentic Sprint"
+  short_description: "Run a gated, lane-based agentic sprint"
+  default_prompt: "Start a Verdify test sprint for this repository. Use sprint id 2026-06-20-test, create only planning artifacts, and stop at the first human gate."
+
+policy:
+  allow_implicit_invocation: true

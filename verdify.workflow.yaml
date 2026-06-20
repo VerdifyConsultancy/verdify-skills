@@ -1,0 +1,183 @@
+version: 0.1
+name: verdify-agentic-sprint
+
+states:
+  INITIALIZE:
+    actor: automation
+    next: CONTROLLER_BOOTSTRAP
+
+  CONTROLLER_BOOTSTRAP:
+    actor: controller
+    prompt: prompts/00-controller-bootstrap.md
+    next: DISCOVER_AND_AUDIT
+
+  DISCOVER_AND_AUDIT:
+    actor: controller
+    prompt: prompts/01-discover-and-audit.md
+    next: WAIT_FOR_HUMAN_REVIEW
+
+  WAIT_FOR_HUMAN_REVIEW:
+    actor: human
+    interrupt: true
+    resume_event: HUMAN_REVIEW_RECEIVED
+    gate:
+      type: review_input
+      artifact: .verdify/sprints/<sprint-id>/gates/human-review.yaml
+      resolver: human
+    next: INGEST_HUMAN_REVIEW
+
+  INGEST_HUMAN_REVIEW:
+    actor: controller
+    prompt: prompts/02-ingest-human-review.md
+    next: INTERVIEW_HUMAN
+
+  INTERVIEW_HUMAN:
+    actor: controller
+    prompt: prompts/03-interview-human.md
+    interrupt: true
+    resume_event: INTERVIEW_RESPONSES_RECEIVED
+    gate:
+      type: decision
+      artifact: .verdify/sprints/<sprint-id>/gates/architecture-interview.yaml
+      resolver: human
+    next: SYNTHESIZE_DECISIONS
+
+  SYNTHESIZE_DECISIONS:
+    actor: controller
+    prompt: prompts/04-synthesize-decisions.md
+    branches:
+      unresolved_blocking_decisions: INTERVIEW_HUMAN
+      otherwise: PLAN_SPRINT
+
+  PLAN_SPRINT:
+    actor: controller
+    prompt: prompts/05-plan-sprint.md
+    next: DECOMPOSE_LANES
+
+  DECOMPOSE_LANES:
+    actor: controller
+    prompt: prompts/06-decompose-lanes.md
+    next: HUMAN_PLAN_APPROVAL
+
+  HUMAN_PLAN_APPROVAL:
+    actor: human
+    interrupt: true
+    resume_event: PLAN_APPROVED
+    gate:
+      type: plan_approval
+      artifact: .verdify/sprints/<sprint-id>/gates/plan-approval.yaml
+      resolver: human
+    branches:
+      revisions_requested: PLAN_SPRINT
+      approved: COMPILE_LANE_CONTRACTS
+
+  COMPILE_LANE_CONTRACTS:
+    actor: controller
+    prompt: prompts/07-compile-lane-contracts.md
+    next: DISPATCH_READY_LANES
+
+  DISPATCH_READY_LANES:
+    actor: automation
+    foreach: lane where dependencies_satisfied
+    child_workflow: LANE_WORKFLOW
+    next: WAIT_FOR_LANES
+
+  WAIT_FOR_LANES:
+    actor: controller
+    event_driven: true
+    events:
+      - DECISION_REQUIRED
+      - BLOCKED
+      - SCOPE_CHANGE_REQUESTED
+      - READY_FOR_CRITIC
+      - HEARTBEAT_TIMEOUT
+    branches:
+      all_lanes_ready_or_terminal: INTEGRATION_CONTROLLER
+      otherwise: WAIT_FOR_LANES
+
+  INTEGRATION_CONTROLLER:
+    actor: fresh_controller
+    prompt: prompts/12-integration-controller.md
+    next: DEPLOYMENT_APPROVAL
+
+  DEPLOYMENT_APPROVAL:
+    actor: human_or_policy
+    interrupt: conditional
+    gate:
+      type: deployment_approval
+      artifact: .verdify/sprints/<sprint-id>/gates/deployment-approval.yaml
+      resolver: human_or_policy
+    branches:
+      approved: DEPLOY_AND_VERDIFY
+      rejected: INTEGRATION_CONTROLLER
+
+  DEPLOY_AND_VERDIFY:
+    actor: deployment_verifier
+    prompt: prompts/13-deploy-and-verdify.md
+    branches:
+      passed: CLOSE_SPRINT
+      failed_and_rolled_back: CLOSE_SPRINT
+      failed_unresolved: HUMAN_INCIDENT_GATE
+
+  HUMAN_INCIDENT_GATE:
+    actor: human
+    interrupt: true
+    gate:
+      type: incident
+      artifact: .verdify/sprints/<sprint-id>/gates/deployment-incident.yaml
+      resolver: human
+    next: DEPLOY_AND_VERDIFY
+
+  CLOSE_SPRINT:
+    actor: controller
+    prompt: prompts/14-close-sprint.md
+    next: HUMAN_OUTCOME_REVIEW
+
+  HUMAN_OUTCOME_REVIEW:
+    actor: human
+    prompt: prompts/15-human-outcome-review.md
+    interrupt: true
+    gate:
+      type: outcome_acceptance
+      artifact: .verdify/sprints/<sprint-id>/gates/outcome-acceptance.yaml
+      resolver: human
+    next: COMPLETE
+
+  COMPLETE:
+    terminal: true
+
+child_workflows:
+  LANE_WORKFLOW:
+    states:
+      START:
+        actor: lane_worker
+        prompt: prompts/08-lane-worker-start.md
+        next: EXECUTE
+      EXECUTE:
+        actor: lane_worker
+        event_driven: true
+        branches:
+          blocker_or_decision: WAIT_FOR_GUIDANCE
+          implementation_complete: LANE_CLOSEOUT
+          otherwise: EXECUTE
+      WAIT_FOR_GUIDANCE:
+        actor: controller
+        prompt: prompts/09-lane-status-and-guidance.md
+        gate:
+          type: scope_change
+          artifact: .verdify/sprints/<sprint-id>/gates/<lane-id>-guidance.yaml
+          resolver: human_or_managing_agent
+        next: EXECUTE
+      LANE_CLOSEOUT:
+        actor: lane_worker
+        prompt: prompts/10-lane-closeout.md
+        next: INDEPENDENT_CRITIC
+      INDEPENDENT_CRITIC:
+        actor: fresh_critic
+        prompt: prompts/11-independent-critic.md
+        branches:
+          pass: READY_FOR_INTEGRATION
+          changes_requested: EXECUTE
+          escalate: WAIT_FOR_GUIDANCE
+      READY_FOR_INTEGRATION:
+        terminal: true
