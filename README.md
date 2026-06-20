@@ -44,6 +44,7 @@ The model may recommend what should happen next. Deterministic checks and explic
 - `templates/` — human-facing input and handoff templates.
 - `docs/human-gates.md` — human and managing-agent gate model.
 - `docs/agent-session-launch.md` — Codex and Claude session launch instructions.
+- `docs/kubernetes-agent-handoff.md` — Kubernetes pod bootstrap guidance for agent runners.
 - `evaluations/` — skill-level regression scenarios.
 - `scripts/validate-repo.rb` — no-dependency repository validator.
 - `scripts/setup-agent-hosts.rb` — checks or repairs Codex/Claude skill links.

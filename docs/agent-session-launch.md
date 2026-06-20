@@ -9,6 +9,8 @@ Verdify skills should be fetched at session startup rather than copied into ever
 
 This preserves one source of truth for the workflow while keeping target repositories focused on their own code, GitHub issues, pull requests, and CI/CD state.
 
+For Kubernetes agent pods, use the dedicated handoff: [kubernetes-agent-handoff.md](kubernetes-agent-handoff.md). It defines the workspace layout, init or entrypoint bootstrap sequence, runtime skill paths, and GitHub-only delivery boundary.
+
 ## Bootstrap Script
 
 Use the checked-in bootstrapper directly when developing this repository:
