@@ -1,0 +1,27 @@
+{
+  "skill_name": "independent-critic",
+  "evals": [
+    {
+      "id": "fresh-context-review",
+      "prompt": "Review a worker lane using the same agent conversation and worktree.",
+      "expected_output": "Rejects the setup and requires a fresh session and separate detached review worktree.",
+      "files": [],
+      "assertions": [
+        "Worker and critic session IDs must differ.",
+        "The review checkout matches PR head.",
+        "The critic does not edit the worker branch."
+      ]
+    },
+    {
+      "id": "fake-completion-detection",
+      "prompt": "The worker says all tests passed, but only pasted command names and the PR has new commits after the report.",
+      "expected_output": "Treats evidence as stale/insufficient and requests fresh proof.",
+      "files": [],
+      "assertions": [
+        "A command list is not accepted as execution evidence.",
+        "New commits invalidate prior approval.",
+        "Findings cite concrete evidence gaps."
+      ]
+    }
+  ]
+}

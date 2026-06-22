@@ -1,36 +1,18 @@
-# Verdify Agent Instructions
+# Agent instructions
 
-## Default Workflow
+Use the Verdify lifecycle skills for project definition, architecture, sprint planning, lane delivery, review, integration, and deployment verification.
 
-Use the `verdify-agentic-sprint` skill for any work involving:
+Start or resume through `$project-router` unless the user explicitly names another lifecycle skill and its prerequisites are present.
 
-- repository discovery or audit;
-- GitHub issue backlog reconciliation;
-- sprint planning;
-- lane decomposition;
-- lane execution or status;
-- independent critic review;
-- integration across lanes;
-- deployment verification;
-- sprint closure.
+Mandatory repository rules:
 
-The skill is available to Codex from `.agents/skills/verdify-agentic-sprint`.
+- GitHub Issues are the backlog source of truth.
+- GitHub is the delivery control plane; do not replace issues or pull requests with private chat state.
+- One issue, lane, branch, worktree, worker session, and pull request is the default unit of implementation.
+- Acquire a lane lease before coding and never share an active worktree between coding sessions.
+- Follow `COMMON_OPERATING_CONTRACT.md` and `config/authority-matrix.yaml`.
+- Use durable `.verdify` artifacts for approved definitions, contracts, status, and evidence.
+- A fresh critic must review lane output before integration.
+- Runtime deployment must be verified separately from merge success.
 
-## Operating Rules
-
-- Treat GitHub Issues as the backlog source of truth.
-- Do not plan executable work unless it maps to GitHub issues or approved issue updates.
-- Assign every approved GitHub issue to exactly one lane.
-- Keep lane workers focused on their assigned issues.
-- Use feature branches and pull requests for lane work.
-- Bring work back through integration in dependency order.
-- Require GitHub CI/CD evidence before deployment verification.
-- Record human or managing-agent gates under `.verdify/sprints/<sprint-id>/gates/`.
-
-## Validation
-
-Before claiming this repository is ready for agent use, run:
-
-```bash
-ruby scripts/validate-repo.rb
-```
+Run `bin/verdify route --write` when lifecycle position is unclear and `ruby scripts/validate-repo.rb` before changing this skills repository.

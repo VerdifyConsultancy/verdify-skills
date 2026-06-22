@@ -1,0 +1,19 @@
+name: policy
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  pull-request-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Check Verdify pull request contract
+        env:
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: ruby scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH"

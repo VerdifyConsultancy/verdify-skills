@@ -1,0 +1,28 @@
+{
+  "skill_name": "project-router",
+  "evals": [
+    {
+      "id": "routes-earliest-missing-artifact",
+      "prompt": "A repository has approved discovery and requirements, but product and design stages are pending. Choose the next skill and mode.",
+      "expected_output": "Routes only to project-definition/product and names the evidence; it does not perform product work.",
+      "files": [],
+      "assertions": [
+        "The answer names project-definition as the next skill.",
+        "The answer names product as the next mode.",
+        "The answer does not skip to architecture or coding.",
+        "The route is based on durable artifact status."
+      ]
+    },
+    {
+      "id": "open-gate-precedence",
+      "prompt": "An approved sprint exists, but a scope-change gate is open for one lane. Route the repository.",
+      "expected_output": "Routes to durable gate resolution before normal progression.",
+      "files": [],
+      "assertions": [
+        "The open gate takes precedence.",
+        "The answer does not dispatch or integrate the affected lane.",
+        "The gate artifact and authorized resolver are identified."
+      ]
+    }
+  ]
+}

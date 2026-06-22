@@ -1,0 +1,43 @@
+name: Material decision
+description: Record a decision that must be resolved before work can safely continue.
+title: "[Decision] "
+labels: ["type:decision", "verdify:decision-required"]
+body:
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision required
+      description: State the exact question and why it blocks or changes delivery.
+    validations: {required: true}
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and evidence
+      description: Cite issue, lane, contract, code, deployment, or incident evidence.
+    validations: {required: true}
+  - type: textarea
+    id: options
+    attributes:
+      label: Viable options
+      description: Include consequences, reversibility, and operational/security impact.
+    validations: {required: true}
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommendation
+  - type: textarea
+    id: resolver
+    attributes:
+      label: Authorized resolver and deadline
+      description: Name a role or team, not a secret or personal credential.
+    validations: {required: true}
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact flags
+      options:
+        - label: Public interface or compatibility
+        - label: Data migration or destructive operation
+        - label: Security or permission boundary
+        - label: Production deployment
+        - label: Policy exception

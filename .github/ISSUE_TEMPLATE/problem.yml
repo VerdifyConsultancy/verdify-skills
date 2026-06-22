@@ -1,0 +1,67 @@
+name: Backlog problem or outcome
+description: Create a durable problem statement for planning into a Verdify lane.
+title: "[Problem] "
+labels: ["type:problem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        GitHub Issues are the backlog source of truth. Describe the problem and observable outcome; do not prescribe an unreviewed implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is wrong, missing, costly, risky, or unclear?
+      placeholder: Operators cannot prove which revision is serving traffic.
+    validations: {required: true}
+  - type: textarea
+    id: desired_outcome
+    attributes:
+      label: Desired outcome
+      description: What observable state should be true when this is solved?
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance intent
+      description: List testable user, system, or operational observations. Final lane criteria are compiled during sprint planning.
+      placeholder: |
+        - Health output contains the running revision.
+        - Deployment verification compares it with the integrated SHA.
+    validations: {required: true}
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What should not be included?
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and related issues
+      description: Use GitHub issue references and native blocked-by relationships when available.
+      placeholder: "Blocked by #123; related to #98"
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Initial risk
+      options: [low, medium, high, critical, unknown]
+      default: 4
+    validations: {required: true}
+  - type: textarea
+    id: affected_surfaces
+    attributes:
+      label: Affected users, modules, data, or environments
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and context
+      description: Link logs, screenshots, incidents, requirements, ADRs, or prior decisions. Redact secrets.
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Readiness
+      options:
+        - label: I described a problem/outcome rather than silently adding implementation scope.
+          required: true
+        - label: I did not include credentials, tokens, private keys, or sensitive production data.
+          required: true

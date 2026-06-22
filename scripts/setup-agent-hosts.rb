@@ -2,64 +2,64 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require "optparse"
 require "pathname"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
-CANONICAL_SKILL = ROOT.join("skills/verdify-agentic-sprint")
+SKILLS = Dir[ROOT.join("skills/*/SKILL.md")].sort.map { |p| Pathname.new(p).dirname.basename.to_s }
 
-LINKS = {
-  "Codex" => ROOT.join(".agents/skills/verdify-agentic-sprint"),
-  "Claude Code" => ROOT.join(".claude/skills/verdify-agentic-sprint")
-}.freeze
+options = { root: ROOT, source: ROOT, check: false, hosts: %w[codex claude] }
+OptionParser.new do |o|
+  o.banner = "Usage: ruby scripts/setup-agent-hosts.rb [--check] [--root PATH] [--source PATH] [--host codex|claude|all]"
+  o.on("--check", "Check links without modifying them") { options[:check] = true }
+  o.on("--root PATH", "Repository where host links are installed") { |v| options[:root] = Pathname.new(v).expand_path }
+  o.on("--source PATH", "Verdify package containing skills/") { |v| options[:source] = Pathname.new(v).expand_path }
+  o.on("--host HOST", %w[codex claude all]) { |v| options[:hosts] = v == "all" ? %w[codex claude] : [v] }
+  o.on("-h", "--help") { puts o; exit 0 }
+end.parse!
 
-mode = ARGV.first || "--check"
-unless %w[--check --repair].include?(mode)
-  warn "Usage: ruby scripts/setup-agent-hosts.rb [--check|--repair]"
-  exit 2
-end
-
-def expected_target_for(link_path)
-  Pathname.new("../../skills/verdify-agentic-sprint")
-end
-
-def valid_link?(link_path)
-  link_path.exist? && link_path.realpath == CANONICAL_SKILL.realpath
-rescue Errno::ENOENT
-  false
-end
-
+HOST_DIRS = { "codex" => ".agents/skills", "claude" => ".claude/skills" }.freeze
 errors = []
 
-LINKS.each do |host, link_path|
-  if valid_link?(link_path)
-    puts "#{host}: ok #{link_path.relative_path_from(ROOT)}"
-    next
-  end
+options[:hosts].each do |host|
+  host_dir = options[:root].join(HOST_DIRS.fetch(host))
+  FileUtils.mkdir_p(host_dir) unless options[:check]
+  SKILLS.each do |skill|
+    source = options[:source].join("skills", skill)
+    link = host_dir.join(skill)
+    unless source.join("SKILL.md").file?
+      errors << "missing source skill #{source}"
+      next
+    end
+    if options[:check]
+      unless link.symlink?
+        errors << "#{link} is not a symlink"
+        next
+      end
+      begin
+        errors << "#{link} resolves to #{link.realpath}, expected #{source.realpath}" unless link.realpath == source.realpath
+      rescue Errno::ENOENT
+        errors << "#{link} is broken"
+      end
+      next
+    end
 
-  if mode == "--check"
-    errors << "#{host}: missing or invalid skill link at #{link_path.relative_path_from(ROOT)}"
-    next
-  end
-
-  FileUtils.mkdir_p(link_path.dirname)
-  if link_path.exist? && !link_path.symlink?
-    errors << "#{host}: #{link_path.relative_path_from(ROOT)} exists and is not a symlink; move it before repair"
-    next
-  end
-
-  FileUtils.rm_f(link_path) if link_path.symlink?
-  File.symlink(expected_target_for(link_path).to_s, link_path)
-
-  if valid_link?(link_path)
-    puts "#{host}: repaired #{link_path.relative_path_from(ROOT)}"
-  else
-    errors << "#{host}: repair failed for #{link_path.relative_path_from(ROOT)}"
+    if link.exist? || link.symlink?
+      begin
+        next if link.symlink? && link.realpath == source.realpath
+      rescue Errno::ENOENT
+        # replace broken link below
+      end
+      FileUtils.rm_rf(link)
+    end
+    relative = source.relative_path_from(link.dirname)
+    File.symlink(relative, link)
+    puts "linked #{link} -> #{relative}"
   end
 end
 
-if errors.any?
+unless errors.empty?
   warn errors.join("\n")
   exit 1
 end
-
-puts "Agent host skill links are ready."
+puts(options[:check] ? "Agent host links are valid." : "Agent host links installed.")

@@ -1,0 +1,37 @@
+version: "1.0"
+entrypoint: project-router
+skills:
+  - name: project-router
+    order: 1
+    modes: [route, resume, gap-detection]
+  - name: project-definition
+    order: 2
+    modes: [discovery, requirements, product, design-surface]
+  - name: architecture-contracts
+    order: 3
+    modes: [north-star-architecture, module-contracts]
+  - name: sprint-planning
+    order: 4
+    modes: [issue-readiness, sprint-plan, lane-transaction, plan-approval]
+  - name: sprint-orchestrator
+    order: 5
+    modes: [dispatch, monitor, reconcile, gate-management]
+  - name: lane-delivery
+    order: 6
+    modes: [implementation, closeout, fix-forward]
+  - name: independent-critic
+    order: 7
+    modes: [lane-review, evidence-review, risk-review]
+  - name: release-verification
+    order: 8
+    modes: [integration, deployment-verification, outcome-review]
+default_cycle:
+  - project-router
+  - project-definition
+  - architecture-contracts
+  - sprint-planning
+  - sprint-orchestrator
+  - lane-delivery
+  - independent-critic
+  - release-verification
+  - project-router

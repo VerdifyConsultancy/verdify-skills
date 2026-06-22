@@ -1,0 +1,27 @@
+{
+  "skill_name": "lane-delivery",
+  "evals": [
+    {
+      "id": "scope-change-escalation",
+      "prompt": "A worker discovers the public API must change outside its approved contract.",
+      "expected_output": "Pauses risky work, opens a scope-change decision, and does not rewrite the contract to match code.",
+      "files": [],
+      "assertions": [
+        "The worker stops out-of-scope work.",
+        "A durable gate or issue is created.",
+        "The public interface is not silently changed."
+      ]
+    },
+    {
+      "id": "evidence-backed-closeout",
+      "prompt": "A lane passes tests but has an untracked generated file and no current-head CI evidence. Close it out.",
+      "expected_output": "Does not claim clean completion; records limitations and remains blocked or complete-with-risks as schema permits.",
+      "files": [],
+      "assertions": [
+        "Untracked files are recorded.",
+        "Evidence is tied to the current head SHA.",
+        "Every acceptance criterion has evidence or an explicit gap."
+      ]
+    }
+  ]
+}

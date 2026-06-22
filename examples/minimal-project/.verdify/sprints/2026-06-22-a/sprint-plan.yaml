@@ -1,0 +1,41 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-06-22-a
+status: active
+goal: Deliver and verify an auditable service health endpoint.
+baseline_sha: "1111111111111111111111111111111111111111"
+github:
+  repository: example/example-service
+  milestone: Sprint 2026-06-22-a
+  project: Verdify delivery
+issue_ids: [123]
+scope:
+  - Implement GET /health in the API adapter.
+  - Add contract tests and release verification.
+non_goals:
+  - Add a monitoring dashboard.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: The reviewed and deployed service returns healthy status and the intended revision.
+    lane_ids: [issue-123-api]
+    evidence_expected: [API test, required GitHub checks, runtime probe]
+risks:
+  - id: RISK-01
+    severity: medium
+    statement: Build metadata may not reach the runtime response.
+    mitigation: Test revision injection and compare deployed output with the integrated SHA.
+lanes:
+  - lane_id: issue-123-api
+    issue_ids: [123]
+    contract_path: .verdify/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml
+    branch: lane/123-health-api
+dependency_order:
+  - [issue-123-api]
+deployment_expectations:
+  - Deploy the exact integrated artifact to staging.
+  - Verify /health and revision identity before acceptance.
+approval:
+  status: approved
+  approver: delivery-owner
+  approved_at: "2026-06-22T11:00:00Z"

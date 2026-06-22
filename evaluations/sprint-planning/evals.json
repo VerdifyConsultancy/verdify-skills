@@ -1,0 +1,28 @@
+{
+  "skill_name": "sprint-planning",
+  "evals": [
+    {
+      "id": "one-issue-one-lane-default",
+      "prompt": "Plan issues #12, #13, and #14 where all can be accepted and merged independently.",
+      "expected_output": "Creates three lanes/contracts and one atomic approval gate without worktrees.",
+      "files": [],
+      "assertions": [
+        "Each issue maps to exactly one lane.",
+        "Every lane has one branch and contract.",
+        "No worker session or worktree is created before approval.",
+        "GitHub Issues remain the backlog."
+      ]
+    },
+    {
+      "id": "coupled-multi-issue-exception",
+      "prompt": "Issues #20 and #21 cannot be tested or merged independently. Plan the exception.",
+      "expected_output": "Allows one lane only with coupling justification and explicit plan approval.",
+      "files": [],
+      "assertions": [
+        "The exception is documented.",
+        "The common acceptance and merge boundary is explained.",
+        "The full plan transaction is revalidated and approved."
+      ]
+    }
+  ]
+}

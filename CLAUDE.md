@@ -1,36 +1,15 @@
-# Verdify Claude Instructions
+# Claude Code instructions
 
-## Default Workflow
+Use `/project-router` as the default entrypoint for Verdify lifecycle work. Invoke a later skill directly only when its prerequisite artifacts and approval gates exist.
 
-Use `/verdify-agentic-sprint` for any work involving:
+Mandatory repository rules:
 
-- repository discovery or audit;
-- GitHub issue backlog reconciliation;
-- sprint planning;
-- lane decomposition;
-- lane execution or status;
-- independent critic review;
-- integration across lanes;
-- deployment verification;
-- sprint closure.
+- GitHub Issues are the backlog source of truth.
+- GitHub issues, pull requests, checks, releases, and deployments form the operational control plane.
+- One issue, lane, branch, worktree, coding session, and pull request is the normal execution unit.
+- Never reuse a worker worktree for a second coding session or for independent criticism.
+- Obey `COMMON_OPERATING_CONTRACT.md`, the lane contract, and `config/authority-matrix.yaml`.
+- Record all material decisions and evidence in durable artifacts.
+- Do not merge, deploy, or close issues based only on narrative claims.
 
-The skill is available to Claude Code from `.claude/skills/verdify-agentic-sprint`.
-
-## Operating Rules
-
-- Treat GitHub Issues as the backlog source of truth.
-- Do not plan executable work unless it maps to GitHub issues or approved issue updates.
-- Assign every approved GitHub issue to exactly one lane.
-- Keep lane workers focused on their assigned issues.
-- Use feature branches and pull requests for lane work.
-- Bring work back through integration in dependency order.
-- Require GitHub CI/CD evidence before deployment verification.
-- Record human or managing-agent gates under `.verdify/sprints/<sprint-id>/gates/`.
-
-## Validation
-
-Before claiming this repository is ready for agent use, run:
-
-```bash
-ruby scripts/validate-repo.rb
-```
+Use `bin/verdify route --write` to reconstruct the next lifecycle step.

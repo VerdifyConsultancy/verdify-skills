@@ -1,0 +1,28 @@
+{
+  "skill_name": "sprint-orchestrator",
+  "evals": [
+    {
+      "id": "dispatch-one-worker",
+      "prompt": "An approved lane is dependency-ready and has no active lease. Dispatch it.",
+      "expected_output": "Reconciles GitHub then creates one locked worker worktree/lease and compiles a bounded prompt.",
+      "files": [],
+      "assertions": [
+        "Exactly one active worker lease is created.",
+        "One worktree and one session are assigned.",
+        "Runtime namespaces are isolated.",
+        "The orchestrator does not implement code."
+      ]
+    },
+    {
+      "id": "stale-lease-recovery",
+      "prompt": "A worker lease expired while its worktree contains unpushed changes.",
+      "expected_output": "Preserves evidence, blocks double dispatch, and requires an explicit recovery decision.",
+      "files": [],
+      "assertions": [
+        "The dirty worktree is not deleted automatically.",
+        "A second worker is not silently assigned.",
+        "Recovery ownership and resulting Git state are recorded."
+      ]
+    }
+  ]
+}

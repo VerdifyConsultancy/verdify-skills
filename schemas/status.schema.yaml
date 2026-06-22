@@ -1,51 +1,18 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$title: Verdify Lane Status
-$type: object
-required: [sprint_id, lane_id, state, updated_at, head_sha, working_tree_clean]
+$id: https://verdify.example/schemas/status.schema.yaml
+title: Verdify Sprint Status
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, sprint_id, state, updated_at, active_lanes, blockers, next_action]
 properties:
+  schema_ref: {const: status.schema.yaml}
+  kind: {const: SprintStatus}
+  schema_version: {const: "1.0"}
   sprint_id: {type: string}
-  lane_id: {type: string}
   state:
     type: string
-    enum:
-      - NOT_STARTED
-      - ORIENTING
-      - PLANNING
-      - IMPLEMENTING
-      - VALIDATING
-      - BLOCKED
-      - DECISION_REQUIRED
-      - READY_FOR_CRITIC
-      - CHANGES_REQUESTED
-      - READY_FOR_INTEGRATION
-      - INTEGRATING
-      - READY_FOR_DEPLOYMENT
-      - DEPLOYING
-      - VERDIFYING_DEPLOYMENT
-      - COMPLETE
-      - FAILED
-      - CANCELLED
-  updated_at: {type: string, format: date-time}
-  head_sha: {type: string}
-  working_tree_clean: {type: boolean}
-  acceptance:
-    type: object
-    properties:
-      passed:
-        type: array
-        items: {type: string}
-      pending:
-        type: array
-        items: {type: string}
-      failed:
-        type: array
-        items: {type: string}
-  blockers:
-    type: array
-    items: {type: string}
-  decisions_requested:
-    type: array
-    items: {type: string}
-  next_actions:
-    type: array
-    items: {type: string}
+    enum: [NOT_STARTED, ORIENTING, DEFINING, ARCHITECTING, PLANNING, AWAITING_APPROVAL, READY, IMPLEMENTING, VALIDATING, BLOCKED, DECISION_REQUIRED, READY_FOR_CRITIC, CHANGES_REQUESTED, READY_FOR_INTEGRATION, INTEGRATING, READY_FOR_DEPLOYMENT, DEPLOYING, VERIFYING_DEPLOYMENT, AWAITING_OUTCOME_ACCEPTANCE, COMPLETE, FAILED, CANCELLED]
+  updated_at: {type: string}
+  active_lanes: {type: array, items: {type: string}}
+  blockers: {type: array, items: {type: string}}
+  next_action: {type: string}

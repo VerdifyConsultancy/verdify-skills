@@ -1,0 +1,37 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/github-snapshot.schema.yaml
+title: Verdify GitHub Snapshot
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, repository, captured_at, default_branch, issues, pull_requests]
+properties:
+  schema_ref: {const: github-snapshot.schema.yaml}
+  kind: {const: GitHubSnapshot}
+  schema_version: {const: "1.0"}
+  repository: {type: string, minLength: 1}
+  captured_at: {type: string, minLength: 1}
+  default_branch: {type: string, minLength: 1}
+  issues:
+    type: array
+    items:
+      type: object
+      required: [number, title, state, url]
+      properties:
+        number: {type: integer}
+        title: {type: string}
+        state: {type: string}
+        url: {type: string}
+      additionalProperties: true
+  pull_requests:
+    type: array
+    items:
+      type: object
+      required: [number, title, state, headRefName, baseRefName, url]
+      properties:
+        number: {type: integer}
+        title: {type: string}
+        state: {type: string}
+        headRefName: {type: string}
+        baseRefName: {type: string}
+        url: {type: string}
+      additionalProperties: true

@@ -1,0 +1,28 @@
+{
+  "skill_name": "architecture-contracts",
+  "evals": [
+    {
+      "id": "black-box-module-contract",
+      "prompt": "Define an extraction module that consumes normalized documents and emits traceable extraction results.",
+      "expected_output": "Produces stable I/O, ownership, invariants, failure behavior, contract tests, and no sprint lane.",
+      "files": [],
+      "assertions": [
+        "Inputs and outputs are typed.",
+        "Owned and prohibited paths are stated.",
+        "Evidence and contract tests are required.",
+        "No lane or worktree is created."
+      ]
+    },
+    {
+      "id": "shared-migration-risk",
+      "prompt": "Two proposed modules both need to edit the same migration and schema. Decide whether they can run in parallel.",
+      "expected_output": "Flags shared mutable ownership and serializes or creates an explicit coordination surface.",
+      "files": [],
+      "assertions": [
+        "Overlapping ownership is treated as a blocking interface risk.",
+        "Parallelism is not forced.",
+        "A durable ADR or contract change is required for the resolution."
+      ]
+    }
+  ]
+}

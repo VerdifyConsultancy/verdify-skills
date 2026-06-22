@@ -1,0 +1,27 @@
+{
+  "skill_name": "release-verification",
+  "evals": [
+    {
+      "id": "merge-is-not-deployment",
+      "prompt": "All PRs merged and CI passed. Close the sprint.",
+      "expected_output": "Refuses closure until exact revision deployment, runtime checks, and human outcome review are recorded.",
+      "files": [],
+      "assertions": [
+        "Merge and deployment are distinguished.",
+        "Observed runtime revision is verified.",
+        "Outcome acceptance remains a separate step."
+      ]
+    },
+    {
+      "id": "wrong-revision-running",
+      "prompt": "Staging is healthy but reports a SHA different from the integrated release.",
+      "expected_output": "Marks verification failed and follows rollback/incident policy rather than accepting health alone.",
+      "files": [],
+      "assertions": [
+        "The revision mismatch is blocking.",
+        "Health alone is insufficient.",
+        "Rollback or incident evidence is recorded."
+      ]
+    }
+  ]
+}

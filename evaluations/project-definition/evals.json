@@ -1,0 +1,27 @@
+{
+  "skill_name": "project-definition",
+  "evals": [
+    {
+      "id": "evidence-before-interview",
+      "prompt": "The user provides transcripts, a PRD, and repository docs but asks you to grill them immediately.",
+      "expected_output": "Inventories and reconciles sources before asking evidence-based gap questions.",
+      "files": [],
+      "assertions": [
+        "Sources are inventoried before questions.",
+        "Known decisions and contradictions are separated.",
+        "Questions target missing material decisions rather than generic discovery."
+      ]
+    },
+    {
+      "id": "traceability-through-design",
+      "prompt": "Turn a requirement for human approval of low-confidence extraction into product and design artifacts.",
+      "expected_output": "Traces the requirement to workflow, surface, states, errors, and acceptance criteria without choosing architecture.",
+      "files": [],
+      "assertions": [
+        "Requirement IDs remain traceable.",
+        "Human approval states and failure paths are explicit.",
+        "The answer does not prematurely select implementation technology."
+      ]
+    }
+  ]
+}

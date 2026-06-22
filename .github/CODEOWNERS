@@ -1,0 +1,6 @@
+# Configure real owners before requiring CODEOWNERS approval.
+# Examples:
+# *                         @your-org/maintainers
+# /schemas/                 @your-org/architecture
+# /skills/                  @your-org/agent-platform
+# /.github/workflows/       @your-org/security

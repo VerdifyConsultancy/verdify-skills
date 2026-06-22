@@ -1,0 +1,37 @@
+schema_ref: project-definition.schema.yaml
+kind: ProjectDefinition
+schema_version: "1.0"
+project_id: replace-me
+status: draft
+stage_status:
+  discovery: draft
+  requirements: pending
+  product: pending
+  design_surface: pending
+sources: []
+decisions: []
+assumptions: []
+contradictions: []
+requirements:
+  functional: []
+  non_functional: []
+  constraints: []
+  acceptance_criteria: []
+product:
+  primary_users: []
+  problem_statement: ""
+  jobs_to_be_done: []
+  scope: []
+  non_goals: []
+  success_metrics: []
+  risks: []
+design:
+  surfaces: []
+  flows: []
+  human_gates: []
+  error_states: []
+traceability: []
+approval:
+  status: pending
+  approver: null
+  approved_at: null

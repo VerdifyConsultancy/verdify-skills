@@ -1,0 +1,23 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: replace-me
+status: draft
+goal: ""
+baseline_sha: ""
+github:
+  repository: owner/repository
+  milestone: null
+  project: null
+issue_ids: []
+scope: []
+non_goals: []
+acceptance_criteria: []
+risks: []
+lanes: []
+dependency_order: []
+deployment_expectations: []
+approval:
+  status: pending
+  approver: null
+  approved_at: null

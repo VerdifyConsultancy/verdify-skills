@@ -1,0 +1,15 @@
+{
+  "schema_ref": "github-snapshot.schema.yaml",
+  "kind": "GitHubSnapshot",
+  "schema_version": "1.0",
+  "repository": "example/example-service",
+  "captured_at": "2026-06-22T13:00:00Z",
+  "default_branch": "main",
+  "issues": [
+    {"number": 123, "title": "Expose auditable health endpoint", "state": "OPEN", "url": "https://github.com/example/example-service/issues/123"},
+    {"number": 124, "title": "Standardize revision identity", "state": "OPEN", "url": "https://github.com/example/example-service/issues/124"}
+  ],
+  "pull_requests": [
+    {"number": 456, "title": "Issue #123: health endpoint", "state": "MERGED", "headRefName": "lane/123-health-api", "baseRefName": "main", "url": "https://github.com/example/example-service/pull/456"}
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Sprint Orchestrator"
+  short_description: "Dispatch and reconcile approved lanes"
+  default_prompt: "Reconstruct the approved sprint, reconcile GitHub, and perform only the next orchestration transition. Do not implement or self-review lane code."
+policy:
+  allow_implicit_invocation: true
