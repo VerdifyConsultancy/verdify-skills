@@ -6,6 +6,7 @@ module Verdify
       project-router
       project-definition
       architecture-contracts
+      state-of-union
       sprint-planning
       sprint-orchestrator
       lane-delivery
@@ -65,7 +66,7 @@ module Verdify
 
         Commands:
           doctor                     Check target repository prerequisites
-          init                       Initialize .verdify in a target repository
+          init                       Initialize .agent-workflow in a target repository
           route                      Determine and optionally write the next skill/mode
           artifact validate          Validate an artifact against its schema_ref
           sprint init                Create a draft sprint skeleton and approval gate
@@ -112,8 +113,8 @@ module Verdify
         checks << check_record("git_repository", true, true, repo.root.to_s)
         checks << check_record("default_branch", !repo.default_branch.to_s.empty?, true, repo.default_branch)
         checks << check_record("working_tree_clean", repo.clean?, false, repo.clean? ? "clean" : "dirty")
-        checks << check_record("verdify_initialized", repo.root.join(".verdify").directory?, false,
-                               repo.root.join(".verdify").directory? ? "present" : "run verdify init")
+        checks << check_record("agent_workflow_initialized", repo.root.join(".agent-workflow").directory?, false,
+                               repo.root.join(".agent-workflow").directory? ? "present" : "run verdify init")
       rescue UsageError => e
         checks << check_record("git_repository", false, true, e.message)
       end
@@ -144,7 +145,7 @@ module Verdify
       end
       parse_options(parser)
       repo = GitRepository.new(options[:repo])
-      root = repo.root.join(".verdify")
+      root = repo.root.join(".agent-workflow")
       FileUtils.mkdir_p(root)
 
       files = {
@@ -202,7 +203,7 @@ module Verdify
       validate_hash!(decision, "route-decision.schema.yaml", "generated route decision")
 
       if options[:write]
-        dir = repo.root.join(".verdify/router")
+        dir = repo.root.join(".agent-workflow/router")
         FileUtils.mkdir_p(dir)
         Verdify.atomic_write(dir.join("route-decision.yaml"), YAML.dump(decision))
         markdown = <<~MD
@@ -283,7 +284,7 @@ module Verdify
       raise UsageError, "invalid sprint ID" unless options[:id].match?(/\A[a-z0-9][a-z0-9-]*\z/)
 
       repo = GitRepository.new(options[:repo])
-      sprint_dir = repo.root.join(".verdify/sprints", options[:id])
+      sprint_dir = repo.root.join(".agent-workflow/sprints", options[:id])
       plan_path = sprint_dir.join("sprint-plan.yaml")
       if plan_path.exist? && !options[:force]
         raise UsageError, "sprint already exists: #{plan_path}"
@@ -765,7 +766,7 @@ module Verdify
         "pull_requests" => prs
       }
       validate_hash!(snapshot, "github-snapshot.schema.yaml", "GitHub snapshot")
-      out = options[:out] ? Pathname.new(options[:out]).expand_path : target.join(".verdify/github/snapshot.json")
+      out = options[:out] ? Pathname.new(options[:out]).expand_path : target.join(".agent-workflow/github/snapshot.json")
       Verdify.atomic_write(out, JSON.pretty_generate(snapshot) + "\n")
       puts "Wrote #{out} (#{issues.length} issues, #{prs.length} pull requests)"
       0
@@ -785,10 +786,10 @@ module Verdify
       parse_options(parser)
       raise UsageError, "--sprint is required" if options[:sprint].to_s.empty?
       repo = GitRepository.new(options[:repo_path])
-      snapshot_path = options[:snapshot] ? resolve_repo_path(repo, options[:snapshot]) : repo.root.join(".verdify/github/snapshot.json")
+      snapshot_path = options[:snapshot] ? resolve_repo_path(repo, options[:snapshot]) : repo.root.join(".agent-workflow/github/snapshot.json")
       raise UsageError, "GitHub snapshot not found: #{snapshot_path}" unless snapshot_path.file?
       snapshot = load_json(snapshot_path)
-      contracts = Dir[repo.root.join(".verdify/sprints", options[:sprint], "lanes/contracts/*.yaml")].sort.map do |path|
+      contracts = Dir[repo.root.join(".agent-workflow/sprints", options[:sprint], "lanes/contracts/*.yaml")].sort.map do |path|
         [Pathname.new(path), load_and_validate_contract(Pathname.new(path))]
       end
       raise UsageError, "no lane contracts found for sprint #{options[:sprint]}" if contracts.empty?
@@ -847,14 +848,14 @@ module Verdify
         "ok" => errors.empty?
       }
       validate_hash!(report, "github-reconciliation.schema.yaml", "GitHub reconciliation")
-      out = repo.root.join(".verdify/sprints", options[:sprint], "reconciliation.json")
+      out = repo.root.join(".agent-workflow/sprints", options[:sprint], "reconciliation.json")
       Verdify.atomic_write(out, JSON.pretty_generate(report) + "\n")
       puts JSON.pretty_generate(report)
       errors.empty? ? 0 : 1
     end
 
     def build_route_decision(repo)
-      root = repo.root.join(".verdify")
+      root = repo.root.join(".agent-workflow")
       evidence = []
       missing = []
       open_gate_files = Dir[root.join("**/gates/*.yaml")].select do |path|
@@ -894,13 +895,16 @@ module Verdify
 
       module_paths = Dir[root.join("modules/contracts/*.yaml")]
       if module_paths.empty? || module_paths.any? { |path| Verdify.safe_load_yaml(path).dig("approval", "status") != "approved" }
-        missing << ".verdify/modules/contracts/<module-id>.contract.yaml"
+        missing << ".agent-workflow/modules/contracts/<module-id>.contract.yaml"
         return route_hash(repo, "MODULE_CONTRACTS_INCOMPLETE", "architecture-contracts", "module-contracts", "Approved black-box module contracts are missing or incomplete.", evidence, missing, open_gates)
       end
 
       plans = Dir[root.join("sprints/*/sprint-plan.yaml")].map { |path| Pathname.new(path) }.sort_by(&:mtime).reverse
       if plans.empty?
-        return route_hash(repo, "READY_FOR_SPRINT_PLANNING", "sprint-planning", "issue-readiness", "Project and module foundations are approved; no sprint plan exists.", evidence, missing, open_gates)
+        strategy_route = route_for_strategy(repo, root, evidence, missing, open_gates)
+        return strategy_route if strategy_route
+
+        return strategy_handoff_route(repo, root, evidence, missing, open_gates)
       end
 
       plan_path = plans.find do |path|
@@ -910,7 +914,10 @@ module Verdify
         !%w[complete cancelled].include?(plan["status"].to_s.downcase) && !%w[COMPLETE CANCELLED].include?(state)
       end
       unless plan_path
-        return route_hash(repo, "SPRINT_CYCLE_COMPLETE", "sprint-planning", "issue-readiness", "All known sprints are complete or cancelled; select the next backlog outcome.", evidence, missing, open_gates)
+        strategy_route = route_for_strategy(repo, root, evidence, missing, open_gates)
+        return strategy_route if strategy_route
+
+        return strategy_handoff_route(repo, root, evidence, missing, open_gates)
       end
 
       plan = Verdify.safe_load_yaml(plan_path)
@@ -922,7 +929,7 @@ module Verdify
 
       contracts = Dir[plan_path.dirname.join("lanes/contracts/*.yaml")].map { |p| Pathname.new(p) }
       if contracts.empty?
-        missing << ".verdify/sprints/#{sprint_id}/lanes/contracts/<lane-id>.contract.yaml"
+        missing << ".agent-workflow/sprints/#{sprint_id}/lanes/contracts/<lane-id>.contract.yaml"
         return route_hash(repo, "LANE_TRANSACTION_INCOMPLETE", "sprint-planning", "lane-transaction", "The approved sprint has no lane contracts.", evidence, missing, open_gates)
       end
 
@@ -961,7 +968,40 @@ module Verdify
         return route_hash(repo, "OUTCOME_REVIEW_REQUIRED", "release-verification", "outcome-review", "Runtime verification exists but human outcome acceptance is missing or incomplete.", evidence, missing, open_gates)
       end
 
-      route_hash(repo, "SPRINT_COMPLETE", "sprint-planning", "issue-readiness", "The current sprint is accepted and verified; select the next GitHub backlog outcome.", evidence, missing, open_gates)
+      route_hash(repo, "SPRINT_COMPLETE", "state-of-union", "strategy-review", "The current sprint is accepted and verified; reconcile the backlog against the north-star goal before selecting the next outcome.", evidence, missing, open_gates)
+    end
+
+    def route_for_strategy(repo, root, evidence, missing, open_gates)
+      strategy_path = root.join("strategy/state-of-union.yaml")
+      unless strategy_path.file?
+        missing << strategy_path.relative_path_from(repo.root).to_s
+        return route_hash(repo, "STATE_OF_UNION_MISSING", "state-of-union", "strategy-review", "Approved foundations exist, but no strategy/backlog reconciliation has been recorded.", evidence, missing, open_gates)
+      end
+
+      strategy = Verdify.safe_load_yaml(strategy_path)
+      evidence << { "source" => strategy_path.relative_path_from(repo.root).to_s, "finding" => "state-of-union status is #{strategy['status'].inspect}" }
+      unless strategy["status"] == "approved" && strategy.dig("approval", "status") == "approved"
+        return route_hash(repo, "STATE_OF_UNION_UNAPPROVED", "state-of-union", "strategy-review", "The strategy/backlog reconciliation is missing approval.", evidence, missing, open_gates)
+      end
+
+      head = repo.head_sha
+      return nil if strategy["baseline_sha"].to_s == head
+
+      route_hash(repo, "STATE_OF_UNION_STALE", "state-of-union", "strategy-refresh", "The approved strategy was assessed against a different repository baseline.", evidence, missing, open_gates)
+    end
+
+    def strategy_handoff_route(repo, root, evidence, missing, open_gates)
+      strategy_path = root.join("strategy/state-of-union.yaml")
+      strategy = Verdify.safe_load_yaml(strategy_path)
+      handoff = strategy["handoff"] || {}
+      skill = handoff["next_skill"].to_s
+      mode = handoff["next_mode"].to_s
+      reason = handoff["reason"].to_s
+      if skill.empty? || mode.empty? || reason.empty?
+        return route_hash(repo, "STATE_OF_UNION_HANDOFF_INCOMPLETE", "state-of-union", "strategy-review", "The approved strategy does not name a complete handoff.", evidence, missing, open_gates)
+      end
+
+      route_hash(repo, "STATE_OF_UNION_HANDOFF", skill, mode, reason, evidence, missing, open_gates)
     end
 
     def route_hash(repo, state, skill, mode, reason, evidence, missing, open_gates)
@@ -985,6 +1025,7 @@ module Verdify
       case type
       when "project_definition" then ["project-definition", "gate-resolution"]
       when "architecture" then ["architecture-contracts", "gate-resolution"]
+      when "strategy" then ["state-of-union", "gate-resolution"]
       when "plan_approval" then ["sprint-planning", "plan-approval"]
       when "deployment_approval", "incident", "outcome_acceptance" then ["release-verification", "gate-resolution"]
       else ["sprint-orchestrator", "gate-management"]
@@ -992,13 +1033,13 @@ module Verdify
     end
 
     def resolve_contract_path(repo, sprint, lane_id, supplied)
-      path = supplied ? resolve_repo_path(repo, supplied) : repo.root.join(".verdify/sprints", sprint, "lanes/contracts/#{lane_id}.contract.yaml")
+      path = supplied ? resolve_repo_path(repo, supplied) : repo.root.join(".agent-workflow/sprints", sprint, "lanes/contracts/#{lane_id}.contract.yaml")
       raise UsageError, "lane contract not found: #{path}" unless path.file?
       path
     end
 
     def find_contract_by_lane(repo, lane_id)
-      matches = Dir[repo.root.join(".verdify/sprints/*/lanes/contracts/#{lane_id}.contract.yaml")].map { |p| Pathname.new(p) }
+      matches = Dir[repo.root.join(".agent-workflow/sprints/*/lanes/contracts/#{lane_id}.contract.yaml")].map { |p| Pathname.new(p) }
       raise UsageError, "no contract found for lane #{lane_id}" if matches.empty?
       raise UsageError, "multiple contracts found for lane #{lane_id}; specify a unique lane ID" if matches.length > 1
       matches.first
@@ -1094,10 +1135,12 @@ module Verdify
     end
 
     def all_leases(repo)
-      Dir[lease_dir(repo).join("*.json")].sort.filter_map do |path|
-        load_json(path)
-      rescue Error
-        nil
+      Dir[lease_dir(repo).join("*.json")].sort.each_with_object([]) do |path, leases|
+        begin
+          leases << load_json(path)
+        rescue Error
+          next
+        end
       end
     end
 

@@ -9,7 +9,7 @@ The Agent Skills specification defines a skill as a directory containing `SKILL.
 - https://agentskills.io/specification
 - https://agentskills.io/skill-creation/best-practices
 
-Verdify therefore exposes eight coherent skills instead of 17 tiny skills or one monolith, keeps each `SKILL.md` concise, and moves detailed procedures to focused references.
+Verdify therefore exposes nine coherent skills instead of 17 tiny skills or one monolith, keeps each `SKILL.md` concise, and moves detailed procedures to focused references.
 
 ## GitHub backlog and delivery primitives
 

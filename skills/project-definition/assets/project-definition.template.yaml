@@ -30,6 +30,31 @@ design:
   flows: []
   human_gates: []
   error_states: []
+lifecycle:
+  coverage: []
+  relationships: []
+  architecture_inputs:
+    system_context: []
+    architecture_decision_areas: []
+    quality_attributes: []
+    constraints: []
+    assumptions: []
+  delivery_operations:
+    environments: []
+    infrastructure: []
+    configuration: []
+    deployment: []
+    rollback: []
+    migrations: []
+    observability: []
+    support: []
+    incident_response: []
+    documentation: []
+  open_gaps: []
+  handoff_readiness:
+    architecture_contracts: []
+    sprint_planning: []
+    release_verification: []
 traceability: []
 approval:
   status: pending

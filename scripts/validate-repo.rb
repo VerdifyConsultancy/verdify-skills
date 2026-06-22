@@ -10,8 +10,8 @@ require_relative "../lib/verdify"
 ROOT = Pathname.new(File.expand_path("..", __dir__))
 SKILL_NAME_PATTERN = /\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
 REQUIRED_SKILLS = %w[
-  project-router project-definition architecture-contracts sprint-planning
-  sprint-orchestrator lane-delivery independent-critic release-verification
+  project-router project-definition architecture-contracts state-of-union
+  sprint-planning sprint-orchestrator lane-delivery independent-critic release-verification
 ].freeze
 REQUIRED_PR_SECTIONS = [
   "Backlog issue", "Lane contract", "Outcome", "Scope proof", "Evidence", "Risk and deployment impact"
@@ -75,6 +75,7 @@ class RepoValidator
     %w[
       README.md COMMON_OPERATING_CONTRACT.md AGENTS.md CLAUDE.md WORKFLOW.md AUTOMATION.md
       CONTRIBUTING.md SECURITY.md CHANGELOG.md VERSION Makefile verdify.workflow.yaml
+      package.json npm/bin/verdify.js
       config/authority-matrix.yaml config/github-primitives.yaml config/lifecycle.yaml
       bin/verdify scripts/validate-repo.rb scripts/setup-agent-hosts.rb scripts/pr-policy.rb
       scripts/bootstrap-agent-session.sh scripts/verify-package.sh .github/pull_request_template.md
@@ -240,7 +241,7 @@ class RepoValidator
   def validate_github_templates
     problem = load_yaml(ROOT.join(".github/ISSUE_TEMPLATE/problem.yml"))
     if problem.is_a?(Hash)
-      ids = Array(problem["body"]).filter_map { |item| item["id"] if item.is_a?(Hash) }
+      ids = Array(problem["body"]).map { |item| item["id"] if item.is_a?(Hash) }.compact
       %w[problem desired_outcome acceptance dependencies risk evidence].each do |id|
         error(ROOT.join(".github/ISSUE_TEMPLATE/problem.yml"), "missing field #{id}") unless ids.include?(id)
       end
@@ -290,6 +291,7 @@ class RepoValidator
     %w[
       bin/verdify scripts/setup-agent-hosts.rb scripts/validate-repo.rb scripts/pr-policy.rb
       scripts/bootstrap-agent-session.sh scripts/launch-codex.sh scripts/launch-claude.sh scripts/package.sh scripts/verify-package.sh
+      npm/bin/verdify.js tests/test_npm_install.sh
     ].each do |relative|
       path = ROOT.join(relative)
       next unless path.file?
@@ -298,12 +300,14 @@ class RepoValidator
         error(path, "Ruby syntax check failed") unless system("ruby", "-c", path.to_s, out: File::NULL, err: File::NULL)
       elsif path.extname == ".sh"
         error(path, "Bash syntax check failed") unless system("bash", "-n", path.to_s, out: File::NULL, err: File::NULL)
+      elsif path.extname == ".js"
+        error(path, "JavaScript syntax check failed") unless system("node", "--check", path.to_s, out: File::NULL, err: File::NULL)
       end
     end
   end
 
   def validate_examples
-    root = ROOT.join("examples/minimal-project/.verdify")
+    root = ROOT.join("examples/minimal-project/.agent-workflow")
     error(root, "complete example project is missing") unless root.directory?
     artifact_paths = Dir[root.join("**/*.{yaml,yml,json}")].sort.map { |p| Pathname.new(p) }
     artifact_paths.each do |path|
@@ -343,9 +347,9 @@ class RepoValidator
     assignments = Hash.new { |h, k| h[k] = [] }
     Array(plan["lanes"]).each do |lane|
       Array(lane["issue_ids"]).each { |issue| assignments[issue] << lane["lane_id"] }
-      contract_path = root.parent.parent.join(lane["contract_path"].to_s.sub(/\A\.verdify\//, ".verdify/"))
-      # The example root already points at .verdify; normalize directly if needed.
-      contract_path = root.join(lane["contract_path"].to_s.sub(/\A\.verdify\//, "")) unless contract_path.file?
+      contract_path = root.parent.parent.join(lane["contract_path"].to_s.sub(/\A\.agent-workflow\//, ".agent-workflow/"))
+      # The example root already points at .agent-workflow; normalize directly if needed.
+      contract_path = root.join(lane["contract_path"].to_s.sub(/\A\.agent-workflow\//, "")) unless contract_path.file?
       error(plan_path, "lane contract missing: #{lane['contract_path']}") unless contract_path.file?
     end
     assignments.each do |issue, lanes|

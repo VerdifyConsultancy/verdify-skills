@@ -8,7 +8,7 @@ next_skill: project-definition
 next_mode: requirements
 reason: Discovery is approved, but requirements are still draft.
 evidence:
-  - source: .verdify/project/project-definition.yaml
+  - source: .agent-workflow/project/project-definition.yaml
     finding: stage_status.requirements is draft
 missing_artifacts:
   - approved functional and non-functional requirements

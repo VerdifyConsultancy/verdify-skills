@@ -1,11 +1,11 @@
 ---
 name: sprint-planning
-description: Selects approved GitHub Issues for a bounded sprint and atomically creates the sprint plan, lane topology, and executable lane contracts. Use after architecture/module approval, when planning the next delivery slice, or when an existing sprint must be replanned before dispatch.
+description: Selects approved GitHub Issues for a bounded sprint and atomically creates the sprint plan, lane topology, and executable lane contracts. Use after approved state-of-union strategy identifies ready candidate issues, when planning the next delivery slice, or when an existing sprint must be replanned before dispatch.
 compatibility: Requires Git, approved project/module artifacts, and GitHub issue access or a current snapshot. No worktree is created until the complete plan transaction is approved.
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "4"
+  lifecycle-order: "5"
 ---
 
 # Sprint Planning
@@ -24,6 +24,7 @@ Use multiple issues in one lane only when they are inseparable at acceptance and
 
 - approved project definition;
 - approved architecture and relevant module contracts;
+- approved current state-of-union strategy naming candidate issues;
 - current GitHub issues, dependencies, and priorities;
 - baseline SHA and repository conventions;
 - no unresolved decision that invalidates the proposed scope.
@@ -44,11 +45,11 @@ Read `references/issue-readiness.md`, `references/planning-method.md`, and `refe
 
 ## Canonical outputs
 
-- `.verdify/sprints/<sprint-id>/sprint-plan.yaml`
-- `.verdify/sprints/<sprint-id>/sprint-plan.md`
-- `.verdify/sprints/<sprint-id>/lanes/lane-map.yaml`
-- `.verdify/sprints/<sprint-id>/lanes/contracts/<lane-id>.contract.yaml`
-- `.verdify/sprints/<sprint-id>/gates/plan-approval.yaml`
+- `.agent-workflow/sprints/<sprint-id>/sprint-plan.yaml`
+- `.agent-workflow/sprints/<sprint-id>/sprint-plan.md`
+- `.agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml`
+- `.agent-workflow/sprints/<sprint-id>/lanes/contracts/<lane-id>.contract.yaml`
+- `.agent-workflow/sprints/<sprint-id>/gates/plan-approval.yaml`
 
 Use `../../schemas/sprint-plan.schema.yaml`, `../../schemas/lane-contract.schema.yaml`, and `../../schemas/human-gate.schema.yaml`.
 

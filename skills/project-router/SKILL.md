@@ -1,6 +1,6 @@
 ---
 name: project-router
-description: Determines the next Verdify lifecycle skill and mode by inspecting repository state, GitHub backlog and delivery state, and approved .verdify artifacts. Use when starting or resuming a project, after a handoff, after sprint closure, or whenever lifecycle position and missing prerequisites are unclear.
+description: Determines the next Verdify lifecycle skill and mode by inspecting repository state, GitHub backlog and delivery state, and approved .agent-workflow artifacts. Use when starting or resuming a project, after a handoff, after sprint closure, or whenever lifecycle position and missing prerequisites are unclear.
 compatibility: Requires repository read access. Git is required; GitHub CLI is recommended when live GitHub state is relevant.
 metadata:
   author: Verdify
@@ -21,7 +21,7 @@ Decide exactly one next lifecycle action without doing that action's substantive
 
 ## Procedure
 
-1. Locate the repository root and identify the default branch, current branch, clean/dirty state, recent commits, open pull requests, active issues, and `.verdify` tree.
+1. Locate the repository root and identify the default branch, current branch, clean/dirty state, recent commits, open pull requests, active issues, and `.agent-workflow` tree.
 2. Run:
 
    ```bash
@@ -31,8 +31,8 @@ Decide exactly one next lifecycle action without doing that action's substantive
 3. Review the deterministic recommendation against material context that the CLI cannot judge, such as an explicit human request, a production incident, or an open decision gate.
 4. Classify missing information as `missing`, `stale`, `contradictory`, or `approval_required`.
 5. Write or update:
-   - `.verdify/router/route-decision.yaml`
-   - `.verdify/router/route-decision.md`
+   - `.agent-workflow/router/route-decision.yaml`
+   - `.agent-workflow/router/route-decision.md`
 6. Name one next skill and one mode. Explain prerequisites, why earlier stages are complete, and what must stop the next role.
 7. Hand off. Do not continue into implementation from the router role.
 
@@ -42,12 +42,13 @@ Use the first unmet condition:
 
 1. Incomplete project understanding or design surface -> `project-definition` in the earliest incomplete mode.
 2. Missing or stale system architecture/module contracts -> `architecture-contracts`.
-3. No approved bounded sprint/lane transaction -> `sprint-planning`.
-4. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
-5. A worker lane explicitly assigned to this session -> `lane-delivery`.
-6. Worker closeout awaiting fresh review -> `independent-critic`.
-7. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
-8. Completed cycle -> route to `project-router` for the next outcome.
+3. Missing or stale backlog/north-star execution strategy -> `state-of-union`.
+4. No approved bounded sprint/lane transaction -> `sprint-planning`.
+5. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
+6. A worker lane explicitly assigned to this session -> `lane-delivery`.
+7. Worker closeout awaiting fresh review -> `independent-critic`.
+8. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
+9. Completed cycle -> route to `state-of-union` for the next outcome.
 
 An urgent incident may route directly to `release-verification` only when the repository's incident policy authorizes it and the decision is recorded.
 

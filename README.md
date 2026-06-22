@@ -1,6 +1,6 @@
 # Verdify Lifecycle Skills
 
-Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages eight coherent Agent Skills, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
+Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages nine coherent Agent Skills, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
 
 The repository is deliberately not one giant sprint prompt. Each skill owns a bounded lifecycle responsibility, consumes durable artifacts, produces durable artifacts, and hands off without relying on hidden chat history.
 
@@ -12,6 +12,8 @@ project-router
        discovery -> requirements -> product -> design surface
   -> architecture-contracts
        north-star architecture -> black-box module contracts
+  -> state-of-union
+       backlog alignment -> execution strategy -> next sprint candidates
   -> sprint-planning
        issue selection -> sprint plan -> lane topology -> lane contracts
   -> sprint-orchestrator
@@ -23,7 +25,7 @@ project-router
   -> project-router
 ```
 
-The 17 detailed stages from the original outline remain represented in `verdify.workflow.yaml`; the eight top-level skills reduce activation ambiguity and context overhead.
+The 17 detailed stages from the original outline remain represented in `verdify.workflow.yaml`; the nine top-level skills reduce activation ambiguity and context overhead.
 
 ## Non-negotiable operating model
 
@@ -41,7 +43,7 @@ See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/la
 ## Repository contents
 
 ```text
-skills/                     Eight canonical Agent Skills
+skills/                     Nine canonical Agent Skills
 .agents/skills/             Codex discovery links
 .claude/skills/             Claude Code discovery links
 bin/verdify                 Dependency-free lifecycle CLI
@@ -57,7 +59,7 @@ There are no duplicated root prompt packs or schema copies inside individual ski
 
 ## Validate this package
 
-Requirements: Ruby 3.1+, Git, and Bash. GitHub CLI is required only for GitHub synchronization commands.
+Requirements: Ruby 3.1+, Git, and Bash. Node.js/npm are required for the `npx` installer test. GitHub CLI is required only for GitHub synchronization commands.
 
 ```bash
 make test
@@ -71,9 +73,40 @@ Release archives include `MANIFEST.sha256`. Verify an archive after download wit
 bash scripts/verify-package.sh /path/to/verdify-lifecycle-skills-v1.0.0.zip
 ```
 
-## Use in a target repository
+## Install in a target repository
 
-Initialize Verdify artifacts without vendoring the skills:
+Run one command from the target repository root:
+
+```bash
+npx @verdify/cli@latest init
+```
+
+Pin the version for reproducible setup:
+
+```bash
+npx @verdify/cli@1.0.0 init
+```
+
+The installer creates a small, explicit agent footprint:
+
+```text
+.agent-skills/
+  verdify-skills/
+    1.0.0/
+.agent-workflow/
+  config.yaml
+  router/
+  project/
+  architecture/
+  sprints/
+.agents/
+  skills/
+AGENTS.md
+```
+
+`.agent-skills` contains the installed Verdify skills package. `.agent-workflow` contains durable project workflow artifacts such as route decisions, definitions, contracts, sprint records, status, and evidence. `.agents/skills` contains host discovery symlinks into the installed package.
+
+Use the Ruby CLI directly when developing against a local checkout:
 
 ```bash
 /path/to/verdify-skills/bin/verdify init --repo /path/to/target
@@ -104,7 +137,7 @@ Compile a bounded worker prompt from authoritative inputs:
 ```bash
 bin/verdify prompt compile \
   --repo /path/to/target \
-  --contract .verdify/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml \
+  --contract .agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml \
   --role worker
 ```
 
@@ -139,7 +172,7 @@ bin/verdify github snapshot --repo OWNER/REPOSITORY --target /path/to/target
 bin/verdify github reconcile --repo-path /path/to/target --sprint 2026-06-22-a
 ```
 
-GitHub remains authoritative; `.verdify/github/snapshot.json` is an ignored cache.
+GitHub remains authoritative; `.agent-workflow/github/snapshot.json` is an ignored cache.
 
 ## Agent host setup
 

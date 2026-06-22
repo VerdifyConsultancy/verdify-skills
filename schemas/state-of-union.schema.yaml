@@ -1,0 +1,126 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/state-of-union.schema.yaml
+title: Verdify State Of Union Strategy
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, strategy_id, status, repository, baseline_sha, assessed_at, inputs, north_star, current_state, issue_inventory, gaps, recommended_sequence, next_sprint_candidates, actions, handoff, approval]
+properties:
+  schema_ref: {const: state-of-union.schema.yaml}
+  kind: {const: StateOfUnion}
+  schema_version: {const: "1.0"}
+  strategy_id: {type: string, pattern: '^[a-z0-9][a-z0-9-]*$'}
+  status: {type: string, enum: [draft, blocked, approved, superseded]}
+  repository: {type: string, minLength: 1}
+  baseline_sha: {type: string, minLength: 1}
+  assessed_at: {type: string, minLength: 1}
+  inputs:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, type, location, summary, evidence_status]
+      properties:
+        id: {type: string, pattern: '^IN-[0-9]{3,}$'}
+        type: {type: string}
+        location: {type: string}
+        summary: {type: string}
+        evidence_status: {type: string, enum: [verified, observed, reported, inferred, unknown]}
+  north_star:
+    type: object
+    additionalProperties: false
+    required: [goal, alignment_status, source_refs]
+    properties:
+      goal: {type: string, minLength: 1}
+      alignment_status: {type: string, enum: [aligned, drift, blocked, unknown]}
+      source_refs: {type: array, items: {type: string}}
+  current_state:
+    type: object
+    additionalProperties: false
+    required: [summary, lifecycle_state, active_sprint, open_gates, delivery_risks]
+    properties:
+      summary: {type: string, minLength: 1}
+      lifecycle_state: {type: string}
+      active_sprint: {type: [string, 'null']}
+      open_gates: {type: array, items: {type: string}}
+      delivery_risks: {type: array, items: {type: string}}
+  issue_inventory:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [issue, title, state, classification, rationale, dependencies, action]
+      properties:
+        issue: {type: [integer, 'null'], minimum: 1}
+        title: {type: string}
+        state: {type: string}
+        classification: {type: string, enum: [candidate, underspecified, stale, duplicate, blocked, missing, deferred, in_progress, done]}
+        rationale: {type: string}
+        dependencies: {type: array, items: {type: string}}
+        action: {type: string}
+  gaps:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, type, statement, owner, blocking, apply_through]
+      properties:
+        id: {type: string, pattern: '^GAP-[0-9]{3,}$'}
+        type: {type: string, enum: [issue, decision, product_definition, architecture, module_contract, delivery, deployment, evidence, external_dependency]}
+        statement: {type: string, minLength: 1}
+        owner: {type: string}
+        blocking: {type: boolean}
+        apply_through: {type: string, enum: [github_issue, github_dependency, human_gate, project_definition, architecture_contracts, sprint_planning, sprint_orchestrator, release_verification]}
+  recommended_sequence:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, outcome, issue_ids, prerequisites, risks, depends_on]
+      properties:
+        id: {type: string, pattern: '^SEQ-[0-9]{3,}$'}
+        outcome: {type: string, minLength: 1}
+        issue_ids: {type: array, items: {type: integer, minimum: 1}}
+        prerequisites: {type: array, items: {type: string}}
+        risks: {type: array, items: {type: string}}
+        depends_on: {type: array, items: {type: string}}
+  next_sprint_candidates:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [outcome, issue_ids, readiness, rationale, required_actions]
+      properties:
+        outcome: {type: string, minLength: 1}
+        issue_ids: {type: array, uniqueItems: true, items: {type: integer, minimum: 1}}
+        readiness: {type: string, enum: [ready, needs_issue_updates, blocked]}
+        rationale: {type: string}
+        required_actions: {type: array, items: {type: string}}
+  actions:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, type, target, owner, status]
+      properties:
+        id: {type: string, pattern: '^ACT-[0-9]{3,}$'}
+        type: {type: string, enum: [create_issue, update_issue, close_duplicate, set_dependency, open_gate, refresh_project_definition, refresh_architecture, plan_sprint, route, no_op]}
+        target: {type: string}
+        owner: {type: string}
+        status: {type: string, enum: [proposed, applied, blocked, not_applicable]}
+  handoff:
+    type: object
+    additionalProperties: false
+    required: [next_skill, next_mode, reason, required_before_handoff]
+    properties:
+      next_skill: {type: string, enum: [project-router, project-definition, architecture-contracts, state-of-union, sprint-planning, sprint-orchestrator, lane-delivery, independent-critic, release-verification]}
+      next_mode: {type: string, minLength: 1}
+      reason: {type: string, minLength: 1}
+      required_before_handoff: {type: array, items: {type: string}}
+  approval:
+    type: object
+    additionalProperties: false
+    required: [status, approver, approved_at]
+    properties:
+      status: {type: string, enum: [pending, approved, rejected]}
+      approver: {type: [string, 'null']}
+      approved_at: {type: [string, 'null']}

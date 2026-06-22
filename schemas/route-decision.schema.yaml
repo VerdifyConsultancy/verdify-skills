@@ -13,7 +13,7 @@ properties:
   current_state: {type: string, minLength: 1}
   next_skill:
     type: string
-    enum: [project-router, project-definition, architecture-contracts, sprint-planning, sprint-orchestrator, lane-delivery, independent-critic, release-verification]
+    enum: [project-router, project-definition, architecture-contracts, state-of-union, sprint-planning, sprint-orchestrator, lane-delivery, independent-critic, release-verification]
   next_mode: {type: string, minLength: 1}
   reason: {type: string, minLength: 1}
   evidence:

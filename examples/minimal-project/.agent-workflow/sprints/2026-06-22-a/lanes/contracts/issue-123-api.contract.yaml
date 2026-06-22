@@ -13,7 +13,7 @@ non_goals:
   - Change storage or deployment topology.
 baseline_sha: "1111111111111111111111111111111111111111"
 branch: lane/123-health-api
-module_contracts: [.verdify/modules/contracts/api-adapter.contract.yaml]
+module_contracts: [.agent-workflow/modules/contracts/api-adapter.contract.yaml]
 worktree_policy:
   one_coding_session_per_worktree: true
   lock_required: true

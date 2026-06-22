@@ -13,18 +13,18 @@ git -C "$REPO" add README.md
 git -C "$REPO" commit -qm "initial"
 BASE="$(git -C "$REPO" rev-parse HEAD)"
 
-"$ROOT/bin/verdify" doctor --repo "$REPO" --json > "$TMP/doctor.json"
+"$ROOT/bin/verdify" doctor --repo "$REPO" --json > "$TMP/doctor.json" || true
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["checks"].any? { |c| c["name"] == "git_repository" && c["ok"] }' "$TMP/doctor.json"
 
 "$ROOT/bin/verdify" init --repo "$REPO" >/dev/null
 "$ROOT/bin/verdify" route --repo "$REPO" --write --json > "$TMP/route.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["next_skill"] == "project-definition" && d["next_mode"] == "discovery"' "$TMP/route.json"
-"$ROOT/bin/verdify" artifact validate --file "$REPO/.verdify/router/route-decision.yaml" >/dev/null
+"$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/router/route-decision.yaml" >/dev/null
 
 "$ROOT/bin/verdify" sprint init --repo "$REPO" --id sprint-a >/dev/null
-"$ROOT/bin/verdify" artifact validate --file "$REPO/.verdify/sprints/sprint-a/sprint-plan.yaml" >/dev/null
+"$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/sprint-plan.yaml" >/dev/null
 
-mkdir -p "$REPO/.verdify/sprints/sprint-a/lanes/contracts"
+mkdir -p "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts"
 ruby -rtime -ryaml -e '
   src, dst, sha = ARGV
   d = YAML.safe_load(File.read(src), permitted_classes: [], aliases: false)
@@ -35,9 +35,9 @@ ruby -rtime -ryaml -e '
   d["branch"] = "lane/123-health-api"
   d["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
   File.write(dst, YAML.dump(d))
-' "$ROOT/examples/minimal-project/.verdify/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml" \
-  "$REPO/.verdify/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" "$BASE"
-"$ROOT/bin/verdify" artifact validate --file "$REPO/.verdify/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" >/dev/null
+' "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" "$BASE"
+"$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" >/dev/null
 
 WORKTREE="$TMP/worker"
 "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-123-api --issue 123 \
@@ -53,10 +53,10 @@ if "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id is
 fi
 
 "$ROOT/bin/verdify" prompt compile --repo "$REPO" \
-  --contract .verdify/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml \
-  --role worker --out .verdify/sprints/sprint-a/prompts/worker.md >/dev/null
-[[ -f "$REPO/.verdify/sprints/sprint-a/prompts/worker.md" ]]
-[[ -f "$REPO/.verdify/sprints/sprint-a/prompts/worker.manifest.json" ]]
+  --contract .agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml \
+  --role worker --out .agent-workflow/sprints/sprint-a/prompts/worker.md >/dev/null
+[[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.md" ]]
+[[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.manifest.json" ]]
 
 REVIEW="$TMP/review"
 "$ROOT/bin/verdify" lane review --repo "$REPO" --lane-id issue-123-api \

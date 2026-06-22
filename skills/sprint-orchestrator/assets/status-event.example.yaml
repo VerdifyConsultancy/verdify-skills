@@ -10,4 +10,4 @@ references:
   issue: 123
   pull_request: 456
   lease_id: issue-123-api
-  artifact: .verdify/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml
+  artifact: .agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml

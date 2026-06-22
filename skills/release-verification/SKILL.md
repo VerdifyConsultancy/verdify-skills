@@ -5,7 +5,7 @@ compatibility: Requires fresh integration context, GitHub checks/reviews, reposi
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "8"
+  lifecycle-order: "9"
 ---
 
 # Release Verification
@@ -30,7 +30,7 @@ Read `references/integration.md`.
 3. Verify commit SHA, image digest, configuration, migrations, health, logs, routes/UI behavior, data state, observability, and rollback readiness.
 4. Compare runtime behavior with sprint acceptance criteria.
 5. Roll back or open an incident gate when policy requires.
-6. Write `.verdify/sprints/<sprint-id>/release/release-verification.yaml` and validate against `../../schemas/release-verification.schema.yaml`.
+6. Write `.agent-workflow/sprints/<sprint-id>/release/release-verification.yaml` and validate against `../../schemas/release-verification.schema.yaml`.
 
 Read `references/deployment-verification.md` and `references/rollback.md`.
 
@@ -38,7 +38,7 @@ Read `references/deployment-verification.md` and `references/rollback.md`.
 
 Explain to the human what changed, what evidence proves it, what remains incomplete, what risks remain, and which follow-up issues were created. Record accepted, accepted-with-risks, rejected, or incomplete. Only then reconcile sprint/issue status according to policy.
 
-Write `.verdify/sprints/<sprint-id>/outcome/outcome-review.yaml` and validate against `../../schemas/outcome-review.schema.yaml`. Read `references/outcome-review.md`.
+Write `.agent-workflow/sprints/<sprint-id>/outcome/outcome-review.yaml` and validate against `../../schemas/outcome-review.schema.yaml`. Read `references/outcome-review.md`.
 
 ## Boundaries
 

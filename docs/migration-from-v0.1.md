@@ -7,6 +7,7 @@ The original repository exposed one `verdify-agentic-sprint` skill with a 16-pro
 | Original capability | Version 1.0 owner |
 |---|---|
 | Discover, ingest review, interview, synthesize | `project-definition` discovery/requirements modes |
+| Reconcile roadmap, backlog, issues, and north-star goal | `state-of-union` strategy review |
 | Plan sprint, decompose lanes, compile contracts | `sprint-planning` as one approved transaction |
 | Controller bootstrap/status guidance | `project-router` and `sprint-orchestrator` |
 | Worker start and closeout | `lane-delivery` |

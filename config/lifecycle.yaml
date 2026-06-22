@@ -10,25 +10,29 @@ skills:
   - name: architecture-contracts
     order: 3
     modes: [north-star-architecture, module-contracts]
-  - name: sprint-planning
+  - name: state-of-union
     order: 4
+    modes: [strategy-review, strategy-refresh, gate-resolution]
+  - name: sprint-planning
+    order: 5
     modes: [issue-readiness, sprint-plan, lane-transaction, plan-approval]
   - name: sprint-orchestrator
-    order: 5
+    order: 6
     modes: [dispatch, monitor, reconcile, gate-management]
   - name: lane-delivery
-    order: 6
+    order: 7
     modes: [implementation, closeout, fix-forward]
   - name: independent-critic
-    order: 7
+    order: 8
     modes: [lane-review, evidence-review, risk-review]
   - name: release-verification
-    order: 8
+    order: 9
     modes: [integration, deployment-verification, outcome-review]
 default_cycle:
   - project-router
   - project-definition
   - architecture-contracts
+  - state-of-union
   - sprint-planning
   - sprint-orchestrator
   - lane-delivery

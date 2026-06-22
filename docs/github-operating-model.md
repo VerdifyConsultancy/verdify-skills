@@ -37,4 +37,4 @@ Use GitHub environments or an equivalent deployment control with separate creden
 
 ## Local snapshots
 
-`bin/verdify github snapshot` writes `.verdify/github/snapshot.json` as an ignored cache. Refresh it before planning or reconciliation. It never overrides live GitHub state.
+`bin/verdify github snapshot` writes `.agent-workflow/github/snapshot.json` as an ignored cache. Refresh it before planning or reconciliation. It never overrides live GitHub state.

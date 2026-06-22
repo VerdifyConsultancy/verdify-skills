@@ -1,0 +1,14 @@
+---
+schema_ref: route-decision.schema.yaml
+kind: RouteDecision
+schema_version: '1.0'
+generated_at: '2026-06-22T21:05:23Z'
+repository: VerdifyConsultancy/verdify-skills
+current_state: PROJECT_DEFINITION_MISSING
+next_skill: project-definition
+next_mode: discovery
+reason: No canonical project definition exists.
+evidence: []
+missing_artifacts:
+- ".agent-workflow/project/project-definition.yaml"
+open_gates: []

@@ -48,7 +48,7 @@ lane = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
 contract = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
 errors << "lane ID is missing or still a placeholder" if lane.to_s.empty? || lane.include?("<!--")
 errors << "lane contract path is missing or still a placeholder" if contract.to_s.empty? || contract.include?("<!--")
-errors << "lane contract must be under .verdify/sprints/.../lanes/contracts" unless contract.to_s.match?(%r{\A\.verdify/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
+errors << "lane contract must be under .agent-workflow/sprints/.../lanes/contracts" unless contract.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
 
 reported_head = body[/^Current head SHA:\s*`?([0-9a-f]{40})`?\s*$/i, 1]
 errors << "Current head SHA must be a 40-character commit SHA" unless reported_head

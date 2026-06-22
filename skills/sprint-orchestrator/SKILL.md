@@ -5,7 +5,7 @@ compatibility: Requires Git, the Verdify CLI, approved sprint artifacts, and Git
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "5"
+  lifecycle-order: "6"
 ---
 
 # Sprint Orchestrator

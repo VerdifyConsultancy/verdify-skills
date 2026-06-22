@@ -11,7 +11,7 @@ Mandatory repository rules:
 - One issue, lane, branch, worktree, worker session, and pull request is the default unit of implementation.
 - Acquire a lane lease before coding and never share an active worktree between coding sessions.
 - Follow `COMMON_OPERATING_CONTRACT.md` and `config/authority-matrix.yaml`.
-- Use durable `.verdify` artifacts for approved definitions, contracts, status, and evidence.
+- Use durable `.agent-workflow` artifacts for approved definitions, contracts, status, and evidence.
 - A fresh critic must review lane output before integration.
 - Runtime deployment must be verified separately from merge success.
 

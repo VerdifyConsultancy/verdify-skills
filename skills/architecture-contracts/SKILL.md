@@ -1,6 +1,6 @@
 ---
 name: architecture-contracts
-description: Creates an approved north-star architecture and converts it into black-box module contracts with stable inputs, outputs, interfaces, ownership, invariants, and validation. Use after project definition, when architecture is missing or stale, or before parallel implementation lanes are planned.
+description: Creates an approved north-star architecture and converts it into black-box module contracts with stable inputs, outputs, interfaces, ownership, invariants, and validation. Use after project definition, when architecture is missing or stale, or before strategy review and parallel implementation lanes are planned.
 compatibility: Requires an approved project definition and repository access. Material security, migration, public-interface, or deployment decisions may require human approval.
 metadata:
   author: Verdify
@@ -14,13 +14,13 @@ Define the system before dividing implementation work. Architecture describes th
 
 ## Canonical artifacts
 
-- `.verdify/architecture/architecture.yaml`
-- `.verdify/architecture/north-star-architecture.md`
-- `.verdify/architecture/decisions/ADR-*.md`
-- `.verdify/modules/module-map.md`
-- `.verdify/modules/contracts/<module-id>.contract.yaml`
-- `.verdify/modules/dependency-graph.md`
-- `.verdify/modules/interface-risk-report.md`
+- `.agent-workflow/architecture/architecture.yaml`
+- `.agent-workflow/architecture/north-star-architecture.md`
+- `.agent-workflow/architecture/decisions/ADR-*.md`
+- `.agent-workflow/modules/module-map.md`
+- `.agent-workflow/modules/contracts/<module-id>.contract.yaml`
+- `.agent-workflow/modules/dependency-graph.md`
+- `.agent-workflow/modules/interface-risk-report.md`
 
 ## Mode 1: north-star architecture
 
@@ -61,4 +61,4 @@ Do not create sprint lanes in this skill. A module may take multiple sprints; a 
 
 ## Approval and handoff
 
-Architecture and module contracts must be approved, versioned on the default branch or in an approved PR, and free of blocking interface risks before handoff to `sprint-planning`.
+Architecture and module contracts must be approved, versioned on the default branch or in an approved PR, and free of blocking interface risks before handoff to `state-of-union`.

@@ -23,6 +23,17 @@
         "The answer does not dispatch or integrate the affected lane.",
         "The gate artifact and authorized resolver are identified."
       ]
+    },
+    {
+      "id": "strategy-before-sprint-planning",
+      "prompt": "A repository has approved project definition, architecture, and module contracts, but no state-of-union strategy has reconciled the open GitHub Issues against the north-star goal.",
+      "expected_output": "Routes to state-of-union/strategy-review before sprint-planning.",
+      "files": [],
+      "assertions": [
+        "The answer names state-of-union as the next skill.",
+        "The answer names strategy-review as the next mode.",
+        "The answer does not create sprint lane contracts."
+      ]
     }
   ]
 }

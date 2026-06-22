@@ -6,7 +6,7 @@ Closes #<!-- issue number -->
 
 - Sprint: `<!-- sprint-id -->`
 - Lane: `<!-- lane-id -->`
-- Contract: `<!-- .verdify/...contract.yaml -->`
+- Contract: `<!-- .agent-workflow/...contract.yaml -->`
 - Baseline SHA: `<!-- 40-character SHA -->`
 
 ## Outcome

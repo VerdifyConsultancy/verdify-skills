@@ -1,0 +1,28 @@
+{
+  "skill_name": "state-of-union",
+  "evals": [
+    {
+      "id": "north-star-backlog-reconciliation",
+      "prompt": "A repository has approved project and architecture artifacts plus twenty open GitHub Issues. Some issues are stale, two duplicate the same acceptance boundary, and three form the next coherent outcome toward the north-star goal.",
+      "expected_output": "Creates a state-of-union strategy that classifies issues, identifies stale and duplicate work, recommends a sequenced next outcome, and hands ready candidates to sprint-planning without creating lane contracts.",
+      "files": [],
+      "assertions": [
+        "Issue classifications are tied to durable evidence.",
+        "Duplicate and stale issues become proposed GitHub actions.",
+        "The next sprint candidate set is explicit.",
+        "Lane contracts are not created."
+      ]
+    },
+    {
+      "id": "stale-foundation-handoff",
+      "prompt": "The backlog contains issues for a new billing workflow, but the approved project definition and architecture do not mention billing, data retention, or payment-provider relationships.",
+      "expected_output": "Blocks sprint planning, records product and architecture gaps, and hands off to project-definition or architecture-contracts before selecting sprint lanes.",
+      "files": [],
+      "assertions": [
+        "Missing product or lifecycle intent is treated as a blocking gap.",
+        "The handoff names exactly one next skill and mode.",
+        "The strategy does not silently invent billing requirements."
+      ]
+    }
+  ]
+}

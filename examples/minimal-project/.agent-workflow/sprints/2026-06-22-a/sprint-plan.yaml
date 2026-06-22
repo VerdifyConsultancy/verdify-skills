@@ -28,7 +28,7 @@ risks:
 lanes:
   - lane_id: issue-123-api
     issue_ids: [123]
-    contract_path: .verdify/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml
+    contract_path: .agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml
     branch: lane/123-health-api
 dependency_order:
   - [issue-123-api]

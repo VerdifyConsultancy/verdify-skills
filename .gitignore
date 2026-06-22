@@ -3,5 +3,5 @@
 *.tmp
 /vendor/
 /.bundle/
-/.verdify-worktrees/
+/.agent-workflow-worktrees/
 /dist/

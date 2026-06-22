@@ -22,6 +22,17 @@
         "Human approval states and failure paths are explicit.",
         "The answer does not prematurely select implementation technology."
       ]
+    },
+    {
+      "id": "lifecycle-coverage-before-handoff",
+      "prompt": "A founder describes a new SaaS idea with users and features but no detail about hosting, environments, deployment, integrations, support, data retention, or vendor relationships.",
+      "expected_output": "Completes source-backed product and requirements work where possible, records lifecycle coverage gaps, and blocks approval until material delivery, operations, data, and relationship questions are resolved.",
+      "files": [],
+      "assertions": [
+        "Lifecycle coverage includes infrastructure, hosting, environments, deployment, operations, integrations, data, support, and relationships.",
+        "Material unknowns become explicit blocking gaps or human gates instead of hidden assumptions.",
+        "Architecture inputs are captured without selecting components or implementation technology."
+      ]
     }
   ]
 }

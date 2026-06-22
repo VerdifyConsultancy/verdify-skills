@@ -15,7 +15,7 @@ Closes #123
 
 - Sprint: \`sprint-a\`
 - Lane: \`issue-123-api\`
-- Contract: \`.verdify/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml\`
+- Contract: \`.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml\`
 - Baseline SHA: \`$BASE\`
 
 ## Outcome
@@ -40,7 +40,7 @@ EOF
 ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/valid.md" --base "$BASE" --head "$HEAD"
 
 cp "$TMP/valid.md" "$TMP/invalid.md"
-sed -i 's/Closes #123/Related issue #123/' "$TMP/invalid.md"
+ruby -0pi -e 'gsub("Closes #123", "Related issue #123")' "$TMP/invalid.md"
 if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/invalid.md" --base "$BASE" --head "$HEAD" >/dev/null 2>&1; then
   echo "expected PR policy to reject a body without a closing issue link" >&2
   exit 1

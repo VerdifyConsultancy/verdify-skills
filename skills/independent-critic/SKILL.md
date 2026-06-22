@@ -5,7 +5,7 @@ compatibility: Requires read access to the repository, pull request, checks, con
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "7"
+  lifecycle-order: "8"
 ---
 
 # Independent Critic
@@ -48,7 +48,7 @@ Review the lane; do not become its implementer.
 5. Assess evidence quality, limitations, and whether checks refer to the current revision.
 6. Search for architecture drift and cross-lane integration risk.
 7. Classify each finding by severity and cite concrete file, line, command, criterion, or evidence.
-8. Write `.verdify/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` and validate against `../../schemas/critic-report.schema.yaml`.
+8. Write `.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` and validate against `../../schemas/critic-report.schema.yaml`.
 9. Submit the corresponding GitHub review when authorized.
 
 Read `references/critic-rubric.md` and `references/evidence-review.md`.

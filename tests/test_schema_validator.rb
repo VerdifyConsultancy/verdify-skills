@@ -33,7 +33,7 @@ class SchemaValidatorTest < Minitest::Test
   end
 
   def test_validates_all_example_artifacts
-    root = Verdify::ROOT.join("examples/minimal-project/.verdify")
+    root = Verdify::ROOT.join("examples/minimal-project/.agent-workflow")
     artifacts = Dir[root.join("**/*.{yaml,yml,json}")]
     checked = 0
     artifacts.each do |path|
@@ -44,5 +44,62 @@ class SchemaValidatorTest < Minitest::Test
       checked += 1
     end
     assert_operator checked, :>=, 15
+  end
+
+  def test_semantic_rejects_approved_project_missing_lifecycle_coverage
+    path = Verdify::ROOT.join("examples/minimal-project/.agent-workflow/project/project-definition.yaml")
+    document = Verdify::SchemaValidator.load_document(path)
+    document["lifecycle"]["coverage"].reject! { |item| item["area"] == "infrastructure_hosting" }
+
+    errors = Verdify::SemanticValidator.validate(document)
+
+    assert errors.any? { |e| e.include?("missing coverage areas") && e.include?("infrastructure_hosting") }
+  end
+
+  def test_semantic_rejects_unknown_coverage_and_open_blocking_gap
+    path = Verdify::ROOT.join("examples/minimal-project/.agent-workflow/project/project-definition.yaml")
+    document = Verdify::SchemaValidator.load_document(path)
+    document["lifecycle"]["coverage"].first["status"] = "unknown"
+    document["lifecycle"]["open_gaps"] << {
+      "id" => "GAP-001",
+      "area" => "deployment_release_rollback",
+      "question" => "Who approves rollback?",
+      "impact" => "Deployment planning cannot proceed safely.",
+      "owner" => "delivery-owner",
+      "blocking" => true,
+      "status" => "open"
+    }
+
+    errors = Verdify::SemanticValidator.validate(document)
+
+    assert errors.any? { |e| e.include?("cannot contain unknown coverage") }
+    assert errors.any? { |e| e.include?("open blocking gaps") && e.include?("GAP-001") }
+  end
+
+  def test_semantic_rejects_approved_state_of_union_with_blocking_gap
+    path = Verdify::ROOT.join("examples/minimal-project/.agent-workflow/strategy/state-of-union.yaml")
+    document = Verdify::SchemaValidator.load_document(path)
+    document["gaps"] << {
+      "id" => "GAP-001",
+      "type" => "decision",
+      "statement" => "Rollback approval owner is unknown.",
+      "owner" => "delivery-owner",
+      "blocking" => true,
+      "apply_through" => "human_gate"
+    }
+
+    errors = Verdify::SemanticValidator.validate(document)
+
+    assert errors.any? { |e| e.include?("approved state of union has blocking gaps") && e.include?("GAP-001") }
+  end
+
+  def test_semantic_requires_candidates_for_sprint_planning_handoff
+    path = Verdify::ROOT.join("examples/minimal-project/.agent-workflow/strategy/state-of-union.yaml")
+    document = Verdify::SchemaValidator.load_document(path)
+    document["next_sprint_candidates"] = []
+
+    errors = Verdify::SemanticValidator.validate(document)
+
+    assert errors.any? { |e| e.include?("sprint-planning handoff requires next_sprint_candidates") }
   end
 end

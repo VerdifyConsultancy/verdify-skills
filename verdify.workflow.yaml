@@ -42,40 +42,51 @@ state_machine:
       actor: router
       skill: project-router
       mode: route
-      outputs: [.verdify/router/route-decision.yaml]
-      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, ORCHESTRATE, CRITIC_REVIEW, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
+      outputs: [.agent-workflow/router/route-decision.yaml]
+      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, ORCHESTRATE, CRITIC_REVIEW, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
     DEFINE_PROJECT:
       actor: planner
       skill: project-definition
       mode: earliest-incomplete
-      outputs: [.verdify/project/project-definition.yaml]
+      outputs: [.agent-workflow/project/project-definition.yaml]
       transitions: [PROJECT_DEFINITION_GATE, DEFINE_ARCHITECTURE, ROUTE]
     PROJECT_DEFINITION_GATE:
       actor: outcome_owner
       gate: project_definition
-      artifact: .verdify/gates/project-definition.yaml
+      artifact: .agent-workflow/gates/project-definition.yaml
       transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, CANCELLED]
     DEFINE_ARCHITECTURE:
       actor: planner
       skill: architecture-contracts
       mode: north-star-architecture-or-module-contracts
-      outputs: [.verdify/architecture/architecture.yaml, .verdify/modules/contracts]
-      transitions: [ARCHITECTURE_GATE, PLAN_SPRINT, ROUTE]
+      outputs: [.agent-workflow/architecture/architecture.yaml, .agent-workflow/modules/contracts]
+      transitions: [ARCHITECTURE_GATE, REVIEW_STRATEGY, ROUTE]
     ARCHITECTURE_GATE:
       actor: outcome_owner
       gate: architecture
-      artifact: .verdify/gates/architecture.yaml
-      transitions: [DEFINE_ARCHITECTURE, PLAN_SPRINT, CANCELLED]
+      artifact: .agent-workflow/gates/architecture.yaml
+      transitions: [DEFINE_ARCHITECTURE, REVIEW_STRATEGY, CANCELLED]
+    REVIEW_STRATEGY:
+      actor: planner
+      skill: state-of-union
+      mode: strategy-review
+      outputs: [.agent-workflow/strategy/state-of-union.yaml]
+      transitions: [STRATEGY_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, ROUTE]
+    STRATEGY_GATE:
+      actor: outcome_owner
+      gate: strategy
+      artifact: .agent-workflow/strategy/gates/state-of-union.yaml
+      transitions: [REVIEW_STRATEGY, DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, CANCELLED]
     PLAN_SPRINT:
       actor: planner
       skill: sprint-planning
       mode: issue-readiness-and-lane-transaction
-      outputs: [.verdify/sprints/<sprint-id>/sprint-plan.yaml, .verdify/sprints/<sprint-id>/lanes/lane-map.yaml, .verdify/sprints/<sprint-id>/lanes/contracts]
+      outputs: [.agent-workflow/sprints/<sprint-id>/sprint-plan.yaml, .agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml, .agent-workflow/sprints/<sprint-id>/lanes/contracts]
       transitions: [PLAN_APPROVAL_GATE, ROUTE]
     PLAN_APPROVAL_GATE:
       actor: outcome_owner
       gate: plan_approval
-      artifact: .verdify/sprints/<sprint-id>/gates/plan-approval.yaml
+      artifact: .agent-workflow/sprints/<sprint-id>/gates/plan-approval.yaml
       transitions: [PLAN_SPRINT, ORCHESTRATE, CANCELLED]
     ORCHESTRATE:
       actor: orchestrator
@@ -88,7 +99,7 @@ state_machine:
       mode: implementation-and-closeout
       lease_required: worker
       worktree_required: true
-      outputs: [.verdify/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml]
+      outputs: [.agent-workflow/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml]
       transitions: [CRITIC_REVIEW, RESOLVE_GATE]
     CRITIC_REVIEW:
       actor: critic
@@ -96,13 +107,13 @@ state_machine:
       mode: lane-review
       lease_required: critic
       separate_worktree_required: true
-      outputs: [.verdify/sprints/<sprint-id>/critic/<lane-id>.critic.yaml]
+      outputs: [.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml]
       transitions: [LANE_WORK, RESOLVE_GATE, ORCHESTRATE, INTEGRATE]
     RESOLVE_GATE:
       actor: outcome_owner
       skill: sprint-orchestrator
       mode: gate-management
-      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
+      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
     INTEGRATE:
       actor: integrator
       skill: release-verification
@@ -114,13 +125,13 @@ state_machine:
       skill: release-verification
       mode: deployment-verification
       deployment_approval_required: true
-      outputs: [.verdify/sprints/<sprint-id>/release/release-verification.yaml]
+      outputs: [.agent-workflow/sprints/<sprint-id>/release/release-verification.yaml]
       transitions: [REVIEW_OUTCOME, RESOLVE_GATE, CANCELLED]
     REVIEW_OUTCOME:
       actor: outcome_owner
       skill: release-verification
       mode: outcome-review
-      outputs: [.verdify/sprints/<sprint-id>/outcome/outcome-review.yaml]
+      outputs: [.agent-workflow/sprints/<sprint-id>/outcome/outcome-review.yaml]
       transitions: [SPRINT_ACCEPTED, PLAN_SPRINT, RESOLVE_GATE, CANCELLED]
     SPRINT_ACCEPTED:
       actor: outcome_owner
@@ -146,6 +157,7 @@ lane_child_workflow:
 gate_types:
   - project_definition
   - architecture
+  - strategy
   - plan_approval
   - decision
   - scope_change

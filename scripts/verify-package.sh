@@ -3,7 +3,7 @@ set -euo pipefail
 [[ $# -eq 1 ]] || { echo "Usage: scripts/verify-package.sh ARCHIVE.zip" >&2; exit 2; }
 archive="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 [[ -f "$archive" ]] || { echo "archive not found: $archive" >&2; exit 2; }
-for command in ruby unzip; do
+for command in node ruby unzip; do
   command -v "$command" >/dev/null || { echo "$command is required to verify Verdify" >&2; exit 1; }
 done
 TMP="$(mktemp -d)"

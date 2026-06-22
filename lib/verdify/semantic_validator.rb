@@ -4,6 +4,25 @@ module Verdify
   class SemanticValidator
     SHA_PATTERN = /\A[0-9a-f]{40}\z/i
     APPROVAL_REQUIRED_STATUSES = %w[approved active complete dispatched changes_requested].freeze
+    PROJECT_COVERAGE_AREAS = %w[
+      product_outcome
+      users_stakeholders_relationships
+      domain_data_model
+      scope_non_goals
+      design_surfaces
+      security_privacy_compliance
+      infrastructure_hosting
+      environments_configuration
+      integrations_dependencies
+      deployment_release_rollback
+      operations_observability_support
+      quality_testing_evidence
+      governance_ownership_approvals
+      documentation_enablement
+      cost_procurement_risk
+      migration_legacy
+      accessibility_localization
+    ].freeze
 
     def self.validate(document)
       new.validate(document)
@@ -16,6 +35,8 @@ module Verdify
       case document["kind"]
       when "ProjectDefinition"
         validate_project_definition(document, errors)
+      when "StateOfUnion"
+        validate_state_of_union(document, errors)
       when "ArchitectureDefinition", "ModuleContract"
         validate_approval(document, errors) if document["status"] == "approved"
       when "SprintPlan"
@@ -49,6 +70,44 @@ module Verdify
       stage_status = document["stage_status"] || {}
       incomplete = %w[discovery requirements product design_surface].reject { |stage| stage_status[stage] == "approved" }
       errors << "$.stage_status: approved project definition has incomplete stages: #{incomplete.join(', ')}" unless incomplete.empty?
+      validate_project_lifecycle(document, errors)
+    end
+
+    def validate_project_lifecycle(document, errors)
+      lifecycle = document["lifecycle"] || {}
+      coverage = Array(lifecycle["coverage"])
+      areas = coverage.map { |item| item["area"] }.compact
+      duplicates = areas.select { |area| areas.count(area) > 1 }.uniq
+      errors << "$.lifecycle.coverage: duplicate coverage areas: #{duplicates.join(', ')}" unless duplicates.empty?
+      missing = PROJECT_COVERAGE_AREAS - areas
+      errors << "$.lifecycle.coverage: approved project definition is missing coverage areas: #{missing.join(', ')}" unless missing.empty?
+
+      unknown = coverage.select { |item| item["status"] == "unknown" }.map { |item| item["area"] }
+      errors << "$.lifecycle.coverage: approved project definition cannot contain unknown coverage: #{unknown.join(', ')}" unless unknown.empty?
+
+      open_blocking = Array(lifecycle["open_gaps"]).select { |gap| gap["blocking"] == true && gap["status"] == "open" }
+      unless open_blocking.empty?
+        ids = open_blocking.map { |gap| gap["id"] }.join(", ")
+        errors << "$.lifecycle.open_gaps: approved project definition has open blocking gaps: #{ids}"
+      end
+    end
+
+    def validate_state_of_union(document, errors)
+      return unless document["status"] == "approved"
+
+      validate_approval(document, errors)
+      open_blocking = Array(document["gaps"]).select { |gap| gap["blocking"] == true }
+      unless open_blocking.empty?
+        ids = open_blocking.map { |gap| gap["id"] }.join(", ")
+        errors << "$.gaps: approved state of union has blocking gaps: #{ids}"
+      end
+
+      blocked_candidates = Array(document["next_sprint_candidates"]).select { |candidate| candidate["readiness"] == "blocked" }
+      errors << "$.next_sprint_candidates: approved state of union cannot hand off blocked sprint candidates" unless blocked_candidates.empty?
+
+      if document.dig("handoff", "next_skill") == "sprint-planning" && Array(document["next_sprint_candidates"]).empty?
+        errors << "$.handoff.next_skill: sprint-planning handoff requires next_sprint_candidates"
+      end
     end
 
     def validate_sprint_plan(document, errors)

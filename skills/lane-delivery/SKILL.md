@@ -5,7 +5,7 @@ compatibility: Requires Git, an active Verdify worker lease, repository build to
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "6"
+  lifecycle-order: "7"
 ---
 
 # Lane Delivery
@@ -53,7 +53,7 @@ Closeout is the final worker action, not a separate skill.
 3. Map evidence to every lane acceptance criterion.
 4. Confirm commits are pushed and PR/head SHA are current.
 5. Record untracked files, residual risks, discovered issues, and deployment implications.
-6. Write `.verdify/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml` and validate it against `../../schemas/lane-closeout.schema.yaml`.
+6. Write `.agent-workflow/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml` and validate it against `../../schemas/lane-closeout.schema.yaml`.
 7. Set the lane to `READY_FOR_CRITIC`; do not mark it integrated or complete.
 
 Read `references/closeout-procedure.md`.
