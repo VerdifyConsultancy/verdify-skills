@@ -78,13 +78,13 @@ bash scripts/verify-package.sh /path/to/verdify-lifecycle-skills-v1.0.0.zip
 Run one command from the target repository root:
 
 ```bash
-npx @verdify/cli@latest init
+npx @verdify-cli/cli@latest init
 ```
 
 Pin the version for reproducible setup:
 
 ```bash
-npx @verdify/cli@1.0.0 init
+npx @verdify-cli/cli@1.0.0 init
 ```
 
 The installer creates a small, explicit agent footprint:

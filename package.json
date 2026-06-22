@@ -1,5 +1,5 @@
 {
-  "name": "@verdify/cli",
+  "name": "@verdify-cli/cli",
   "version": "1.0.0",
   "description": "One-command installer and lifecycle CLI wrapper for Verdify agent skills.",
   "bin": {

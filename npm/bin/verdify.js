@@ -38,8 +38,8 @@ function usage() {
   return `Verdify CLI ${version}
 
 Usage:
-  npx @verdify/cli@${version} init [--repo PATH] [--host codex|claude|all] [--force]
-  npx @verdify/cli@${version} <verdify-command> [options]
+  npx @verdify-cli/cli@${version} init [--repo PATH] [--host codex|claude|all] [--force]
+  npx @verdify-cli/cli@${version} <verdify-command> [options]
 
 The init command installs the skills package under .agent-skills, links agent
 skills into .agents/skills, writes AGENTS.md instructions, and initializes
