@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "One-command installer and lifecycle CLI wrapper for Verdify agent skills.",
   "bin": {
-    "verdify": "./npm/bin/verdify.js"
+    "verdify": "npm/bin/verdify.js"
   },
   "files": [
     "AGENTS.md",
