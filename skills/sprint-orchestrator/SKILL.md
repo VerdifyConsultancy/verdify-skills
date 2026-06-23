@@ -14,7 +14,8 @@ Act as conductor, not worker, critic, or deployment operator.
 
 ## Start
 
-1. Read the approved sprint plan, plan gate, lane contracts, module contracts, and dependency order.
+1. Read the approved sprint plan, wave release plan when present, plan gate,
+   lane contracts, module contracts, and dependency order.
 2. Refresh GitHub state:
 
    ```bash
@@ -55,6 +56,10 @@ Handle durable events rather than polling chat narratives:
 - dependency completion;
 - lease expiry or abandoned worktree.
 
+Coordinate with `controller-loop` so dispatch, lease, closeout, critic,
+review, deployment, gate, and handoff transitions have session-ledger events or
+explicit exceptions.
+
 Read `references/state-machine.md` and `references/gate-management.md`.
 
 ## Reconcile
@@ -76,5 +81,5 @@ Read `references/github-reconciliation.md`.
 - Ready worker -> `lane-delivery`
 - Worker closeout -> fresh `independent-critic`
 - Critic changes requested -> original or newly leased `lane-delivery` session per policy
-- All required lanes approved -> `release-verification`
+- All required lanes approved -> `release-verification` review-inbox packet mode
 - Material replan -> `sprint-planning`

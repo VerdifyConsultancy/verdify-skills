@@ -1,0 +1,29 @@
+{
+  "skill_name": "northstar-interview",
+  "evals": [
+    {
+      "id": "review-ready-question-set",
+      "prompt": "A North Star has product and architecture drafts plus new SDLC evidence. Prepare interview questions before final lock approval.",
+      "expected_output": "Creates a prioritized interview packet with review findings, proposed defaults, options, tradeoffs, affected North Star IDs, evidence references, and answer capture rules without approving the North Star.",
+      "files": [],
+      "assertions": [
+        "Questions are prioritized as P0, P1, or P2.",
+        "Each material question includes a proposed default and tradeoffs.",
+        "Evidence references and affected North Star IDs are included.",
+        "Final lock approval is not recorded from inferred answers."
+      ]
+    },
+    {
+      "id": "answers-return-to-planning-loop",
+      "prompt": "Jason answers several North Star interview questions and changes a product priority.",
+      "expected_output": "Preserves the answers as feedback or evidence, routes accepted changes back to northstar-planning review-feedback or artifact-loop, and keeps protected approval separate.",
+      "files": [],
+      "assertions": [
+        "Human answers are not silently treated as final approval.",
+        "Accepted changes route back to the North Star planning loop.",
+        "Protected or high-impact changes remain proposed until approved.",
+        "The interview packet records disposition or next action."
+      ]
+    }
+  ]
+}

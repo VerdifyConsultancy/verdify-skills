@@ -1,0 +1,43 @@
+{
+  "skill_name": "northstar-planning",
+  "evals": [
+    {
+      "id": "research-to-plan",
+      "prompt": "A repository has transcript evidence, two research notes, and rough requirements. Create the North Star planning loop output.",
+      "expected_output": "Produces source-backed NORTHSTAR_PRODUCT.md, NORTHSTAR_ARCHITECTURE.md, northstar-artifacts.yaml, and the supporting synthesis/index with goals, requirements, user stories, architecture principles, milestones, risks, traceability, and one handoff.",
+      "files": [],
+      "assertions": [
+        "Research and transcript claims remain tied to source IDs.",
+        "Product goals and architecture principles are separated into the product and architecture artifacts but linked.",
+        "User stories include acceptance signals.",
+        "The artifacts record cross-links and open questions.",
+        "The output names exactly one next lifecycle handoff."
+      ]
+    },
+    {
+      "id": "artifact-loop-questions",
+      "prompt": "A repository has registered evidence but unresolved approval semantics and branch/wave identity. Iterate the North Star artifacts.",
+      "expected_output": "Updates the product and architecture North Star drafts, records NSQ planning questions in northstar-artifacts.yaml, answers what the evidence can answer, proposes follow-up research where needed, and keeps routing to the planning loop until the artifacts are ready for review.",
+      "files": [],
+      "assertions": [
+        "Planning questions appear in both the markdown artifact and loop YAML.",
+        "Ordinary planning questions are not treated as human gates.",
+        "The loop status is iterating, questions_open, or review_requested, not approved.",
+        "The next action is routed back to northstar-planning until the artifacts are ready for review.",
+        "Downstream skills are not allowed to treat the artifacts as signed-off authority."
+      ]
+    },
+    {
+      "id": "protected-design-gate",
+      "prompt": "Ideation proposes changing DESIGN_COMMITTED North Star content and starting Gravity implementation immediately.",
+      "expected_output": "Marks changes as proposed, recommends protected gates, keeps Gravity blocked, and does not start implementation.",
+      "files": [],
+      "assertions": [
+        "Protected design content is not silently edited.",
+        "Gravity implementation remains gated.",
+        "Human approval ownership is recorded.",
+        "Implementation lanes are not created."
+      ]
+    }
+  ]
+}

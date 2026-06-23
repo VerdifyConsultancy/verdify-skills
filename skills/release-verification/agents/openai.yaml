@@ -1,6 +1,6 @@
 interface:
   display_name: "Verdify Release Verification"
-  short_description: "Integrate, deploy, verify, and close outcomes"
-  default_prompt: "Perform only the next release-verification mode from durable evidence. Keep integration, deployment authorization, runtime verification, and outcome acceptance distinct."
+  short_description: "Review packets, diagnostics, deploy, and verify"
+  default_prompt: "Perform only the next release-verification mode from durable evidence. Keep review packets, diagnostics, integration, deployment authorization, runtime verification, and outcome acceptance distinct."
 policy:
   allow_implicit_invocation: false

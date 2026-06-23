@@ -1,0 +1,33 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-walk-transcript-agent-platform-gravity-skills
+reference: northstar://evidence/NSE-20260623-walk-transcript-agent-platform-gravity-skills
+title: 'Walk transcript: Agent Platform, Gravity, and Skills'
+evidence_type: transcript
+evidence_status: reported
+ingested_at: '2026-06-23T02:20:21Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/docs/northstar/evidence/2026-06-23-walk-transcript-agent-platform-gravity-skills.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-walk-transcript-agent-platform-gravity-skills-2026-06-23-walk-transcript-agent-platform-gravit"
+  sha256: b249abc5a0b7df64c650d753f7016562c957d4f0d3a8f8546ed7fe6fd19b4664
+summary: Reported transcript evidence for Gravity readiness, North Star governance,
+  transcript intake, repo hygiene, controller loops, platform readiness, observability,
+  and deployed review.
+tags:
+- agent-platform
+- gravity
+- northstar
+- skills
+- transcript
+claims:
+- Gravity implementation is blocked until the Agent Platform, SDLC skills, credentials,
+  namespaces, CI/CD, observability, and human-review workflow are ready and approved.
+- Walk transcripts are top-level planning input that should become structured proposed
+  changes.
+planning_relevance:
+- Feeds North Star planning, project definition, platform readiness, and Gravity readiness
+  gates.
+limitations: []

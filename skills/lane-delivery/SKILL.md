@@ -64,4 +64,7 @@ When the critic requests contract-scoped fixes, use a newly authorized coding se
 
 ## Handoff
 
-Provide contract, issue, PR, head SHA, closeout, evidence, and known risks to `independent-critic`. Do not reuse this session as critic.
+Provide contract, issue, PR, head SHA, closeout, evidence, known risks, session
+ID, lease/worktree refs, and artifact refs to `independent-critic` and
+`controller-loop` for session-ledger events. Do not reuse this session as
+critic.

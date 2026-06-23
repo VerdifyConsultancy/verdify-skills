@@ -1,0 +1,29 @@
+{
+  "skill_name": "controller-loop",
+  "evals": [
+    {
+      "id": "restartable-state",
+      "prompt": "A controller session loses chat context while two child lanes, one critic, and a human gate are active.",
+      "expected_output": "Reconstructs state from durable artifacts and session ledger, pauses at the human gate, and avoids double-dispatching workers.",
+      "files": [],
+      "assertions": [
+        "Durable artifacts are used instead of chat memory.",
+        "Open gates block protected progression.",
+        "Existing child sessions are preserved.",
+        "No duplicate worker session is launched."
+      ]
+    },
+    {
+      "id": "feedback-replan-loop",
+      "prompt": "Human review rejects a deployed preview and says the product direction changed.",
+      "expected_output": "Records the feedback event, routes to fix or replan based on scope, and does not continue to the next protected wave until dispositioned.",
+      "files": [],
+      "assertions": [
+        "Human feedback is linked to the wave and review evidence.",
+        "Protected product change routes to replan or project definition.",
+        "Next wave progression is blocked.",
+        "Controller state and handoff are updated."
+      ]
+    }
+  ]
+}

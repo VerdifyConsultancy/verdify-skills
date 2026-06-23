@@ -1,0 +1,84 @@
+---
+schema_ref: northstar-learning-proposals.schema.yaml
+kind: NorthStarLearningProposals
+schema_version: "1.0"
+project_id: verdify-skills
+status: staged
+generated_at: "2026-06-23T06:22:49Z"
+updated_at: "2026-06-23T06:22:49Z"
+source_ids:
+  - NSE-20260623-long-horizon-agent-compounding-learning
+  - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  - current-goal-2026-06-23-northstar-alignment-loop
+redaction_policy:
+  secrets_handling: Do not copy or summarize raw secrets, keys, private tokens, production data, or credential values into learning proposals.
+  sensitive_data_handling: Prefer source references, hashes, filenames, and summarized findings over raw session logs or personal data.
+  retained_source_scope: Retain only the evidence IDs, affected artifact paths, verifier results, and distilled lesson required to review the proposal.
+proposals:
+  - id: NLP-001
+    title: Add a typed North Star learning proposal packet.
+    source_refs:
+      - northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
+      - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md#arch-015-learning-capture-and-loop-readiness
+      - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md#product-008-surfaces-and-shapes
+    observed_issue_or_opportunity: The current North Star product and architecture define a learning-capture proposal packet, but without a schema or current packet the alignment loop remains mostly prose.
+    verification: Inspected skills, schemas, North Star artifacts, and current evidence registry; no `northstar-learning-proposals.schema.yaml` existed before this loop.
+    proposed_destination: artifact_schema
+    proposed_change: Add `schemas/northstar-learning-proposals.schema.yaml` and a current `.agent-workflow/northstar/learning-capture/` packet for proposal-only alignment improvements.
+    expected_benefit: Makes self-improvement queryable, reviewable, validateable, and safer by separating staged proposals from approved changes or recurring automation.
+    risk_class: low
+    approval_required: false
+    routing_decision: apply_now
+    affected_artifacts:
+      - schemas/northstar-learning-proposals.schema.yaml
+      - .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
+      - skills/northstar-planning/SKILL.md
+      - skills/northstar-planning/references/artifact-loop.md
+      - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+      - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+      - .agent-workflow/northstar/northstar-artifacts.yaml
+    loop_readiness:
+      recurs: Evidence, review feedback, session friction, and repeated corrections are recurring inputs to the North Star loop.
+      verifier: Validate proposal YAML, run repository validation, run tests, and keep final approval separate from proposal staging.
+      durable_state: Store proposal packets under `.agent-workflow/northstar/learning-capture/`.
+      stop_condition: Stop after staging or applying explicitly approved low-risk artifact-shape changes; do not schedule recurring session mining.
+      budget: No standing loop budget is defined; this is a manual alignment pass only.
+      objective_done_criteria: Schema validates, packet validates, North Star product/architecture reference the packet, and tests pass.
+      permissions: Local repo artifact edits only; no raw secrets, production mutation, or protected North Star lock approval.
+      manual_run_evidence: This manual Codex pass produced the first typed proposal packet and validation will be recorded in the final response.
+      ready_for_scheduling: false
+  - id: NLP-002
+    title: Keep recurring session mining unscheduled until loop readiness is proven.
+    source_refs:
+      - northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
+      - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md#product-010-planning-questions-and-research-queue
+    observed_issue_or_opportunity: Learning-capture evidence supports session mining, but the source, retention, redaction, and verifier policy is still an open planning question.
+    verification: "`NSQ-009` remains open in product, architecture, and `northstar-artifacts.yaml`."
+    proposed_destination: backlog_issue
+    proposed_change: "Keep recurring mining as a future issue until `NSQ-009` is resolved and at least one reliable manual run proves source scope, redaction, verifier, stop condition, and cost controls."
+    expected_benefit: Prevents useful self-improvement from becoming unbounded or unsafe background mutation.
+    risk_class: medium
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+      - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+      - .agent-workflow/northstar/northstar-plan.yaml
+    loop_readiness:
+      recurs: Session mining can recur, but only after the source and retention policy is approved.
+      verifier: A future verifier must reject duplicate, weakly evidenced, secret-bearing, or unsupported proposals.
+      durable_state: Future runs should append proposal packets or update a registry without relying on chat memory.
+      stop_condition: Stop after a fixed source window, iteration cap, or proposal count.
+      budget: Budget is unresolved; cost per accepted change should be tracked before scheduling.
+      objective_done_criteria: Human-approved source scope, redaction rules, verifier behavior, and one reliable manual run.
+      permissions: Read-only session evidence access and proposal staging only.
+      manual_run_evidence: This manual packet is the first narrow proof of proposal staging, not a proof of recurring mining.
+      ready_for_scheduling: false
+review:
+  status: not_requested
+  reviewers: [Skills maintainer]
+  approvals: []
+handoff:
+  next_skill: northstar-planning
+  next_mode: artifact-loop
+  reason: Use this packet as current alignment-loop evidence while continuing product and architecture iteration.

@@ -112,7 +112,7 @@ properties:
     additionalProperties: false
     required: [next_skill, next_mode, reason, required_before_handoff]
     properties:
-      next_skill: {type: string, enum: [project-router, project-definition, architecture-contracts, state-of-union, sprint-planning, sprint-orchestrator, lane-delivery, independent-critic, release-verification]}
+      next_skill: {type: string, enum: [project-router, transcript-replan, northstar-research-ingest, northstar-planning, project-definition, architecture-contracts, state-of-union, repo-hygiene, sprint-planning, sprint-orchestrator, controller-loop, platform-readiness, gravity-readiness, lane-delivery, independent-critic, release-verification]}
       next_mode: {type: string, minLength: 1}
       reason: {type: string, minLength: 1}
       required_before_handoff: {type: array, items: {type: string}}

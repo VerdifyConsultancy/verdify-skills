@@ -1,0 +1,40 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-environment-gitops-implementation-best-p
+reference: northstar://evidence/NSE-20260623-environment-gitops-implementation-best-p
+title: Environment GitOps implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T18:58:38Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-environment-gitops-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-environment-gitops-implementation-best-p-2026-06-23-environment-gitops-best-practices-md"
+  sha256: 668646fa78de0c3ccd39e4c6fb67209f7c692a020a4a61dbde669ad40bf9e56b
+summary: Primary-source research for a first stable environment GitOps reconciliation
+  contract, covering OpenGitOps principles, Argo CD sync/health/ApplicationSet preview
+  behavior, Flux Kustomization and HelmRelease status/remediation, Kubernetes namespace
+  controls, and GitHub deployment environments.
+tags:
+- argocd
+- environment-gitops
+- flux
+- gitops
+- kubernetes
+- platform-readiness
+- release-verification
+claims:
+- Environment GitOps reconciliation should distinguish desired state from observed
+  controller and runtime state, recording controller status, namespace controls, deployment
+  evidence, health signals, drift, remediation, rollback, review gates, and handoff.
+- First implementation should remain a platform-readiness artifact consumed by sprint
+  planning and release verification, not an unauthorized environment mutation mechanism.
+planning_relevance:
+- Supports environment-gitops, PRQ-006, PRQ-014, PRQ-017, ARCH-005, ARCH-009, platform
+  readiness, wave release planning, release verification, and OpenClaw release-path
+  workflows.
+limitations:
+- This evidence defines reconciliation artifact shape and stop conditions; it does
+  not grant cluster, GitOps, or production mutation authority.

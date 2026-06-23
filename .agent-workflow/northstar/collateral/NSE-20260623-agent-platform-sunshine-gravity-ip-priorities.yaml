@@ -1,0 +1,56 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+reference: northstar://evidence/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+title: Agent Platform, Sunshine Gravity, OpenClaw, and owned-IP priorities
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-06-23T05:06:47Z'
+source:
+  uri:
+  original_path:
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities-2026-06-23-planning-review.md"
+  sha256: 790df877ca7e9c043145899ede2338e10f79e5a49c826c08d827e4e731767b7e
+summary: Planning evidence combining Jason's latest priority answers with observed Agent Platform,
+  Sunshine Club Gravity, OpenClaw, and Orbit repository/runtime context. It reframes the
+  owned-IP priority as a self-hosted software-and-knowledge operating plane, makes
+  `agents.vallery.net` API/MCP-first with UI as operator console, and identifies Sunshine
+  Club as the reference implementation to mine for reusable Gravity core capabilities.
+tags:
+- agent-platform
+- api-first
+- cicd
+- gravity
+- hermes
+- k3s
+- mcp
+- openclaw
+- owned-ip
+- sunshine-club
+- source-control
+claims:
+- The core product should include source control, CI/CD, pipeline, k3s management,
+  agent orchestration, and evidence/knowledge workflows rather than only agent delivery.
+- "`agents.vallery.net` should be planned API/MCP-first for higher-level planning agents, with the UI acting primarily as inspection, review, recovery, and operator console."
+- Gravity should remain blocked until a non-Gravity pilot proves the delivery loop, and
+  its first MVP story is local filesystem evidence ingestion.
+- Sunshine Club already contains substantial reusable Gravity substrate, including
+  filesystem ingestion, SHA-256 identity, managed S3 source objects, Postgres/Qdrant
+  state, search, MCP tools, review queues, vault projection, workers, and Kubernetes
+  deployment.
+- Sunshine-specific naming, paths, environment variables, taxonomy, and business-story
+  assumptions mean Gravity reuse should happen through extraction into a generic core
+  plus organization-specific packs rather than a direct copy.
+- OpenClaw/Hermes should be treated as a higher-level planning and conversation layer
+  above Agent Platform control APIs.
+planning_relevance:
+- Updates the North Star product boundary, priority sequence, owned-IP strategy, platform
+  surface model, Agent Platform readiness scope, Gravity readiness sequencing, and
+  Sunshine-to-Gravity extraction plan.
+limitations:
+- Combines user-reported priorities with sampled local repository and cluster observations.
+- Does not represent a complete code audit of Sunshine Club, Agent Platform, OpenClaw,
+  or Orbit.
+- Does not record final North Star lock approval.

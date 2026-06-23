@@ -1,0 +1,37 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-source-control-migration-local-forges
+reference: northstar://evidence/NSE-20260623-source-control-migration-local-forges
+title: Source-control migration and local forge patterns
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:08:00Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-source-control-migration-local-forges.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-source-control-migration-local-forges-2026-06-23-source-control-migration-local-forges"
+  sha256: f65495bbfb36c142ed612660d503bb700195c1850322e005df178222a1fee504
+summary: Primary-source research comparing GitLab, Gitea, and Forgejo documentation
+  for imports, CI runners, package/container registry, mirroring, and GitHub authority
+  migration planning.
+tags:
+- cicd
+- forgejo
+- gitea
+- gitlab
+- platform-readiness
+- registry
+- source-control
+claims:
+- GitLab provides first-class GitHub import, CI/CD, runners, and container registry
+  capabilities but expands readiness scope across import, runner, registry, environment,
+  and policy operations.
+- Gitea and Forgejo provide lighter local forge options with Actions-like runners
+  and package/container registry support.
+- Verdify should keep GitHub as delivery authority until a specific migration ADR
+  changes issue, PR, check, review, and deployment ownership.
+planning_relevance:
+- Supports PRQ-010, ARQ-010, ARCH-009, and source-control migration readiness planning.
+limitations: []

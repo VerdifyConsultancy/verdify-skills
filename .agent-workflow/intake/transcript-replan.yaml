@@ -1,0 +1,250 @@
+---
+schema_ref: transcript-replan.schema.yaml
+kind: TranscriptReplan
+schema_version: '1.0'
+source_id: SRC-NS-002
+status: routed
+generated_at: '2026-06-23T19:30:23Z'
+repositories:
+- VerdifyConsultancy/verdify-skills
+- jvallery/agents
+- multi_repo
+- unresolved/vast-tco-calculator
+items:
+- id: TR-001
+  category: direction
+  statement: Every active repository across Jason, Emily, James, and shared organizations should eventually have an assigned controller agent with durable state and standard fleet operating expectations.
+  original_phrase: semantic normalization of the repo-controller fleet walk, not a literal transcript
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: platform-readiness
+  next_action: Define the repo-controller bootstrap workflow and fleet inventory standard before broad rollout.
+  protected_artifact_impact: proposed_change
+- id: TR-002
+  category: requirement
+  statement: A repo-bootstrap self-discovery workflow must inspect repo contents, documentation, Git history, GitHub state, Kubernetes namespace resources, pods, utilization, deployments, logs, metrics, routes, secret references, credential validation status, storage mounts, CI/CD shape, and runtime/package requirements.
+  original_phrase: semantic normalization of the repo self-discovery skill request
+  evidence_status: reported
+  target_repository: VerdifyConsultancy/verdify-skills
+  lifecycle_phase: repo-hygiene
+  next_action: Add repo-bootstrap as a workflow or mode spanning repo-hygiene, platform-readiness, controller-loop, state-of-union, and northstar-planning.
+  protected_artifact_impact: proposed_change
+- id: TR-003
+  category: requirement
+  statement: Bootstrap output must include a standard project inventory, updated AGENTS.md, namespace and environment mapping, gap assessment, recommended backlog issues, and a proposed PR for repo-local planning changes.
+  original_phrase: semantic normalization of the standard templated project artifact request
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: project-definition
+  next_action: Define a project inventory artifact and link it to project-definition, repo-hygiene, and state-of-union.
+  protected_artifact_impact: proposed_change
+- id: TR-004
+  category: architecture_input
+  statement: Repo controllers should run with durable workspace storage, local worktree/session awareness, tmux/web/API visibility, and Agent Platform MCP or control operations that can dispatch and monitor worktree agents.
+  original_phrase: semantic normalization of controller pod, PVC, tmux, web UI, and MCP control requirements
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: controller-loop
+  next_action: Feed Agent Platform control API, session ledger, and controller-loop architecture.
+  protected_artifact_impact: proposed_change
+- id: TR-005
+  category: requirement
+  statement: Repository, namespace, and environment naming should be standardized around repository identity, with explicit rules for owner or organization prefixes and dev, preview, staging, and production namespace sets.
+  original_phrase: semantic normalization of repo name and namespace alignment discussion
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: platform-readiness
+  next_action: Resolve namespace naming convention and encode it in platform readiness plus environment GitOps contracts.
+  protected_artifact_impact: proposed_change
+- id: TR-006
+  category: architecture_input
+  statement: Least privilege remains the default, but infrastructure domain agents such as networking, storage, backup, and platform agents may need broader scoped access to their owned systems, credentials, logs, metrics, and change history.
+  original_phrase: semantic normalization of networking, storage, backup, and project-specific agent access boundaries
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: platform-readiness
+  next_action: Add domain-agent authority boundaries and approval gates to platform readiness.
+  protected_artifact_impact: approval_required
+- id: TR-007
+  category: requirement
+  statement: Secret and credential discovery must record references, auth modes, scopes, owners, validation results, and failure modes without copying raw secrets into prompts, artifacts, logs, or commits.
+  original_phrase: semantic normalization of secret inventory and validation request
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: platform-readiness
+  next_action: Specify safe credential validation probes and redaction rules.
+  protected_artifact_impact: approval_required
+- id: TR-008
+  category: requirement
+  statement: Agent workspaces must make durable controller state, Git worktrees, repo source, and authorized NFS or PVC mounts understandable inside the pod and visible in VS Code or equivalent remote workspaces.
+  original_phrase: semantic normalization of NFS mount, persistent storage, and VS Code view requirements
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: platform-readiness
+  next_action: Add workspace mount inventory and visibility checks to repo bootstrap and platform readiness.
+  protected_artifact_impact: proposed_change
+- id: TR-009
+  category: requirement
+  statement: Repo discovery should recommend useful base-container packages; fleet operators should consolidate recommendations into versioned prebuilt images with registry cache, regular rebuilds, regression checks, and rollback procedure.
+  original_phrase: semantic normalization of base image package recommendation and rollback requirements
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: platform-readiness
+  next_action: Define image recommendation, rebuild, regression, and rollback policy as platform readiness work.
+  protected_artifact_impact: proposed_change
+- id: TR-010
+  category: requirement
+  statement: Controller loops must persist state, reset or resume contexts safely, manage inner worktree loops, emit metrics, update dashboards, and trigger alert or recovery behavior when loops or pods fail.
+  original_phrase: semantic normalization of outer loop, inner loop, dashboard, alert, and recovery requirements
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: controller-loop
+  next_action: Extend controller-loop, session-ledger, observability diagnostic, and Alertmanager routing plans.
+  protected_artifact_impact: proposed_change
+- id: TR-011
+  category: user_story
+  statement: As Jason, I can ask Orbit or the higher-level planner for a daily operating brief that synthesizes email, calendar, GitHub, repo controllers, issues, PRs, agent health, and recent agent activity.
+  original_phrase: semantic normalization of the good morning Orbit request
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: northstar-planning
+  next_action: Route to an Orbit/Hermes/OpenClaw product surface after source, privacy, and connector boundaries are defined.
+  protected_artifact_impact: proposed_change
+- id: TR-012
+  category: requirement
+  statement: The skill architecture and decisions should receive an adversarial evidence-backed audit, including Brave/API-backed research where external evidence is needed, with evidence scoring and traceability into the North Star evidence vault.
+  original_phrase: semantic normalization of the Brave-backed adversarial audit request
+  evidence_status: reported
+  target_repository: VerdifyConsultancy/verdify-skills
+  lifecycle_phase: northstar-planning
+  next_action: Add adversarial audit expectations to North Star planning and state-of-union review.
+  protected_artifact_impact: proposed_change
+- id: TR-013
+  category: requirement
+  statement: Planning and documentation consensus should include adversarial Codex and Claude review, lane-owner review, and stakeholder lenses such as product, management, finance, infrastructure, SRE, and security before final plan consensus.
+  original_phrase: semantic normalization of bidirectional Codex/Claude and lane-owner review loop
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: northstar-planning
+  next_action: Extend North Star review script and planning questions with consensus-review roles and acceptance signals.
+  protected_artifact_impact: proposed_change
+- id: TR-014
+  category: question
+  statement: Should the repository controller be based on Codex, Claude, or a controller abstraction that can select the model per task and failure mode?
+  original_phrase: semantic normalization of Claude controller versus Codex controller uncertainty
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: architecture-contracts
+  next_action: Resolve model/controller abstraction in Agent Platform architecture after manual pilot evidence.
+  protected_artifact_impact: proposed_change
+- id: TR-015
+  category: question
+  statement: What exact namespace naming convention should be used for owner, organization, repo, dev, preview, staging, and production namespace identity?
+  original_phrase: semantic normalization of repo name, GitHub ID dash repo name, and environment namespace discussion
+  evidence_status: reported
+  target_repository: jvallery/agents
+  lifecycle_phase: platform-readiness
+  next_action: Decide and document the naming rule before fleet bootstrap.
+  protected_artifact_impact: proposed_change
+- id: TR-016
+  category: conflict
+  statement: Broad infrastructure-domain access and self-service mount configuration are in tension with least privilege, storage ownership, and secret-boundary controls.
+  original_phrase: semantic normalization of infrastructure agents with broad access and repo agents configuring mounts
+  evidence_status: reported
+  target_repository: multi_repo
+  lifecycle_phase: platform-readiness
+  next_action: Open platform/security approval gate before implementing broad access or self-service storage mutation.
+  protected_artifact_impact: approval_required
+- id: TR-017
+  category: memory
+  statement: A VAST TCO calculator follow-up should compare object storage tiers and pricing/performance assumptions, but it belongs to a separate owning repository or workstream once identified.
+  original_phrase: semantic normalization of the VAST TCO calculator object storage comparison aside
+  evidence_status: reported
+  target_repository: unresolved/vast-tco-calculator
+  lifecycle_phase: transcript-replan
+  next_action: Route to the owning repo or project when identified; do not fold it into Verdify Skills North Star requirements.
+  protected_artifact_impact: none
+conflicts:
+- id: CON-001
+  statement: Broad infrastructure-domain agent access conflicts with default least-privilege repo-agent boundaries unless authority, owners, scopes, auditing, and approval gates are explicit.
+  existing_authority: COMMON_OPERATING_CONTRACT.md, existing North Star security/RBAC sections, and secret-injection evidence.
+  proposed_change: Allow networking, storage, backup, and platform domain agents to hold broader scoped access to owned systems while repo agents remain namespace-scoped.
+  owner: Jason, platform owner, and security owner
+  blocking: true
+- id: CON-002
+  statement: Self-service NFS/PVC mount creation by repo controllers conflicts with storage ownership and change-control boundaries unless mediated by approved platform/storage APIs.
+  existing_authority: Existing platform-readiness least-privilege and environment GitOps rules.
+  proposed_change: Let local repo controllers request or configure mounts for data work.
+  owner: Storage infrastructure owner and platform owner
+  blocking: true
+proposed_artifact_changes:
+- path: .agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml
+  change_type: create
+  summary: Register the semantic walk intake as North Star evidence.
+  approval_required: false
+- path: .agent-workflow/northstar/evidence-registry.yaml
+  change_type: update
+  summary: Add the repo-controller bootstrap and fleet self-discovery evidence item.
+  approval_required: false
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Add repo-bootstrap, fleet self-discovery, Orbit daily brief, image recommendation, and consensus-review product requirements.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add repo-controller bootstrap, namespace/storage/credential topology, controller observability, and alert-to-agent architecture inputs.
+  approval_required: true
+- path: .agent-workflow/northstar/northstar-plan.yaml
+  change_type: update
+  summary: Add structured goals, requirements, user stories, principles, risks, questions, and traceability for repo-controller bootstrap.
+  approval_required: true
+- path: skills/repo-hygiene
+  change_type: update
+  summary: Proposed future work to add repo-bootstrap/self-discovery mode or workflow facade.
+  approval_required: false
+- path: skills/platform-readiness
+  change_type: update
+  summary: Proposed future work to validate namespace naming, storage mounts, base image recommendations, credential references, and domain-agent authority.
+  approval_required: false
+- path: skills/controller-loop
+  change_type: update
+  summary: Proposed future work to validate controller loop metrics, alert recovery, and fleet dashboard integration.
+  approval_required: false
+issue_recommendations:
+- title: Define repo-controller bootstrap and self-discovery workflow
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Specify the cross-skill workflow for controller agents to inventory a repo, GitHub state, Kubernetes namespace, logs, metrics, secrets references, storage mounts, CI/CD shape, package needs, and planning gaps, then produce AGENTS.md/project inventory/issue recommendations/PR output.
+  labels: [northstar, repo-hygiene, bootstrap]
+- title: Define fleet namespace, storage, secret, and domain-agent authority standard
+  repository: jvallery/agents
+  body_summary: Decide namespace naming, owner/repo/environment cardinality, NFS/PVC mount request flow, credential validation rules, infrastructure domain-agent authority, and repo-agent least-privilege boundaries.
+  labels: [platform, security, namespaces]
+- title: Implement controller loop observability and alert-to-agent recovery design
+  repository: jvallery/agents
+  body_summary: Define Prometheus/Grafana dashboards, loop metrics, session ledger signals, Alertmanager routing, controller/pod recovery behavior, and outstanding-work rehydration.
+  labels: [controller-loop, observability, reliability]
+- title: Define Orbit daily operating brief and cross-repo review loop
+  repository: multi_repo
+  body_summary: Specify the daily brief sources, privacy/connector boundaries, repo-controller status model, PR/issue review cadence, and human approval flow for Orbit or the higher-level planning agent.
+  labels: [orbit, planning, product]
+- title: Route VAST TCO calculator object-storage comparison to owning repo
+  repository: unresolved/vast-tco-calculator
+  body_summary: Capture the separate follow-up for S3, S3 One Zone-IA, Azure Blob Hot/Premium, object size, read/write mix, throughput, IOPS, SLA, and tail-latency comparison once the owning repository is identified.
+  labels: [routing, tco, follow-up]
+gate_recommendations:
+- type: platform_security_authority
+  owner: Jason, platform owner, and security owner
+  reason: Broad domain-agent access, credential validation, and self-service storage mount changes require explicit access model and approval before implementation.
+  blocking: true
+- type: fleet_bootstrap_readiness
+  owner: Jason and platform owner
+  reason: Running bootstrap across 30+ repo controllers should wait for namespace naming, inventory schema, safe credential probes, and controller recovery behavior to be specified.
+  blocking: true
+handoff:
+  next_skill: northstar-planning
+  next_mode: artifact-loop
+  reason: The semantic walk evidence has been routed and registered; North Star product and architecture drafts need artifact-loop synthesis before downstream project-definition or implementation work consumes it.
+approval:
+  status: pending
+  approver: null
+  approved_at: null

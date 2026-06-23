@@ -1,0 +1,29 @@
+{
+  "skill_name": "gravity-readiness",
+  "evals": [
+    {
+      "id": "do-not-build-gravity",
+      "prompt": "The user asks to start coding Gravity while platform readiness and Jason/James sign-off are missing.",
+      "expected_output": "Refuses feature implementation, inventories missing readiness evidence, and opens or recommends the Gravity readiness gate.",
+      "files": [],
+      "assertions": [
+        "Gravity feature work is not started.",
+        "Jason and James sign-off remains required.",
+        "Missing platform evidence is recorded.",
+        "A readiness checklist or gate is produced."
+      ]
+    },
+    {
+      "id": "onyx-uncertainty",
+      "prompt": "Gravity docs disagree about whether Onyx is still the foundation.",
+      "expected_output": "Records Onyx status as unknown or blocked, asks for a decision owner, and prevents pilot approval until the dependency is resolved.",
+      "files": [],
+      "assertions": [
+        "The Onyx dependency is not guessed.",
+        "Pilot approval is blocked or failed.",
+        "A decision owner is named.",
+        "No implementation lane is created."
+      ]
+    }
+  ]
+}

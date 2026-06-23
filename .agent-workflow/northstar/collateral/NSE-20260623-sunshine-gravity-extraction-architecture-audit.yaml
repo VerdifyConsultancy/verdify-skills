@@ -1,0 +1,37 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-sunshine-gravity-extraction-architecture-audit
+reference: northstar://evidence/NSE-20260623-sunshine-gravity-extraction-architecture-audit
+title: Sunshine Gravity extraction architecture audit
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:15:22Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-sunshine-gravity-extraction-architecture-audit.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-sunshine-gravity-extraction-architecture-audit-2026-06-23-sunshine-gravity-extraction-architect"
+  sha256: 9dec8e0c0ab78c9bbb8e397bb4c5349a777ba38fbf32b12a63ecc1e441e0ec02
+summary: Source-boundary audit comparing Sunshine Club's implemented Gravity-like
+  substrate with Verdify Gravity's generic core and Sunshine client-pack target shape.
+tags:
+- architecture
+- gravity
+- gravity-core-extraction
+- mcp
+- source-boundary
+- sunshine-club
+claims:
+- Sunshine Club has substantial reusable Gravity-like implementation, but package
+  names, env vars, paths, MCP instructions, business stories, and corpus assumptions
+  remain Sunshine-specific.
+- Verdify Gravity already defines a cleaner verdify_gravity core package and clients/sunshine
+  pack boundary for generic core plus client-specific source setup.
+- Extraction should port generic scanner, SHA-256/object staging, Postgres pipeline,
+  readiness, read-only MCP, and validation contracts first, while keeping Sunshine
+  taxonomy/prompts/business stories in a client pack.
+planning_relevance:
+- Supports PRQ-019, ARQ-018, WAVE-005, Gravity readiness, and Sunshine-to-Gravity
+  migration planning.
+limitations: []

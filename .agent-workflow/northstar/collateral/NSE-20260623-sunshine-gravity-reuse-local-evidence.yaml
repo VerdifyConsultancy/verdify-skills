@@ -1,0 +1,51 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-sunshine-gravity-reuse-local-evidence
+reference: northstar://evidence/NSE-20260623-sunshine-gravity-reuse-local-evidence
+title: Sunshine Gravity reuse local evidence
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:50:52Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-sunshine-gravity-reuse-local-evidence.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-sunshine-gravity-reuse-local-evidence-2026-06-23-sunshine-gravity-reuse-local-evidence"
+  sha256: 5f31450cc3753956e708c6c1a2221cc542c2ad99f19f81fcc19d497948694896
+summary: Observed local Sunshine Club evidence for reusable Gravity file-to-knowledge
+  substrate, including NAS/SHA/S3/Postgres/Qdrant/vault/MCP/review/root-of-trust surfaces
+  and the generic-core versus Sunshine-pack boundary.
+tags:
+- evidence-ingestion
+- file-to-knowledge
+- gravity
+- gravity-core-extraction
+- mcp
+- postgres
+- qdrant
+- review
+- s3
+- sunshine-club
+- vault
+claims:
+- Sunshine Club documents a production model where source paths remain provenance,
+  SHA-256 identified bytes are copied into managed S3 source objects, and downstream
+  processing uses the managed object after ingest.
+- Sunshine planning makes content_sha256 the durable unit of progress and demotes
+  runs to audit/provenance rather than ownership of file intelligence.
+- Sunshine architecture separates generic Gravity file enrichment from Sunshine-specific
+  prompt/schema pack enrichment.
+- Sunshine implementation includes source-byte resolution by content_sha256, Gravity
+  artifact services, vault projection, review store, governed Gravity MCP tools, and
+  root-of-trust verification.
+- Sunshine has tests and scripts around Gravity readiness, vault projection, review
+  queues, root-of-trust, S3 storage, reconciliation, Kubernetes/NAS smoke, production
+  audits, and pipeline health.
+planning_relevance:
+- Supports the North Star Sunshine-to-Gravity extraction path and the plan to pilot
+  local filesystem evidence ingestion only after platform readiness and review workflow
+  are approved.
+limitations:
+- Local repository evidence only; live GitHub, Argo CD, Kubernetes, object-store,
+  model gateway, and production corpus state were not audited.

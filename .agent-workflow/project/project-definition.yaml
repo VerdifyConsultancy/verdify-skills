@@ -1,0 +1,474 @@
+---
+schema_ref: project-definition.schema.yaml
+kind: ProjectDefinition
+schema_version: '1.0'
+project_id: verdify-skills
+status: draft
+stage_status:
+  discovery: draft
+  requirements: pending
+  product: pending
+  design_surface: pending
+sources:
+- id: SRC-001
+  type: repository_doc
+  location: README.md
+  summary: Describes Verdify as an end-to-end GitHub-native lifecycle skills package with routing, definition, architecture, strategy, planning, orchestration, delivery, criticism, release verification, and new readiness loops.
+  evidence_status: observed
+- id: SRC-002
+  type: repository_doc
+  location: COMMON_OPERATING_CONTRACT.md
+  summary: Defines universal Verdify rules for evidence, typed authority, GitHub backlog truth, one issue per lane by default, worktree leases, role purity, production protection, and completion evidence.
+  evidence_status: observed
+- id: SRC-003
+  type: northstar_evidence
+  location: docs/northstar/evidence/2026-06-23-walk-transcript-agent-platform-gravity-skills.md
+  summary: Reported walk transcript extraction establishes Gravity readiness gate, North Star governance, transcript-to-replan, repo hygiene, controller, platform readiness, observability, and deployed-review requirements.
+  evidence_status: reported
+- id: SRC-004
+  type: lifecycle_artifact
+  location: .agent-workflow/intake/transcript-replan.yaml
+  summary: Routes transcript evidence into proposed lifecycle changes, conflicts, issue recommendations, and gates.
+  evidence_status: observed
+- id: SRC-005
+  type: architecture_decision
+  location: docs/decisions/ADR-0004-readiness-loop-skills.md
+  summary: Adds first-class transcript-replan, repo-hygiene, controller-loop, platform-readiness, and gravity-readiness skills as readiness loops around the original delivery lifecycle.
+  evidence_status: observed
+- id: SRC-006
+  type: lifecycle_artifact
+  location: .agent-workflow/northstar/northstar-plan.yaml
+  summary: Draft North Star planning artifact that synthesizes routed transcript evidence into goals, requirements, user stories, architecture principles, milestones, risks, open questions, conflicts, issues, gates, and handoff.
+  evidence_status: observed
+- id: SRC-007
+  type: architecture_decision
+  location: docs/decisions/ADR-0006-northstar-evidence-registry.md
+  summary: Adds a CLI-backed North Star evidence registry so research is copied, hashed, tagged, referenced, and queryable before planning synthesis.
+  evidence_status: observed
+- id: SRC-008
+  type: architecture_decision
+  location: docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md
+  summary: Splits the North Star into iterative product and architecture markdown artifacts with a machine-readable questions/review/signoff record.
+  evidence_status: observed
+decisions:
+- id: DEC-001
+  statement: GitHub Issues, pull requests, checks, reviews, releases, and deployments remain the delivery control plane.
+  status: approved
+  rationale: Existing operating model and ADRs assign typed authority to GitHub primitives for backlog and delivery evidence.
+  source_ids: [SRC-001, SRC-002]
+- id: DEC-002
+  statement: The skills package now includes North Star research ingestion, North Star planning, and five readiness-loop skills in addition to the original delivery skills.
+  status: proposed
+  rationale: North Star evidence requires a research registry, planning synthesis loop, transcript intake, repo hygiene, durable controller state, platform readiness, and Gravity readiness before autonomous feature execution.
+  source_ids: [SRC-003, SRC-004, SRC-005, SRC-006, SRC-007]
+- id: DEC-003
+  statement: Gravity implementation remains blocked until platform and readiness gates are approved by Jason and James.
+  status: proposed
+  rationale: The transcript states an immediate Gravity gate and positions Gravity as a gated pilot rather than the first implementation target.
+  source_ids: [SRC-003, SRC-004]
+assumptions:
+- id: ASM-001
+  statement: The canonical skills repository for this work is VerdifyConsultancy/verdify-skills.
+  status: validated
+- id: ASM-002
+  statement: Agent Platform API and MCP contracts will be supplied by or reconciled with jvallery/agents rather than invented in this repository alone.
+  status: open
+contradictions:
+- id: CON-001
+  statement: The transcript explores one branch per wave, while current Verdify policy defaults to one issue, lane, branch, worktree, session, pull request, and preview.
+  source_ids: [SRC-002, SRC-003, SRC-004]
+  status: open
+requirements:
+  functional:
+  - id: FR-001
+    statement: The package must provide triggerable lifecycle skills from transcript intake through verified release.
+    source_ids: [SRC-001, SRC-003, SRC-005]
+    acceptance_ids: [AC-001, AC-002]
+  - id: FR-002
+    statement: New transcript or walk evidence must be routed into proposed changes, conflicts, issue recommendations, and gates before protected artifacts are edited.
+    source_ids: [SRC-003, SRC-004]
+    acceptance_ids: [AC-003]
+  - id: FR-006
+    statement: Registered research, ideation, transcript evidence, and rough requirements must be synthesized into a North Star planning artifact before project definition or architecture consume them.
+    source_ids: [SRC-003, SRC-004, SRC-006, SRC-007]
+    acceptance_ids: [AC-010]
+  - id: FR-007
+    statement: Research files must be ingestible into North Star collateral with stable evidence references and queryable registry entries.
+    source_ids: [SRC-007]
+    acceptance_ids: [AC-011]
+  - id: FR-008
+    statement: North Star planning must produce separate product and architecture artifacts plus a loop/signoff record before downstream skills treat them as planning authority.
+    source_ids: [SRC-008]
+    acceptance_ids: [AC-012]
+  - id: FR-003
+    statement: Repositories must pass Wave 0 hygiene or record explicit blockers before feature execution.
+    source_ids: [SRC-003, SRC-005]
+    acceptance_ids: [AC-004]
+  - id: FR-004
+    statement: The lifecycle must support a persistent controller loop with durable state, child session records, gates, waves, and handoffs.
+    source_ids: [SRC-003, SRC-005]
+    acceptance_ids: [AC-005]
+  - id: FR-005
+    statement: Platform and Gravity readiness must be represented as triggerable skills and machine-checkable artifacts before Gravity feature work.
+    source_ids: [SRC-003, SRC-004, SRC-005]
+    acceptance_ids: [AC-006]
+  non_functional:
+  - id: NFR-001
+    category: traceability
+    statement: Requirements, decisions, stories, gates, issues, PRs, tests, deployments, and reviews must trace back to source evidence or approved decisions.
+    source_ids: [SRC-002, SRC-003]
+    acceptance_ids: [AC-007]
+  - id: NFR-002
+    category: governance
+    statement: Human gates must prevent protected design drift, premature Gravity implementation, production changes, and unreviewed wave progression.
+    source_ids: [SRC-002, SRC-003]
+    acceptance_ids: [AC-008]
+  - id: NFR-003
+    category: operability
+    statement: Review-ready work must include CI evidence, a deployed environment where relevant, exact human test steps, observability evidence, and rollback information.
+    source_ids: [SRC-003]
+    acceptance_ids: [AC-009]
+  constraints:
+  - id: CST-001
+    statement: GitHub remains the backlog and delivery control plane until an approved migration changes that authority.
+    source_ids: [SRC-001, SRC-002]
+  - id: CST-002
+    statement: One issue equals one lane, branch, worktree, worker session, pull request, and preview by default until the wave-branch conflict is resolved.
+    source_ids: [SRC-002, SRC-004]
+  - id: CST-003
+    statement: Gravity feature implementation cannot begin from this repository until the Gravity readiness gate is approved.
+    source_ids: [SRC-003, SRC-004]
+  acceptance_criteria:
+  - id: AC-001
+    statement: Repository validation recognizes every canonical skill, host link, schema, workflow transition, and evaluation pack.
+    evidence_expected: [ruby scripts/validate-repo.rb]
+  - id: AC-002
+    statement: Full package tests pass after lifecycle-skill changes.
+    evidence_expected: [make test]
+  - id: AC-003
+    statement: '`bin/verdify route` sends repositories with unprocessed North Star evidence to `transcript-replan`.'
+    evidence_expected: [tests/test_cli.sh]
+  - id: AC-010
+    statement: '`northstar-planning` defines a planning artifact with goals, requirements, user stories, architecture principles, milestones, risks, conflicts, traceability, issues, gates, and handoff.'
+    evidence_expected: [skills/northstar-planning/SKILL.md, schemas/northstar-plan.schema.yaml, .agent-workflow/northstar/northstar-plan.yaml]
+  - id: AC-011
+    statement: '`northstar-research-ingest` registers research through `bin/verdify northstar ingest-research` and makes it discoverable through `bin/verdify northstar evidence list`.'
+    evidence_expected: [skills/northstar-research-ingest/SKILL.md, schemas/northstar-evidence-item.schema.yaml, schemas/northstar-evidence-registry.schema.yaml, tests/test_cli.sh]
+  - id: AC-012
+    statement: '`northstar-planning` maintains `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md`, and `northstar-artifacts.yaml` through questions, review, and signoff.'
+    evidence_expected: [skills/northstar-planning/SKILL.md, schemas/northstar-artifacts.schema.yaml, .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml]
+  - id: AC-004
+    statement: '`repo-hygiene` defines pass/warn/fail/blocked areas and completion criteria before sprint planning.'
+    evidence_expected: [schemas/repo-hygiene.schema.yaml, skills/repo-hygiene/SKILL.md]
+  - id: AC-005
+    statement: '`controller-loop` defines durable state, session records, events, gates, next actions, and handoff.'
+    evidence_expected: [schemas/controller-state.schema.yaml, skills/controller-loop/SKILL.md]
+  - id: AC-006
+    statement: '`platform-readiness` and `gravity-readiness` produce machine-checkable readiness artifacts and stop before Gravity implementation.'
+    evidence_expected: [schemas/platform-readiness.schema.yaml, schemas/gravity-readiness.schema.yaml]
+  - id: AC-007
+    statement: Project artifacts include source IDs and traceability records linking requirements to evidence.
+    evidence_expected: [.agent-workflow/project/project-definition.yaml]
+  - id: AC-008
+    statement: Gate types cover repo hygiene, platform readiness, and Gravity readiness.
+    evidence_expected: [verdify.workflow.yaml, lib/verdify/cli.rb]
+  - id: AC-009
+    statement: Release and readiness skills preserve deployed-review, observability, human test, and rollback expectations.
+    evidence_expected: [skills/release-verification/SKILL.md, skills/platform-readiness/SKILL.md, skills/gravity-readiness/SKILL.md]
+product:
+  primary_users:
+  - id: USR-001
+    name: Jason
+    needs:
+    - Speak planning intent naturally and have agents preserve, route, and operationalize it without losing governance.
+    - Review deployed, evidence-backed work instead of supervising every agent step.
+  - id: USR-002
+    name: James
+    needs:
+    - Co-approve protected North Star and Gravity readiness decisions with clear evidence and unresolved questions.
+  - id: USR-003
+    name: Worktree agent
+    needs:
+    - Receive bounded lane contracts, ownership rules, environment permissions, and stop conditions.
+  problem_statement: Verdify needs to become a self-building SDLC skill system that can turn transcript evidence into governed requirements, skills, loops, gates, and delivery artifacts, then use those artifacts to drive Gravity to completion without bypassing human or platform readiness controls.
+  jobs_to_be_done:
+  - Ingest and route planning transcripts across repositories.
+  - Define project intent, architecture, and execution strategy from durable evidence.
+  - Gate repositories through hygiene, platform readiness, and Gravity readiness.
+  - Dispatch, monitor, review, verify, and accept implementation waves through durable artifacts.
+  scope:
+  - Lifecycle skills and trigger rules.
+  - Machine-checkable schemas and templates.
+  - CLI routing and validation support.
+  - Host discovery links for Codex and Claude.
+  - Evidence-backed project definition and readiness records.
+  non_goals:
+  - Implementing Gravity product features before readiness approval.
+  - Applying production infrastructure changes from planning skills.
+  - Replacing GitHub with a local Git service in this phase.
+  success_metrics:
+  - id: MET-001
+    measure: Canonical skills recognized by validator
+    target: Validator reports sixteen skills and all required schemas.
+  - id: MET-002
+    measure: Transcript evidence routing
+    target: Route command selects `transcript-replan` when North Star evidence is unrouted.
+  - id: MET-003
+    measure: Gravity gate preservation
+    target: Gravity readiness skill and intake artifact both prohibit feature implementation before approval.
+  risks:
+  - The platform surface may expand faster than readiness evidence can be validated.
+  - Branch/wave identity remains unresolved and could break automation if encoded prematurely.
+  - Approval semantics for Jason and James are still open.
+design:
+  surfaces:
+  - id: SURF-001
+    type: skill
+    actor: Codex or Claude session
+    purpose: Trigger bounded lifecycle procedures with progressive disclosure.
+    inputs: [user request, repository state, .agent-workflow artifacts]
+    outputs: [validated artifacts, handoff, proposed issues, gates]
+    requirement_ids: [FR-001, FR-002, FR-003, FR-004, FR-005]
+  - id: SURF-002
+    type: cli
+    actor: Router or operator
+    purpose: Validate artifacts, route lifecycle state, ingest research, initialize workflows, manage lanes, and compile prompts.
+    inputs: [repository path, artifacts, research files, Git state]
+    outputs: [route decision, validation result, evidence registry entry, lease, prompt manifest]
+    requirement_ids: [FR-001, FR-002, FR-007]
+  - id: SURF-003
+    type: artifact
+    actor: Lifecycle skills and controller
+    purpose: Persist intent, requirements, readiness, gates, sessions, and evidence independently of chat history.
+    inputs: [source evidence, decisions, runtime evidence]
+    outputs: [.agent-workflow YAML and Markdown views]
+    requirement_ids: [FR-002, FR-003, FR-004, FR-005, NFR-001]
+  - id: SURF-005
+    type: planning_artifact
+    actor: North Star planning agent
+    purpose: Convert registered research, ideation, requirements, and routed transcript evidence into product and architecture North Star artifacts with a structured signoff record.
+    inputs: [routed transcript intake, evidence registry, registered collateral, requirements, ideation, current artifacts]
+    outputs: [.agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml, .agent-workflow/northstar/northstar-plan.yaml]
+    requirement_ids: [FR-006, FR-007, FR-008, NFR-001]
+  - id: SURF-004
+    type: human_gate
+    actor: Jason and James
+    purpose: Approve protected changes, readiness gates, and Gravity pilot execution.
+    inputs: [readiness checklist, conflicts, risks, proposed decisions]
+    outputs: [approved, rejected, changes requested]
+    requirement_ids: [FR-005, NFR-002]
+  flows:
+  - id: FLOW-001
+    name: Transcript to routed project work
+    steps:
+    - Pin transcript as North Star evidence.
+    - Run `transcript-replan`.
+    - Run `northstar-research-ingest` for research files that need stable references.
+    - Run `northstar-planning`.
+    - Convert routed items and planning synthesis into project definition, architecture inputs, issues, or gates.
+    - Route to the earliest incomplete lifecycle skill.
+    acceptance_ids: [AC-003, AC-007, AC-010, AC-011]
+  - id: FLOW-002
+    name: Readiness before Gravity
+    steps:
+    - Run repo hygiene.
+    - Run platform readiness and non-Gravity pilot planning.
+    - Run Gravity readiness inventory and checklist.
+    - Require Jason and James sign-off before Gravity implementation lanes.
+    acceptance_ids: [AC-004, AC-006, AC-008]
+  human_gates:
+  - Jason and James approval semantics for protected North Star changes.
+  - Repo hygiene exception approval.
+  - Platform readiness approval.
+  - Gravity readiness and pilot approval.
+  error_states:
+  - Transcript claim conflicts with existing authority.
+  - Required readiness evidence is missing.
+  - Agent attempts Gravity implementation before readiness approval.
+  - Session or branch identity is ambiguous.
+lifecycle:
+  coverage:
+  - id: COV-001
+    area: product_outcome
+    status: covered
+    summary: Product outcome is a governed SDLC skill package capable of driving future Gravity work through evidence-backed loops.
+    source_ids: [SRC-001, SRC-003, SRC-004]
+    requirement_ids: [FR-001, FR-005]
+    decision_ids: [DEC-002, DEC-003]
+  - id: COV-002
+    area: design_surfaces
+    status: covered
+    summary: Skill, CLI, artifact, research registry, North Star planning, and human-gate surfaces are identified for the current draft.
+    source_ids: [SRC-001, SRC-004, SRC-006, SRC-007]
+    requirement_ids: [FR-001, FR-002, FR-004, FR-006, FR-007, FR-008]
+    decision_ids: [DEC-002]
+  - id: COV-003
+    area: governance_ownership_approvals
+    status: unknown
+    summary: Jason and James approval semantics are known to be required but not yet defined.
+    source_ids: [SRC-003, SRC-004]
+    requirement_ids: [NFR-002]
+    decision_ids: []
+  - id: COV-004
+    area: infrastructure_hosting
+    status: deferred
+    summary: Agent Platform and Kubernetes readiness must be reconciled through `platform-readiness`.
+    source_ids: [SRC-003, SRC-004]
+    requirement_ids: [FR-005, NFR-003]
+    decision_ids: []
+  - id: COV-005
+    area: deployment_release_rollback
+    status: deferred
+    summary: Existing release-verification covers deployment proof, but rollback and deployed-review expectations need reconciliation against the new evidence.
+    source_ids: [SRC-001, SRC-003]
+    requirement_ids: [NFR-003]
+    decision_ids: []
+  - id: COV-006
+    area: operations_observability_support
+    status: deferred
+    summary: Observability is a core requirement and is initially represented in platform readiness; project-specific telemetry contracts remain to be defined.
+    source_ids: [SRC-003]
+    requirement_ids: [NFR-003]
+    decision_ids: []
+  relationships:
+  - id: REL-001
+    type: approver
+    parties: [Jason, James]
+    nature: Human governance boundary for protected North Star and Gravity readiness decisions.
+    owner: Jason and James
+    source_ids: [SRC-003, SRC-004]
+  - id: REL-002
+    type: dependency
+    parties: [VerdifyConsultancy/verdify-skills, jvallery/agents]
+    nature: Skills define lifecycle contracts; Agent Platform is expected to provide control-plane/session/environment capabilities.
+    owner: Multi-repo planning
+    source_ids: [SRC-003]
+  - id: REL-003
+    type: pilot_customer
+    parties: [VerdifyConsultancy/verdify-skills, VerdifyConsultancy/gravity]
+    nature: Gravity is the gated proving ground for the complete lifecycle.
+    owner: Gravity readiness owner
+    source_ids: [SRC-003, SRC-004]
+  architecture_inputs:
+    system_context:
+    - Verdify skills coordinate GitHub, .agent-workflow artifacts, worktrees, Agent Platform sessions, CI/CD, and human review.
+    architecture_decision_areas:
+    - North Star planning artifact authority and protected handoff.
+    - Branch/wave identity model.
+    - Controller persistence and session ledger storage.
+    - Agent Platform API or MCP contract.
+    - Repo/application/environment/namespace cardinality.
+    - RBAC and secret injection.
+    - Observability contract and review inbox integration.
+    quality_attributes:
+    - Traceability.
+    - Human-governed autonomy.
+    - Reproducibility.
+    - Least privilege.
+    - Runtime verifiability.
+    constraints:
+    - GitHub remains the current delivery control plane.
+    - Gravity implementation is blocked by readiness gates.
+    - Workers do not self-certify.
+    assumptions:
+    - Existing Agent Platform work can provide or evolve the required controller/session/runtime APIs.
+  delivery_operations:
+    environments:
+    - Dev-write, stage/prod promotion-only policy is required but not yet fully encoded.
+    infrastructure:
+    - Platform readiness must inventory Kubernetes, namespaces, quotas, PVCs, ingress, DNS, registry/cache, and GitOps.
+    configuration:
+    - Skills expose schemas and templates; target repos hold project-specific configuration.
+    deployment:
+    - Release verification must prove the intended revision in the target environment.
+    rollback:
+    - Rollback criteria remain an open platform readiness decision.
+    migrations: []
+    observability:
+    - Platform readiness must include metrics, logs, traces, dashboards, SLOs, endpoint health, storage, network, and deployment markers.
+    support:
+    - Human review workflow and combined review inbox remain future platform work.
+    incident_response:
+    - Incident routing remains release-verification or platform-specific policy.
+    documentation:
+    - README, WORKFLOW, lifecycle docs, ADRs, skill docs, schemas, and .agent-workflow artifacts must stay aligned.
+  open_gaps:
+  - id: GAP-001
+    area: governance
+    question: 'What approval rule applies to protected North Star changes: Jason, James, either, both, or change-class-specific?'
+    impact: Blocks DESIGN_COMMITTED and protected-file enforcement.
+    owner: Jason and James
+    blocking: true
+    status: open
+  - id: GAP-002
+    area: branch_model
+    question: Should automation retain one issue/lane/branch/worktree/session/PR or introduce one branch per wave?
+    impact: Blocks wave automation and branch policy changes.
+    owner: Release and skills owners
+    blocking: true
+    status: open
+  - id: GAP-003
+    area: platform
+    question: What is the canonical repo/application/environment/namespace cardinality and RBAC boundary?
+    impact: Blocks platform readiness and Gravity pilot approval.
+    owner: Platform and security owners
+    blocking: true
+    status: open
+  - id: GAP-004
+    area: gravity
+    question: Does Gravity still depend on Onyx?
+    impact: Blocks Gravity readiness approval.
+    owner: Jason and Gravity readiness owner
+    blocking: true
+    status: open
+  handoff_readiness:
+    architecture_contracts:
+    - Project definition is draft; architecture should wait until discovery, requirements, product, and design surface are approved or explicit gates are accepted.
+    sprint_planning:
+    - Sprint planning is blocked by missing approved project definition, architecture, state-of-union, and repo hygiene.
+    release_verification:
+    - Release verification is not applicable until an approved sprint produces integrated work.
+traceability:
+- from: SRC-003
+  to: FR-002
+  relationship: supports transcript-to-replan requirement
+- from: SRC-003
+  to: FR-005
+  relationship: supports platform and Gravity readiness requirement
+- from: SRC-004
+  to: CON-001
+  relationship: records branch/wave conflict
+- from: FR-005
+  to: SURF-004
+  relationship: requires human-gate surface
+- from: FR-004
+  to: SURF-003
+  relationship: requires durable controller artifacts
+- from: SRC-006
+  to: FR-006
+  relationship: supports North Star planning requirement
+- from: FR-006
+  to: SURF-005
+  relationship: requires planning artifact surface
+- from: SRC-007
+  to: FR-007
+  relationship: supports research evidence registry requirement
+- from: FR-007
+  to: SURF-002
+  relationship: requires CLI ingest and query command
+- from: FR-007
+  to: SURF-005
+  relationship: supplies registered evidence for planning synthesis
+- from: SRC-008
+  to: FR-008
+  relationship: supports split product/architecture North Star artifact requirement
+- from: FR-008
+  to: SURF-005
+  relationship: requires product and architecture artifacts plus signoff record
+- from: NFR-002
+  to: GAP-001
+  relationship: approval semantics gap blocks governance completion
+approval:
+  status: pending
+  approver: null
+  approved_at: null

@@ -1,0 +1,1345 @@
+---
+schema_ref: northstar-evidence-registry.schema.yaml
+kind: NorthStarEvidenceRegistry
+schema_version: '1.0'
+project_id: VerdifyConsultancy/verdify-skills
+generated_at: '2026-06-23T02:20:21Z'
+updated_at: '2026-06-23T19:30:23Z'
+evidence:
+- id: NSE-20260623-agent-platform-control-implementation-be
+  reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
+  title: Agent Platform control implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:36:56Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-agent-platform-control-implementation-be.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-control-implementation-be-2026-06-23-agent-platform-control-best-practices"
+  source_uri:
+  source_sha256: cb367130644338c1fca5248866cccc5dfabe1cb9b1bf2c6e5e31c79d3433b8f9
+  summary: Primary-source research for a first stable Agent Platform control request
+    contract, covering MCP tools/authorization, OpenAPI operation contracts, Kubernetes
+    authorization/SubjectAccessReview/RBAC/audit logging, GitHub REST workflow/check/deployment
+    operations, OAuth scopes, and OPA policy decision logs.
+  tags:
+  - agent-platform-control
+  - authorization
+  - github
+  - kubernetes
+  - mcp
+  - oauth
+  - opa
+  - openapi
+  - platform-readiness
+  claims:
+  - Agent Platform control requests should identify MCP tool or API operation, operation
+    ID/tool name, target, requester, authorization context, scopes, policy verdict,
+    mutation level, inputs, expected effects, evidence refs, result, review gate,
+    and handoff without copying raw tokens or payloads.
+  - Protected or production-affecting control actions should remain blocked unless
+    authorization, policy decision, target identity, rollback or recovery path, and
+    evidence capture are explicit.
+  - First implementation should remain a platform-readiness request artifact, deferring
+    actual Agent Platform API/MCP execution until concrete operations have a reliable
+    manual run.
+  planning_relevance:
+  - Supports defining `agent-platform-control-request.schema.yaml`, operation identity,
+    authorization context, policy verdict, mutation level, target, inputs, expected
+    effects, evidence refs, execution result, review gate, and handoff.
+  - Supports `PRQ-018`, `SURF-012`, `IFACE-012`, `ARCH-013`, platform readiness, and
+    OpenClaw MCP/API-first control.
+  - Supports keeping `agent-platform-control` as a platform-readiness artifact contract
+    before adding a top-level canonical skill or executor.
+- id: NSE-20260623-agent-platform-live-state-audit
+  reference: northstar://evidence/NSE-20260623-agent-platform-live-state-audit
+  title: Agent Platform live-state audit
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:15:22Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-agent-platform-live-state-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-live-state-audit-2026-06-23-agent-platform-live-state-audit-md"
+  source_uri:
+  source_sha256: 5dfcab56be0a5e7cc153deca1c31740b8394aea30dec9b88a6bc5c0672cf5f80
+  summary: Read-only GitHub, Git, Kubernetes, and Argo CD audit showing current Agent
+    Platform issues, PRs, repo pods, namespaces, and readiness gaps.
+  tags:
+  - agent-platform
+  - argocd
+  - github
+  - kubernetes
+  - live-state
+  - platform-readiness
+  - repo-pods
+  claims:
+  - Agent Platform remote main is ahead of the local checkout and GitHub currently
+    has 35 open issues and 3 open PRs.
+  - The agent-fleet-runners namespace has 31 StatefulSets and 31 running repo pods,
+    proving a live repo-pod runtime surface.
+  - Argo CD live state includes Unknown, OutOfSync, and Degraded statuses that must
+    be reconciled before broad autonomous readiness claims.
+  planning_relevance:
+  - Supports platform-readiness, PRQ-017, PRQ-018, ARQ-016, ARQ-017, and readiness
+    gating for Agent Platform.
+- id: NSE-20260623-agent-platform-local-repo-evidence
+  reference: northstar://evidence/NSE-20260623-agent-platform-local-repo-evidence
+  title: Agent Platform local repository evidence
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:47:22Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-agent-platform-local-repo-evidence.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-local-repo-evidence-2026-06-23-agent-platform-local-repo-evidence-md"
+  source_uri:
+  source_sha256: 49e67660953d2c4b5606f03d33bb71fbd80e3019fb911b88d80aa8208914605d
+  summary: Observed local Agent Platform repository evidence for pod-per-repo runtime,
+    registry source of truth, GitOps rendering, issue-scoped work identity, namespace
+    contracts, secret boundaries, and observability standards relevant to the Verdify
+    Skills North Star.
+  tags:
+  - agent-platform
+  - control-plane
+  - gitops
+  - k3s
+  - namespaces
+  - observability
+  - registry
+  - review-inbox
+  - wave-release-planning
+  claims:
+  - The Agent Platform repository describes a pod-per-repo k3s runtime and a UI/API
+    to registry to render to Argo CD to pod control flow.
+  - The agent-fleet-control subtree names registry YAML as the source of truth and
+    the render-to-Argo-to-StatefulSet chain as the durable deliverable.
+  - The Agent Platform docs encode GitHub issue authority, issue-scoped work identity,
+    change gates, durability re-probes, completion contracts, namespace contracts,
+    and minimum observability standards.
+  planning_relevance:
+  - Strengthens North Star requirements for Agent Platform control APIs, CI/CD wave
+    deployment, review inbox evidence, session/worktree traceability, namespace modeling,
+    and observability diagnostics.
+- id: NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  reference: northstar://evidence/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  title: Agent Platform, Sunshine Gravity, OpenClaw, and owned-IP priorities
+  evidence_type: observation
+  evidence_status: observed
+  ingested_at: '2026-06-23T05:06:47Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities-2026-06-23-planning-review.md"
+  source_uri:
+  source_sha256: 790df877ca7e9c043145899ede2338e10f79e5a49c826c08d827e4e731767b7e
+  summary: Planning evidence combining Jason's latest priority answers with observed
+    Agent Platform, Sunshine Club Gravity, OpenClaw, and Orbit repository/runtime
+    context. It reframes the owned-IP priority as a self-hosted software-and-knowledge
+    operating plane, makes `agents.vallery.net` API/MCP-first with UI as operator
+    console, and identifies Sunshine Club as the reference implementation to mine
+    for reusable Gravity core capabilities.
+  tags:
+  - agent-platform
+  - api-first
+  - cicd
+  - gravity
+  - hermes
+  - k3s
+  - mcp
+  - openclaw
+  - owned-ip
+  - sunshine-club
+  - source-control
+  claims:
+  - The core product should include source control, CI/CD, pipeline, k3s management,
+    agent orchestration, and evidence/knowledge workflows rather than only agent delivery.
+  - "`agents.vallery.net` should be planned API/MCP-first for higher-level planning
+    agents, with the UI acting primarily as inspection, review, recovery, and operator
+    console."
+  - Gravity should remain blocked until a non-Gravity pilot proves the delivery loop,
+    and its first MVP story is local filesystem evidence ingestion.
+  - Sunshine Club already contains substantial reusable Gravity substrate, including
+    filesystem ingestion, SHA-256 identity, managed S3 source objects, Postgres/Qdrant
+    state, search, MCP tools, review queues, vault projection, workers, and Kubernetes
+    deployment.
+  - Sunshine-specific naming, paths, environment variables, taxonomy, and business-story
+    assumptions mean Gravity reuse should happen through extraction into a generic
+    core plus organization-specific packs rather than a direct copy.
+  - OpenClaw/Hermes should be treated as a higher-level planning and conversation
+    layer above Agent Platform control APIs.
+  planning_relevance:
+  - Updates the North Star product boundary, priority sequence, owned-IP strategy,
+    platform surface model, Agent Platform readiness scope, Gravity readiness sequencing,
+    and Sunshine-to-Gravity extraction plan.
+- id: NSE-20260623-browser-terminal-security-patterns
+  reference: northstar://evidence/NSE-20260623-browser-terminal-security-patterns
+  title: Browser terminal security patterns
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-browser-terminal-security-patterns.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-browser-terminal-security-patterns-2026-06-23-browser-terminal-security-patterns-md"
+  source_uri:
+  source_sha256: f8c19252f80c90585e28f419ce0c540276c909071c48b10e2a9be6dcf9820dfe
+  summary: Primary-source research on Argo CD web terminal, Kubernetes exec/debug
+    primitives, and generic browser terminal tools, supporting least-privilege terminal
+    policy for Agent Platform.
+  tags:
+  - argocd
+  - browser-terminal
+  - kubernetes
+  - platform-readiness
+  - security
+  claims:
+  - Argo CD web terminal access depends on exec/create authorization and can run arbitrary
+    code inside authorized pods.
+  - Kubernetes exec, debug, and ephemeral containers are troubleshooting primitives
+    that require explicit RBAC, audit, and environment boundaries when exposed through
+    browser terminals.
+  - Generic browser terminal tools expose terminal access over web transports but
+    do not by themselves provide the full Verdify authorization, audit, or Kubernetes
+    policy boundary.
+  planning_relevance:
+  - Supports SURF-005, ARQ-003, ARCH-007, and platform-readiness browser-terminal
+    gates.
+- id: NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  reference: northstar://evidence/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  title: CI/CD, SDLC, agent orchestration, and human-governed delivery
+  evidence_type: research_report
+  evidence_status: reported
+  ingested_at: '2026-06-23T02:28:33Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery-2026-06-23-ci-cd-sdlc-agent-orchestration-human"
+  source_uri:
+  source_sha256: 272e4ad3d3274c8d678e11792ed0bcf86cb7f410d15253524385d0789b89878d
+  summary: Research report supporting a Git-governed, wave-oriented, policy-enforced
+    autonomous delivery platform with human gates, GitOps reconciliation, observability,
+    least-privilege secrets handling, review inboxes, and session ledger evidence.
+  tags:
+  - agent-orchestration
+  - cicd
+  - gitops
+  - human-governed-delivery
+  - observability
+  - platform-readiness
+  - sdlc
+  - security
+  - session-ledger
+  claims:
+  - The strongest current pattern is human-governed, policy-constrained, Git-anchored
+    autonomous execution rather than fully autonomous delivery.
+  - A credible architecture composes CI, GitOps reconciliation, agent orchestration,
+    observability, and a durable audit ledger instead of replacing them with one monolith.
+  - Browser terminals, broad Kubernetes secret access, and dynamic preview generators
+    are high-risk surfaces that need explicit gates and least-privilege controls.
+  - The near-term proving path should be a narrow non-production pilot measured by
+    trace completeness, policy conformance, rollback confidence, and review efficiency.
+  planning_relevance:
+  - Feeds North Star planning, platform readiness, controller-loop design, CI/CD release
+    architecture, observability requirements, RBAC/secrets policy, review inbox design,
+    and session ledger schema.
+- id: NSE-20260623-controller-ledger-platform-control-primary-sources
+  reference: northstar://evidence/NSE-20260623-controller-ledger-platform-control-primary-sources
+  title: Controller, ledger, and Agent Platform control primary sources
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:42:02Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-controller-ledger-platform-control-primary-sources.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-controller-ledger-platform-control-primary-sources-2026-06-23-controller-ledger-platform-control-so"
+  source_uri:
+  source_sha256: 31ade5f2306f8ae40b6ecdb710acb4acca161e1738dfe30e25afced7251944ed
+  summary: Primary-source evidence for durable agent orchestration, human-in-the-loop
+    multi-agent control, MCP/API operations, Backstage-style catalog modeling, and
+    session-ledger storage/search options.
+  tags:
+  - agent-platform
+  - autogen
+  - backstage
+  - controller
+  - jsonl
+  - langgraph
+  - mcp
+  - pgvector
+  - qdrant
+  - session-ledger
+  - sqlite
+  claims:
+  - LangGraph is a reference for long-running, stateful agent orchestration, but the
+    North Star should keep the controller contract framework-neutral.
+  - AutoGen provides evidence for multi-agent systems that integrate LLMs, tools,
+    humans, and code, including human-in-the-loop intervention modes.
+  - MCP standardizes how LLM applications connect to external data sources and tools,
+    and MCP tools expose named operations with schemas.
+  - Backstage's catalog model uses components, APIs, resources, and systems as useful
+    reference concepts for Agent Platform project and application modeling.
+  - SQLite JSON functions plus JSON Lines can support a low-overhead pilot ledger
+    with queryable JSON payloads and append-style event files.
+  - Postgres plus pgvector and Qdrant represent different retrieval tradeoffs for
+    semantic search and filtered vector search over evidence or session records.
+  planning_relevance:
+  - Supports session-ledger as a separately testable contract if multiple skills write
+    audit/session events.
+  - Supports agent-platform-control as an MCP/API-first skill once concrete control-plane
+    operations exist.
+  - Supports treating Backstage as a reference architecture rather than an immediate
+    dependency.
+- id: NSE-20260623-end-to-end-agent-based-sdlc
+  reference: northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc
+  title: End-to-end agent-based SDLC
+  evidence_type: research_report
+  evidence_status: reported
+  ingested_at: '2026-06-23T03:38:31Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-end-to-end-agent-based-sdlc.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-end-to-end-agent-based-sdlc-2026-06-23-end-to-end-agent-based-sdlc-md"
+  source_uri:
+  source_sha256: 19785a5a91aa0c3752d58fb09b708beb4b6948ff5611da83967c32e23e7edad5
+  summary: Planning evidence for a deterministic workflow-driven, human-governed,
+    agent-executed SDLC service model spanning intake, North Star planning, research,
+    repository readiness, task/wave execution, CI/CD evidence, review environments,
+    promotion, diagnostics, and wave sign-off.
+  tags:
+  - agent-orchestration
+  - cicd
+  - controller
+  - gitops
+  - human-governed-delivery
+  - observability
+  - product-service
+  - sdlc
+  - security
+  - session-ledger
+  - user-stories
+  - workflow-engine
+  claims:
+  - The controller should be a deterministic workflow system that invokes bounded
+    agents rather than an LLM conversation acting as the workflow engine.
+  - A wave should be a coherent deployable product increment represented through metadata,
+    milestones, integration environments, and traceability while individual tasks
+    use short-lived branches and worktrees.
+  - Review-ready work requires an immutable artifact deployed to a reachable review
+    environment with CI evidence, provenance, test steps, telemetry, known risks,
+    and rollback context.
+  - Agent access should use task-specific least privilege, runtime identity, network
+    isolation, audit logging, and no reusable secrets in prompts.
+  - The product surface includes a human review inbox, deterministic controller, session
+    ledger, repository readiness wave, diagnostic loop, and versioned skills registry.
+  planning_relevance:
+  - Feeds North Star planning for product/service scope, user stories, controller
+    architecture, lane/task/wave model, review inbox, CI/CD evidence, GitOps promotion,
+    observability, diagnostics, and session ledger requirements.
+- id: NSE-20260623-environment-gitops-implementation-best-p
+  reference: northstar://evidence/NSE-20260623-environment-gitops-implementation-best-p
+  title: Environment GitOps implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:58:38Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-environment-gitops-implementation-best-p.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-environment-gitops-implementation-best-p-2026-06-23-environment-gitops-best-practices-md"
+  source_uri:
+  source_sha256: 668646fa78de0c3ccd39e4c6fb67209f7c692a020a4a61dbde669ad40bf9e56b
+  summary: Primary-source research for a first stable environment GitOps reconciliation
+    contract, covering OpenGitOps principles, Argo CD sync/health/ApplicationSet preview
+    behavior, Flux Kustomization and HelmRelease status/remediation, Kubernetes namespace
+    controls, and GitHub deployment environments.
+  tags:
+  - argocd
+  - environment-gitops
+  - flux
+  - gitops
+  - kubernetes
+  - platform-readiness
+  - release-verification
+  claims:
+  - Environment GitOps reconciliation should distinguish desired state from observed
+    controller and runtime state, recording controller status, namespace controls,
+    deployment evidence, health signals, drift, remediation, rollback, review gates,
+    and handoff.
+  - First implementation should remain a platform-readiness artifact consumed by sprint
+    planning and release verification, not an unauthorized environment mutation mechanism.
+  planning_relevance:
+  - Supports environment-gitops, PRQ-006, PRQ-014, PRQ-017, ARCH-005, ARCH-009, platform
+    readiness, wave release planning, release verification, and OpenClaw release-path
+    workflows.
+- id: NSE-20260623-github-backlog-sync-implementation-best
+  reference: northstar://evidence/NSE-20260623-github-backlog-sync-implementation-best
+  title: GitHub backlog sync implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:49:14Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-github-backlog-sync-implementation-best.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-github-backlog-sync-implementation-best-2026-06-23-github-backlog-sync-best-practices-md"
+  source_uri:
+  source_sha256: 224b956d6410ab4691e8bff291359d763c3db5159284c83f3da4a9047f64d347
+  summary: Primary-source research for a stronger GitHub backlog sync and reconciliation
+    contract, covering GitHub Issues, PRs, sub-issues, dependencies, timeline events,
+    checks, workflow runs, deployments, deployment statuses/environments, Projects,
+    and search.
+  tags:
+  - backlog
+  - github
+  - reconciliation
+  - sprint-orchestrator
+  - state-of-union
+  claims:
+  - GitHub backlog sync should reconcile issues, sub-issues, dependencies, PRs, checks,
+    workflow runs, deployments, deployment statuses, environments, project fields,
+    lane contracts, branches, and closing-link coverage while treating local snapshots
+    as caches.
+  - First implementation should remain a state-of-union and sprint-orchestrator mode
+    with a richer reconciliation artifact, not a standalone source of authority.
+  planning_relevance:
+  - Supports github-backlog-sync, PRQ-010, SURF-010, IFACE-008, ARQ-010, state-of-union
+    issue reconciliation, sprint-orchestrator lane reconciliation, and OpenClaw backlog
+    strategy.
+- id: NSE-20260623-gravity-core-extraction-implementation-b
+  reference: northstar://evidence/NSE-20260623-gravity-core-extraction-implementation-b
+  title: Gravity core extraction implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T19:09:33Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-gravity-core-extraction-implementation-b.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-core-extraction-implementation-b-2026-06-23-gravity-core-extraction-best-practice"
+  source_uri:
+  source_sha256: 69f2e8a0e58c68ac778d6db546abdb40e59a21f0b4693ff32b6d773db2c3a1e4
+  summary: Primary-source research for a first stable Gravity core extraction planning
+    contract, covering provenance, checksummed file manifests, resource metadata,
+    content descriptors, source/build provenance, research-object packaging, and repository
+    source refs.
+  tags:
+  - gravity-core-extraction
+  - gravity-readiness
+  - provenance
+  - source-objects
+  - sunshine-gravity
+  claims:
+  - Gravity extraction should inventory each candidate file, package, schema, prompt,
+    test, migration, or Kubernetes object as a source object with identity, provenance,
+    checksum strategy, reuse classification, and pack/core boundary decision.
+  - First implementation should remain a gravity-readiness artifact that plans reusable
+    core extraction and local filesystem evidence ingestion; it does not authorize
+    Gravity feature implementation.
+  planning_relevance:
+  - Supports gravity-core-extraction, PRQ-019, SURF-013, IFACE-013, ARQ-018, ARCH-014,
+    Gravity readiness, and Sunshine-to-Gravity reuse planning.
+- id: NSE-20260623-gravity-local-repo-evidence
+  reference: northstar://evidence/NSE-20260623-gravity-local-repo-evidence
+  title: Gravity local repository evidence
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:47:32Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-gravity-local-repo-evidence.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-local-repo-evidence-2026-06-23-gravity-local-repo-evidence-md"
+  source_uri:
+  source_sha256: be73c1fb92556bd2c01b08091cae4d69c3660b6906e42909369a7e80d708f298
+  summary: Observed local Gravity repository evidence for product vision, architecture
+    draft, pipeline state model, CI/CD release evidence, implementation gating, and
+    unresolved Onyx/dependency status relevant to the Verdify Skills North Star.
+  tags:
+  - ci-cd
+  - cicd
+  - evidence-ingestion
+  - gravity
+  - gravity-readiness
+  - onyx
+  - pipeline
+  - readiness-gate
+  - run-ledger
+  claims:
+  - Gravity is documented as a local-first universal evidence-ingestion platform with
+    content-addressed preservation, provenance-rich extraction, manifestation, indexing,
+    and permission-aware retrieval.
+  - Gravity planning documents show substantial draft product and architecture collateral
+    but no observed product implementation or runtime/deployment evidence in the status
+    document.
+  - Gravity's architecture constrains LangGraph to bounded workflow logic and keeps
+    durable state, work queue, run ledger, model registry, and review gate outside
+    LangGraph.
+  - Gravity's CI/CD planning requires docs/contracts/code/tests/migrations/release
+    evidence, provenance, SBOMs, vulnerability scans, smoke tests, and rollback paths
+    for lane PRs and deployments.
+  - No direct Onyx dependency was observed in the inspected local Gravity documents,
+    so the Onyx question remains unresolved rather than answered.
+  planning_relevance:
+  - Supports keeping Gravity gated behind platform readiness, repo hygiene, issue/lane
+    planning, CI/CD wave deployment, observability, review workflow, and explicit
+    readiness approval.
+- id: NSE-20260623-gravity-remote-onyx-confirmation
+  reference: northstar://evidence/NSE-20260623-gravity-remote-onyx-confirmation
+  title: Gravity remote and Onyx confirmation
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:15:22Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-gravity-remote-onyx-confirmation.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-remote-onyx-confirmation-2026-06-23-gravity-remote-onyx-confirmation-md"
+  source_uri:
+  source_sha256: 9ecfb83534b202f8e50b54184bac9c3ab102e4ffc39601437c6973f592a8d902
+  summary: Read-only Git, GitHub, Kubernetes, and Argo CD evidence resolving the Gravity/Onyx
+    dependency question for North Star planning.
+  tags:
+  - argocd
+  - github
+  - gravity
+  - gravity-readiness
+  - onyx
+  - platform-readiness
+  claims:
+  - Current Gravity and Verdify Gravity GitHub issue and PR searches returned zero
+    Onyx-matching issues or PRs.
+  - Verdify Gravity origin/main states Gravity does not depend on Onyx ingestion and
+    no Onyx ingestion of Gravity data is enabled.
+  - Onyx remains a separate planned or gated vault/search front door and post-MVP/control-plane
+    concern, not a current Gravity MVP dependency.
+  planning_relevance:
+  - Supports resolving NSQ-003, gravity-readiness routing, and stale issue-reference
+    hygiene before downstream planning.
+- id: NSE-20260623-kubernetes-gitops-cicd-cardinality
+  reference: northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality
+  title: Kubernetes, GitOps, and CI/CD cardinality research
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T02:58:05Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-kubernetes-gitops-cicd-cardinality.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-kubernetes-gitops-cicd-cardinality-2026-06-23-kubernetes-gitops-cicd-cardinality-md"
+  source_uri:
+  source_sha256: 9fe2ee08ab742b3c13ac2c2a9e6f78b5aecb72b2ea055c08186749a67ffc1a29
+  summary: Primary-source research supporting repo/application boundaries, environment-scoped
+    namespaces, namespace quotas/RBAC/network policy, PR preview environments, and
+    CI/CD based wave deployment.
+  tags:
+  - cicd
+  - gitops
+  - kubernetes
+  - namespace
+  - platform-readiness
+  - security
+  - wave-deployment
+  claims:
+  - A repository/application should be modeled as the durable product boundary while
+    dev, staging, production, and preview execution use environment-scoped namespaces
+    or namespace sets.
+  - Kubernetes namespace isolation must be paired with ResourceQuota, least-privilege
+    RBAC, NetworkPolicy, and secret handling rules; namespace boundaries alone are
+    not sufficient.
+  - 'CI/CD based wave deployment should be core: PR or wave branches produce CI evidence
+    and preview/review deployments, while protected environments and GitOps promotion
+    control staging and production.'
+  - PR-generated preview environments are useful but require admin-controlled configuration
+    and least-privilege policies because dynamic generators can leak secrets or manage
+    unintended resources.
+  planning_relevance:
+  - Resolves the North Star namespace cardinality planning question and strengthens
+    the CI/CD wave deployment architecture requirement.
+- id: NSE-20260623-learning-capture-implementation-best-pra
+  reference: northstar://evidence/NSE-20260623-learning-capture-implementation-best-pra
+  title: Learning capture implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T19:20:48Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-learning-capture-implementation-best-pra.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-learning-capture-implementation-best-pra-2026-06-23-learning-capture-best-practices-md"
+  source_uri:
+  source_sha256: 3de21c5fe82429677be47b9c8f6e58308246d59e95c5266923fa0cbf51fc6a31
+  summary: Primary-source research for hardening proposal-only learning capture, covering
+    OpenAI Evals, MCP evaluation consistency, LangGraph durable state, NIST privacy/data
+    minimization, and OWASP LLM prompt-injection and sensitive-information risks.
+  tags:
+  - evals
+  - learning-capture
+  - loop-readiness
+  - northstar-planning
+  - privacy
+  - redaction
+  claims:
+  - Learning capture should stage proposals with explicit source scope, verifier,
+    durable state, redaction policy, stop condition, budget, permissions, manual-run
+    evidence, and review route before any recurring scan is scheduled.
+  - Learning capture inputs must be treated as untrusted and minimized; raw secrets,
+    private tokens, sensitive data, and unverified instructions must not be copied
+    into proposal packets.
+  planning_relevance:
+  - Supports learning-capture, PRQ-020, PRQ-021, SURF-014, IFACE-014, ARCH-015, NSQ-009,
+    and northstar-planning proposal-only improvement workflows.
+- id: NSE-20260623-long-horizon-agent-compounding-learning
+  reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
+  title: Agent loop and learning-capture patterns
+  evidence_type: external_reference
+  evidence_status: reported
+  ingested_at: '2026-06-23T06:08:29Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-long-horizon-agent-compounding-learning.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-long-horizon-agent-compounding-learning-2026-06-23-x-fable-mythos-learning.md"
+  source_uri: https://x.com/0xCodez/status/2065089060104720776
+  source_sha256: e4b0c8b6030404695aa20cd3ccec1649aec4a90382f26b972d5d7d9a62b4e73d
+  summary: Reported external-reference evidence from three social posts and associated
+    article/mirror pages that effective agent systems are loops with goals, verifiers,
+    state, stop conditions, budgets, and evidence-backed learning capture rather than
+    one-off chat sessions or unreviewed self-modification.
+  tags:
+  - agent-orchestration
+  - artifacts
+  - fallback
+  - learning-capture
+  - long-horizon-agents
+  - model-routing
+  - northstar
+  - self-improvement
+  - skill-compounding
+  - verification
+  claims:
+  - Long-running agent systems should preserve useful memory in durable state files
+    and skill artifacts rather than relying on transient chat history.
+  - Independent verifier or critic agents reduce the bias of self-review and should
+    be used before final lock, integration, or review-ready claims.
+  - Effective planning loops should explicitly support fan-out and synthesis, adversarial
+    review, and iterate-until-evidence workflows.
+  - Skill improvement should be evidence-backed and reviewable through observed issue
+    or opportunity, investigation, verification, distilled lesson, proposed artifact
+    or skill change, risk class, and approval path.
+  - Model refusal, fallback, downgrade, and availability loss should be modeled as
+    ordinary orchestration states.
+  - UI, review-inbox, Gravity, and control-plane outcomes should use visual, browser,
+    runtime, or telemetry evidence when text-only self-report is insufficient.
+  - A loop is worth automating only when the task recurs, bad output can be rejected,
+    the agent can complete it end-to-end, and done is objective enough to verify.
+  - Reliable loop rollout should proceed from one proven manual run, to saved skill
+    or command, to loop with gate and stop condition, and only then to scheduling.
+  - Session-mining loops should scan Codex, Claude, and terminal sessions as evidence
+    and stage proposals only; applying changes remains a human or governed decision.
+  - Learning-capture proposals should route lessons to content, context files, slash
+    commands, skills, hooks, tool/CLI fixes, config, backlog, or no-op.
+  - Cost per accepted change, not raw token spend or loop count, is the most useful
+    operational metric for recurring agent loops.
+  planning_relevance:
+  - Supports adding a learning-capture pattern to the North Star planning loop and
+    skill instructions.
+  - Strengthens the existing durable `.agent-workflow` artifact architecture.
+  - Strengthens independent critic/verifier requirements and model-abstraction/fallback
+    planning.
+  - Adds visual/runtime verification expectations for UI and control-plane-related
+    North Star stories.
+  - Adds loop-readiness criteria and rollout sequence for future controller-loop,
+    scheduling, and session-mining automation.
+  - Supports proposal-only session mining as a future owned-IP capability for Verdify
+    Skills, Agent Platform, and Hermes/OpenClaw.
+- id: NSE-20260623-long-horizon-learning-loop-source-verification
+  reference: northstar://evidence/NSE-20260623-long-horizon-learning-loop-source-verification
+  title: Long-horizon learning loop source verification
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-long-horizon-learning-loop-source-verification.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-long-horizon-learning-loop-source-verification-2026-06-23-long-horizon-learning-loop-source-ver"
+  source_uri:
+  source_sha256: f91e33eae22030efeee4f14bd5078f74e9e02c518f8c9be763053b9f1569fee7
+  summary: Primary-source research on Anthropic and OpenAI long-horizon agent harness
+    patterns, strengthening proposal-only learning-capture planning beyond social
+    or mirrored sources.
+  tags:
+  - agent-orchestration
+  - learning-capture
+  - long-horizon-agents
+  - self-improvement
+  - verification
+  claims:
+  - Anthropic long-running agent sources emphasize harness design, context management,
+    stable interfaces, environment setup, evaluation, and planner/generator/evaluator
+    patterns.
+  - OpenAI Codex long-horizon source emphasizes explicit specifications, task persistence,
+    verification, and alignment over long work intervals.
+  - Prior social or mirrored learning-loop evidence should remain reported unless
+    independently verified against official sources or primary papers.
+  planning_relevance:
+  - Supports PRQ-020, PRQ-021, ARCH-015, IFACE-014, and learning-capture loop readiness.
+- id: NSE-20260623-north-star-research-queue-completion
+  reference: northstar://evidence/NSE-20260623-north-star-research-queue-completion
+  title: North Star research queue completion
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:42:45Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-north-star-research-queue-completion.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-north-star-research-queue-completion-2026-06-23-northstar-research-queue-md"
+  source_uri:
+  source_sha256: 92ec43e16677a9e2e6f82371137940d18e091474fb68073e513e0c4c2954451a
+  summary: Research queue evidence showing the June 23 North Star topics were searched,
+    ingested, and left with only gate-driven follow-up work.
+  tags:
+  - brave-search
+  - evidence-registry
+  - northstar
+  - research
+  claims:
+  - The June 23 North Star research queue records every queued topic as searched or
+    inspected and ingested into the evidence registry.
+  - The queue records no pending topics remaining from the pass, with follow-up limited
+    to downstream readiness or architecture gates.
+  - The Brave Search credential is persisted only as a project reference, not as a
+    raw secret in the evidence registry.
+  planning_relevance:
+  - Supports defining the `review-inbox` packet schema, required evidence groups,
+    completeness verdicts, recommendation states, and feedback routing.
+  - Supports `SURF-004`, `IFACE-004`, `PRQ-004`, `ARCH-008`, `ARCH-009`, and the `sdlc-review-inbox`
+    OpenClaw workflow stage.
+  - Supports keeping `review-inbox` as a promoted capability contract before adding
+    a top-level canonical skill.
+- id: NSE-20260623-observability-diagnostics-implementation
+  reference: northstar://evidence/NSE-20260623-observability-diagnostics-implementation
+  title: Observability diagnostics implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:20:07Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-observability-diagnostics-implementation.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-observability-diagnostics-implementation-2026-06-23-observability-diagnostics-best-practi"
+  source_uri:
+  source_sha256: f607d853f95133710be676261d459da420a542e6f4d8e2d7b118afdb0ea4a073
+  summary: Primary-source research for a first stable observability diagnostic packet
+    contract, covering OpenTelemetry semantic conventions/resources, Prometheus alert/recording
+    rules, Grafana provisioning/dashboard automation, Kubernetes probes/events/debugging/observability,
+    and GitHub workflow/check/deployment markers.
+  tags:
+  - diagnostics
+  - github
+  - grafana
+  - kubernetes
+  - observability-diagnostics
+  - opentelemetry
+  - prometheus
+  - release-health
+  claims:
+  - Diagnostic packets should correlate service, namespace, pod, deployment, commit,
+    PR, wave, session, trace, check, deployment, and policy identifiers before review-ready
+    or release-health conclusions are accepted.
+  - Diagnostic evidence should distinguish raw telemetry links, interpreted health
+    signals, runtime checks, deployment markers, findings, missing instrumentation,
+    recommendation, and feedback route.
+  - Kubernetes probes, events, logs, pod lifecycle state, and endpoint health should
+    be recorded alongside GitHub checks/workflow/deployment markers when diagnosing
+    review or release health.
+  planning_relevance:
+  - Supports defining the `observability-diagnostic-packet` schema, diagnostic hypotheses,
+    telemetry links, signal assessments, runtime checks, deployment markers, findings,
+    missing instrumentation, recommendation, and feedback route.
+  - Supports `ARQ-004`, `ARCH-008`, `PRQ-004`, `SURF-004`, release health, platform
+    readiness, and the `sdlc-review-inbox` and `sdlc-release-path` OpenClaw workflow
+    stages.
+  - Supports keeping `observability-diagnostics` as a release-verification mode before
+    adding a top-level canonical skill.
+- id: NSE-20260623-observability-diagnostics-primary-sources
+  reference: northstar://evidence/NSE-20260623-observability-diagnostics-primary-sources
+  title: Observability and diagnostics primary sources
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:41:51Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-observability-diagnostics-primary-sources.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-observability-diagnostics-primary-sources-2026-06-23-observability-diagnostics-sources-md"
+  source_uri:
+  source_sha256: f1007232997ffd3ba6311bd16883b6a6bbf860c3e4115f8f04df61cf6b970b26
+  summary: Primary-source evidence for OpenTelemetry CI/CD and agent telemetry, Grafana
+    observability-as-code, provisioned dashboards, and diagnostics evidence required
+    by review-ready and release workflows.
+  tags:
+  - agents
+  - cicd
+  - diagnostics
+  - grafana
+  - observability
+  - opentelemetry
+  claims:
+  - OpenTelemetry CI/CD semantic conventions define pipeline run states and results
+    that can be used as standard review and release evidence.
+  - OpenTelemetry agent-observability work identifies a need to standardize telemetry
+    for agent applications and frameworks such as AutoGen and LangGraph.
+  - Grafana AI Observability is built on OpenTelemetry and targets production LLM
+    agents, conversations, costs, quality, and performance.
+  - Grafana Observability as Code supports managing dashboards, data sources, and
+    observability workflows through code, version control, automated testing, and
+    CI/CD pipelines.
+  - Grafana provisioning can load dashboards from filesystem-backed YAML/JSON definitions,
+    but UI changes do not automatically round-trip to provisioning source files.
+  planning_relevance:
+  - Supports promoting observability-diagnostics as a repeatable skill or mode.
+  - Supports requiring telemetry links, CI/CD states, dashboard/log/trace evidence,
+    and missing-telemetry findings in review-inbox packets.
+  - Supports defining agent activity and tool-call telemetry as part of Agent Platform
+    observability.
+- id: NSE-20260623-openclaw-hermes-local-evidence
+  reference: northstar://evidence/NSE-20260623-openclaw-hermes-local-evidence
+  title: OpenClaw and Hermes local evidence
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:50:41Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-openclaw-hermes-local-evidence.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-openclaw-hermes-local-evidence-2026-06-23-openclaw-hermes-local-evidence-md"
+  source_uri:
+  source_sha256: ecca8188ac7ad84bf94e37ba30efd52d174b15f603dd59f0f52557715c09a3b7
+  summary: Observed local evidence from OpenClaw and Hermes for agent runtimes, sessions,
+    queues, approvals, MCP, logs, plugin boundaries, and MCP-only governed planning
+    agents relevant to the Verdify Skills North Star.
+  tags:
+  - agent-runtime
+  - approvals
+  - controller
+  - hermes
+  - mcp
+  - observability
+  - openclaw
+  - planning-agent
+  - session-ledger
+  claims:
+  - OpenClaw documents a local-first Gateway with sessions, channels, tools, events,
+    multi-agent routing, skills, MCP, queueing, approvals, and JSONL logs.
+  - OpenClaw separates provider, model, agent runtime, and channel layers, with runtime
+    ownership potentially delegated to OpenClaw, Codex, ACP/acpx, Claude CLI, or other
+    harnesses.
+  - OpenClaw serializes runs per session key and supports queue modes such as steer,
+    followup, collect, and interrupt.
+  - Hermes Iris is configured as a production planner with an MCP-only tool surface,
+    disabled shell/web/browser/filesystem toolsets, raw SQL excluded, and audit identifiers
+    required on writes.
+  planning_relevance:
+  - Supports framework-neutral planning for agent-platform-control, session-ledger,
+    transcript-replan, northstar-interview, runtime adapters, MCP/API control, and
+    governed planning-agent tool boundaries.
+- id: NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  reference: northstar://evidence/NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  title: OpenClaw and Hermes reuse interface/security audit
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:15:23Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-openclaw-hermes-reuse-interface-security-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-openclaw-hermes-reuse-interface-security-audit-2026-06-23-openclaw-hermes-reuse-interface-secur"
+  source_uri:
+  source_sha256: 4c56e5f2b5d071750ea75be900d87473855f3c0a1628da251c3e6adae5d28c77
+  summary: Focused local evidence on OpenClaw MCP/session/approval/logging patterns
+    and Hermes Iris MCP-only production planner constraints.
+  tags:
+  - agent-platform-control
+  - hermes
+  - mcp
+  - openclaw
+  - planning-agent
+  - security
+  - session-ledger
+  claims:
+  - OpenClaw provides reusable reference patterns for MCP conversation bridges, session
+    isolation, queue modes, approvals, runtime adapters, and JSONL logs.
+  - Hermes Iris uses a narrower MCP-only production planner posture with memory, web,
+    terminal, filesystem, browser, dashboard, and raw query surfaces disabled.
+  - Hermes/OpenClaw should be treated as a higher-level planning/conversation layer
+    above Agent Platform control APIs rather than the deterministic SDLC controller
+    or GitHub/GitOps authority.
+  planning_relevance:
+  - Supports PRQ-018, SURF-012, IFACE-012, ARCH-013, ARCH-007, and future agent-platform-control/session-ledger
+    contracts.
+- id: NSE-20260623-repo-controller-bootstrap-self-discovery
+  reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
+  title: Repo controller bootstrap and fleet self-discovery walk intake
+  evidence_type: transcript
+  evidence_status: reported
+  ingested_at: '2026-06-23T19:30:23Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-repo-controller-bootstrap-self-discovery-2026-06-23-repo-controller-bootstrap-self-discovery-md"
+  source_uri:
+  source_sha256: e7af76f8392528da8a232c63d68125cadfde6aad9956a5d89af47022e3e31180
+  summary: Reported semantic walk intake for repo-controller bootstrap, fleet self-discovery,
+    namespace and storage standards, controller loops, Grafana/Prometheus observability,
+    alert-to-agent recovery, Orbit daily operating briefs, adversarial plan review,
+    and standard repo onboarding across a multi-repository agent fleet.
+  tags:
+  - agent-platform
+  - bootstrap
+  - controller-loop
+  - fleet
+  - grafana
+  - kubernetes
+  - namespaces
+  - observability
+  - orbit
+  - repo-hygiene
+  - self-discovery
+  - storage
+  - transcript
+  claims:
+  - Active repositories should eventually have controller agents with durable state,
+    structured worktree-agent control, tmux/web/API visibility, and Agent Platform
+    MCP or control operations.
+  - A repo-bootstrap workflow should inventory repository content, Git history, GitHub
+    state, Kubernetes deployments, logs, metrics, routes, secret references, credential
+    validation results, storage mounts, CI/CD shape, and runtime/package needs.
+  - Bootstrap output should include a standard project inventory, updated `AGENTS.md`,
+    namespace/environment mapping, gap assessment, proposed backlog issues, and a pull
+    request for repo-local planning changes.
+  - Namespace, storage, route, secret, credential, and CI/CD patterns should become
+    consistent across the fleet while preserving least privilege and scoped infrastructure
+    domain-agent authority.
+  - Controller loops should emit metrics, update dashboards, persist state, recover
+    from failures, and route Alertmanager events back to the responsible controller
+    when possible.
+  - Planning should include adversarial Codex/Claude review, lane-owner review, and
+    stakeholder lenses before final plan consensus.
+  - Orbit or an equivalent higher-level planner should aggregate cross-repo controller,
+    issue, PR, email, calendar, and agent status into a daily operating brief.
+  planning_relevance:
+  - Adds repo-bootstrap/self-discovery as a cross-skill workflow spanning `repo-hygiene`,
+    `platform-readiness`, `controller-loop`, `state-of-union`, and `northstar-planning`.
+  - Extends Agent Platform planning with durable PVC/workspace, tmux/web/API, VS Code
+    workspace visibility, base-image recommendations, registry rollback, and alert-to-agent
+    recovery requirements.
+  - Adds non-blocking questions for namespace naming, infrastructure domain-agent boundaries,
+    storage mount self-service, controller model choice, and Orbit ownership.
+- id: NSE-20260623-opengitops-events-session-specificity
+  reference: northstar://evidence/NSE-20260623-opengitops-events-session-specificity
+  title: OpenGitOps event and session specificity
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-opengitops-events-session-specificity.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-opengitops-events-session-specificity-2026-06-23-opengitops-events-session-specificity"
+  source_uri:
+  source_sha256: daccd1b590a467daa76508b5035e296e8041075ae24075870f15a3e1b51855db
+  summary: Primary-source research on OpenGitOps event indexes and why talk-level
+    GitOps claims need session-specific verification before becoming architecture
+    evidence.
+  tags:
+  - argocd
+  - events
+  - flux
+  - gitops
+  - opengitops
+  - research
+  claims:
+  - OpenGitOps maintains event indexes for GitOpsCon, ArgoCon, OpenGitOps, and related
+    recordings that are the right starting point for talk-level GitOps evidence.
+  - Event index pages do not by themselves prove individual architecture claims; specific
+    talks need verified titles, speakers, URLs, and claim extraction.
+  planning_relevance:
+  - Supports the research queue for GitOps event/session specificity and future wave-release-planning
+    evidence.
+- id: NSE-20260623-opengitops-session-shortlist
+  reference: northstar://evidence/NSE-20260623-opengitops-session-shortlist
+  title: OpenGitOps session shortlist
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:17:10Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-opengitops-session-shortlist.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-opengitops-session-shortlist-2026-06-23-opengitops-session-shortlist-md"
+  source_uri:
+  source_sha256: 676ba156cb8b1588ad6923ebd3148787a54b809bc792a918541ada6ce7f1d557
+  summary: Brave-discovered session-level OpenGitOps, GitOpsCon, Argo, Flux, and progressive
+    delivery references that turn event hubs into a concrete future research queue.
+  tags:
+  - argocd
+  - events
+  - flux
+  - gitops
+  - opengitops
+  - research
+  - wave-release-planning
+  claims:
+  - Official LF/OpenGitOps/CNCF/Sched pages and YouTube playlists provide a session-level
+    queue for GitOps, Argo CD, Flux, progressive delivery, platform APIs, and interoperability
+    research.
+  - The shortlisted sessions are candidate sources only and should not support specific
+    architecture claims until watched or otherwise reviewed for exact claims.
+  - For the current North Star, primary documentation remains stronger than video
+    session references for concrete wave-release and platform-readiness requirements.
+  planning_relevance:
+  - Resolves the OpenGitOps event/session specificity research gap and supports future
+    wave-release-planning and platform-readiness research.
+- id: NSE-20260623-review-inbox-product-examples
+  reference: northstar://evidence/NSE-20260623-review-inbox-product-examples
+  title: Review inbox product examples
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-review-inbox-product-examples.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-product-examples-2026-06-23-review-inbox-product-examples-md"
+  source_uri:
+  source_sha256: 3dd06efcf74e374c60178883fdfa9b5ff8e1e5f161f513111c8c7160b80d5275
+  summary: Primary-source research on GitHub deployment reviews/checks, GitLab Review
+    Apps, Backstage plugins, and Argo CD ApplicationSet PR generators as review-inbox
+    primitives.
+  tags:
+  - argocd
+  - backstage
+  - cicd
+  - github
+  - gitlab
+  - gitops
+  - review-inbox
+  claims:
+  - GitHub environments and deployment reviews provide a native approval queue for
+    protected deployments, while GitHub Checks provide structured CI/status evidence.
+  - GitLab Review Apps provide per-branch or per-merge-request environments for inspecting
+    live changes before merge.
+  - Argo CD ApplicationSet Pull Request generators can create Applications for open
+    pull requests but require admin controls because templating can leak or misuse
+    secrets if mis-scoped.
+  planning_relevance:
+  - Supports SURF-004, IFACE-004, PRQ-004, ARCH-008, ARCH-009, and platform-readiness
+    checks for dynamic review environments.
+- id: NSE-20260623-review-inbox-skill-implementation-best-p
+  reference: northstar://evidence/NSE-20260623-review-inbox-skill-implementation-best-p
+  title: Review inbox skill implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:00:57Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-review-inbox-skill-implementation-best-p.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-skill-implementation-best-p-2026-06-23-review-inbox-skill-best-practices-md"
+  source_uri:
+  source_sha256: 87871ca0939b39c2eeb23bb1e83fc23356923a0d3886f8e6de7bcb2dc2e70306
+  summary: Primary-source research for the first stable review-inbox packet contract,
+    covering GitHub PR/check/deployment/environment APIs, GitLab review apps, Argo
+    CD pull-request preview generation and security constraints, and OpenGitOps reconciliation
+    principles.
+  tags:
+  - argocd
+  - delivery
+  - github
+  - gitlab
+  - gitops
+  - human-review
+  - review-inbox
+  claims:
+  - Review inbox packets should bind PR identity, exact head SHA, checks/workflow
+    results, deployment or preview environment state, reviewer state, rollback readiness,
+    telemetry links, evidence completeness, recommendation, and feedback route.
+  - Preview or review environments generated from PRs require explicit traceability
+    and security controls, including source-of-truth ownership and safe generator
+    configuration.
+  - GitOps-aligned review evidence should distinguish desired state, observed runtime
+    state, and reconciliation evidence rather than treating pipeline completion as
+    deployment proof.
+  planning_relevance:
+  - Supports defining the `review-inbox` packet schema, required evidence groups,
+    completeness verdicts, recommendation states, and feedback routing.
+  - Supports `SURF-004`, `IFACE-004`, `PRQ-004`, `ARCH-008`, `ARCH-009`, and the `sdlc-review-inbox`
+    OpenClaw workflow stage.
+  - Supports keeping `review-inbox` as a promoted capability contract before adding
+    a top-level canonical skill.
+- id: NSE-20260623-review-inbox-wave-release-primary-sources
+  reference: northstar://evidence/NSE-20260623-review-inbox-wave-release-primary-sources
+  title: Review inbox and wave release primary sources
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:41:41Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-review-inbox-wave-release-primary-sources.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-wave-release-primary-sources-2026-06-23-review-inbox-wave-release-sources-md"
+  source_uri:
+  source_sha256: 3c5aae58dfd058f9d8cf49c23d7488cc6b4496f8631a2ae1ac1d574385965a7b
+  summary: Primary-source evidence for review-ready delivery, GitHub deployment gates,
+    issue hierarchy, merge queues, GitOps preview environments, Argo/Flux release
+    mechanics, and progressive delivery.
+  tags:
+  - argo
+  - cicd
+  - flux
+  - github
+  - gitops
+  - review-inbox
+  - wave-release-planning
+  claims:
+  - GitHub environments can require deployment protection rules such as manual approval,
+    wait timers, branch restrictions, and custom protection rules before deployment
+    jobs proceed.
+  - GitHub Issues support dependencies, sub-issues, metadata, and CLI workflows that
+    can represent initiatives, waves, and task lanes.
+  - GitHub merge queues require CI to run on merge_group events and can validate queued
+    PR changes against the latest target branch plus earlier queued changes.
+  - OpenGitOps frames desired state as declarative, versioned and immutable, automatically
+    pulled, and continuously reconciled.
+  - Argo CD pull request generators support per-PR test environments, while Argo CD
+    sync phases and sync waves provide deployment validation and resource sequencing
+    mechanics.
+  - Argo Rollouts supports blue-green, canary, analysis, experimentation, and progressive
+    delivery capabilities for Kubernetes.
+  planning_relevance:
+  - Supports promoting review-inbox and wave-release-planning capabilities from the
+    SDLC skill design.
+  - Supports keeping product delivery waves distinct from Argo CD sync waves while
+    using GitOps for environment reconciliation.
+  - Strengthens GitHub backlog synchronization requirements for issues, sub-issues,
+    merge queues, deployments, and checks.
+- id: NSE-20260623-secrets-credential-injection-patterns
+  reference: northstar://evidence/NSE-20260623-secrets-credential-injection-patterns
+  title: Secrets and credential injection patterns
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-secrets-credential-injection-patterns.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-secrets-credential-injection-patterns-2026-06-23-secrets-credential-injection-patterns"
+  source_uri:
+  source_sha256: 277b5f31513b6996afb3d785e5f55e065abd5d796ad0a87dceebb6111a0adc78
+  summary: Primary-source research on External Secrets Operator, Vault Agent Injector,
+    Kubernetes Secrets encryption, and GitHub OIDC for scoped runtime credential handling.
+  tags:
+  - external-secrets
+  - github-oidc
+  - kubernetes
+  - platform-readiness
+  - secrets
+  - security
+  - vault
+  claims:
+  - External Secrets Operator synchronizes external provider data into Kubernetes
+    and makes operator identity, SecretStore scope, RBAC, and namespace boundaries
+    part of the security boundary.
+  - Vault Agent Injector supports runtime secret retrieval for pods, while Kubernetes
+    Secret objects still require RBAC and encryption-at-rest controls.
+  - GitHub Actions OIDC supports short-lived cloud credentials instead of long-lived
+    stored CI secrets.
+  planning_relevance:
+  - Supports ARQ-003, ARCH-007, platform-readiness secret checks, CI credential policy,
+    and safe Brave Search credential handling.
+- id: NSE-20260623-session-ledger-implementation-best-pract
+  reference: northstar://evidence/NSE-20260623-session-ledger-implementation-best-pract
+  title: Session ledger implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:28:38Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-session-ledger-implementation-best-pract.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-session-ledger-implementation-best-pract-2026-06-23-session-ledger-best-practices-md"
+  source_uri:
+  source_sha256: 6b4f885cbdce9d5101926ffe3fcbdc85b3744110df0a201d1836f17a1926e1d4
+  summary: Primary-source research for a first stable session-ledger contract, covering
+    CloudEvents event envelopes, W3C Trace Context correlation, OpenTelemetry traces
+    and semantic conventions, SLSA provenance, Sigstore Rekor transparency patterns,
+    Temporal event history, LangGraph persistence, and GitHub workflow/check/deployment
+    references.
+  tags:
+  - audit
+  - cloudevents
+  - controller-loop
+  - opentelemetry
+  - orchestration
+  - provenance
+  - session-ledger
+  - trace-context
+  claims:
+  - Session ledger events should use a stable event envelope with ID, source, type,
+    time, subject, correlation IDs, actor/session identity, artifact refs, evidence
+    refs, external refs, previous event ID, content hash, result, and summary.
+  - Ledger reconstruction should be append-oriented and preserve parent/child session
+    graph, wave/session/PR/deployment/review relationships, checkpoints, handoffs,
+    and exceptions so lifecycle state survives model context loss.
+  - First implementation should remain a controller-loop YAML artifact with checksum
+    and external-reference fields, while deferring storage-engine choice, signing,
+    transparency-log inclusion, and automated trace ingestion.
+  planning_relevance:
+  - Supports defining `session-ledger.schema.yaml`, append-oriented event fields,
+    parent/child session graph, correlation IDs, artifact/evidence/external refs,
+    checksums, and exception handling.
+  - Supports `PRQ-005`, `ARQ-005`, `ARCH-008`, `sdlc-lane-dispatch`, controller reconstruction,
+    learning capture, and durable handoff after model context loss.
+  - Supports keeping `session-ledger` as a controller-loop artifact contract before
+    adding a top-level canonical skill.
+- id: NSE-20260623-source-control-migration-local-forges
+  reference: northstar://evidence/NSE-20260623-source-control-migration-local-forges
+  title: Source-control migration and local forge patterns
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:08:00Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-source-control-migration-local-forges.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-source-control-migration-local-forges-2026-06-23-source-control-migration-local-forges"
+  source_uri:
+  source_sha256: f65495bbfb36c142ed612660d503bb700195c1850322e005df178222a1fee504
+  summary: Primary-source research comparing GitLab, Gitea, and Forgejo documentation
+    for imports, CI runners, package/container registry, mirroring, and GitHub authority
+    migration planning.
+  tags:
+  - cicd
+  - forgejo
+  - gitea
+  - gitlab
+  - platform-readiness
+  - registry
+  - source-control
+  claims:
+  - GitLab provides first-class GitHub import, CI/CD, runners, and container registry
+    capabilities but expands readiness scope across import, runner, registry, environment,
+    and policy operations.
+  - Gitea and Forgejo provide lighter local forge options with Actions-like runners
+    and package/container registry support.
+  - Verdify should keep GitHub as delivery authority until a specific migration ADR
+    changes issue, PR, check, review, and deployment ownership.
+  planning_relevance:
+  - Supports PRQ-010, ARQ-010, ARCH-009, and source-control migration readiness planning.
+- id: NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  reference: northstar://evidence/NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  title: Sunshine Gravity extraction architecture audit
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T17:15:22Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-sunshine-gravity-extraction-architecture-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-sunshine-gravity-extraction-architecture-audit-2026-06-23-sunshine-gravity-extraction-architect"
+  source_uri:
+  source_sha256: 9dec8e0c0ab78c9bbb8e397bb4c5349a777ba38fbf32b12a63ecc1e441e0ec02
+  summary: Source-boundary audit comparing Sunshine Club's implemented Gravity-like
+    substrate with Verdify Gravity's generic core and Sunshine client-pack target
+    shape.
+  tags:
+  - architecture
+  - gravity
+  - gravity-core-extraction
+  - mcp
+  - source-boundary
+  - sunshine-club
+  claims:
+  - Sunshine Club has substantial reusable Gravity-like implementation, but package
+    names, env vars, paths, MCP instructions, business stories, and corpus assumptions
+    remain Sunshine-specific.
+  - Verdify Gravity already defines a cleaner verdify_gravity core package and clients/sunshine
+    pack boundary for generic core plus client-specific source setup.
+  - Extraction should port generic scanner, SHA-256/object staging, Postgres pipeline,
+    readiness, read-only MCP, and validation contracts first, while keeping Sunshine
+    taxonomy/prompts/business stories in a client pack.
+  planning_relevance:
+  - Supports PRQ-019, ARQ-018, WAVE-005, Gravity readiness, and Sunshine-to-Gravity
+    migration planning.
+- id: NSE-20260623-sunshine-gravity-reuse-local-evidence
+  reference: northstar://evidence/NSE-20260623-sunshine-gravity-reuse-local-evidence
+  title: Sunshine Gravity reuse local evidence
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:50:52Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-sunshine-gravity-reuse-local-evidence.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-sunshine-gravity-reuse-local-evidence-2026-06-23-sunshine-gravity-reuse-local-evidence"
+  source_uri:
+  source_sha256: 5f31450cc3753956e708c6c1a2221cc542c2ad99f19f81fcc19d497948694896
+  summary: Observed local Sunshine Club evidence for reusable Gravity file-to-knowledge
+    substrate, including NAS/SHA/S3/Postgres/Qdrant/vault/MCP/review/root-of-trust
+    surfaces and the generic-core versus Sunshine-pack boundary.
+  tags:
+  - evidence-ingestion
+  - file-to-knowledge
+  - gravity
+  - gravity-core-extraction
+  - mcp
+  - postgres
+  - qdrant
+  - review
+  - s3
+  - sunshine-club
+  - vault
+  claims:
+  - Sunshine Club documents a production model where source paths remain provenance,
+    SHA-256 identified bytes are copied into managed S3 source objects, and downstream
+    processing uses the managed object after ingest.
+  - Sunshine planning makes content_sha256 the durable unit of progress and demotes
+    runs to audit/provenance rather than ownership of file intelligence.
+  - Sunshine architecture separates generic Gravity file enrichment from Sunshine-specific
+    prompt/schema pack enrichment.
+  - Sunshine implementation includes source-byte resolution by content_sha256, Gravity
+    artifact services, vault projection, review store, governed Gravity MCP tools,
+    and root-of-trust verification.
+  - Sunshine has tests and scripts around Gravity readiness, vault projection, review
+    queues, root-of-trust, S3 storage, reconciliation, Kubernetes/NAS smoke, production
+    audits, and pipeline health.
+  planning_relevance:
+  - Supports the North Star Sunshine-to-Gravity extraction path and the plan to pilot
+    local filesystem evidence ingestion only after platform readiness and review workflow
+    are approved.
+- id: NSE-20260623-supply-chain-policy-knowledge-store-primary-sources
+  reference: northstar://evidence/NSE-20260623-supply-chain-policy-knowledge-store-primary-sources
+  title: Supply chain, policy, and knowledge store primary sources
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T16:42:13Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-supply-chain-policy-knowledge-store-primary-sources.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-supply-chain-policy-knowledge-store-primary-sources-2026-06-23-supply-chain-policy-knowledge-store-s"
+  source_uri:
+  source_sha256: 7e80dbe4a093cf49045223722b65b42a1796804774b2b6c41e3066a6414090e0
+  summary: Primary-source evidence for SLSA provenance, Tekton Chains attestations,
+    CycloneDX provenance, OPA policy-as-code, Kubernetes RBAC/multi-tenancy, and storage
+    tradeoffs for knowledge/evidence systems.
+  tags:
+  - cyclonedx
+  - kubernetes
+  - opa
+  - pgvector
+  - policy-as-code
+  - provenance
+  - qdrant
+  - security
+  - supply-chain
+  - tekton
+  claims:
+  - SLSA provenance describes where, when, and how artifacts were produced so consumers
+    can verify artifacts against expectations or rebuild them if needed.
+  - Tekton Chains can generate and sign in-toto attestations for images and store/query
+    attestations through a transparency log.
+  - CycloneDX provenance can track origin, development, ownership, location, and modification
+    chronology of software components.
+  - OPA externalizes policy decisions and can enforce policy across microservices,
+    Kubernetes, CI/CD pipelines, APIs, and gateways.
+  - Kubernetes RBAC guidance emphasizes least privilege, minimizing privileged service-account
+    tokens, and treating namespace boundaries as insufficient by themselves.
+  - Kubernetes multi-tenancy guidance pairs namespace access control with RBAC and
+    ResourceQuota to constrain tenant access and resource consumption.
+  planning_relevance:
+  - Supports distinguishing review-ready evidence from production-ready supply-chain
+    evidence.
+  - Supports adding policy-as-code hooks to platform-readiness, agent-platform-control,
+    and release-verification rather than relying only on prompts.
+  - Supports treating pgvector and Qdrant as tradeoff points for Gravity and evidence-system
+    retrieval.
+- id: NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  reference: northstar://evidence/NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  title: 'Walk transcript: Agent Platform, Gravity, and Skills'
+  evidence_type: transcript
+  evidence_status: reported
+  ingested_at: '2026-06-23T02:20:21Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-walk-transcript-agent-platform-gravity-skills.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-walk-transcript-agent-platform-gravity-skills-2026-06-23-walk-transcript-agent-platform-gravit"
+  source_uri:
+  source_sha256: b249abc5a0b7df64c650d753f7016562c957d4f0d3a8f8546ed7fe6fd19b4664
+  summary: Reported transcript evidence for Gravity readiness, North Star governance,
+    transcript intake, repo hygiene, controller loops, platform readiness, observability,
+    and deployed review.
+  tags:
+  - agent-platform
+  - gravity
+  - northstar
+  - skills
+  - transcript
+  claims:
+  - Gravity implementation is blocked until the Agent Platform, SDLC skills, credentials,
+    namespaces, CI/CD, observability, and human-review workflow are ready and approved.
+  - Walk transcripts are top-level planning input that should become structured proposed
+    changes.
+  planning_relevance:
+  - Feeds North Star planning, project definition, platform readiness, and Gravity
+    readiness gates.
+- id: NSE-20260623-wave-release-planning-implementation-bes
+  reference: northstar://evidence/NSE-20260623-wave-release-planning-implementation-bes
+  title: Wave release planning implementation best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-23T18:12:08Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-wave-release-planning-implementation-bes.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-wave-release-planning-implementation-bes-2026-06-23-wave-release-planning-best-practices"
+  source_uri:
+  source_sha256: e022797a098b0bed4821a94d91865f9af76ab8090242e8a8b849ec96736f26b1
+  summary: Primary-source research for a first stable wave-release-plan contract,
+    covering GitHub merge queues and environments, Argo CD sync waves, Argo Rollouts
+    progressive delivery, Flux reconciliation/remediation, Kubernetes namespace controls,
+    and OpenGitOps principles.
+  tags:
+  - argo-rollouts
+  - argocd
+  - delivery
+  - flux
+  - github
+  - gitops
+  - kubernetes
+  - wave-release-planning
+  claims:
+  - Wave release plans should record branch or merge-queue model, required checks
+    and merge_group support, deployment environments, protection rules, CI workflows,
+    preview/review environment constraints, GitOps desired-state references, reconciliation
+    checks, deployment strategy, rollback, and release-health signals before dispatch.
+  - Preview and review environments should define namespace, quota, limit, network
+    policy, TTL, secrets scope, and observed revision requirements before worker sessions
+    begin.
+  - Progressive delivery and GitOps evidence should distinguish product release waves
+    from Argo CD sync waves while preserving ordered deployment, health gates, remediation,
+    promotion criteria, and rollback readiness.
+  planning_relevance:
+  - Supports defining the `wave-release-plan` artifact schema, required CI/CD evidence
+    groups, environment expectations, GitOps references, release-health signals, and
+    rollback criteria.
+  - Supports `PRQ-006`, `ARQ-006`, `ARCH-009`, `WAVE-002`, `WAVE-007`, and the `sdlc-wave-planning`
+    OpenClaw workflow stage.
+  - Supports keeping `wave-release-planning` as a sprint-planning mode before adding
+    a top-level canonical skill.

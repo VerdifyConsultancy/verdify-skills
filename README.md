@@ -1,6 +1,6 @@
 # Verdify Lifecycle Skills
 
-Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages nine coherent Agent Skills, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
+Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages seventeen coherent Agent Skills, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
 
 The repository is deliberately not one giant sprint prompt. Each skill owns a bounded lifecycle responsibility, consumes durable artifacts, produces durable artifacts, and hands off without relying on hidden chat history.
 
@@ -8,24 +8,37 @@ The repository is deliberately not one giant sprint prompt. Each skill owns a bo
 
 ```text
 project-router
+  -> transcript-replan
+       transcript evidence -> routed proposals -> conflicts/gates
+  -> northstar-research-ingest
+       research files -> collateral copies -> queryable evidence registry
+  -> northstar-planning
+       registered evidence + ideation + requirements + feedback -> self-improving drafts -> locked North Star
+  -> northstar-interview
+       review-ready drafts + evidence -> prioritized Q&A -> feedback routing
   -> project-definition
        discovery -> requirements -> product -> design surface
   -> architecture-contracts
        north-star architecture -> black-box module contracts
   -> state-of-union
        backlog alignment -> execution strategy -> next sprint candidates
+  -> repo-hygiene
+       Wave 0 compliance -> safe cleanup -> hygiene gate
   -> sprint-planning
-       issue selection -> sprint plan -> lane topology -> lane contracts
+       issue selection -> sprint plan -> lane topology -> lane contracts -> wave release plan
   -> sprint-orchestrator
        dispatch -> monitor -> reconcile
+       |-> controller-loop (durable controller state + session ledger)
+       |-> platform-readiness (Agent Platform, environment/GitOps gates, and control requests)
+       |-> gravity-readiness (Gravity pilot gate + core extraction plan)
        |-> lane-delivery (one worker session in one worktree)
        |-> independent-critic (fresh session and review worktree)
   -> release-verification
-       integration -> deployment verification -> outcome review
+       review inbox packet -> diagnostics -> integration -> deployment verification -> outcome review
   -> project-router
 ```
 
-The 17 detailed stages from the original outline remain represented in `verdify.workflow.yaml`; the nine top-level skills reduce activation ambiguity and context overhead.
+The 17 detailed delivery stages from the original outline remain represented in `verdify.workflow.yaml`; readiness and controller-loop skills add the gates needed to turn transcript-driven planning into safe autonomous execution.
 
 ## Non-negotiable operating model
 
@@ -35,7 +48,8 @@ The 17 detailed stages from the original outline remain represented in `verdify.
 - **One issue = one lane = one branch = one worktree = one pull request** by default. A coupled multi-issue lane requires an explicit justification and approval.
 - **One coding agent/session per worktree.** A local lease prevents two worker sessions from owning the same lane. Critics use a fresh session and a separate detached review worktree.
 - **Worktrees are disposable execution locations, not durable identity.** Lane ID, issue, branch, baseline SHA, contract, and lease identify work.
-- **No self-certification.** Deterministic checks and a fresh critic precede integration.
+- **No self-certification.** Deterministic checks, a fresh critic, and a review
+  inbox packet precede integration when work claims review-ready status.
 - **Merge is not deployment.** The intended revision must be proven in the target environment before outcome acceptance.
 
 See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/lane-worktrees.md` for the precise rules.
@@ -43,7 +57,7 @@ See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/la
 ## Repository contents
 
 ```text
-skills/                     Nine canonical Agent Skills
+skills/                     Seventeen canonical Agent Skills
 .agents/skills/             Codex discovery links
 .claude/skills/             Claude Code discovery links
 bin/verdify                 Dependency-free lifecycle CLI
@@ -56,6 +70,11 @@ verdify.workflow.yaml       Full lifecycle and lane child workflow
 ```
 
 There are no duplicated root prompt packs or schema copies inside individual skills. Skill detail is progressively disclosed through focused `references/` files.
+
+Gravity reuse planning stays under `gravity-readiness`: when Sunshine-to-Gravity
+extraction is in scope, record a validated
+`.agent-workflow/gravity/gravity-core-extraction-plan.yaml` before any Gravity
+implementation lane opens.
 
 ## Validate this package
 
@@ -173,6 +192,10 @@ bin/verdify github reconcile --repo-path /path/to/target --sprint 2026-06-22-a
 ```
 
 GitHub remains authoritative; `.agent-workflow/github/snapshot.json` is an ignored cache.
+When backlog strategy depends on issue, PR, lane, check, deployment, dependency,
+or Project state, record a validated
+`.agent-workflow/strategy/github-backlog-sync.yaml` artifact under
+`state-of-union`.
 
 ## Agent host setup
 
@@ -202,6 +225,7 @@ Before enforcing code-owner review, replace the commented example in `.github/CO
 - `docs/authority-model.md` — typed source-of-truth boundaries
 - `docs/github-operating-model.md` — issues, PRs, Projects, checks, and deployments
 - `docs/lane-worktrees.md` — lane leases, worktrees, runtime namespaces, and cleanup
+- `docs/northstar/README.md` - North Star evidence ledger and planning inputs
 - `docs/security-and-permissions.md` — least privilege and production separation
 - `docs/research/industry-alignment.md` — primary-source design rationale
 - `docs/migration-from-v0.1.md` — migration from the original single sprint skill

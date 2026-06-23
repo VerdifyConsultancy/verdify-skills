@@ -4,11 +4,18 @@ module Verdify
   class CLI
     SKILLS = %w[
       project-router
+      transcript-replan
+      northstar-planning
+      northstar-research-ingest
       project-definition
       architecture-contracts
       state-of-union
+      repo-hygiene
       sprint-planning
       sprint-orchestrator
+      controller-loop
+      platform-readiness
+      gravity-readiness
       lane-delivery
       independent-critic
       release-verification
@@ -47,6 +54,7 @@ module Verdify
       when "init" then command_init
       when "route" then command_route
       when "artifact" then command_artifact
+      when "northstar" then command_northstar
       when "sprint" then command_sprint
       when "lane" then command_lane
       when "prompt" then command_prompt
@@ -69,6 +77,8 @@ module Verdify
           init                       Initialize .agent-workflow in a target repository
           route                      Determine and optionally write the next skill/mode
           artifact validate          Validate an artifact against its schema_ref
+          northstar ingest-research  Register research in the North Star evidence registry
+          northstar evidence list    Query registered North Star evidence
           sprint init                Create a draft sprint skeleton and approval gate
           lane create                Create and lock one worker worktree/lease
           lane review                Create a fresh detached critic worktree/lease
@@ -182,6 +192,7 @@ module Verdify
 
       %w[
         router project architecture/decisions modules/contracts sprints github
+        northstar/collateral/sources northstar/research-inbox
       ].each { |relative| FileUtils.mkdir_p(root.join(relative)) }
 
       puts "Verdify initialized in #{repo.root}"
@@ -264,6 +275,195 @@ module Verdify
         warn errors.map { |e| "#{file}: #{e}" }.join("\n")
         1
       end
+    end
+
+    def command_northstar
+      subcommand = @argv.shift
+      case subcommand
+      when "ingest-research" then command_northstar_ingest_research
+      when "evidence" then command_northstar_evidence
+      else
+        raise UsageError, "Usage: bin/verdify northstar <ingest-research|evidence>"
+      end
+    end
+
+    def command_northstar_ingest_research
+      options = {
+        repo: Dir.pwd,
+        file: nil,
+        title: nil,
+        summary: nil,
+        id: nil,
+        source_uri: nil,
+        evidence_type: "research_note",
+        evidence_status: "observed",
+        tags: [],
+        claims: [],
+        planning_relevance: [],
+        limitations: [],
+        json: false
+      }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify northstar ingest-research --file PATH --title TITLE --summary TEXT [options]"
+        o.on("--repo PATH", "Target Git repository") { |v| options[:repo] = v }
+        o.on("--file PATH", "Research source file to ingest") { |v| options[:file] = v }
+        o.on("--title TITLE", "Evidence title") { |v| options[:title] = v }
+        o.on("--summary TEXT", "Why this evidence matters") { |v| options[:summary] = v }
+        o.on("--id ID", "Stable evidence ID; default is generated") { |v| options[:id] = v }
+        o.on("--source-uri URI", "Original source URL or URI") { |v| options[:source_uri] = v }
+        o.on("--type TYPE", %w[research_note research_report source_doc benchmark external_reference adversarial_review transcript observation]) { |v| options[:evidence_type] = v }
+        o.on("--status STATUS", %w[verified observed reported inferred unknown]) { |v| options[:evidence_status] = v }
+        o.on("--tag TAG", "Evidence tag; repeatable or comma-separated") { |v| options[:tags].concat(split_list(v)) }
+        o.on("--claim TEXT", "Source-backed claim; repeatable") { |v| options[:claims] << v }
+        o.on("--relevance TEXT", "Planning relevance; repeatable") { |v| options[:planning_relevance] << v }
+        o.on("--limitation TEXT", "Evidence limitation; repeatable") { |v| options[:limitations] << v }
+        o.on("--json", "Emit JSON") { options[:json] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      raise UsageError, "--file is required" if options[:file].to_s.empty?
+      raise UsageError, "--title is required" if options[:title].to_s.empty?
+      raise UsageError, "--summary is required" if options[:summary].to_s.empty?
+
+      repo = GitRepository.new(options[:repo])
+      source = Pathname.new(options[:file]).expand_path
+      raise UsageError, "research file does not exist: #{source}" unless source.file?
+
+      root = repo.root.join(".agent-workflow/northstar")
+      collateral_dir = root.join("collateral")
+      source_dir = collateral_dir.join("sources")
+      registry_path = root.join("evidence-registry.yaml")
+      FileUtils.mkdir_p(source_dir)
+
+      now = Verdify.utc_now
+      evidence_id = options[:id].to_s.empty? ? next_northstar_evidence_id(registry_path, options[:title]) : options[:id]
+      unless evidence_id.match?(/\ANSE-[0-9]{8}-[a-z0-9][a-z0-9-]*\z/)
+        raise UsageError, "invalid evidence ID: #{evidence_id}"
+      end
+
+      registry = load_northstar_registry(repo, registry_path, now)
+      if Array(registry["evidence"]).any? { |item| item["id"] == evidence_id }
+        raise UsageError, "evidence already exists: #{evidence_id}"
+      end
+
+      source_sha = Digest::SHA256.file(source).hexdigest
+      copied_source = source_dir.join("#{evidence_id}-#{Verdify.slug(source.basename.to_s, max: 48)}")
+      item_path = collateral_dir.join("#{evidence_id}.yaml")
+      raise UsageError, "evidence item already exists: #{item_path}" if item_path.exist?
+      raise UsageError, "copied source already exists: #{copied_source}" if copied_source.exist?
+
+      FileUtils.cp(source, copied_source)
+      reference = "northstar://evidence/#{evidence_id}"
+      rel_item = item_path.relative_path_from(repo.root).to_s
+      rel_source = copied_source.relative_path_from(repo.root).to_s
+
+      item = {
+        "schema_ref" => "northstar-evidence-item.schema.yaml",
+        "kind" => "NorthStarEvidenceItem",
+        "schema_version" => "1.0",
+        "id" => evidence_id,
+        "reference" => reference,
+        "title" => options[:title],
+        "evidence_type" => options[:evidence_type],
+        "evidence_status" => options[:evidence_status],
+        "ingested_at" => now,
+        "source" => {
+          "uri" => options[:source_uri],
+          "original_path" => source.to_s,
+          "copied_path" => rel_source,
+          "sha256" => source_sha
+        },
+        "summary" => options[:summary],
+        "tags" => normalize_tags(options[:tags]),
+        "claims" => options[:claims],
+        "planning_relevance" => options[:planning_relevance],
+        "limitations" => options[:limitations]
+      }
+      validate_hash!(item, "northstar-evidence-item.schema.yaml", "northstar evidence item")
+
+      registry_entry = {
+        "id" => evidence_id,
+        "reference" => reference,
+        "title" => options[:title],
+        "evidence_type" => options[:evidence_type],
+        "evidence_status" => options[:evidence_status],
+        "ingested_at" => now,
+        "item_path" => rel_item,
+        "copied_source_path" => rel_source,
+        "source_uri" => options[:source_uri],
+        "source_sha256" => source_sha,
+        "summary" => options[:summary],
+        "tags" => item["tags"],
+        "claims" => options[:claims],
+        "planning_relevance" => options[:planning_relevance]
+      }
+      registry["updated_at"] = now
+      registry["evidence"] = Array(registry["evidence"]).reject { |entry| entry["id"] == evidence_id } << registry_entry
+      registry["evidence"] = registry["evidence"].sort_by { |entry| entry["id"] }
+      validate_hash!(registry, "northstar-evidence-registry.schema.yaml", "northstar evidence registry")
+
+      Verdify.atomic_write(item_path, YAML.dump(item))
+      Verdify.atomic_write(registry_path, YAML.dump(registry))
+
+      result = {
+        "id" => evidence_id,
+        "reference" => reference,
+        "item_path" => rel_item,
+        "registry_path" => registry_path.relative_path_from(repo.root).to_s,
+        "copied_source_path" => rel_source
+      }
+      if options[:json]
+        puts JSON.pretty_generate(result)
+      else
+        puts "Ingested #{evidence_id}"
+        puts "Reference: #{reference}"
+        puts "Item: #{rel_item}"
+        puts "Registry: #{result['registry_path']}"
+        puts "Source copy: #{rel_source}"
+      end
+      0
+    end
+
+    def command_northstar_evidence
+      subcommand = @argv.shift
+      raise UsageError, "Usage: bin/verdify northstar evidence list [--repo PATH] [--query TEXT] [--tag TAG] [--json]" unless subcommand == "list"
+
+      options = { repo: Dir.pwd, query: nil, tags: [], json: false }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify northstar evidence list [--repo PATH] [--query TEXT] [--tag TAG] [--json]"
+        o.on("--repo PATH") { |v| options[:repo] = v }
+        o.on("--query TEXT") { |v| options[:query] = v }
+        o.on("--tag TAG", "Filter by tag; repeatable or comma-separated") { |v| options[:tags].concat(split_list(v)) }
+        o.on("--json") { options[:json] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      repo = GitRepository.new(options[:repo])
+      registry_path = repo.root.join(".agent-workflow/northstar/evidence-registry.yaml")
+      registry = registry_path.file? ? Verdify.safe_load_yaml(registry_path) : empty_northstar_registry(repo, Verdify.utc_now)
+      entries = Array(registry["evidence"])
+      query = options[:query].to_s.downcase
+      tags = normalize_tags(options[:tags])
+      entries = entries.select { |entry| evidence_entry_matches?(entry, query, tags) }
+
+      result = {
+        "registry_path" => registry_path.relative_path_from(repo.root).to_s,
+        "count" => entries.length,
+        "evidence" => entries
+      }
+      if options[:json]
+        puts JSON.pretty_generate(result)
+      else
+        if entries.empty?
+          puts "No matching North Star evidence."
+        else
+          puts format("%-28s %-32s %-16s %s", "ID", "TITLE", "TAGS", "REFERENCE")
+          entries.each do |entry|
+            puts format("%-28s %-32s %-16s %s", entry["id"], entry["title"][0, 32], Array(entry["tags"]).join(","), entry["reference"])
+          end
+        end
+      end
+      0
     end
 
     def command_sprint
@@ -874,6 +1074,15 @@ module Verdify
         return route_hash(repo, "OPEN_GATE", skill, mode, "An open durable gate blocks normal progression.", evidence, missing, open_gates)
       end
 
+      intake_route = route_for_pending_transcript_replan(repo, root, evidence, missing, open_gates)
+      return intake_route if intake_route
+
+      research_route = route_for_pending_northstar_research_ingest(repo, root, evidence, missing, open_gates)
+      return research_route if research_route
+
+      northstar_route = route_for_pending_northstar_plan(repo, root, evidence, missing, open_gates)
+      return northstar_route if northstar_route
+
       project_path = root.join("project/project-definition.yaml")
       unless project_path.file?
         missing << project_path.relative_path_from(repo.root).to_s
@@ -1001,7 +1210,138 @@ module Verdify
         return route_hash(repo, "STATE_OF_UNION_HANDOFF_INCOMPLETE", "state-of-union", "strategy-review", "The approved strategy does not name a complete handoff.", evidence, missing, open_gates)
       end
 
+      hygiene_route = route_for_repo_hygiene(repo, root, evidence, missing, open_gates) if skill == "sprint-planning"
+      return hygiene_route if hygiene_route
+
       route_hash(repo, "STATE_OF_UNION_HANDOFF", skill, mode, reason, evidence, missing, open_gates)
+    end
+
+    def route_for_pending_transcript_replan(repo, root, evidence, missing, open_gates)
+      sources = Dir[repo.root.join("docs/northstar/evidence/*")].map { |path| Pathname.new(path) }.select(&:file?)
+      return nil if sources.empty?
+
+      intake_path = root.join("intake/transcript-replan.yaml")
+      if intake_path.file?
+        intake = Verdify.safe_load_yaml(intake_path)
+        evidence << { "source" => intake_path.relative_path_from(repo.root).to_s, "finding" => "transcript-replan status is #{intake['status'].inspect}" }
+        return nil if %w[routed approved].include?(intake["status"])
+      else
+        missing << intake_path.relative_path_from(repo.root).to_s
+      end
+
+      sources.first(5).each do |source|
+        evidence << { "source" => source.relative_path_from(repo.root).to_s, "finding" => "north-star evidence has not been routed into .agent-workflow" }
+      end
+      route_hash(repo, "TRANSCRIPT_REPLAN_REQUIRED", "transcript-replan", "ingest", "North Star evidence exists and has not been converted into a routed transcript-replan artifact.", evidence, missing, open_gates)
+    end
+
+    def route_for_pending_northstar_research_ingest(repo, root, evidence, missing, open_gates)
+      sources = [
+        Dir[root.join("northstar/research-inbox/*")],
+        Dir[repo.root.join("docs/northstar/research/*")]
+      ].flatten.map { |path| Pathname.new(path) }.select(&:file?)
+      return nil if sources.empty?
+
+      registry_path = root.join("northstar/evidence-registry.yaml")
+      registered = if registry_path.file?
+                     registry = Verdify.safe_load_yaml(registry_path)
+                     Array(registry["evidence"]).map { |entry| entry["source_sha256"] }
+                   else
+                     missing << registry_path.relative_path_from(repo.root).to_s
+                     []
+                   end
+      unregistered = sources.reject { |source| registered.include?(Digest::SHA256.file(source).hexdigest) }
+      return nil if unregistered.empty?
+
+      unregistered.first(5).each do |source|
+        evidence << {
+          "source" => source.relative_path_from(repo.root).to_s,
+          "finding" => "research source has not been registered in the North Star evidence registry"
+        }
+      end
+      route_hash(repo, "NORTHSTAR_RESEARCH_INGEST_REQUIRED", "northstar-research-ingest", "ingest-research", "Research sources exist but have not been copied into collateral and registered as queryable North Star evidence.", evidence, missing, open_gates)
+    end
+
+    def route_for_pending_northstar_plan(repo, root, evidence, missing, open_gates)
+      intake_path = root.join("intake/transcript-replan.yaml")
+      evidence_sources = Dir[repo.root.join("docs/northstar/evidence/*")].map { |path| Pathname.new(path) }.select(&:file?)
+      registry_path = root.join("northstar/evidence-registry.yaml")
+      registry = registry_path.file? ? Verdify.safe_load_yaml(registry_path) : nil
+      registry_has_evidence = registry.is_a?(Hash) && !Array(registry["evidence"]).empty?
+      return nil unless intake_path.file? || !evidence_sources.empty? || registry_has_evidence
+
+      if intake_path.file?
+        intake = Verdify.safe_load_yaml(intake_path)
+        intake_source = intake_path.relative_path_from(repo.root).to_s
+        unless evidence.any? { |item| item["source"] == intake_source }
+          evidence << { "source" => intake_source, "finding" => "transcript-replan status is #{intake['status'].inspect}" }
+        end
+        return nil unless %w[routed approved].include?(intake["status"])
+      end
+
+      if registry_has_evidence
+        evidence << {
+          "source" => registry_path.relative_path_from(repo.root).to_s,
+          "finding" => "registered North Star evidence count is #{Array(registry['evidence']).length}"
+        }
+      end
+
+      product_path = root.join("northstar/NORTHSTAR_PRODUCT.md")
+      architecture_path = root.join("northstar/NORTHSTAR_ARCHITECTURE.md")
+      artifacts_path = root.join("northstar/northstar-artifacts.yaml")
+      artifacts_present = [product_path, architecture_path, artifacts_path].all?(&:file?)
+
+      plan_path = root.join("northstar/northstar-plan.yaml")
+      unless plan_path.file? || artifacts_present
+        missing << plan_path.relative_path_from(repo.root).to_s
+        return route_hash(repo, "NORTHSTAR_PLAN_MISSING", "northstar-planning", "intake", "Planning evidence has been routed, but no North Star planning artifact exists.", evidence, missing, open_gates)
+      end
+
+      if plan_path.file?
+        plan = Verdify.safe_load_yaml(plan_path)
+        evidence << { "source" => plan_path.relative_path_from(repo.root).to_s, "finding" => "northstar-plan status is #{plan['status'].inspect}" }
+        unless artifacts_present || (%w[approved].include?(plan["status"]) && plan.dig("approval", "status") == "approved")
+          return route_hash(repo, "NORTHSTAR_PLAN_INCOMPLETE", "northstar-planning", "synthesis", "North Star planning exists but is not approved.", evidence, missing, open_gates)
+        end
+      end
+
+      [product_path, architecture_path, artifacts_path].each do |path|
+        missing << path.relative_path_from(repo.root).to_s unless path.file?
+      end
+      unless missing.none? { |item| item.start_with?(".agent-workflow/northstar/NORTHSTAR_") || item == ".agent-workflow/northstar/northstar-artifacts.yaml" }
+        return route_hash(repo, "NORTHSTAR_ARTIFACTS_MISSING", "northstar-planning", "artifact-loop", "North Star evidence is routed, but product/architecture North Star artifacts or their signoff record are missing.", evidence, missing, open_gates)
+      end
+
+      artifacts = Verdify.safe_load_yaml(artifacts_path)
+      artifact_status = artifacts["status"].to_s
+      evidence << { "source" => artifacts_path.relative_path_from(repo.root).to_s, "finding" => "northstar-artifacts status is #{artifact_status.inspect}" }
+      product_ok = artifacts.dig("product", "status") == "approved"
+      architecture_ok = artifacts.dig("architecture", "status") == "approved"
+      review_ok = artifacts.dig("review", "status") == "approved"
+      return nil if artifact_status == "approved" && product_ok && architecture_ok && review_ok
+
+      mode = if artifact_status == "review_requested" || artifacts.dig("review", "status") == "requested"
+               "human-review"
+             elsif artifact_status == "blocked"
+               artifacts.dig("handoff", "next_mode").to_s.empty? ? "artifact-loop" : artifacts.dig("handoff", "next_mode")
+             else
+               "artifact-loop"
+             end
+      route_hash(repo, "NORTHSTAR_ARTIFACTS_INCOMPLETE", "northstar-planning", mode, "Product and architecture North Star artifacts must be cross-linked and signed off before downstream lifecycle skills treat them as core planning authority.", evidence, missing, open_gates)
+    end
+
+    def route_for_repo_hygiene(repo, root, evidence, missing, open_gates)
+      hygiene_path = root.join("hygiene/repo-hygiene.yaml")
+      unless hygiene_path.file?
+        missing << hygiene_path.relative_path_from(repo.root).to_s
+        return route_hash(repo, "REPO_HYGIENE_MISSING", "repo-hygiene", "assess", "Approved strategy is ready for sprint planning, but Wave 0 repo hygiene is missing.", evidence, missing, open_gates)
+      end
+
+      hygiene = Verdify.safe_load_yaml(hygiene_path)
+      evidence << { "source" => hygiene_path.relative_path_from(repo.root).to_s, "finding" => "repo-hygiene status is #{hygiene['status'].inspect}" }
+      return nil if hygiene["status"] == "complete" && hygiene.dig("approval", "status") == "approved"
+
+      route_hash(repo, "REPO_HYGIENE_INCOMPLETE", "repo-hygiene", "assess", "Repo hygiene must be complete and approved before sprint planning.", evidence, missing, open_gates)
     end
 
     def route_hash(repo, state, skill, mode, reason, evidence, missing, open_gates)
@@ -1024,8 +1364,12 @@ module Verdify
     def route_for_gate(type)
       case type
       when "project_definition" then ["project-definition", "gate-resolution"]
+      when "northstar" then ["northstar-planning", "human-review"]
       when "architecture" then ["architecture-contracts", "gate-resolution"]
       when "strategy" then ["state-of-union", "gate-resolution"]
+      when "repo_hygiene" then ["repo-hygiene", "gate-resolution"]
+      when "platform_readiness" then ["platform-readiness", "gate-resolution"]
+      when "gravity_readiness" then ["gravity-readiness", "gate-resolution"]
       when "plan_approval" then ["sprint-planning", "plan-approval"]
       when "deployment_approval", "incident", "outcome_acceptance" then ["release-verification", "gate-resolution"]
       else ["sprint-orchestrator", "gate-management"]
@@ -1168,6 +1512,74 @@ module Verdify
       errors = SchemaValidator.new.validate(document, schema)
       errors.concat(SemanticValidator.validate(document))
       raise Error, "#{label} failed validation:\n#{errors.join("\n")}" unless errors.empty?
+    end
+
+    def split_list(value)
+      value.to_s.split(",").map(&:strip).reject(&:empty?)
+    end
+
+    def normalize_tags(tags)
+      Array(tags).flat_map { |tag| split_list(tag) }
+                 .map { |tag| Verdify.slug(tag, max: 48) }
+                 .reject(&:empty?)
+                 .uniq
+                 .sort
+    end
+
+    def next_northstar_evidence_id(registry_path, title)
+      date = Time.now.utc.strftime("%Y%m%d")
+      base = "NSE-#{date}-#{Verdify.slug(title, max: 40)}"
+      registry = registry_path.file? ? Verdify.safe_load_yaml(registry_path) : {}
+      existing = Array(registry["evidence"]).map { |entry| entry["id"] }
+      id = base
+      counter = 2
+      while existing.include?(id) || registry_path.dirname.join("collateral/#{id}.yaml").file?
+        id = "#{base}-#{counter}"
+        counter += 1
+      end
+      id
+    end
+
+    def load_northstar_registry(repo, registry_path, now)
+      if registry_path.file?
+        registry = Verdify.safe_load_yaml(registry_path)
+        validate_hash!(registry, "northstar-evidence-registry.schema.yaml", "northstar evidence registry")
+        registry
+      else
+        empty_northstar_registry(repo, now)
+      end
+    end
+
+    def empty_northstar_registry(repo, now)
+      {
+        "schema_ref" => "northstar-evidence-registry.schema.yaml",
+        "kind" => "NorthStarEvidenceRegistry",
+        "schema_version" => "1.0",
+        "project_id" => repo.github_slug || "local/#{repo.root.basename}",
+        "generated_at" => now,
+        "updated_at" => now,
+        "evidence" => []
+      }
+    end
+
+    def evidence_entry_matches?(entry, query, tags)
+      entry_tags = normalize_tags(entry["tags"])
+      return false unless tags.all? { |tag| entry_tags.include?(tag) }
+      return true if query.empty?
+
+      haystack = [
+        entry["id"],
+        entry["reference"],
+        entry["title"],
+        entry["summary"],
+        entry["source_uri"],
+        entry["item_path"],
+        entry["copied_source_path"],
+        Array(entry["tags"]).join(" "),
+        Array(entry["claims"]).join(" "),
+        Array(entry["planning_relevance"]).join(" ")
+      ].compact.join(" ").downcase
+      haystack.include?(query)
     end
 
     def resolve_repo_path(repo, value)

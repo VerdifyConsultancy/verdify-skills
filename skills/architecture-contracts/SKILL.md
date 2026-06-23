@@ -24,7 +24,9 @@ Define the system before dividing implementation work. Architecture describes th
 
 ## Mode 1: north-star architecture
 
-1. Verify that project definition is approved and traceable.
+1. Verify that `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md`, and
+   `northstar-artifacts.yaml` are approved or explicitly accepted as draft
+   input, and that project definition is approved and traceable.
 2. Reconstruct existing code and deployment reality before proposing changes.
 3. Define system context, components, runtime topology, data flow, storage, external integrations, trust/security boundaries, deployment model, observability, failure modes, and major tradeoffs.
 4. Record material choices as ADRs with alternatives and consequences.

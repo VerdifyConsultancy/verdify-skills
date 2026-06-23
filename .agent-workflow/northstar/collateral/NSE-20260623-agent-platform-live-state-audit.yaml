@@ -1,0 +1,36 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-agent-platform-live-state-audit
+reference: northstar://evidence/NSE-20260623-agent-platform-live-state-audit
+title: Agent Platform live-state audit
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:15:22Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-agent-platform-live-state-audit.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-live-state-audit-2026-06-23-agent-platform-live-state-audit-md"
+  sha256: 5dfcab56be0a5e7cc153deca1c31740b8394aea30dec9b88a6bc5c0672cf5f80
+summary: Read-only GitHub, Git, Kubernetes, and Argo CD audit showing current Agent
+  Platform issues, PRs, repo pods, namespaces, and readiness gaps.
+tags:
+- agent-platform
+- argocd
+- github
+- kubernetes
+- live-state
+- platform-readiness
+- repo-pods
+claims:
+- Agent Platform remote main is ahead of the local checkout and GitHub currently has
+  35 open issues and 3 open PRs.
+- The agent-fleet-runners namespace has 31 StatefulSets and 31 running repo pods,
+  proving a live repo-pod runtime surface.
+- Argo CD live state includes Unknown, OutOfSync, and Degraded statuses that must
+  be reconciled before broad autonomous readiness claims.
+planning_relevance:
+- Supports platform-readiness, PRQ-017, PRQ-018, ARQ-016, ARQ-017, and readiness gating
+  for Agent Platform.
+limitations: []

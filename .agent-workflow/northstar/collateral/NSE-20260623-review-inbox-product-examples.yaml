@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-review-inbox-product-examples
+reference: northstar://evidence/NSE-20260623-review-inbox-product-examples
+title: Review inbox product examples
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:08:00Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-review-inbox-product-examples.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-product-examples-2026-06-23-review-inbox-product-examples-md"
+  sha256: 3dd06efcf74e374c60178883fdfa9b5ff8e1e5f161f513111c8c7160b80d5275
+summary: Primary-source research on GitHub deployment reviews/checks, GitLab Review
+  Apps, Backstage plugins, and Argo CD ApplicationSet PR generators as review-inbox
+  primitives.
+tags:
+- argocd
+- backstage
+- cicd
+- github
+- gitlab
+- gitops
+- review-inbox
+claims:
+- GitHub environments and deployment reviews provide a native approval queue for protected
+  deployments, while GitHub Checks provide structured CI/status evidence.
+- GitLab Review Apps provide per-branch or per-merge-request environments for inspecting
+  live changes before merge.
+- Argo CD ApplicationSet Pull Request generators can create Applications for open
+  pull requests but require admin controls because templating can leak or misuse secrets
+  if mis-scoped.
+planning_relevance:
+- Supports SURF-004, IFACE-004, PRQ-004, ARCH-008, ARCH-009, and platform-readiness
+  checks for dynamic review environments.
+limitations: []

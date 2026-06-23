@@ -7,6 +7,11 @@ principles:
   - "One authoritative owner exists for each information type."
   - "One issue maps to one lane, branch, worktree, worker session, and pull request by default."
   - "Workers do not self-certify; deployment requires runtime proof."
+  - "Transcript evidence becomes proposed lifecycle changes before protected artifacts are edited."
+  - "Research sources become registered, queryable North Star evidence before synthesis."
+  - "North Star planning runs a self-improving evidence, research, question, design, and feedback loop before final approval locks product and architecture artifacts for the next milestone."
+  - "North Star interview turns review-ready drafts and new evidence into prioritized human Q&A without recording approval."
+  - "Repo hygiene and platform readiness gate feature work when evidence says they are required."
 roles:
   router: {may_write_code: false, may_approve_own_work: false}
   planner: {may_write_code: false, may_approve_own_work: false}
@@ -43,7 +48,37 @@ state_machine:
       skill: project-router
       mode: route
       outputs: [.agent-workflow/router/route-decision.yaml]
-      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, ORCHESTRATE, CRITIC_REVIEW, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
+      transitions: [TRANSCRIPT_REPLAN, NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLAN_SPRINT, ORCHESTRATE, CONTROLLER_LOOP, PLATFORM_READINESS, GRAVITY_READINESS, CRITIC_REVIEW, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
+    TRANSCRIPT_REPLAN:
+      actor: planner
+      skill: transcript-replan
+      mode: ingest-or-route-proposals
+      outputs: [.agent-workflow/intake/transcript-replan.yaml]
+      transitions: [NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, DEFINE_PROJECT, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
+    NORTHSTAR_RESEARCH_INGEST:
+      actor: planner
+      skill: northstar-research-ingest
+      mode: ingest-research-or-evidence-list
+      outputs: [.agent-workflow/northstar/evidence-registry.yaml, .agent-workflow/northstar/collateral]
+      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, DEFINE_PROJECT, REVIEW_STRATEGY, ROUTE]
+    NORTHSTAR_PLANNING:
+      actor: planner
+      skill: northstar-planning
+      mode: intake-synthesis-artifact-loop-research-loop-or-review-feedback
+      outputs: [.agent-workflow/northstar/northstar-plan.yaml, .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml]
+      transitions: [NORTHSTAR_INTERVIEW, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
+    NORTHSTAR_INTERVIEW:
+      actor: planner
+      skill: northstar-interview
+      mode: review-question-pack-answer-capture-or-feedback-routing
+      outputs: [.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md]
+      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, ROUTE]
+    NORTHSTAR_GATE:
+      actor: outcome_owner
+      gate: northstar
+      artifact: .agent-workflow/gates/northstar.yaml
+      purpose: final-lock-approval-only
+      transitions: [NORTHSTAR_PLANNING, DEFINE_PROJECT, DEFINE_ARCHITECTURE, CANCELLED]
     DEFINE_PROJECT:
       actor: planner
       skill: project-definition
@@ -71,12 +106,23 @@ state_machine:
       skill: state-of-union
       mode: strategy-review
       outputs: [.agent-workflow/strategy/state-of-union.yaml]
-      transitions: [STRATEGY_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, ROUTE]
+      transitions: [STRATEGY_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, PLAN_SPRINT, ROUTE]
     STRATEGY_GATE:
       actor: outcome_owner
       gate: strategy
       artifact: .agent-workflow/strategy/gates/state-of-union.yaml
-      transitions: [REVIEW_STRATEGY, DEFINE_PROJECT, DEFINE_ARCHITECTURE, PLAN_SPRINT, CANCELLED]
+      transitions: [REVIEW_STRATEGY, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, PLAN_SPRINT, CANCELLED]
+    REPO_HYGIENE:
+      actor: planner
+      skill: repo-hygiene
+      mode: assess-or-safe-cleanup
+      outputs: [.agent-workflow/hygiene/repo-hygiene.yaml]
+      transitions: [HYGIENE_GATE, REVIEW_STRATEGY, PLAN_SPRINT, ROUTE]
+    HYGIENE_GATE:
+      actor: outcome_owner
+      gate: repo_hygiene
+      artifact: .agent-workflow/gates/repo-hygiene.yaml
+      transitions: [REPO_HYGIENE, PLAN_SPRINT, CANCELLED]
     PLAN_SPRINT:
       actor: planner
       skill: sprint-planning
@@ -92,7 +138,35 @@ state_machine:
       actor: orchestrator
       skill: sprint-orchestrator
       mode: dispatch-or-monitor
-      transitions: [LANE_WORK, CRITIC_REVIEW, RESOLVE_GATE, INTEGRATE, CANCELLED]
+      transitions: [CONTROLLER_LOOP, LANE_WORK, CRITIC_REVIEW, RESOLVE_GATE, INTEGRATE, CANCELLED]
+    CONTROLLER_LOOP:
+      actor: orchestrator
+      skill: controller-loop
+      mode: state-machine-or-wave-supervision
+      outputs: [.agent-workflow/controller/controller-state.yaml]
+      transitions: [ORCHESTRATE, RESOLVE_GATE, REVIEW_STRATEGY, PLAN_SPRINT, PLATFORM_READINESS, GRAVITY_READINESS, CANCELLED]
+    PLATFORM_READINESS:
+      actor: planner
+      skill: platform-readiness
+      mode: inventory-or-readiness-gate
+      outputs: [.agent-workflow/platform/platform-readiness.yaml]
+      transitions: [PLATFORM_READINESS_GATE, REPO_HYGIENE, CONTROLLER_LOOP, GRAVITY_READINESS, ROUTE]
+    PLATFORM_READINESS_GATE:
+      actor: outcome_owner
+      gate: platform_readiness
+      artifact: .agent-workflow/gates/platform-readiness.yaml
+      transitions: [PLATFORM_READINESS, CONTROLLER_LOOP, GRAVITY_READINESS, CANCELLED]
+    GRAVITY_READINESS:
+      actor: planner
+      skill: gravity-readiness
+      mode: inventory-or-readiness-checklist
+      outputs: [.agent-workflow/gravity/gravity-readiness.yaml]
+      transitions: [GRAVITY_READINESS_GATE, PLATFORM_READINESS, PLAN_SPRINT, ROUTE]
+    GRAVITY_READINESS_GATE:
+      actor: outcome_owner
+      gate: gravity_readiness
+      artifact: .agent-workflow/gates/gravity-readiness.yaml
+      transitions: [GRAVITY_READINESS, PLATFORM_READINESS, PLAN_SPRINT, CANCELLED]
     LANE_WORK:
       actor: worker
       skill: lane-delivery
@@ -113,7 +187,7 @@ state_machine:
       actor: outcome_owner
       skill: sprint-orchestrator
       mode: gate-management
-      transitions: [DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
+      transitions: [NORTHSTAR_PLANNING, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
     INTEGRATE:
       actor: integrator
       skill: release-verification
@@ -156,9 +230,13 @@ lane_child_workflow:
     LANE_CANCELLED: {next: []}
 gate_types:
   - project_definition
+  - northstar
   - architecture
   - strategy
+  - repo_hygiene
   - plan_approval
+  - platform_readiness
+  - gravity_readiness
   - decision
   - scope_change
   - policy_exception

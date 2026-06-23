@@ -1,0 +1,29 @@
+{
+  "skill_name": "transcript-replan",
+  "evals": [
+    {
+      "id": "protected-north-star-change",
+      "prompt": "A walk transcript says the approved product North Star should change and Gravity should start immediately.",
+      "expected_output": "Routes the North Star change as proposed evidence, flags the Gravity readiness conflict, and recommends gates rather than editing protected artifacts or starting implementation.",
+      "files": [],
+      "assertions": [
+        "Protected artifacts are not silently rewritten.",
+        "Gravity implementation remains blocked by a readiness gate.",
+        "Conflicts and owners are recorded.",
+        "Issue or gate recommendations are source-linked."
+      ]
+    },
+    {
+      "id": "multi-repo-routing",
+      "prompt": "A transcript covers Agent Platform terminal access, skills repo branching policy, and Gravity Onyx uncertainty.",
+      "expected_output": "Separates items by repository and lifecycle phase, preserves uncertainty, and recommends the next owner for each item.",
+      "files": [],
+      "assertions": [
+        "Items are routed to distinct target repositories.",
+        "Uncertain transcription or missing evidence is not promoted to verified fact.",
+        "Open questions remain explicit.",
+        "No implementation lane is dispatched."
+      ]
+    }
+  ]
+}

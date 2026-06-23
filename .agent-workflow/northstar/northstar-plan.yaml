@@ -1,0 +1,1804 @@
+---
+schema_ref: northstar-plan.schema.yaml
+kind: NorthStarPlan
+schema_version: '1.0'
+project_id: verdify-skills
+status: proposed
+generated_at: '2026-06-23T19:30:23Z'
+sources:
+- id: SRC-001
+  type: repository_doc
+  location: README.md
+  summary: Defines Verdify as a lifecycle skills package and describes the current skill flow.
+  evidence_status: observed
+- id: SRC-002
+  type: northstar_evidence
+  location: docs/northstar/evidence/2026-06-23-walk-transcript-agent-platform-gravity-skills.md
+  summary: Reported transcript evidence requiring Gravity readiness, North Star governance, transcript planning, repo hygiene, controller loops, platform readiness, observability, and deployed review.
+  evidence_status: reported
+- id: SRC-003
+  type: routed_intake
+  location: .agent-workflow/intake/transcript-replan.yaml
+  summary: Routes transcript claims into decisions, requirements, conflicts, issue recommendations, and gate recommendations.
+  evidence_status: observed
+- id: SRC-004
+  type: architecture_decision
+  location: docs/decisions/ADR-0004-readiness-loop-skills.md
+  summary: Records readiness-loop skills and their relationship to the original delivery lifecycle.
+  evidence_status: observed
+- id: SRC-005
+  type: architecture_decision
+  location: docs/decisions/ADR-0006-northstar-evidence-registry.md
+  summary: Records the decision to register research through a CLI-backed North Star evidence registry before synthesis.
+  evidence_status: observed
+- id: SRC-006
+  type: architecture_decision
+  location: docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md
+  summary: Records the decision to split the North Star into signed product and architecture artifacts with a loop/signoff record.
+  evidence_status: observed
+- id: SRC-007
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-kubernetes-gitops-cicd-cardinality.yaml
+  summary: Primary-source research supporting repository/application boundaries, environment-scoped namespaces, and CI/CD wave deployment.
+  evidence_status: observed
+- id: SRC-008
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-end-to-end-agent-based-sdlc.yaml
+  summary: Reported SDLC service-model evidence supporting deterministic controller architecture, North Star Q&A, task-branch/wave identity, review-ready evidence bundles, supply-chain evidence, diagnostics, and versioned skill registry concerns.
+  evidence_status: reported
+- id: SRC-009
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities.yaml
+  summary: Observed planning evidence from Jason's latest priority answers plus Agent Platform, Sunshine Club Gravity, OpenClaw, and Orbit review. Reframes the product as a self-hosted source-control, CI/CD, k3s, agent, and evidence/knowledge operating plane; positions Agent Platform API/MCP-first; and identifies Sunshine Club as the reference implementation for reusable Gravity.
+  evidence_status: observed
+- id: SRC-010
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-long-horizon-agent-compounding-learning.yaml
+  summary: Reported external-reference evidence from three social posts and associated article/mirror pages supporting goal-driven loops with verifier, state, stop condition, budget, manual proof before scheduling, independent checking, model fallback, and proposal-only learning capture from Codex/Claude/terminal sessions.
+  evidence_status: reported
+- id: SRC-011
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-agent-platform-live-state-audit.yaml
+  summary: Read-only live-state audit of GitHub, Kubernetes, Argo CD, and repo-pod surfaces for the Agent Platform, including current readiness gaps.
+  evidence_status: observed
+- id: SRC-012
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-gravity-remote-onyx-confirmation.yaml
+  summary: Local and GitHub evidence confirming current Gravity MVP planning does not depend on Onyx ingestion.
+  evidence_status: observed
+- id: SRC-013
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-sunshine-gravity-extraction-architecture-audit.yaml
+  summary: Architecture audit of Sunshine Club's Gravity-like substrate and the reusable Gravity core versus Sunshine client-pack extraction boundary.
+  evidence_status: observed
+- id: SRC-014
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-openclaw-hermes-reuse-interface-security-audit.yaml
+  summary: OpenClaw and Hermes audit supporting constrained MCP/API-first planning-agent control surfaces and security boundaries.
+  evidence_status: observed
+- id: SRC-015
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-browser-terminal-security-patterns.yaml
+  summary: Primary-source browser terminal and Kubernetes exec/debug research supporting RBAC, audit, isolation, and production restrictions.
+  evidence_status: observed
+- id: SRC-016
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-secrets-credential-injection-patterns.yaml
+  summary: Primary-source runtime secret injection and short-lived credential research for External Secrets, Vault Agent Injector, Kubernetes encryption, and GitHub OIDC.
+  evidence_status: observed
+- id: SRC-017
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-source-control-migration-local-forges.yaml
+  summary: Primary-source GitHub, GitLab, Gitea, and Forgejo research supporting GitHub authority until an explicit migration ADR changes source-control ownership.
+  evidence_status: observed
+- id: SRC-018
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-opengitops-events-session-specificity.yaml
+  summary: Brave-sourced OpenGitOps and GitOpsCon research identifying event/session evidence limits and candidate sources for later release-architecture research.
+  evidence_status: observed
+- id: SRC-019
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-opengitops-session-shortlist.yaml
+  summary: Shortlisted GitOpsCon schedules, playlists, and session candidates for future timestamped GitOps release-architecture evidence.
+  evidence_status: observed
+- id: SRC-020
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-long-horizon-learning-loop-source-verification.yaml
+  summary: Primary-source long-horizon agent harness research supporting verifiers, durable state, stop/budget criteria, and manual proof before scheduling loops.
+  evidence_status: observed
+- id: SRC-021
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-review-inbox-product-examples.yaml
+  summary: Primary-source review-inbox and deployment-review examples from GitHub, GitLab, Backstage, and Argo CD ecosystems.
+  evidence_status: observed
+- id: SRC-022
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-openclaw-hermes-local-evidence.yaml
+  summary: Local OpenClaw and Hermes evidence for sessions, channels, tools, events, multi-agent routing, skills, MCP, queueing, approvals, JSONL logs, and MCP-only governed planning-agent boundaries.
+  evidence_status: observed
+- id: SRC-023
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-north-star-research-queue-completion.yaml
+  summary: Observed queue-completion evidence showing the June 23 research topics were searched and ingested, with remaining follow-up limited to downstream gates.
+  evidence_status: observed
+- id: SRC-024
+  type: northstar_design_artifact
+  location: .agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md
+  summary: Proposed OpenClaw-facing SDLC workflow skill design mapping ideation through production to delegated Verdify skills, GitHub primitives, durable artifacts, milestones, stop conditions, and proof requirements.
+  evidence_status: observed
+- id: SRC-025
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-review-inbox-skill-implementation-best-p.yaml
+  summary: Brave-backed primary-source research for the first stable review-inbox packet contract, including GitHub PR/check/deployment/environment APIs, GitLab review apps, Argo CD pull-request preview generation and security constraints, and OpenGitOps reconciliation principles.
+  evidence_status: observed
+- id: SRC-026
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-wave-release-planning-implementation-bes.yaml
+  summary: Brave-backed primary-source research for the first stable wave release plan contract, including GitHub merge queues/environments, Argo CD sync waves, Argo Rollouts progressive delivery, Flux reconciliation/remediation, Kubernetes namespace controls, and OpenGitOps principles.
+  evidence_status: observed
+- id: SRC-027
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-observability-diagnostics-implementation.yaml
+  summary: Brave-backed primary-source research for the first stable observability diagnostic packet contract, including OpenTelemetry semantic conventions/resources, Prometheus alerting and recording rules, Grafana provisioning/dashboard automation, Kubernetes probes/events/debugging/observability, and GitHub workflow/check/deployment markers.
+  evidence_status: observed
+- id: SRC-028
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-session-ledger-implementation-best-pract.yaml
+  summary: Brave-backed primary-source research for the first stable session-ledger contract, including CloudEvents event envelopes, W3C Trace Context correlation, OpenTelemetry traces, SLSA provenance, Sigstore transparency patterns, Temporal event history, LangGraph persistence, and GitHub workflow/check/deployment references.
+  evidence_status: observed
+- id: SRC-029
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-agent-platform-control-implementation-be.yaml
+  summary: Brave-backed primary-source research for the first stable Agent Platform control request contract, including MCP tools and authorization, OpenAPI operation contracts, Kubernetes authorization and SubjectAccessReview, GitHub workflow/check/deployment APIs, OAuth scopes, and OPA policy decision logs.
+  evidence_status: observed
+- id: SRC-030
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-github-backlog-sync-implementation-best.yaml
+  summary: Brave-backed primary-source research for the first stable GitHub backlog sync contract, including GitHub Issues, PRs, sub-issues, dependencies, timeline events, checks, workflow runs, deployments, deployment statuses/environments, Projects, and search.
+  evidence_status: observed
+- id: SRC-031
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-environment-gitops-implementation-best-p.yaml
+  summary: Brave-backed primary-source research for the first stable environment GitOps reconciliation contract, including OpenGitOps principles, Argo CD sync/health/ApplicationSet preview behavior, Flux Kustomization and HelmRelease status/remediation, Kubernetes namespace controls, and GitHub deployment environments.
+  evidence_status: observed
+- id: SRC-032
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-gravity-core-extraction-implementation-b.yaml
+  summary: Brave-backed primary-source research for the first stable Gravity core extraction planning contract, including W3C PROV provenance, BagIt checksummed manifests, Frictionless resource metadata, OCI descriptors, SLSA provenance, RO-Crate metadata, and GitHub source refs.
+  evidence_status: observed
+- id: SRC-033
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-learning-capture-implementation-best-pra.yaml
+  summary: Brave-backed primary-source research for hardening proposal-only learning capture, including OpenAI Evals, MCP evaluation consistency, LangGraph durable state, NIST privacy/data minimization, and OWASP LLM prompt-injection and sensitive-information risks.
+  evidence_status: observed
+- id: SRC-034
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml
+  summary: Reported semantic walk intake for repo-controller bootstrap, fleet self-discovery, namespace/storage/credential standards, controller observability, alert-to-agent recovery, Orbit daily operating briefs, and adversarial plan review.
+  evidence_status: reported
+- id: SRC-035
+  type: northstar_design_artifact
+  location: .agent-workflow/northstar/walk-routing-2026-06-23.md
+  summary: Cross-project routing matrix assigning the repo-controller bootstrap walk ideas to verdify-skills, jvallery/agents, VerdifyConsultancy/gravity, and jvallery/vast-cloud-tco, with concrete issue references.
+  evidence_status: observed
+- id: SRC-036
+  type: northstar_feedback
+  location: current planning feedback 2026-06-23
+  summary: Jason requested that the North Star include a scope and responsibilities model for each repo-associated agent, tied to exploration/discovery and represented by a reusable template.
+  evidence_status: reported
+goals:
+- id: NSG-001
+  statement: Turn registered research, ideation, transcript input, feedback, and requirements into durable North Star planning artifacts before implementation planning.
+  priority: must
+  source_ids: [SRC-002, SRC-003, SRC-005]
+  success_signals:
+  - A validated North Star loop record exists.
+  - Router sends projects with draft North Star artifacts back to `northstar-planning` and `artifact-loop`.
+- id: NSG-002
+  statement: Keep product intent and architecture inputs separate but traceably linked.
+  priority: must
+  source_ids: [SRC-002, SRC-006]
+  success_signals:
+  - Architecture principles link to goals and requirements.
+  - Product requirements explain user or operator value.
+- id: NSG-003
+  statement: Preserve the Gravity readiness gate until platform, skills, credentials, namespaces, CI/CD, observability, and review workflow are proven and approved.
+  priority: must
+  source_ids: [SRC-002, SRC-003, SRC-011, SRC-012, SRC-015, SRC-016]
+  success_signals:
+  - Gravity readiness remains a gate recommendation.
+  - No Gravity feature implementation lanes are created from planning evidence.
+- id: NSG-004
+  statement: Preserve CI/CD based wave deployment as a core delivery planning requirement.
+  priority: must
+  source_ids: [SRC-002, SRC-007, SRC-018, SRC-019, SRC-021, SRC-026]
+  success_signals:
+  - Wave plans require CI evidence, preview or review deployment, promotion path, rollback evidence, and traceability before review-ready status.
+  - Release architecture resolves exact branch/session/worktree/wave naming before automation is encoded.
+- id: NSG-005
+  statement: Add a repeatable North Star interview loop for human priorities, decisions, and architecture tradeoffs before final lock approval.
+  priority: must
+  source_ids: [SRC-008]
+  success_signals:
+  - '`northstar-interview` produces a durable question packet with P0/P1/P2 priorities, proposed defaults, options, tradeoffs, affected IDs, and evidence references.'
+  - 'Interview answers route back to `northstar-planning` without being mistaken for final approval.'
+- id: NSG-006
+  statement: Reframe the owned-IP priority as a self-hosted software-and-knowledge operating plane spanning source control, CI/CD, pipelines, k3s, agents, and evidence workflows.
+  priority: must
+  source_ids: [SRC-009, SRC-011, SRC-014, SRC-017]
+  success_signals:
+  - Platform readiness evaluates source-control authority, CI/CD, k3s app state, MCP/API controls, observability, and rollback as one integrated system.
+  - The North Star no longer describes the product only as an Agent Delivery OS.
+- id: NSG-007
+  statement: Treat Sunshine Club as the reference implementation for reusable Gravity local-filesystem evidence ingestion.
+  priority: must
+  source_ids: [SRC-009, SRC-012, SRC-013, SRC-032]
+  success_signals:
+  - Gravity readiness includes a validated Gravity core extraction plan, Sunshine reuse matrix, and generic-core/pack extraction boundary.
+  - Gravity implementation remains blocked until the non-Gravity platform pilot and readiness gates pass.
+- id: NSG-008
+  statement: Make self-improving skills evidence-backed and proposal-only until the configured approval path accepts a change.
+  priority: should
+  source_ids: [SRC-010, SRC-020, SRC-033]
+  success_signals:
+  - Learning-capture proposals cite source evidence, verification, proposed destination, risk class, and approval requirement.
+  - Proposed lessons route to content, context files, slash commands, skills, hooks, tool/CLI fixes, config, backlog, or no-op.
+- id: NSG-009
+  statement: Require loop-readiness checks before recurring agent loops are scheduled or delegated.
+  priority: must
+  source_ids: [SRC-010, SRC-020, SRC-033]
+  success_signals:
+  - Candidate loops document recurrence, verifier, state record, stop condition, budget, objective done criteria, and one reliable manual run.
+  - Loop metrics include proposal acceptance rate or cost per accepted change where cost is material.
+- id: NSG-010
+  statement: Expose the end-to-end SDLC through a curated set of OpenClaw-facing workflow skills while preserving GitHub and `.agent-workflow` as authority.
+  priority: must
+  source_ids: [SRC-008, SRC-014, SRC-022, SRC-024, SRC-025]
+  success_signals:
+  - OpenClaw workflow skills map ideation, research, planning, definition, architecture, backlog, readiness, wave planning, lane work, review, release, production proof, and learning capture to delegated Verdify skills.
+  - Each workflow names GitHub primitives, durable artifacts, human gates, stop conditions, and evidence needed before advancing.
+- id: NSG-011
+  statement: Make review-ready status a validated evidence packet rather than an unstructured claim.
+  priority: must
+  source_ids: [SRC-021, SRC-025, SRC-027]
+  success_signals:
+  - '`schemas/review-inbox-packet.schema.yaml` validates the review inbox packet contract.'
+  - Review packets record PR/MR identity, exact head SHA, checks, preview/review deployment, telemetry, security, rollback, evidence completeness, recommendation, and feedback route.
+- id: NSG-012
+  statement: Make deployment-affecting waves validate a release plan before worker dispatch.
+  priority: must
+  source_ids: [SRC-021, SRC-026]
+  success_signals:
+  - '`schemas/wave-release-plan.schema.yaml` validates branch/merge model, checks, workflows, environments, GitOps desired state, deployment strategy, observability, rollback, release health, and review handoff.'
+  - Sprint planning treats the wave release plan as part of the plan approval transaction when deployment or preview evidence is in scope.
+- id: NSG-013
+  statement: Make observability diagnostics a validated evidence packet for review, release, readiness, incident, and feedback decisions.
+  priority: must
+  source_ids: [SRC-027]
+  success_signals:
+  - '`schemas/observability-diagnostic-packet.schema.yaml` validates correlation, hypotheses, telemetry links, signal assessments, runtime checks, deployment markers, findings, missing instrumentation, recommendation, and feedback route.'
+  - Review and release decisions distinguish runtime health evidence from CI/check success.
+- id: NSG-014
+  statement: Make session and wave history reconstructable from an append-oriented ledger.
+  priority: must
+  source_ids: [SRC-028]
+  success_signals:
+  - '`schemas/session-ledger.schema.yaml` validates parent/child session graph, event envelope fields, correlation IDs, artifact/evidence/external refs, checksums, exceptions, and handoff.'
+  - Controller reconstruction does not rely on hidden chat history.
+- id: NSG-015
+  statement: Make Agent Platform MCP/API operations explicit request, authorization, policy, target, and evidence records before execution.
+  priority: must
+  source_ids: [SRC-029]
+  success_signals:
+  - '`schemas/agent-platform-control-request.schema.yaml` validates operation identity, requester, target, authorization, policy verdict, mutation level, expected effects, result refs, review gate, and handoff.'
+  - Protected or production-affecting operations remain blocked until the configured authorization, policy, human review, rollback, and evidence requirements are satisfied.
+- id: NSG-016
+  statement: Make GitHub backlog sync a typed reconciliation record while preserving GitHub as backlog and delivery authority.
+  priority: must
+  source_ids: [SRC-030]
+  success_signals:
+  - '`schemas/github-backlog-sync.schema.yaml` validates source authority, snapshot freshness, issue findings, PR findings, lane findings, delivery findings, actions, and handoff.'
+  - State-of-union and sprint orchestration distinguish GitHub authority from local snapshots or strategy notes.
+- id: NSG-017
+  statement: Make environment GitOps reconciliation a typed readiness and release evidence record before environment-dependent work advances.
+  priority: must
+  source_ids: [SRC-031]
+  success_signals:
+  - '`schemas/environment-gitops-reconciliation.schema.yaml` validates desired state, observed controller state, namespace controls, deployment evidence, runtime health, drift, remediation, review, and handoff.'
+  - Platform readiness, wave planning, and release verification do not infer environment health from merge or CI success alone.
+- id: NSG-018
+  statement: Make Gravity core extraction a typed readiness artifact before Sunshine reuse or Gravity implementation lanes open.
+  priority: must
+  source_ids: [SRC-032, SRC-013, SRC-009]
+  success_signals:
+  - '`schemas/gravity-core-extraction-plan.schema.yaml` validates source-object inventory, reuse matrix, pack assumptions, contracts, migration risks, pilot criteria, readiness updates, handoff, and approval.'
+  - Gravity readiness treats source-object provenance, checksum strategy, generic-core/pack boundary, and local filesystem ingestion pilot criteria as prerequisites, not implementation side notes.
+- id: NSG-019
+  statement: Make repo-controller bootstrap and self-discovery a standard fleet workflow before broad autonomous rollout.
+  priority: must
+  source_ids: [SRC-034, SRC-011, SRC-030, SRC-031]
+  success_signals:
+  - A repo-bootstrap workflow can produce a standard inventory, AGENTS.md update, namespace map, credential-reference validation summary, storage mount inventory, package recommendations, gap backlog, and PR proposal.
+  - Bootstrap output routes through GitHub Issues/PRs and `.agent-workflow` artifacts rather than private controller memory.
+- id: NSG-020
+  statement: Standardize repo, namespace, environment, storage, route, and credential boundaries across the controller fleet.
+  priority: must
+  source_ids: [SRC-034, SRC-016, SRC-031]
+  success_signals:
+  - Platform readiness defines owner/repo/environment namespace naming, scoped mounts, route propagation, domain-agent authority, and secret-reference validation without raw secret exposure.
+  - Repo agents remain least-privilege by default while approved infrastructure domain agents have explicit owner, scope, audit, and gate records.
+- id: NSG-021
+  statement: Make controller loops observable, recoverable, and measurable at fleet scale.
+  priority: must
+  source_ids: [SRC-034, SRC-027, SRC-028]
+  success_signals:
+  - Grafana/Prometheus dashboards show pod availability, controller availability, loop counts, stop reasons, ledger events, resource pressure, and cost or token signals where material.
+  - Alertmanager or equivalent alerts can route to the responsible controller or recovery path with durable outstanding-work rehydration.
+- id: NSG-022
+  statement: Add Orbit-style cross-repo governance and daily operating context as a planning surface.
+  priority: should
+  source_ids: [SRC-034, SRC-014, SRC-022]
+  success_signals:
+  - A higher-level planner can produce a daily brief from authorized email, calendar, GitHub, repo-controller, PR, issue, and agent-status sources.
+  - Privacy, connector authority, human approval, and source retention boundaries are explicit before scheduling the brief.
+- id: NSG-023
+  statement: Give every repo-associated controller or long-lived agent a typed scope, ownership, responsibility, authority, runtime, and escalation charter tied to repo discovery.
+  priority: must
+  source_ids: [SRC-034, SRC-036]
+  success_signals:
+  - '`schemas/repo-agent-scope.schema.yaml` validates the repo-agent scope contract.'
+  - Repo hygiene/bootstrap can create `.agent-workflow/hygiene/repo-agent-scope.yaml` from a reusable template before a controller claims operational ownership.
+requirements:
+- id: NSR-005
+  kind: functional
+  statement: The CLI must ingest research files into `.agent-workflow/northstar/collateral/`, update `.agent-workflow/northstar/evidence-registry.yaml`, and expose stable `northstar://evidence/<id>` references.
+  source_ids: [SRC-005]
+  acceptance_signals:
+  - '`bin/verdify northstar ingest-research` creates an evidence item and registry entry.'
+  - '`bin/verdify northstar evidence list` returns matching registered evidence.'
+- id: NSR-006
+  kind: functional
+  statement: The North Star planning loop must create and iterate `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`, `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`, and `.agent-workflow/northstar/northstar-artifacts.yaml` through evidence, research, questions, design, and feedback until final lock approval is recorded.
+  source_ids: [SRC-006, SRC-007]
+  acceptance_signals:
+  - '`skills/northstar-planning/SKILL.md` defines `artifact-loop`, `human-review`, and `signoff` modes.'
+  - '`schemas/northstar-artifacts.schema.yaml` validates the loop status, questions, cross-links, review state, and approvals.'
+  - Router does not proceed to downstream lifecycle skills when the paired North Star artifacts are missing or unsigned.
+- id: NSR-001
+  kind: functional
+  statement: The North Star planning skill must synthesize source evidence into goals, requirements, user stories, architecture principles, milestones, risks, conflicts, proposed issues, research proposals, and final lock approval state.
+  source_ids: [SRC-002, SRC-003, SRC-007]
+  acceptance_signals:
+  - '`skills/northstar-planning/SKILL.md` defines the loop modes.'
+  - '`schemas/northstar-plan.schema.yaml` validates the artifact.'
+- id: NSR-002
+  kind: functional
+  statement: The router must stop at `northstar-research-ingest` for unregistered research and at `northstar-planning` after evidence is routed or registered before project definition consumes the plan.
+  source_ids: [SRC-003, SRC-005]
+  acceptance_signals:
+  - '`bin/verdify route` returns `northstar-research-ingest` when raw research exists but no matching evidence registry entry exists.'
+  - '`bin/verdify route` returns `northstar-planning` when intake is routed but North Star planning is missing or draft.'
+- id: NSR-003
+  kind: non_functional
+  statement: Every planning record must trace to evidence or remain marked as a question, idea, risk, or proposed change.
+  source_ids: [SRC-002]
+  acceptance_signals:
+  - Goals, requirements, stories, and principles include source IDs.
+- id: NSR-004
+  kind: constraint
+  statement: North Star planning must not mark `DESIGN_COMMITTED`, edit protected artifacts, start implementation, or hand off authority to downstream lifecycle skills until final lock approval is recorded.
+  source_ids: [SRC-002, SRC-003]
+  acceptance_signals:
+  - Ordinary evidence, research, questions, design proposals, and review feedback continue through the loop without a human gate.
+  - Final lock approval is the only North Star planning gate for advancing to the next milestone.
+  - Approval remains pending in this review-requested artifact.
+- id: NSR-007
+  kind: functional
+  statement: The North Star loop must support a reusable Q&A/interview skill that prepares prioritized questions, proposed defaults, options, tradeoffs, affected IDs, evidence references, and answer-capture rules.
+  source_ids: [SRC-008]
+  acceptance_signals:
+  - '`skills/northstar-interview/SKILL.md` defines review, question-pack, answer-capture, and feedback-routing behavior.'
+  - '`.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md` exists and contains P0/P1/P2 questions.'
+  - Interview answers route to `northstar-planning` / `review-feedback` or `artifact-loop` and do not self-record final approval.
+- id: NSR-008
+  kind: functional
+  statement: The North Star must model Verdify Skills and Agent Platform as part of an integrated self-hosted operating plane for source control, CI/CD, pipelines, k3s, agent orchestration, and evidence/knowledge workflows.
+  source_ids: [SRC-009, SRC-011, SRC-017]
+  acceptance_signals:
+  - Product and architecture North Stars include the operating-plane boundary and responsibility split.
+  - Platform readiness scope includes source-control, CI/CD, k3s, API/MCP controls, and observability.
+- id: NSR-009
+  kind: functional
+  statement: Agent Platform planning must be API/MCP-first, with UI scoped to inspection, review, recovery, and operator-console workflows.
+  source_ids: [SRC-009, SRC-011, SRC-014]
+  acceptance_signals:
+  - Architecture artifacts define Agent Platform MCP/control APIs as a primary interface.
+  - UI surfaces are not treated as the only or primary routine orchestration path.
+- id: NSR-010
+  kind: functional
+  statement: Gravity planning must use Sunshine Club as a reference implementation for reusable file-to-knowledge capabilities and define a generic core plus organization-pack boundary before implementation.
+  source_ids: [SRC-009, SRC-012, SRC-013, SRC-032]
+  acceptance_signals:
+  - Gravity readiness queues a Sunshine reuse inventory and validates `gravity-core-extraction-plan.yaml`.
+  - The first Gravity MVP story remains local filesystem evidence ingestion.
+  - Sunshine-specific naming, paths, env vars, taxonomy, and business-story assumptions are identified before reuse.
+- id: NSR-011
+  kind: functional
+  statement: The North Star loop must capture validated lessons as proposed improvements rather than silently rewriting skills or relying on chat memory.
+  source_ids: [SRC-010, SRC-020, SRC-033]
+  acceptance_signals:
+  - Learning-capture output records source evidence, observed issue or opportunity, verification performed, proposed destination, risk class, approval requirement, and routing decision.
+  - '`skills/northstar-planning/references/learning-capture.md` defines source eligibility, redaction, verifier, stop, budget, permissions, and scheduling boundaries.'
+  - The default action is to stage proposals without mutation.
+- id: NSR-012
+  kind: constraint
+  statement: Recurring agent loops must pass a loop-readiness check before scheduling or automated delegation.
+  source_ids: [SRC-010, SRC-020, SRC-033]
+  acceptance_signals:
+  - Candidate loops identify recurrence, verifier, state record, stop condition, budget, objective done criteria, permissions, and one reliable manual run.
+  - Unverified loops remain manual prompts or unscheduled skills.
+- id: NSR-013
+  kind: functional
+  statement: External OpenClaw workflow skills must be orchestration facades over Verdify lifecycle skills, Agent Platform MCP/API operations, GitHub primitives, and durable `.agent-workflow` records.
+  source_ids: [SRC-008, SRC-014, SRC-022, SRC-024, SRC-025]
+  acceptance_signals:
+  - '`.agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md` defines workflow skills from ideation to production with delegated skills, stakeholders, GitHub primitives, milestones, stop conditions, and proof requirements.'
+  - The North Star product and architecture artifacts include product and architecture IDs for the OpenClaw workflow facade.
+  - OpenClaw is explicitly blocked from replacing GitHub authority, final human approval, or deployment verification.
+- id: NSR-014
+  kind: non_functional
+  statement: Review-ready lane, wave, and release work must produce a validated review inbox packet before human approval or release verification.
+  source_ids: [SRC-021, SRC-025, SRC-027]
+  acceptance_signals:
+  - '`schemas/review-inbox-packet.schema.yaml` defines the packet contract.'
+  - '`skills/release-verification/references/review-inbox.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating review inbox packet example.
+- id: NSR-015
+  kind: functional
+  statement: Deployment-affecting sprint plans must include a validated wave release plan before `sprint-orchestrator` dispatches worker sessions.
+  source_ids: [SRC-021, SRC-026]
+  acceptance_signals:
+  - '`schemas/wave-release-plan.schema.yaml` defines the wave release plan contract.'
+  - '`skills/sprint-planning/references/wave-release-planning.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating wave release plan example.
+- id: NSR-016
+  kind: non_functional
+  statement: Runtime-sensitive review, release, readiness, incident, and feedback decisions must use a validated observability diagnostic packet when telemetry materially affects the decision.
+  source_ids: [SRC-027]
+  acceptance_signals:
+  - '`schemas/observability-diagnostic-packet.schema.yaml` defines the diagnostic packet contract.'
+  - '`skills/release-verification/references/observability-diagnostics.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating observability diagnostic packet example.
+- id: NSR-017
+  kind: non_functional
+  statement: Controller-managed lifecycle sessions and waves must produce a validated session ledger that survives model context loss.
+  source_ids: [SRC-028]
+  acceptance_signals:
+  - '`schemas/session-ledger.schema.yaml` defines the session ledger contract.'
+  - '`skills/controller-loop/references/session-ledger.md` defines event coverage, completeness, and stop conditions.'
+  - The minimal project includes a validating controller session ledger example.
+- id: NSR-018
+  kind: functional
+  statement: Proposed Agent Platform MCP/API operations must validate as an Agent Platform control request before execution is trusted.
+  source_ids: [SRC-029]
+  acceptance_signals:
+  - '`schemas/agent-platform-control-request.schema.yaml` defines the request, authorization, policy, target, expected effects, result, review, and handoff contract.'
+  - '`skills/platform-readiness/references/agent-platform-control.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating Agent Platform control request example.
+- id: NSR-019
+  kind: functional
+  statement: GitHub backlog sync must validate issue, PR, lane, delivery, dependency, project, action, and source-freshness findings before state-of-union depends on them.
+  source_ids: [SRC-030]
+  acceptance_signals:
+  - '`schemas/github-backlog-sync.schema.yaml` defines the backlog sync contract.'
+  - '`skills/state-of-union/references/github-backlog-sync.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating GitHub backlog sync example.
+- id: NSR-020
+  kind: non_functional
+  statement: Environment-sensitive readiness, wave planning, and release verification must validate desired-state, observed-state, health, drift, remediation, rollback, and cleanup evidence.
+  source_ids: [SRC-031]
+  acceptance_signals:
+  - '`schemas/environment-gitops-reconciliation.schema.yaml` defines the environment GitOps reconciliation contract.'
+  - '`skills/platform-readiness/references/environment-gitops.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating environment GitOps reconciliation example.
+- id: NSR-021
+  kind: functional
+  statement: Gravity readiness must validate a Gravity core extraction plan before Sunshine-derived core reuse, pack extraction, or local filesystem ingestion implementation starts.
+  source_ids: [SRC-032, SRC-013]
+  acceptance_signals:
+  - '`schemas/gravity-core-extraction-plan.schema.yaml` defines the Gravity core extraction plan contract.'
+  - '`skills/gravity-readiness/references/gravity-core-extraction.md` defines completeness and stop conditions.'
+  - The minimal project includes a validating Gravity core extraction plan example.
+- id: NSR-022
+  kind: functional
+  statement: Repo bootstrap must produce a standard self-discovery inventory covering repository structure, Git history, documentation, GitHub issues/PRs, deployed Kubernetes resources, logs, metrics, routes, storage mounts, secret references, credential validation status, CI/CD shape, package needs, and planning gaps.
+  source_ids: [SRC-034, SRC-011, SRC-030, SRC-031]
+  acceptance_signals:
+  - A bootstrap packet records evidence, limitations, missing access, and proposed issues without copying raw secrets.
+  - The packet updates or proposes `AGENTS.md`, project inventory, namespace map, gap backlog, and a PR where repo-local changes are needed.
+- id: NSR-023
+  kind: constraint
+  statement: Credential discovery and validation must record secret references, auth modes, scopes, owners, validation result, and failure mode without logging raw secret values.
+  source_ids: [SRC-034, SRC-016]
+  acceptance_signals:
+  - Bootstrap and platform-readiness artifacts contain no raw tokens, passwords, refresh tokens, API keys, client secrets, or private keys.
+  - Credential checks run through scoped probes and record only safe metadata plus pass/fail/needs-reauth status.
+- id: NSR-024
+  kind: functional
+  statement: Platform readiness must define repo-to-namespace naming, environment namespace sets, route propagation, storage mount requests, and domain-agent authority before fleet bootstrap runs broadly.
+  source_ids: [SRC-034, SRC-031]
+  acceptance_signals:
+  - Namespace naming covers owner, organization, repository, dev, preview, staging, and production identity.
+  - Self-service storage or route changes are mediated by approved platform/storage/network control APIs or human gates.
+- id: NSR-025
+  kind: non_functional
+  statement: Controller loops must expose fleet observability and recovery signals, including pod health, controller health, loop counts, stop reasons, session-ledger events, alerts, recovery attempts, and outstanding-work rehydration.
+  source_ids: [SRC-034, SRC-027, SRC-028]
+  acceptance_signals:
+  - Dashboards and diagnostic packets can identify which controller, repo, issue, lane, namespace, pod, or alert needs action.
+  - Controller or pod restarts reconstruct pending work from durable state rather than hidden chat memory.
+- id: NSR-026
+  kind: functional
+  statement: Planning review must support adversarial Codex/Claude review, lane-owner review, and stakeholder lenses before final plan consensus when a plan materially affects fleet operations.
+  source_ids: [SRC-034, SRC-008, SRC-033]
+  acceptance_signals:
+  - North Star review packets identify reviewer lenses, objections, dispositions, evidence quality, and open questions.
+  - Brave/API-backed research is used when external evidence is needed to defend skill boundaries or architecture choices.
+- id: NSR-027
+  kind: functional
+  statement: Repo hygiene/bootstrap must create a typed scope and responsibility contract for each repo-associated controller or long-lived agent before that agent claims operational ownership.
+  source_ids: [SRC-034, SRC-036]
+  acceptance_signals:
+  - '`schemas/repo-agent-scope.schema.yaml` defines repository identity, scope, ownership, responsibilities, authority boundaries, discovery inputs, runtime context, escalation paths, review, handoff, and approval.'
+  - '`skills/repo-hygiene/assets/repo-agent-scope.template.yaml` provides a starter artifact for target repositories.'
+  - '`skills/repo-hygiene/references/repo-agent-scope.md` defines completion and safety rules.'
+user_stories:
+- id: NSS-001
+  actor: Jason
+  story: As a planner, I can register research, feed transcripts and rough requirements into one loop, and receive a structured planning artifact that preserves my intent.
+  acceptance_signal: The output contains goals, requirements, user stories, milestones, planning questions, conflicts, research paths, and approval state with source links.
+  requirement_ids: [NSR-001, NSR-003, NSR-005]
+  source_ids: [SRC-002, SRC-005]
+- id: NSS-002
+  actor: James
+  story: As an approver, I can review the product and architecture North Star only when the loop is ready for final lock or needs feedback.
+  acceptance_signal: Feedback routes back to `artifact-loop`; approval records the final lock and only then permits downstream authority.
+  requirement_ids: [NSR-004]
+  source_ids: [SRC-002, SRC-003]
+- id: NSS-003
+  actor: Worktree agent
+  story: As a future implementation agent, I receive requirements and milestones that are traceable to the North Star rather than ad hoc chat instructions.
+  acceptance_signal: Later lane contracts can cite North Star requirement and milestone IDs.
+  requirement_ids: [NSR-001, NSR-003]
+  source_ids: [SRC-002]
+- id: NSS-004
+  actor: Jason
+  story: As a reviewer, I can answer a prioritized North Star interview packet with proposed defaults and tradeoffs before approving or requesting changes.
+  acceptance_signal: The packet lists P0/P1/P2 questions, answer shapes, affected IDs, evidence, and routing rules.
+  requirement_ids: [NSR-007, NSR-004]
+  source_ids: [SRC-008]
+- id: NSS-005
+  actor: Hermes/OpenClaw planning agent
+  story: As the higher-level planning agent, I can drive Agent Platform and Verdify Skills through authorized MCP/control APIs instead of relying on direct dashboard operation.
+  acceptance_signal: MCP/API contracts exist for routine planning, session, worktree, readiness, review, and deployment evidence operations.
+  requirement_ids: [NSR-009, NSR-008]
+  source_ids: [SRC-009, SRC-011, SRC-014]
+- id: NSS-006
+  actor: Platform operator
+  story: As the operator, I can manage source control, CI/CD, pipelines, k3s app state, agent sessions, and review evidence as one coherent operating plane.
+  acceptance_signal: Platform readiness and controller artifacts evaluate these surfaces together and expose one traceable status model.
+  requirement_ids: [NSR-008]
+  source_ids: [SRC-009, SRC-011, SRC-017]
+- id: NSS-007
+  actor: Gravity owner
+  story: As the Gravity owner, I can reuse Sunshine Club's working file-centric pipeline while extracting a reusable engine and pack model.
+  acceptance_signal: A validated Gravity core extraction plan identifies source objects, generic code, pack-specific code, migration risks, and the local-filesystem evidence ingestion pilot.
+  requirement_ids: [NSR-010, NSR-021]
+  source_ids: [SRC-009, SRC-012, SRC-013, SRC-032]
+- id: NSS-008
+  actor: Learning-capture reviewer
+  story: As a reviewer, I can inspect proposed improvements mined from sessions and research before they alter skills, hooks, tools, config, or planning artifacts.
+  acceptance_signal: Each proposal validates as a learning-capture packet and includes evidence, redaction policy, verifier, destination, risk, approval requirement, and an explicit accept/modify/reject/defer/no-op path.
+  requirement_ids: [NSR-011]
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSS-009
+  actor: Loop operator
+  story: As an operator, I can decide whether a candidate recurring task is ready to become a loop.
+  acceptance_signal: The loop-readiness checklist passes before scheduling, and failed checks produce either a manual prompt, a research task, or a skill-hardening task.
+  requirement_ids: [NSR-012]
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSS-010
+  actor: OpenClaw workflow user
+  story: As a user of the external OpenClaw planner, I can invoke a small curated set of workflow skills that drive a repository from ideation through production while GitHub issues, branches, worktrees, PRs, checks, deployments, and releases remain the coordination primitives.
+  acceptance_signal: The OpenClaw workflow design names each workflow skill, delegated Verdify skill, stakeholder, GitHub primitive, durable artifact, milestone, stop condition, and production-proof evidence.
+  requirement_ids: [NSR-013, NSR-014]
+  source_ids: [SRC-008, SRC-014, SRC-022, SRC-024, SRC-025]
+- id: NSS-011
+  actor: Human reviewer
+  story: As a reviewer, I can inspect one packet that proves what changed, which SHA was reviewed, what checks and preview deployment ran, what telemetry and rollback evidence exists, and what decision is recommended.
+  acceptance_signal: '`review-inbox-packet.yaml` validates and routes to approve, request changes, reject, or escalate.'
+  requirement_ids: [NSR-014, NSR-016]
+  source_ids: [SRC-021, SRC-025, SRC-027]
+- id: NSS-012
+  actor: Release planner
+  story: As a release planner, I can approve a wave only after branch identity, CI events, checks, environments, GitOps desired state, rollback, release health, and review handoff are explicit.
+  acceptance_signal: '`wave-release-plan.yaml` validates before worker dispatch.'
+  requirement_ids: [NSR-015]
+  source_ids: [SRC-021, SRC-026]
+- id: NSS-013
+  actor: Release verifier
+  story: As a verifier, I can diagnose runtime health with correlated telemetry, deployment markers, hypotheses, findings, and missing instrumentation before accepting review or release claims.
+  acceptance_signal: '`observability-diagnostic-packet.yaml` validates and routes to review inbox, release verification, platform readiness, lane delivery, sprint planning, incident handling, or no action.'
+  requirement_ids: [NSR-016]
+  source_ids: [SRC-027]
+- id: NSS-014
+  actor: Controller agent
+  story: As the durable outer loop, I can reconstruct parent and child sessions, lane dispatch, critic review, review packets, diagnostics, deployments, gates, and handoffs from a typed ledger.
+  acceptance_signal: '`session-ledger.yaml` validates and every lifecycle-significant event has a ledger entry or explicit exception.'
+  requirement_ids: [NSR-017]
+  source_ids: [SRC-028]
+- id: NSS-015
+  actor: Hermes/OpenClaw planning agent
+  story: As the higher-level planner, I can propose Agent Platform operations with explicit operation identity, target, authorization, policy verdict, mutation level, expected effects, review gate, and result refs before an executor acts.
+  acceptance_signal: '`agent-platform-control-request.yaml` validates and blocks unsafe, unauthorized, stale, or ambiguous operations.'
+  requirement_ids: [NSR-018, NSR-009]
+  source_ids: [SRC-029, SRC-014]
+- id: NSS-016
+  actor: State-of-union owner
+  story: As the strategy owner, I can reconcile GitHub Issues, PRs, dependencies, sub-issues, Projects, checks, deployments, and lane contracts in one typed artifact before recommending the next sprint.
+  acceptance_signal: '`github-backlog-sync.yaml` validates and records whether each proposed action belongs in GitHub, a durable gate, state-of-union, sprint-orchestrator, or release-verification.'
+  requirement_ids: [NSR-019, NSR-013]
+  source_ids: [SRC-030, SRC-024]
+- id: NSS-017
+  actor: Platform operator
+  story: As the platform operator, I can prove a preview, review, staging, or production-like environment is reconciled from desired state to observed runtime health before it supports review or release.
+  acceptance_signal: '`environment-gitops-reconciliation.yaml` validates and records controller sync/health, namespace policy, deployment evidence, endpoint health, drift, remediation, rollback, and cleanup.'
+  requirement_ids: [NSR-020, NSR-015, NSR-016]
+  source_ids: [SRC-031, SRC-026, SRC-027]
+- id: NSS-018
+  actor: Gravity readiness owner
+  story: As the Gravity readiness owner, I can review Sunshine-derived source objects and approve or block generic core extraction before implementation begins.
+  acceptance_signal: '`gravity-core-extraction-plan.yaml` validates source-object identity, provenance, reuse decisions, pack assumptions, risks, pilot criteria, readiness updates, and approval state.'
+  requirement_ids: [NSR-021, NSR-010]
+  source_ids: [SRC-032, SRC-013]
+- id: NSS-019
+  actor: Repo controller agent
+  story: As a newly assigned repository controller, I can bootstrap myself by inventorying the repo, GitHub state, runtime namespace, credentials references, storage, observability, CI/CD, and planning gaps before proposing changes.
+  acceptance_signal: A bootstrap packet and PR proposal exist with traceable evidence, missing-access notes, issue recommendations, and safe credential-validation results.
+  requirement_ids: [NSR-022, NSR-023, NSR-024]
+  source_ids: [SRC-034]
+- id: NSS-020
+  actor: Platform operator
+  story: As the platform operator, I can see every repo controller's pod, loop, namespace, storage, alert, and outstanding-work status in one fleet dashboard.
+  acceptance_signal: Grafana/Prometheus and diagnostic packets show controller health, loop activity, stop reasons, resource pressure, alerts, and recovery state by repo/controller.
+  requirement_ids: [NSR-025, NSR-020]
+  source_ids: [SRC-034, SRC-027, SRC-028]
+- id: NSS-021
+  actor: Infrastructure domain agent
+  story: As a networking, storage, backup, or platform domain agent, I have scoped access to the systems I own while repo-local agents remain constrained to their project namespace and approved mounts/routes/secrets.
+  acceptance_signal: Platform readiness records owner, scope, credentials, audit path, allowed operations, prohibited operations, and approval gate for each domain-agent authority class.
+  requirement_ids: [NSR-023, NSR-024]
+  source_ids: [SRC-034, SRC-016]
+- id: NSS-022
+  actor: Jason
+  story: As the fleet owner, I can ask Orbit or an equivalent planner for a daily operating brief covering authorized email, calendar, GitHub, repo-controller health, open PRs, issues, and agent activity.
+  acceptance_signal: The daily brief identifies source freshness, privacy boundaries, missing connectors, required approvals, and cross-repo items needing review.
+  requirement_ids: [NSR-026, NSR-025]
+  source_ids: [SRC-034, SRC-014, SRC-022]
+- id: NSS-023
+  actor: Repo controller agent
+  story: As a repo-associated agent, I can declare my scope, ownership, responsibilities, allowed and prohibited operations, runtime context, and escalation paths before I operate the repository.
+  acceptance_signal: '`repo-agent-scope.yaml` validates and links the agent charter to discovery evidence, GitHub authority, AGENTS.md, platform boundaries, review, and handoff.'
+  requirement_ids: [NSR-027, NSR-022, NSR-024]
+  source_ids: [SRC-034, SRC-036]
+architecture_principles:
+- id: NSP-001
+  statement: North Star planning artifacts are durable `.agent-workflow` records, not hidden chat state.
+  purpose: Allows project-definition, architecture, state-of-union, and controller loops to resume without relying on conversation memory.
+  linked_goal_ids: [NSG-001]
+  linked_requirement_ids: [NSR-001, NSR-003, NSR-005]
+  source_ids: [SRC-001, SRC-002, SRC-005]
+- id: NSP-004
+  statement: Research evidence is registered with stable IDs, source hashes, tags, claims, and copied source paths before synthesis.
+  purpose: Makes research referenceable and queryable while preserving provenance for later requirements, issues, ADRs, tests, and reviews.
+  linked_goal_ids: [NSG-001]
+  linked_requirement_ids: [NSR-005]
+  source_ids: [SRC-005]
+- id: NSP-002
+  statement: Product goals and architecture inputs remain separate but bidirectionally traceable.
+  purpose: Prevents infrastructure choices from drifting away from user, operator, security, delivery, or cost value.
+  linked_goal_ids: [NSG-002]
+  linked_requirement_ids: [NSR-003]
+  source_ids: [SRC-002]
+- id: NSP-003
+  statement: Planning remains self-improving until final lock approval; ordinary questions and research gaps are loop inputs, not gates.
+  purpose: Preserves Jason and James governance at the milestone boundary while allowing agents to keep improving drafts from evidence and feedback.
+  linked_goal_ids: [NSG-003]
+  linked_requirement_ids: [NSR-004]
+  source_ids: [SRC-002, SRC-003]
+- id: NSP-005
+  statement: Human interview answers are feedback inputs, not final approval.
+  purpose: Lets the system refine product priorities and architecture tradeoffs while preserving the separate final-lock gate.
+  linked_goal_ids: [NSG-005]
+  linked_requirement_ids: [NSR-007, NSR-004]
+  source_ids: [SRC-008]
+- id: NSP-006
+  statement: The owned IP is the orchestration, evidence, control-plane, readiness, and reusable Gravity contract layer, not commodity infrastructure primitives.
+  purpose: Focuses engineering effort on unique Verdify value while composing GitHub/Git, Kubernetes, GitOps, databases, vector stores, and observability tools.
+  linked_goal_ids: [NSG-006]
+  linked_requirement_ids: [NSR-008]
+  source_ids: [SRC-009, SRC-011, SRC-017]
+- id: NSP-007
+  statement: Agent Platform control is API/MCP-first and UI-assisted.
+  purpose: Allows Hermes/OpenClaw and future planners to operate the platform directly while preserving UI inspection, review, and recovery workflows for humans.
+  linked_goal_ids: [NSG-006]
+  linked_requirement_ids: [NSR-009]
+  source_ids: [SRC-009, SRC-011, SRC-014]
+- id: NSP-008
+  statement: Gravity core and organization packs are separate architecture concerns.
+  purpose: Lets Sunshine Club become the first pack/reference implementation without baking Sunshine assumptions into reusable Gravity.
+  linked_goal_ids: [NSG-007]
+  linked_requirement_ids: [NSR-010, NSR-021]
+  source_ids: [SRC-009, SRC-012, SRC-013, SRC-032]
+- id: NSP-009
+  statement: Self-improvement must stage evidence-backed proposals before mutation.
+  purpose: Lets skills compound from real lessons while preserving human judgment, redaction, risk review, and source traceability.
+  linked_goal_ids: [NSG-008]
+  linked_requirement_ids: [NSR-011]
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSP-010
+  statement: A recurring agent loop is only real when it has a verifier, state, stop condition, budget, and objective done criteria.
+  purpose: Prevents scheduled loops from becoming expensive self-approval cycles with no reliable completion signal.
+  linked_goal_ids: [NSG-009]
+  linked_requirement_ids: [NSR-012]
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSP-011
+  statement: OpenClaw workflow skills are user-facing orchestration facades, not sources of authority.
+  purpose: Lets an external OpenClaw agent provide ergonomic SDLC workflows while preserving GitHub, Verdify artifacts, human gates, and deployment proof as the authoritative control plane.
+  linked_goal_ids: [NSG-010]
+  linked_requirement_ids: [NSR-013, NSR-014]
+  source_ids: [SRC-008, SRC-014, SRC-022, SRC-024, SRC-025]
+- id: NSP-012
+  statement: Review readiness is packetized and schema-validated before human approval.
+  purpose: Prevents reviewers from reconstructing evidence from chat, CI pages, or deployment dashboards without a durable completeness verdict and feedback route.
+  linked_goal_ids: [NSG-011]
+  linked_requirement_ids: [NSR-014, NSR-016]
+  source_ids: [SRC-021, SRC-025, SRC-027]
+- id: NSP-013
+  statement: Release architecture is planned before dispatch, not reverse-engineered during review.
+  purpose: Makes CI/CD, preview environments, GitOps reconciliation, rollback, and release-health evidence available to workers, critics, reviewers, and release verifiers from the start of the wave.
+  linked_goal_ids: [NSG-012]
+  linked_requirement_ids: [NSR-015]
+  source_ids: [SRC-021, SRC-026]
+- id: NSP-014
+  statement: Runtime diagnostics must correlate telemetry, deployment markers, checks, and human feedback before release-health conclusions.
+  purpose: Keeps review and release decisions grounded in observable runtime state instead of raw CI success or process-health claims.
+  linked_goal_ids: [NSG-013]
+  linked_requirement_ids: [NSR-016]
+  source_ids: [SRC-027]
+- id: NSP-015
+  statement: Controller history is an append-oriented event ledger, not chat memory.
+  purpose: Makes recovery, audit, learning capture, and cross-session handoff possible without depending on transient model context.
+  linked_goal_ids: [NSG-014]
+  linked_requirement_ids: [NSR-017]
+  source_ids: [SRC-028]
+- id: NSP-016
+  statement: Agent Platform control starts as a policy-evaluated request artifact before it becomes an executor.
+  purpose: Lets planners and controllers prepare API/MCP operations with authorization, target, expected effects, review, and evidence while blocking unsafe mutation until concrete platform operations are approved.
+  linked_goal_ids: [NSG-015]
+  linked_requirement_ids: [NSR-018, NSR-009]
+  source_ids: [SRC-029, SRC-014]
+- id: NSP-017
+  statement: GitHub backlog sync records findings, not authority.
+  purpose: Keeps Issues, PRs, checks, deployments, dependencies, sub-issues, and Projects authoritative while making strategy and sprint reconciliation durable, reviewable, and schema-validated.
+  linked_goal_ids: [NSG-016]
+  linked_requirement_ids: [NSR-019, NSR-013]
+  source_ids: [SRC-030, SRC-024]
+- id: NSP-018
+  statement: Environment proof separates desired state, observed controller state, and runtime health.
+  purpose: Prevents merge or CI success from being mistaken for deployment proof, while giving platform readiness, wave planning, and release verification one reusable evidence shape.
+  linked_goal_ids: [NSG-017]
+  linked_requirement_ids: [NSR-020, NSR-015, NSR-016]
+  source_ids: [SRC-031, SRC-026, SRC-027]
+- id: NSP-019
+  statement: Gravity source objects are provenance-bearing inputs, not anonymous files to copy into core.
+  purpose: Forces Sunshine reuse to preserve path, checksum strategy, source refs, pack assumptions, reuse decision, and migration risk before code movement or pilot work.
+  linked_goal_ids: [NSG-018, NSG-007]
+  linked_requirement_ids: [NSR-021, NSR-010]
+  source_ids: [SRC-032, SRC-013]
+- id: NSP-020
+  statement: Repo bootstrap is a cross-skill workflow facade, not a new ungoverned source of authority.
+  purpose: Lets controllers get organized across repository, GitHub, runtime, storage, credential, and observability dimensions while preserving GitHub and `.agent-workflow` as control planes.
+  linked_goal_ids: [NSG-019]
+  linked_requirement_ids: [NSR-022, NSR-023]
+  source_ids: [SRC-034]
+- id: NSP-021
+  statement: Namespace, storage, route, and secret boundaries are platform contracts before they are repo-controller powers.
+  purpose: Keeps fleet standardization compatible with least privilege, infrastructure-domain ownership, and auditable change control.
+  linked_goal_ids: [NSG-020]
+  linked_requirement_ids: [NSR-023, NSR-024]
+  source_ids: [SRC-034, SRC-016, SRC-031]
+- id: NSP-022
+  statement: Controller availability is an observable service objective, not an assumed property of a chat session.
+  purpose: Makes controller failures, restarts, alert routing, and outstanding-work recovery measurable and reviewable.
+  linked_goal_ids: [NSG-021]
+  linked_requirement_ids: [NSR-025, NSR-017]
+  source_ids: [SRC-034, SRC-027, SRC-028]
+- id: NSP-023
+  statement: Fleet governance should be summarized by a higher-level planner but decided through durable issues, PRs, gates, and review packets.
+  purpose: Allows Orbit-style daily operating context without turning a digest into an approval or delivery control plane.
+  linked_goal_ids: [NSG-022]
+  linked_requirement_ids: [NSR-026, NSR-019]
+  source_ids: [SRC-034, SRC-014, SRC-022]
+- id: NSP-024
+  statement: Repo-agent ownership starts with an explicit scope contract, not with a running session.
+  purpose: Prevents controllers from silently expanding their authority and gives downstream skills a durable charter for ownership, responsibilities, runtime context, and escalation.
+  linked_goal_ids: [NSG-023, NSG-019]
+  linked_requirement_ids: [NSR-027, NSR-022, NSR-024]
+  source_ids: [SRC-034, SRC-036]
+milestones:
+- id: NSM-001
+  name: North Star planning loop implemented
+  outcome: Triggerable research-ingest and planning skills, schemas, templates, evals, router stops, and docs exist for North Star planning.
+  entry_criteria:
+  - Transcript evidence has been routed.
+  exit_criteria:
+  - Validator recognizes the skill and schema.
+  - Full package tests pass.
+  requirement_ids: [NSR-001, NSR-002, NSR-005]
+- id: NSM-002
+  name: North Star locks for next milestone
+  outcome: Product and architecture North Star artifacts are approved as planning authority for the next milestone.
+  entry_criteria:
+  - The self-improving North Star loop has produced coherent product and architecture drafts.
+  exit_criteria:
+  - Final lock approval is recorded in `northstar-artifacts.yaml`.
+  requirement_ids: [NSR-003, NSR-004]
+- id: NSM-003
+  name: Gravity readiness planning
+  outcome: Gravity has a binary readiness checklist and pilot proposal without feature implementation.
+  entry_criteria:
+  - Platform readiness inputs are available.
+  exit_criteria:
+  - Jason and James approve or reject the readiness gate.
+  requirement_ids: [NSR-004]
+- id: NSM-004
+  name: Sunshine-to-Gravity reuse plan
+  outcome: Sunshine Club's Gravity substrate is inventoried and mapped into a reusable Gravity core plus pack model.
+  entry_criteria:
+  - The new owned-IP and Sunshine reuse evidence is registered.
+  exit_criteria:
+  - Validated Gravity core extraction plan, reuse matrix, extraction risks, local-filesystem ingestion pilot story, and readiness updates exist.
+  requirement_ids: [NSR-010, NSR-021]
+- id: NSM-005
+  name: Learning-capture loop design
+  outcome: Proposal-only session mining and loop-readiness checks are specified before scheduled automation is enabled.
+  entry_criteria:
+  - Learning-loop evidence is registered.
+  exit_criteria:
+  - Proposal format, operator reference, reusable template, routing taxonomy, redaction rules, approval behavior, loop-readiness checklist, and cost-per-accepted-change metric are defined.
+  requirement_ids: [NSR-011, NSR-012]
+- id: NSM-006
+  name: OpenClaw SDLC workflow skill design
+  outcome: OpenClaw-facing workflow skills are specified for ideation through production deployment.
+  entry_criteria:
+  - OpenClaw/Hermes and end-to-end SDLC evidence is registered.
+  exit_criteria:
+  - Workflow skills, stakeholder/persona map, GitHub primitive model, SDLC stage map, milestones, governance rules, and pilot slice are documented.
+  requirement_ids: [NSR-013]
+- id: NSM-007
+  name: Fleet repo-bootstrap readiness
+  outcome: Repo-controller bootstrap is ready to run on a limited pilot repo without unsafe credential, namespace, storage, or approval ambiguity.
+  entry_criteria:
+  - Repo-controller bootstrap evidence is registered and synthesized into product and architecture drafts.
+  exit_criteria:
+  - Bootstrap inventory shape, repo-agent scope contract, namespace naming, credential-reference validation, storage mount request flow, controller observability, issue/PR output, and security gates are specified.
+  requirement_ids: [NSR-022, NSR-023, NSR-024, NSR-025, NSR-027]
+risks:
+- id: NSK-001
+  statement: The planning loop could become a parallel source of truth if project-definition and architecture artifacts do not consume it.
+  impact: Agents may optimize against stale or duplicate planning records.
+  mitigation: Treat `northstar-plan.yaml` as planning input and require one explicit lifecycle handoff.
+  source_ids: [SRC-001, SRC-002]
+- id: NSK-002
+  statement: Final lock approval is still pending.
+  impact: Downstream skills can read the product and architecture North Star as draft planning input but cannot treat them as locked authority for the next milestone.
+  mitigation: Keep the durable North Star gate open and route to `northstar-planning` / `human-review` until approval or changes-requested feedback is recorded.
+  source_ids: [SRC-002, SRC-003]
+- id: NSK-003
+  statement: A UI-first platform plan could under-serve the intended Hermes/OpenClaw planning-agent workflow.
+  impact: The system may over-invest in dashboard UX while leaving the API/MCP control surface too weak for the intended operating model.
+  mitigation: Treat Agent Platform as API/MCP-first and scope UI to inspection, review, recovery, and operator override.
+  source_ids: [SRC-009, SRC-011, SRC-014]
+- id: NSK-004
+  statement: Directly copying Sunshine Club into Gravity could preserve Sunshine-specific assumptions in the reusable core.
+  impact: Gravity could become a renamed Sunshine application instead of reusable platform IP.
+  mitigation: Validate `gravity-core-extraction-plan.yaml`, inventory reusable packages/contracts, and extract a generic core plus organization pack boundary before implementation.
+  source_ids: [SRC-009, SRC-013, SRC-032]
+- id: NSK-005
+  statement: Learning capture could become unreviewed self-modification if proposals are applied automatically.
+  impact: Skills, hooks, commands, or config could drift from governance and encode a bad lesson.
+  mitigation: Schedule scans only after source scope, verifier, durable state, stop/budget, permissions, and manual-run evidence are approved; require evidence, redaction, risk classification, and approval before applying changes.
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSK-006
+  statement: Recurring loops without verifiers, stop conditions, budgets, or acceptance metrics can spend tokens while producing low-quality output.
+  impact: The system could optimize for activity rather than accepted improvement or reviewable progress.
+  mitigation: Add loop-readiness checks and track cost per accepted change where practical.
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSK-007
+  statement: OpenClaw workflow state could drift into a competing source of truth if workflow skills store private progress instead of reconciling GitHub and `.agent-workflow`.
+  impact: Agents and reviewers could act on hidden or stale state, bypassing issue scope, PR evidence, human review, or deployment proof.
+  mitigation: Require every OpenClaw workflow skill to name authoritative GitHub primitives, durable artifacts, stop conditions, and evidence before advancing.
+  source_ids: [SRC-014, SRC-022, SRC-024]
+- id: NSK-008
+  statement: A control request artifact could be mistaken for execution authorization if the policy verdict, human gate, and target identity are incomplete.
+  impact: Planner-generated requests could encourage unsafe or premature Agent Platform mutations.
+  mitigation: Keep `agent-platform-control` under platform-readiness, validate requests before use, and block protected or production-affecting actions without explicit policy and review evidence.
+  source_ids: [SRC-029]
+- id: NSK-009
+  statement: A GitHub backlog sync artifact could drift into a private backlog if actions are not applied through GitHub or the named durable control plane.
+  impact: Sprint planning could execute stale local intent instead of the authoritative issue, PR, dependency, check, or deployment state.
+  mitigation: Treat snapshots as caches, require source freshness and limitations, and record every proposed action with its authoritative apply-through path.
+  source_ids: [SRC-030]
+- id: NSK-010
+  statement: Environment GitOps reconciliation could be mistaken for mutation approval if desired-state drift or protected-environment gates are incomplete.
+  impact: Agents could advance review or release with unsafe namespace policy, stale desired state, missing runtime proof, or unauthorized protected-environment changes.
+  mitigation: Keep `environment-gitops` under platform-readiness, require explicit desired/observed state, drift, remediation, rollback, cleanup, and review fields, and route mutation through authorized control planes only.
+  source_ids: [SRC-031]
+- id: NSK-011
+  statement: A Gravity extraction plan could be mistaken for implementation approval if source-object provenance, migration risks, or readiness gates are incomplete.
+  impact: Agents could open Gravity implementation lanes or copy Sunshine-specific behavior into core before platform and Gravity readiness approve the pilot.
+  mitigation: Keep `gravity-core-extraction` under gravity-readiness, validate source-object identity, reuse decisions, pack assumptions, risks, pilot criteria, handoff, and approval, and route implementation through readiness gates only.
+  source_ids: [SRC-032, SRC-013]
+- id: NSK-012
+  statement: Fleet bootstrap could expose secrets or overstate access if credential validation records raw values or lacks scoped probes.
+  impact: Sensitive credentials could leak into artifacts or agents could make unsafe assumptions about production access.
+  mitigation: Record only credential references, auth modes, scopes, owners, validation results, and failure modes; require platform/security approval for broad access.
+  source_ids: [SRC-034, SRC-016]
+- id: NSK-013
+  statement: Repo controllers could mutate namespace, storage, route, or image policy before the platform contract is approved.
+  impact: Repos could drift into inconsistent runtime topology, broken mounts, route conflicts, or unreviewed base images.
+  mitigation: Gate self-service mutation behind platform-readiness contracts, storage/network owners, GitOps desired state, and PR/review paths.
+  source_ids: [SRC-034, SRC-031]
+- id: NSK-014
+  statement: Orbit daily briefs could become a parallel source of truth if they summarize work without reconciling GitHub and `.agent-workflow` records.
+  impact: Human review could act on stale email/calendar/agent summaries instead of authoritative issues, PRs, gates, and deployment evidence.
+  mitigation: Treat daily briefs as read-only summaries with source freshness, missing-source warnings, and links back to authoritative records.
+  source_ids: [SRC-034, SRC-030]
+- id: NSK-015
+  statement: Repo-associated agents could overreach if scope and responsibility are left in chat, pod state, or informal AGENTS.md prose only.
+  impact: A controller might mutate paths, credentials, namespaces, storage, routes, or GitHub state outside its intended authority.
+  mitigation: Require a validated `repo-agent-scope.yaml` before operational ownership; route missing or overbroad authority through platform/security or repo-owner review.
+  source_ids: [SRC-034, SRC-036]
+adversarial_findings:
+- id: ADV-001
+  perspective: architect
+  finding: A planning artifact that duplicates project definition fields could create competing truth unless its handoff and authority are explicit.
+  disposition: accepted
+  owner: Skills maintainer
+- id: ADV-002
+  perspective: SRE
+  finding: Gravity readiness cannot be judged from planning artifacts alone; platform observability and runtime evidence are required.
+  disposition: accepted
+  owner: Platform readiness owner
+- id: ADV-003
+  perspective: finance
+  finding: Local-first infrastructure and one-wave-per-day ambitions need later cost and capacity evidence before becoming commitments.
+  disposition: deferred
+  owner: State-of-union owner
+- id: ADV-004
+  perspective: architect
+  finding: The current evidence points to a four-layer responsibility split among Skills, Agent Platform, Hermes/OpenClaw, and Gravity; blurring those boundaries would make the platform hard to reason about.
+  disposition: accepted
+  owner: Architecture owner
+- id: ADV-005
+  perspective: maintainer
+  finding: Sunshine Club is valuable reuse evidence but is still coupled to Sunshine naming, paths, env vars, taxonomy, and business stories.
+  disposition: accepted
+  owner: Gravity readiness owner
+- id: ADV-006
+  perspective: security/privacy
+  finding: Session-mining learning capture can expose secrets, personal data, or sensitive operational context if redaction is not a first-class step.
+  disposition: accepted
+  owner: Skills maintainer and security owner
+- id: ADV-007
+  perspective: cost/TCO
+  finding: Loop count and token spend are weak success metrics; cost per accepted change and proposal acceptance rate better reflect useful automation.
+  disposition: accepted
+  owner: Controller-loop owner
+- id: ADV-008
+  perspective: operator/security
+  finding: An external OpenClaw planner can make the SDLC easier to drive, but it must remain a constrained MCP/API client and workflow facade rather than a broad shell, browser, filesystem, dashboard, or production mutation surface.
+  disposition: accepted
+  owner: Platform and security owner
+- id: ADV-009
+  perspective: security/privacy
+  finding: A bootstrap workflow that validates secrets and credentials is useful only if it never records raw secret material and cannot silently expand repo-agent authority.
+  disposition: accepted
+  owner: Platform and security owner
+- id: ADV-010
+  perspective: SRE
+  finding: Controller availability, pod health, loop throughput, and alert-to-agent recovery need explicit telemetry and runbooks before fleet-scale autonomy is credible.
+  disposition: accepted
+  owner: Controller-loop owner
+- id: ADV-011
+  perspective: operator
+  finding: A daily Orbit brief is valuable as a cross-repo operating surface, but it must remain a summary over authoritative records rather than an approval channel.
+  disposition: accepted
+  owner: Orbit/platform owner
+open_questions:
+- id: NSQ-001
+  question: 'What approval rule applies to protected North Star changes? Resolved for this loop: final lock approval to proceed to the next milestone is the only North Star planning gate.'
+  owner: Jason and James
+  blocking: false
+  source_ids: [SRC-002, SRC-003]
+- id: NSQ-002
+  question: Should wave automation keep the current one issue/lane/branch/worktree/session/PR model or introduce a wave branch?
+  owner: Skills and release owners
+  blocking: false
+  source_ids: [SRC-002, SRC-003, SRC-007]
+- id: NSQ-003
+  question: 'Resolved for this loop: Gravity does not depend on Onyx ingestion for the MVP; any post-MVP Onyx or control-plane coupling needs a separate gate.'
+  owner: Gravity readiness owner
+  blocking: false
+  source_ids: [SRC-002, SRC-012]
+- id: NSQ-006
+  question: Which P0 North Star interview decisions should be accepted, modified, or rejected before final lock?
+  owner: Jason and James
+  blocking: false
+  source_ids: [SRC-008]
+- id: NSQ-007
+  question: 'What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw, and Gravity? Current default: Skills owns lifecycle contracts/artifacts; Agent Platform owns runtime/control integration; Hermes/OpenClaw plans through constrained MCP/API surfaces; Gravity owns the reusable evidence engine plus packs.'
+  owner: Jason and architecture owner
+  blocking: false
+  source_ids: [SRC-009, SRC-011, SRC-014]
+- id: NSQ-008
+  question: 'What is the safest extraction path from Sunshine Club into reusable Gravity core? Current default: port scanner, SHA-256/object staging, Postgres pipeline, readiness, read-only MCP, and validation contracts before Sunshine-specific client-pack behavior.'
+  owner: Gravity readiness owner
+  blocking: false
+  source_ids: [SRC-009, SRC-013, SRC-032]
+- id: NSQ-009
+  question: 'Which session sources, retention windows, and redaction rules should the learning-capture loop use? Current default: explicit research artifacts plus redacted local Codex/Claude/terminal summaries, proposal-only output, and loop-readiness proof before scheduling.'
+  owner: Skills maintainer and security owner
+  blocking: false
+  source_ids: [SRC-010, SRC-020, SRC-033]
+- id: NSQ-010
+  question: What exact namespace naming convention should bind GitHub owner, organization, repository, dev, preview, staging, and production namespace identity for fleet bootstrap?
+  owner: Platform and security owner
+  blocking: false
+  source_ids: [SRC-034, SRC-031]
+- id: NSQ-011
+  question: 'Which controller model should own repo-controller orchestration: Codex, Claude, or a controller abstraction that selects the model/tooling per task and failure mode?'
+  owner: Platform architecture owner
+  blocking: false
+  source_ids: [SRC-034, SRC-014, SRC-022]
+- id: NSQ-012
+  question: Which infrastructure domain agents are allowed to hold broader scoped access, and what owner, audit, approval, and rollback rules apply to networking, storage, backup, and platform domains?
+  owner: Jason, platform owner, and security owner
+  blocking: false
+  source_ids: [SRC-034, SRC-016]
+- id: NSQ-013
+  question: What is the approved request path for repo agents to add NFS/PVC mounts, route/DNS changes, or base-image packages without bypassing storage, networking, security, and platform controls?
+  owner: Platform, storage, and networking owners
+  blocking: false
+  source_ids: [SRC-034, SRC-031]
+- id: NSQ-014
+  question: What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use?
+  owner: Jason and Orbit/platform owner
+  blocking: false
+  source_ids: [SRC-034]
+conflicts:
+- id: CON-001
+  statement: Wave branch proposals conflict with current one issue/lane/branch/worktree/session/PR policy.
+  existing_authority: COMMON_OPERATING_CONTRACT.md
+  proposed_direction: Treat wave as the CI/CD deployment and review unit; defer exact branch/session/worktree naming to release architecture before automation is encoded.
+  blocking: false
+- id: CON-002
+  statement: Gravity implementation pressure conflicts with the explicit readiness gate.
+  existing_authority: SRC-NS-001 immediate gate
+  proposed_direction: Start Gravity implementation early.
+  blocking: true
+- id: CON-003
+  statement: The previous Agent Delivery OS framing is too narrow for Jason's updated source-control, CI/CD, pipeline, k3s, and knowledge operating-plane intent.
+  existing_authority: Iteration 7 North Star wording
+  proposed_direction: Reframe the product boundary around the self-hosted software-and-knowledge operating plane while preserving the same final-lock gate.
+  blocking: false
+- id: CON-004
+  statement: Gravity's clean repo architecture could duplicate work already built in Sunshine Club.
+  existing_authority: Gravity draft planning docs and Sunshine Club implementation evidence
+  proposed_direction: Run a Sunshine-to-Gravity reuse inventory before implementation and extract reusable core/pack boundaries.
+  blocking: false
+- id: CON-005
+  statement: Broad infrastructure-domain access and repo-controller self-discovery are in tension with existing least-privilege and raw-secret-exclusion rules.
+  existing_authority: COMMON_OPERATING_CONTRACT.md, ARQ-003, NSR-023, and secret-injection evidence.
+  proposed_direction: Allow broader access only for named infrastructure domain agents with owner, scope, audit, rollback, and approval gates; keep repo agents namespace-scoped by default.
+  blocking: true
+- id: CON-006
+  statement: Repo-controller self-service storage, route, or base-image changes could bypass platform ownership if implemented as local shell actions.
+  existing_authority: Platform-readiness, environment GitOps, source-control authority, and GitHub PR/review controls.
+  proposed_direction: Treat storage mounts, routes, namespace creation, and base-image changes as platform control requests or PR-reviewed desired-state changes.
+  blocking: true
+traceability:
+- from: SRC-002
+  to: NSG-001
+  relationship: supports planning-loop goal
+- from: SRC-003
+  to: NSR-002
+  relationship: supports router stop requirement
+- from: SRC-005
+  to: NSR-005
+  relationship: supports evidence registry requirement
+- from: SRC-006
+  to: NSR-006
+  relationship: supports product/architecture North Star artifact loop
+- from: NSG-002
+  to: NSP-002
+  relationship: drives architecture traceability principle
+- from: NSR-004
+  to: NSQ-001
+  relationship: final-lock-only approval rule resolves the protected design commitment gate for this loop
+- from: SRC-007
+  to: NSR-006
+  relationship: supports CI/CD wave deployment and namespace cardinality updates
+- from: NSG-003
+  to: NSM-003
+  relationship: drives Gravity readiness milestone
+- from: SRC-008
+  to: NSR-007
+  relationship: supports North Star interview skill and Q&A packet requirement
+- from: NSG-005
+  to: NSP-005
+  relationship: drives interview-answer governance principle
+- from: NSG-004
+  to: NSR-006
+  relationship: drives CI/CD wave deployment as first-class North Star architecture scope
+- from: SRC-009
+  to: NSG-006
+  relationship: reframes the owned-IP product boundary
+- from: SRC-009
+  to: NSR-009
+  relationship: supports API/MCP-first Agent Platform planning
+- from: SRC-009
+  to: NSR-010
+  relationship: supports Sunshine-to-Gravity reuse planning
+- from: NSG-006
+  to: NSP-006
+  relationship: drives owned-IP architecture principle
+- from: NSG-007
+  to: NSP-008
+  relationship: drives Gravity core/pack separation principle
+- from: SRC-010
+  to: NSR-011
+  relationship: supports proposal-only learning capture from session and research evidence
+- from: SRC-010
+  to: NSR-012
+  relationship: supports loop-readiness criteria before scheduled automation
+- from: NSG-008
+  to: NSP-009
+  relationship: drives evidence-backed self-improvement principle
+- from: NSG-009
+  to: NSP-010
+  relationship: drives verifier/state/stop/budget loop-readiness principle
+- from: SRC-011
+  to: NSR-008
+  relationship: proves live Agent Platform operating-plane surfaces and readiness gaps
+- from: SRC-012
+  to: NSQ-003
+  relationship: resolves current Gravity MVP Onyx dependency question
+- from: SRC-013
+  to: NSR-010
+  relationship: supports Sunshine-to-Gravity generic core and client-pack extraction boundary
+- from: SRC-032
+  to: NSR-021
+  relationship: supports the first stable Gravity core extraction plan contract
+- from: SRC-032
+  to: NSG-018
+  relationship: supports typed readiness evidence before Gravity extraction or implementation advances
+- from: SRC-014
+  to: NSR-009
+  relationship: supports constrained MCP/API-first Hermes and OpenClaw control surfaces
+- from: SRC-015
+  to: NSG-003
+  relationship: supports browser-terminal security, RBAC, audit, isolation, and production restrictions
+- from: SRC-016
+  to: NSG-003
+  relationship: supports runtime secret injection and short-lived credential boundaries
+- from: SRC-017
+  to: NSR-008
+  relationship: supports explicit source-control authority and migration planning
+- from: SRC-018
+  to: NSG-004
+  relationship: records OpenGitOps event evidence limits for later release-architecture research
+- from: SRC-019
+  to: NSG-004
+  relationship: records GitOpsCon session candidates for later timestamped research
+- from: SRC-020
+  to: NSR-012
+  relationship: strengthens loop-readiness criteria with primary-source long-horizon harness evidence
+- from: SRC-021
+  to: NSG-004
+  relationship: supports review inbox and deployment-review product examples
+- from: SRC-022
+  to: NSR-013
+  relationship: supports OpenClaw sessions, queue modes, approvals, MCP, logs, and governed planning-agent boundaries
+- from: SRC-023
+  to: NSG-001
+  relationship: proves the June 23 research queue was completed and ingested before OpenClaw workflow synthesis
+- from: SRC-024
+  to: NSR-013
+  relationship: records the proposed OpenClaw SDLC workflow skill design
+- from: SRC-025
+  to: NSR-014
+  relationship: supports the first stable review-inbox packet contract
+- from: SRC-026
+  to: NSR-015
+  relationship: supports the first stable wave release plan contract
+- from: SRC-027
+  to: NSR-016
+  relationship: supports the first stable observability diagnostic packet contract
+- from: SRC-028
+  to: NSR-017
+  relationship: supports the first stable session ledger contract
+- from: SRC-029
+  to: NSR-018
+  relationship: supports the first stable Agent Platform control request contract
+- from: SRC-029
+  to: NSG-015
+  relationship: supports policy-evaluated request records before Agent Platform execution
+- from: SRC-030
+  to: NSR-019
+  relationship: supports the first stable GitHub backlog sync contract
+- from: SRC-030
+  to: NSG-016
+  relationship: supports typed reconciliation while preserving GitHub authority
+- from: SRC-031
+  to: NSR-020
+  relationship: supports the first stable environment GitOps reconciliation contract
+- from: SRC-031
+  to: NSG-017
+  relationship: supports typed environment proof before review or release claims
+- from: NSG-010
+  to: NSP-011
+  relationship: drives OpenClaw workflow facade principle
+- from: NSG-011
+  to: NSP-012
+  relationship: drives schema-validated review readiness principle
+- from: NSG-012
+  to: NSP-013
+  relationship: drives pre-dispatch release planning principle
+- from: NSG-013
+  to: NSP-014
+  relationship: drives runtime diagnostics correlation principle
+- from: NSG-014
+  to: NSP-015
+  relationship: drives append-oriented controller history principle
+- from: NSG-015
+  to: NSP-016
+  relationship: drives request-before-execution Agent Platform control principle
+- from: NSG-016
+  to: NSP-017
+  relationship: drives findings-not-authority GitHub backlog sync principle
+- from: NSG-017
+  to: NSP-018
+  relationship: drives desired-state versus observed-state environment proof principle
+- from: NSG-018
+  to: NSP-019
+  relationship: drives provenance-bearing source-object extraction principle
+- from: NSR-013
+  to: NSS-010
+  relationship: supports OpenClaw workflow user story
+- from: NSR-013
+  to: NSM-006
+  relationship: drives OpenClaw SDLC workflow design milestone
+- from: NSR-014
+  to: NSS-011
+  relationship: supports human review packet user story
+- from: NSR-014
+  to: schemas/review-inbox-packet.schema.yaml
+  relationship: requires a validated review inbox packet schema
+- from: NSR-015
+  to: NSS-012
+  relationship: supports release planner user story
+- from: NSR-015
+  to: schemas/wave-release-plan.schema.yaml
+  relationship: requires a validated wave release plan schema
+- from: NSR-016
+  to: NSS-013
+  relationship: supports release verifier diagnostic user story
+- from: NSR-016
+  to: schemas/observability-diagnostic-packet.schema.yaml
+  relationship: requires a validated observability diagnostic packet schema
+- from: NSR-017
+  to: NSS-014
+  relationship: supports controller session ledger user story
+- from: NSR-017
+  to: schemas/session-ledger.schema.yaml
+  relationship: requires a validated session ledger schema
+- from: NSR-018
+  to: NSS-015
+  relationship: supports planning-agent Agent Platform control request user story
+- from: NSR-018
+  to: schemas/agent-platform-control-request.schema.yaml
+  relationship: requires a validated Agent Platform control request schema
+- from: NSR-019
+  to: NSS-016
+  relationship: supports state-of-union GitHub backlog sync user story
+- from: NSR-019
+  to: schemas/github-backlog-sync.schema.yaml
+  relationship: requires a validated GitHub backlog sync schema
+- from: NSR-020
+  to: NSS-017
+  relationship: supports platform operator environment GitOps reconciliation user story
+- from: NSR-020
+  to: schemas/environment-gitops-reconciliation.schema.yaml
+  relationship: requires a validated environment GitOps reconciliation schema
+- from: NSR-021
+  to: NSS-018
+  relationship: supports Gravity readiness owner extraction-plan user story
+- from: NSR-021
+  to: schemas/gravity-core-extraction-plan.schema.yaml
+  relationship: requires a validated Gravity core extraction plan schema
+- from: SRC-034
+  to: NSG-019
+  relationship: supports repo-controller bootstrap and fleet self-discovery goal
+- from: SRC-034
+  to: NSR-022
+  relationship: supports standard bootstrap inventory requirement
+- from: SRC-034
+  to: NSR-023
+  relationship: supports safe credential-reference validation requirement
+- from: SRC-034
+  to: NSR-024
+  relationship: supports namespace, storage, route, and domain-agent platform standard
+- from: SRC-034
+  to: NSR-025
+  relationship: supports controller observability and recovery requirement
+- from: SRC-034
+  to: NSR-026
+  relationship: supports adversarial review and stakeholder consensus requirement
+- from: NSG-019
+  to: NSP-020
+  relationship: drives repo-bootstrap workflow-facade principle
+- from: NSG-020
+  to: NSP-021
+  relationship: drives platform contracts before repo-controller powers principle
+- from: NSG-021
+  to: NSP-022
+  relationship: drives controller observability and recovery principle
+- from: NSG-022
+  to: NSP-023
+  relationship: drives Orbit summary-without-authority principle
+- from: NSR-022
+  to: NSS-019
+  relationship: supports repo controller bootstrap story
+- from: NSR-025
+  to: NSS-020
+  relationship: supports fleet observability story
+- from: NSR-024
+  to: NSS-021
+  relationship: supports infrastructure domain-agent boundary story
+- from: NSR-026
+  to: NSS-022
+  relationship: supports Orbit daily operating brief story
+- from: NSR-022
+  to: NSM-007
+  relationship: drives fleet repo-bootstrap readiness milestone
+- from: SRC-036
+  to: NSG-023
+  relationship: records Jason's request for repo-agent scope and responsibility in the North Star
+- from: SRC-034
+  to: NSR-027
+  relationship: supports repo-bootstrap discovery producing an agent scope contract
+- from: SRC-036
+  to: NSR-027
+  relationship: supports the explicit templated scope and responsibility requirement
+- from: NSG-023
+  to: NSP-024
+  relationship: drives repo-agent ownership-through-scope-contract principle
+- from: NSR-027
+  to: NSS-023
+  relationship: supports repo controller scope-declaration user story
+- from: NSR-027
+  to: schemas/repo-agent-scope.schema.yaml
+  relationship: requires a validated repo-agent scope schema
+- from: NSR-027
+  to: skills/repo-hygiene/assets/repo-agent-scope.template.yaml
+  relationship: requires a reusable repo-agent scope template
+- from: NSR-027
+  to: NSM-007
+  relationship: adds repo-agent scope to fleet bootstrap readiness
+proposed_artifact_changes:
+- path: skills/northstar-research-ingest
+  change_type: create
+  summary: Add the CLI-backed research ingestion skill and evidence registry rules.
+  approval_required: false
+- path: schemas/northstar-evidence-item.schema.yaml
+  change_type: create
+  summary: Add the normalized North Star evidence item contract.
+  approval_required: false
+- path: schemas/northstar-evidence-registry.schema.yaml
+  change_type: create
+  summary: Add the queryable North Star evidence registry contract.
+  approval_required: false
+- path: schemas/northstar-artifacts.schema.yaml
+  change_type: create
+  summary: Add the product/architecture North Star artifact loop and signoff schema.
+  approval_required: false
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: create
+  summary: Add draft product North Star artifact.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: create
+  summary: Add draft architecture North Star artifact.
+  approval_required: true
+- path: .agent-workflow/northstar/northstar-artifacts.yaml
+  change_type: create
+  summary: Add machine-readable loop state, open questions, review, and signoff record.
+  approval_required: true
+- path: skills/northstar-planning
+  change_type: create
+  summary: Add the North Star planning skill and references.
+  approval_required: false
+- path: schemas/northstar-plan.schema.yaml
+  change_type: create
+  summary: Add a machine-checkable North Star planning artifact contract.
+  approval_required: false
+- path: .agent-workflow/project/project-definition.yaml
+  change_type: update
+  summary: Reconcile project definition stages from the approved or accepted North Star plan.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Reframe the product boundary around the self-hosted operating plane, API/MCP-first Agent Platform, and Sunshine-to-Gravity reuse.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add operating-plane control surface and Gravity core/pack architecture sections.
+  approval_required: true
+- path: skills/northstar-planning/SKILL.md
+  change_type: update
+  summary: Add learning-capture and loop-readiness expectations to the North Star planning procedure.
+  approval_required: false
+- path: skills/northstar-planning/references/artifact-loop.md
+  change_type: update
+  summary: Add the learning-capture pass and loop-readiness criteria to the self-improving planning loop.
+  approval_required: false
+- path: skills/northstar-planning/assets/NORTHSTAR_PRODUCT.template.md
+  change_type: update
+  summary: Add learning-capture and loop-readiness placeholders to future product North Star drafts.
+  approval_required: false
+- path: skills/northstar-planning/assets/NORTHSTAR_ARCHITECTURE.template.md
+  change_type: update
+  summary: Add learning-capture, loop-readiness, and loop-scheduling placeholders to future architecture North Star drafts.
+  approval_required: false
+- path: schemas/northstar-learning-proposals.schema.yaml
+  change_type: create
+  summary: Add a typed proposal packet contract for proposal-only learning capture and alignment-loop improvements.
+  approval_required: false
+- path: .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
+  change_type: create
+  summary: Record the first manual alignment-loop proposal packet and keep recurring session mining unscheduled.
+  approval_required: false
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Add proposal-only learning capture, typed proposal packet, and loop-readiness product shape.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add learning-capture proposal packet schema, storage path, and loop-readiness architecture.
+  approval_required: true
+- path: .agent-workflow/northstar/credential-references.yaml
+  change_type: create
+  summary: Persist the Brave Search key location and validation mode without storing the raw secret.
+  approval_required: false
+- path: .agent-workflow/northstar/research-inbox/2026-06-23-northstar-research-queue.md
+  change_type: update
+  summary: Mark the June 23 North Star research topics complete and document gate-driven follow-ups.
+  approval_required: false
+- path: .agent-workflow/northstar/northstar-plan.md
+  change_type: update
+  summary: Add the June 23 research-loop summary, resolved Gravity/Onyx note, and refreshed handoff.
+  approval_required: true
+- path: .agent-workflow/northstar/northstar-plan.yaml
+  change_type: update
+  summary: Add June 23 evidence sources, source links, traceability, and refreshed handoff.
+  approval_required: true
+- path: .agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md
+  change_type: create
+  summary: Add the OpenClaw-facing SDLC workflow skill design for ideation through production deployment.
+  approval_required: true
+- path: .agent-workflow/northstar/SDLC_SKILL_DESIGN.md
+  change_type: update
+  summary: Link the existing SDLC skill design to the OpenClaw workflow facade and delegated workflow map.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Add OpenClaw SDLC workflow product story, requirement, milestone, wave, surface, and traceability.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add OpenClaw SDLC workflow architecture requirement, interface, section, and traceability.
+  approval_required: true
+- path: schemas/review-inbox-packet.schema.yaml
+  change_type: create
+  summary: Add the first stable review inbox packet contract for review-ready evidence.
+  approval_required: false
+- path: skills/release-verification/references/review-inbox.md
+  change_type: create
+  summary: Add review inbox packet procedure, completeness rules, stop conditions, and feedback routing.
+  approval_required: false
+- path: skills/release-verification/assets/review-inbox-packet.template.yaml
+  change_type: create
+  summary: Add a starter packet template for future review inbox artifacts.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml
+  change_type: create
+  summary: Add a validating minimal-project review inbox packet example.
+  approval_required: false
+- path: skills/release-verification/SKILL.md
+  change_type: update
+  summary: Add review inbox packet mode to release-verification without changing the 17-skill kernel.
+  approval_required: false
+- path: .agent-workflow/northstar/SDLC_SKILL_DESIGN.md
+  change_type: update
+  summary: Mark review-inbox as having an initial packet/schema contract and keep top-level promotion pending manual proof.
+  approval_required: true
+- path: schemas/wave-release-plan.schema.yaml
+  change_type: create
+  summary: Add the first stable wave release plan contract for pre-dispatch CI/CD, environment, GitOps, rollback, and review-handoff evidence.
+  approval_required: false
+- path: skills/sprint-planning/references/wave-release-planning.md
+  change_type: create
+  summary: Add wave release planning procedure, completeness rules, stop conditions, and dispatch gating.
+  approval_required: false
+- path: skills/sprint-planning/assets/wave-release-plan.template.yaml
+  change_type: create
+  summary: Add a starter wave release plan template for future sprint plans.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/wave-release-plan.yaml
+  change_type: create
+  summary: Add a validating minimal-project wave release plan example.
+  approval_required: false
+- path: skills/sprint-planning/SKILL.md
+  change_type: update
+  summary: Add wave release planning to the sprint-planning transaction without changing the 17-skill kernel.
+  approval_required: false
+- path: schemas/observability-diagnostic-packet.schema.yaml
+  change_type: create
+  summary: Add the first stable observability diagnostic packet contract for runtime evidence, release health, and missing instrumentation.
+  approval_required: false
+- path: skills/release-verification/references/observability-diagnostics.md
+  change_type: create
+  summary: Add diagnostic packet procedure, completeness rules, stop conditions, and feedback routing.
+  approval_required: false
+- path: skills/release-verification/assets/observability-diagnostic-packet.template.yaml
+  change_type: create
+  summary: Add a starter diagnostic packet template for review, release, readiness, incident, and feedback workflows.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/observability-diagnostic-packet.yaml
+  change_type: create
+  summary: Add a validating minimal-project observability diagnostic packet example.
+  approval_required: false
+- path: skills/platform-readiness/SKILL.md
+  change_type: update
+  summary: Allow platform readiness to use observability diagnostic packets for telemetry and missing-instrumentation gaps.
+  approval_required: false
+- path: schemas/session-ledger.schema.yaml
+  change_type: create
+  summary: Add the first stable session ledger contract for parent/child sessions, append-oriented events, correlation IDs, refs, checksums, exceptions, and handoff.
+  approval_required: false
+- path: skills/controller-loop/references/session-ledger.md
+  change_type: create
+  summary: Add session ledger procedure, completeness rules, stop conditions, and event coverage expectations.
+  approval_required: false
+- path: skills/controller-loop/assets/session-ledger.template.yaml
+  change_type: create
+  summary: Add a starter session ledger template for controller-managed projects.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/controller/session-ledger.yaml
+  change_type: create
+  summary: Add a validating minimal-project controller session ledger example.
+  approval_required: false
+- path: skills/controller-loop/SKILL.md
+  change_type: update
+  summary: Add validated session-ledger ownership to the controller-loop procedure without changing the 17-skill kernel.
+  approval_required: false
+- path: schemas/agent-platform-control-request.schema.yaml
+  change_type: create
+  summary: Add the first stable Agent Platform control request contract for operation identity, authorization, policy verdict, target, expected effects, result refs, review gate, and handoff.
+  approval_required: false
+- path: skills/platform-readiness/references/agent-platform-control.md
+  change_type: create
+  summary: Add Agent Platform control request procedure, completeness rules, stop conditions, and authorization/policy boundaries.
+  approval_required: false
+- path: skills/platform-readiness/assets/agent-platform-control-request.template.yaml
+  change_type: create
+  summary: Add a starter Agent Platform control request template for proposed MCP/API operations.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/platform/agent-platform-control-request.yaml
+  change_type: create
+  summary: Add a validating minimal-project Agent Platform control request example.
+  approval_required: false
+- path: skills/platform-readiness/SKILL.md
+  change_type: update
+  summary: Add optional Agent Platform control request validation to platform-readiness without changing the 17-skill kernel.
+  approval_required: false
+- path: schemas/github-backlog-sync.schema.yaml
+  change_type: create
+  summary: Add the first stable GitHub backlog sync contract for source authority, snapshot freshness, issue findings, PR findings, lane findings, delivery findings, actions, and handoff.
+  approval_required: false
+- path: skills/state-of-union/references/github-backlog-sync.md
+  change_type: create
+  summary: Add GitHub backlog sync procedure, completeness rules, stop conditions, and GitHub authority boundaries.
+  approval_required: false
+- path: skills/state-of-union/assets/github-backlog-sync.template.yaml
+  change_type: create
+  summary: Add a starter GitHub backlog sync template for state-of-union strategy work.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/strategy/github-backlog-sync.yaml
+  change_type: create
+  summary: Add a validating minimal-project GitHub backlog sync example.
+  approval_required: false
+- path: skills/state-of-union/SKILL.md
+  change_type: update
+  summary: Add optional GitHub backlog sync validation to state-of-union without changing the 17-skill kernel.
+  approval_required: false
+- path: schemas/environment-gitops-reconciliation.schema.yaml
+  change_type: create
+  summary: Add the first stable environment GitOps reconciliation contract for desired state, controller status, namespace controls, deployment evidence, health, drift, remediation, review, and handoff.
+  approval_required: false
+- path: skills/platform-readiness/references/environment-gitops.md
+  change_type: create
+  summary: Add environment GitOps reconciliation procedure, completeness rules, stop conditions, and protected-environment boundaries.
+  approval_required: false
+- path: skills/platform-readiness/assets/environment-gitops-reconciliation.template.yaml
+  change_type: create
+  summary: Add a starter environment GitOps reconciliation template for platform readiness and release proof.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/platform/environment-gitops-reconciliation.yaml
+  change_type: create
+  summary: Add a validating minimal-project environment GitOps reconciliation example.
+  approval_required: false
+- path: skills/platform-readiness/SKILL.md
+  change_type: update
+  summary: Add optional environment GitOps reconciliation validation to platform-readiness without changing the 17-skill kernel.
+  approval_required: false
+- path: schemas/gravity-core-extraction-plan.schema.yaml
+  change_type: create
+  summary: Add the first stable Gravity core extraction plan contract for source-object identity, reuse matrix, pack assumptions, contracts, migration risks, pilot criteria, readiness updates, handoff, and approval.
+  approval_required: false
+- path: skills/gravity-readiness/references/gravity-core-extraction.md
+  change_type: create
+  summary: Add Gravity core extraction procedure, completeness rules, stop conditions, and readiness boundaries.
+  approval_required: false
+- path: skills/gravity-readiness/assets/gravity-core-extraction-plan.template.yaml
+  change_type: create
+  summary: Add a starter Gravity core extraction plan template for Sunshine-to-Gravity reuse planning.
+  approval_required: false
+- path: examples/minimal-project/.agent-workflow/gravity/gravity-core-extraction-plan.yaml
+  change_type: create
+  summary: Add a validating minimal-project Gravity core extraction plan example.
+  approval_required: false
+- path: skills/gravity-readiness/SKILL.md
+  change_type: update
+  summary: Add optional Gravity core extraction plan validation to gravity-readiness without changing the 17-skill kernel or authorizing implementation.
+  approval_required: false
+- path: .agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml
+  change_type: create
+  summary: Register the semantic repo-controller bootstrap and fleet self-discovery walk as North Star evidence.
+  approval_required: false
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Add repo-bootstrap, fleet self-discovery, Orbit daily brief, image recommendation, and adversarial consensus-review product requirements.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add repo-controller bootstrap, namespace/storage/credential topology, controller observability, and alert-to-agent architecture inputs.
+  approval_required: true
+- path: skills/repo-hygiene/SKILL.md
+  change_type: update
+  summary: Proposed future work to add a repo-bootstrap/self-discovery mode or workflow facade over existing lifecycle skills.
+  approval_required: false
+- path: skills/platform-readiness/SKILL.md
+  change_type: update
+  summary: Proposed future work to validate namespace naming, storage mount request flow, base-image recommendations, credential references, and domain-agent authority.
+  approval_required: false
+- path: skills/controller-loop/SKILL.md
+  change_type: update
+  summary: Proposed future work to validate controller loop metrics, alert recovery, and fleet dashboard integration.
+  approval_required: false
+- path: schemas/repo-agent-scope.schema.yaml
+  change_type: create
+  summary: Add the first repo-agent scope and responsibility contract for repo-associated controllers and long-lived agents.
+  approval_required: false
+- path: skills/repo-hygiene/assets/repo-agent-scope.template.yaml
+  change_type: create
+  summary: Add a starter repo-agent scope template for repo exploration and discovery.
+  approval_required: false
+- path: skills/repo-hygiene/references/repo-agent-scope.md
+  change_type: create
+  summary: Add completion and safety rules for repo-agent scope contracts.
+  approval_required: false
+- path: skills/repo-hygiene/SKILL.md
+  change_type: update
+  summary: Tie repo hygiene/bootstrap to the repo-agent scope contract when a controller or long-lived agent is assigned.
+  approval_required: false
+issue_recommendations:
+- title: Approve North Star planning loop authority and handoff
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Record the final lock approval or changes-requested feedback for the review-ready product and architecture North Star.
+  labels: [northstar, governance]
+- title: Resolve release architecture identity model
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Decide the exact issue/lane/branch/worktree/session/PR/wave naming model before CI/CD wave automation is encoded.
+  labels: [decision, release]
+- title: Answer North Star interview P0 decisions
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Review `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`, answer or modify the P0 questions, and route accepted changes back through northstar-planning.
+  labels: [northstar, interview, governance]
+- title: Define Agent Platform MCP/control API contract
+  repository: jvallery/agents
+  body_summary: Define API/MCP-first control operations for planning agents across repo/session/worktree/reconcile/CI/CD/k3s/review/telemetry workflows, with UI scoped to inspection and recovery.
+  labels: [agent-platform, mcp, control-plane]
+- title: Inventory Sunshine Club for reusable Gravity core extraction
+  repository: VerdifyConsultancy/gravity
+  body_summary: Compare Sunshine Club's file-centric Gravity substrate against Gravity target architecture and produce a validated reusable core versus organization-pack extraction plan before implementation.
+  labels: [gravity, planning, reuse]
+- title: Specify proposal-only learning capture and loop-readiness checks
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Define how Codex, Claude, terminal, research, and delivery sessions are mined for proposed improvements; include redaction, routing taxonomy, approval behavior, verifier/state/stop/budget checks, and cost-per-accepted-change metrics.
+  labels: [northstar, learning-capture, controller-loop]
+- title: Pilot OpenClaw-facing SDLC workflow skills on one non-Gravity repository
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Use the OpenClaw SDLC workflow design to drive one repository from ideation through review/deployment proof using GitHub issues, branches, worktrees, PRs, checks, deployments, releases, review inbox, and learning capture.
+  labels: [northstar, openclaw, sdlc, pilot]
+- title: Define repo-controller bootstrap and self-discovery workflow
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Created as VerdifyConsultancy/verdify-skills#1. Runtime counterpart is jvallery/agents#1810. Specify the cross-skill workflow for controller agents to inventory a repo, GitHub state, Kubernetes namespace, logs, metrics, routes, secret references, storage mounts, CI/CD shape, package needs, planning gaps, AGENTS.md updates, issue recommendations, and PR output.
+  labels: [northstar, repo-hygiene, bootstrap]
+- title: Define fleet namespace, storage, secret, and domain-agent authority standard
+  repository: jvallery/agents
+  body_summary: Tracked across jvallery/agents#1778, #1796, #1811, #1808, and #1813. Decide namespace naming, owner/repo/environment cardinality, NFS/PVC mount request flow, credential validation rules, infrastructure domain-agent authority, and repo-agent least-privilege boundaries.
+  labels: [platform, security, namespaces]
+- title: Implement controller loop observability and alert-to-agent recovery design
+  repository: jvallery/agents
+  body_summary: Created as jvallery/agents#1809 with reusable skill contract in VerdifyConsultancy/verdify-skills#2. Define Prometheus/Grafana dashboards, loop metrics, session ledger signals, Alertmanager routing, controller/pod recovery behavior, and outstanding-work rehydration.
+  labels: [controller-loop, observability, reliability]
+- title: Run adversarial skill architecture audit and consensus review loop
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Created as VerdifyConsultancy/verdify-skills#3. Review skill boundaries, evidence scoring, schema/tag consistency, Codex/Claude adversarial passes, lane-owner votes, stakeholder lenses, objections, and final unresolved issue set.
+  labels: [northstar, review, governance]
+- title: Define Orbit daily operating brief and cross-repo review loop
+  repository: jvallery/agents
+  body_summary: Created as jvallery/agents#1812 with Gravity boundary decision in VerdifyConsultancy/gravity#2. Specify daily brief sources, privacy and connector boundaries, repo-controller status model, PR/issue review cadence, and human approval flow for Orbit or an equivalent higher-level planning agent.
+  labels: [orbit, planning, product]
+- title: Add VAST TCO calculator object-storage comparison addendum
+  repository: jvallery/vast-cloud-tco
+  body_summary: Created as jvallery/vast-cloud-tco#217. Capture object-storage pricing, performance, throughput, request-rate, IOPS, SLA, and tail-latency comparison with official-source provenance and calculator/deck constraints.
+  labels: [routing, tco, follow-up]
+gate_recommendations:
+- type: northstar
+  owner: Jason and James
+  reason: Final lock approval remains required before downstream lifecycle skills treat the North Star as authority; the current iteration is back in artifact-loop after the June 23 Brave, live-state, and contract-hardening research passes.
+  blocking: true
+- type: gravity_readiness
+  owner: Jason and James
+  reason: Gravity implementation remains blocked until readiness criteria are approved.
+  blocking: true
+- type: platform_security_authority
+  owner: Jason, platform owner, and security owner
+  reason: Broad domain-agent access, credential validation, and self-service storage mount changes require explicit access model and approval before implementation.
+  blocking: true
+- type: fleet_bootstrap_readiness
+  owner: Jason and platform owner
+  reason: Running bootstrap across 30+ repo controllers should wait for namespace naming, inventory shape, safe credential probes, and controller recovery behavior to be specified.
+  blocking: true
+handoff:
+  next_skill: northstar-planning
+  next_mode: artifact-loop
+  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, first repo-agent scope contract, and repo-controller bootstrap walk evidence have been synthesized into product, architecture, SDLC design, schemas, examples, and structured plan artifacts; continue artifact-loop review before requesting final lock approval.
+approval:
+  status: pending
+  approver: null
+  approved_at: null

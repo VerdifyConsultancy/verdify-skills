@@ -1,0 +1,36 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-browser-terminal-security-patterns
+reference: northstar://evidence/NSE-20260623-browser-terminal-security-patterns
+title: Browser terminal security patterns
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:08:00Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-browser-terminal-security-patterns.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-browser-terminal-security-patterns-2026-06-23-browser-terminal-security-patterns-md"
+  sha256: f8c19252f80c90585e28f419ce0c540276c909071c48b10e2a9be6dcf9820dfe
+summary: Primary-source research on Argo CD web terminal, Kubernetes exec/debug primitives,
+  and generic browser terminal tools, supporting least-privilege terminal policy for
+  Agent Platform.
+tags:
+- argocd
+- browser-terminal
+- kubernetes
+- platform-readiness
+- security
+claims:
+- Argo CD web terminal access depends on exec/create authorization and can run arbitrary
+  code inside authorized pods.
+- Kubernetes exec, debug, and ephemeral containers are troubleshooting primitives
+  that require explicit RBAC, audit, and environment boundaries when exposed through
+  browser terminals.
+- Generic browser terminal tools expose terminal access over web transports but do
+  not by themselves provide the full Verdify authorization, audit, or Kubernetes policy
+  boundary.
+planning_relevance:
+- Supports SURF-005, ARQ-003, ARCH-007, and platform-readiness browser-terminal gates.
+limitations: []

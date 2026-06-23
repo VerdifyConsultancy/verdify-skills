@@ -2,13 +2,21 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-06-22T21:05:23Z'
+generated_at: '2026-06-23T20:16:44Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: PROJECT_DEFINITION_MISSING
-next_skill: project-definition
-next_mode: discovery
-reason: No canonical project definition exists.
-evidence: []
-missing_artifacts:
-- ".agent-workflow/project/project-definition.yaml"
+current_state: NORTHSTAR_ARTIFACTS_INCOMPLETE
+next_skill: northstar-planning
+next_mode: artifact-loop
+reason: Product and architecture North Star artifacts must be cross-linked and signed
+  off before downstream lifecycle skills treat them as core planning authority.
+evidence:
+- source: ".agent-workflow/intake/transcript-replan.yaml"
+  finding: transcript-replan status is "routed"
+- source: ".agent-workflow/northstar/evidence-registry.yaml"
+  finding: registered North Star evidence count is 36
+- source: ".agent-workflow/northstar/northstar-plan.yaml"
+  finding: northstar-plan status is "proposed"
+- source: ".agent-workflow/northstar/northstar-artifacts.yaml"
+  finding: northstar-artifacts status is "iterating"
+missing_artifacts: []
 open_gates: []

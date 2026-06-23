@@ -1,0 +1,35 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-gravity-remote-onyx-confirmation
+reference: northstar://evidence/NSE-20260623-gravity-remote-onyx-confirmation
+title: Gravity remote and Onyx confirmation
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:15:22Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-gravity-remote-onyx-confirmation.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-remote-onyx-confirmation-2026-06-23-gravity-remote-onyx-confirmation-md"
+  sha256: 9ecfb83534b202f8e50b54184bac9c3ab102e4ffc39601437c6973f592a8d902
+summary: Read-only Git, GitHub, Kubernetes, and Argo CD evidence resolving the Gravity/Onyx
+  dependency question for North Star planning.
+tags:
+- argocd
+- github
+- gravity
+- gravity-readiness
+- onyx
+- platform-readiness
+claims:
+- Current Gravity and Verdify Gravity GitHub issue and PR searches returned zero Onyx-matching
+  issues or PRs.
+- Verdify Gravity origin/main states Gravity does not depend on Onyx ingestion and
+  no Onyx ingestion of Gravity data is enabled.
+- Onyx remains a separate planned or gated vault/search front door and post-MVP/control-plane
+  concern, not a current Gravity MVP dependency.
+planning_relevance:
+- Supports resolving NSQ-003, gravity-readiness routing, and stale issue-reference
+  hygiene before downstream planning.
+limitations: []

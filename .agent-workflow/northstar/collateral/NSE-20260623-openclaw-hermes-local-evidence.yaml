@@ -1,0 +1,45 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-openclaw-hermes-local-evidence
+reference: northstar://evidence/NSE-20260623-openclaw-hermes-local-evidence
+title: OpenClaw and Hermes local evidence
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:50:41Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-openclaw-hermes-local-evidence.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-openclaw-hermes-local-evidence-2026-06-23-openclaw-hermes-local-evidence-md"
+  sha256: ecca8188ac7ad84bf94e37ba30efd52d174b15f603dd59f0f52557715c09a3b7
+summary: Observed local evidence from OpenClaw and Hermes for agent runtimes, sessions,
+  queues, approvals, MCP, logs, plugin boundaries, and MCP-only governed planning
+  agents relevant to the Verdify Skills North Star.
+tags:
+- agent-runtime
+- approvals
+- controller
+- hermes
+- mcp
+- observability
+- openclaw
+- planning-agent
+- session-ledger
+claims:
+- OpenClaw documents a local-first Gateway with sessions, channels, tools, events,
+  multi-agent routing, skills, MCP, queueing, approvals, and JSONL logs.
+- OpenClaw separates provider, model, agent runtime, and channel layers, with runtime
+  ownership potentially delegated to OpenClaw, Codex, ACP/acpx, Claude CLI, or other
+  harnesses.
+- OpenClaw serializes runs per session key and supports queue modes such as steer,
+  followup, collect, and interrupt.
+- Hermes Iris is configured as a production planner with an MCP-only tool surface,
+  disabled shell/web/browser/filesystem toolsets, raw SQL excluded, and audit identifiers
+  required on writes.
+planning_relevance:
+- Supports framework-neutral planning for agent-platform-control, session-ledger,
+  transcript-replan, northstar-interview, runtime adapters, MCP/API control, and governed
+  planning-agent tool boundaries.
+limitations:
+- Local repository evidence only; no live OpenClaw or Hermes runtime audit was performed.

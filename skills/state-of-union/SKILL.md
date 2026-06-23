@@ -16,22 +16,27 @@ Reconcile durable intent with delivery reality before committing to the next exe
 
 - `.agent-workflow/strategy/state-of-union.yaml` — authoritative strategy record
 - `.agent-workflow/strategy/state-of-union.md` — generated human view
+- `.agent-workflow/strategy/github-backlog-sync.yaml` — optional detailed
+  GitHub backlog and delivery reconciliation artifact
 - `.agent-workflow/strategy/gates/*.yaml` — optional human or policy gates
 
 The YAML is canonical. Markdown summarizes it and must not introduce new decisions.
 
 ## Procedure
 
-1. Reconstruct approved intent: project definition, lifecycle readiness, north-star architecture, ADRs, module contracts, and previous outcome reviews.
+1. Reconstruct approved intent: `NORTHSTAR_PRODUCT.md`,
+   `NORTHSTAR_ARCHITECTURE.md`, `northstar-artifacts.yaml`, project definition,
+   lifecycle readiness, north-star architecture, ADRs, module contracts, and
+   previous outcome reviews.
 2. Reconstruct delivery reality: Git state, active branches, open pull requests, open gates, active/completed sprints, release verification, and deployment evidence.
-3. Reconstruct backlog reality from live GitHub when available, otherwise from `.agent-workflow/github/snapshot.json`. GitHub Issues remain the backlog source of truth.
+3. Reconstruct backlog reality from live GitHub when available, otherwise from `.agent-workflow/github/snapshot.json`. GitHub Issues remain the backlog source of truth. Use `github-backlog-sync.yaml` when issue/PR/lane/delivery reconciliation materially affects the strategy.
 4. Compare open issues against the north-star goal and current architecture. Classify issues as ready candidates, underspecified, stale, duplicate, blocked, missing, deferred, in progress, or done.
 5. Identify drift: stale docs, stale architecture, missing module contracts, missing issues, unresolved decisions, dependency conflicts, sequencing risks, and delivery/operations gaps.
 6. Produce a recommended execution sequence and a next sprint candidate set only when prerequisites are ready.
 7. Record proposed actions with where they must be applied: GitHub issue, GitHub dependency, durable gate, project definition, architecture contracts, sprint planning, orchestrator, or release verification.
-8. Validate `state-of-union.yaml` against `../../schemas/state-of-union.schema.yaml`.
+8. Validate `state-of-union.yaml` against `../../schemas/state-of-union.schema.yaml`. Validate any `github-backlog-sync.yaml` artifact against `../../schemas/github-backlog-sync.schema.yaml`.
 
-Read `references/issue-reconciliation.md` before classifying issues. Read `references/handoff-rules.md` before naming the next skill.
+Read `references/issue-reconciliation.md` before classifying issues. Read `references/github-backlog-sync.md` before writing or evaluating a GitHub backlog sync artifact. Read `references/handoff-rules.md` before naming the next skill.
 
 ## Action rules
 

@@ -1,0 +1,52 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-end-to-end-agent-based-sdlc
+reference: northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc
+title: End-to-end agent-based SDLC
+evidence_type: research_report
+evidence_status: reported
+ingested_at: '2026-06-23T03:38:31Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-end-to-end-agent-based-sdlc.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-end-to-end-agent-based-sdlc-2026-06-23-end-to-end-agent-based-sdlc-md"
+  sha256: 19785a5a91aa0c3752d58fb09b708beb4b6948ff5611da83967c32e23e7edad5
+summary: Planning evidence for a deterministic workflow-driven, human-governed, agent-executed
+  SDLC service model spanning intake, North Star planning, research, repository readiness,
+  task/wave execution, CI/CD evidence, review environments, promotion, diagnostics,
+  and wave sign-off.
+tags:
+- agent-orchestration
+- cicd
+- controller
+- gitops
+- human-governed-delivery
+- observability
+- product-service
+- sdlc
+- security
+- session-ledger
+- user-stories
+- workflow-engine
+claims:
+- The controller should be a deterministic workflow system that invokes bounded agents
+  rather than an LLM conversation acting as the workflow engine.
+- A wave should be a coherent deployable product increment represented through metadata,
+  milestones, integration environments, and traceability while individual tasks use
+  short-lived branches and worktrees.
+- Review-ready work requires an immutable artifact deployed to a reachable review
+  environment with CI evidence, provenance, test steps, telemetry, known risks, and
+  rollback context.
+- Agent access should use task-specific least privilege, runtime identity, network
+  isolation, audit logging, and no reusable secrets in prompts.
+- The product surface includes a human review inbox, deterministic controller, session
+  ledger, repository readiness wave, diagnostic loop, and versioned skills registry.
+planning_relevance:
+- Feeds North Star planning for product/service scope, user stories, controller architecture,
+  lane/task/wave model, review inbox, CI/CD evidence, GitOps promotion, observability,
+  diagnostics, and session ledger requirements.
+limitations:
+- The memo is user-supplied planning evidence; cited references were preserved but
+  not independently reverified during this side conversation.

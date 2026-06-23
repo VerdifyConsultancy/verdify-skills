@@ -1,6 +1,6 @@
 interface:
   display_name: "Verdify State of Union"
   short_description: "Align backlog with north-star goals"
-  default_prompt: "Use $state-of-union to review project goals, GitHub Issues, gates, and current delivery state, then recommend the next execution strategy."
+  default_prompt: "Use $state-of-union to review project goals, GitHub Issues, gates, current delivery state, and any github-backlog-sync artifact, then recommend the next execution strategy."
 policy:
   allow_implicit_invocation: true

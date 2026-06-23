@@ -1,6 +1,6 @@
 ---
 name: sprint-planning
-description: Selects approved GitHub Issues for a bounded sprint and atomically creates the sprint plan, lane topology, and executable lane contracts. Use after approved state-of-union strategy identifies ready candidate issues, when planning the next delivery slice, or when an existing sprint must be replanned before dispatch.
+description: Selects approved GitHub Issues for a bounded sprint and atomically creates the sprint plan, lane topology, executable lane contracts, and wave release plan when delivery has CI/CD, preview, deployment, or rollback implications. Use after approved state-of-union strategy identifies ready candidate issues, when planning the next delivery slice, or when an existing sprint must be replanned before dispatch.
 compatibility: Requires Git, approved project/module artifacts, and GitHub issue access or a current snapshot. No worktree is created until the complete plan transaction is approved.
 metadata:
   author: Verdify
@@ -24,6 +24,8 @@ Use multiple issues in one lane only when they are inseparable at acceptance and
 
 - approved project definition;
 - approved architecture and relevant module contracts;
+- approved or explicitly accepted `NORTHSTAR_PRODUCT.md`,
+  `NORTHSTAR_ARCHITECTURE.md`, and `northstar-artifacts.yaml`;
 - approved current state-of-union strategy naming candidate issues;
 - current GitHub issues, dependencies, and priorities;
 - baseline SHA and repository conventions;
@@ -38,10 +40,18 @@ Perform these steps as one transaction:
 3. **Lane topology.** Assign each issue to exactly one lane by default. Decide parallel versus serial execution based on contracts and dependency risk, not desired agent count.
 4. **Lane contracts.** Compile objective, ownership, dependencies, runtime namespace policy, validation, evidence, Git policy, escalation triggers, and definition of done.
 5. **Cross-lane review.** Detect overlapping paths, interfaces, runtime resources, database migrations, and incompatible baselines.
-6. **Validation.** Validate the sprint plan and every lane contract.
-7. **Approval.** Present the complete plan, topology, contracts, risks, and exceptions as one gate. Do not dispatch before approval.
+6. **Wave release planning.** For deployment-affecting work, record branch or
+   merge queue model, required checks/events, CI workflows, preview/review
+   environments, GitOps desired state, deployment strategy, observability,
+   rollback, release-health signals, and review inbox handoff.
+7. **Validation.** Validate the sprint plan, every lane contract, and any wave
+   release plan.
+8. **Approval.** Present the complete plan, topology, contracts, release plan,
+   risks, and exceptions as one gate. Do not dispatch before approval.
 
-Read `references/issue-readiness.md`, `references/planning-method.md`, and `references/lane-transaction.md` as needed.
+Read `references/issue-readiness.md`, `references/planning-method.md`,
+`references/lane-transaction.md`, and `references/wave-release-planning.md` as
+needed.
 
 ## Canonical outputs
 
@@ -50,8 +60,13 @@ Read `references/issue-readiness.md`, `references/planning-method.md`, and `refe
 - `.agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml`
 - `.agent-workflow/sprints/<sprint-id>/lanes/contracts/<lane-id>.contract.yaml`
 - `.agent-workflow/sprints/<sprint-id>/gates/plan-approval.yaml`
+- `.agent-workflow/sprints/<sprint-id>/release/wave-release-plan.yaml`
+  when release/review/deployment evidence is in scope
 
-Use `../../schemas/sprint-plan.schema.yaml`, `../../schemas/lane-contract.schema.yaml`, and `../../schemas/human-gate.schema.yaml`.
+Use `../../schemas/sprint-plan.schema.yaml`,
+`../../schemas/lane-contract.schema.yaml`,
+`../../schemas/human-gate.schema.yaml`, and
+`../../schemas/wave-release-plan.schema.yaml` when applicable.
 
 ## Handoff
 

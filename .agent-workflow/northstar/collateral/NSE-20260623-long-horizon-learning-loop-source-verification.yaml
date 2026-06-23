@@ -1,0 +1,35 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-long-horizon-learning-loop-source-verification
+reference: northstar://evidence/NSE-20260623-long-horizon-learning-loop-source-verification
+title: Long-horizon learning loop source verification
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:08:00Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-long-horizon-learning-loop-source-verification.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-long-horizon-learning-loop-source-verification-2026-06-23-long-horizon-learning-loop-source-ver"
+  sha256: f91e33eae22030efeee4f14bd5078f74e9e02c518f8c9be763053b9f1569fee7
+summary: Primary-source research on Anthropic and OpenAI long-horizon agent harness
+  patterns, strengthening proposal-only learning-capture planning beyond social or
+  mirrored sources.
+tags:
+- agent-orchestration
+- learning-capture
+- long-horizon-agents
+- self-improvement
+- verification
+claims:
+- Anthropic long-running agent sources emphasize harness design, context management,
+  stable interfaces, environment setup, evaluation, and planner/generator/evaluator
+  patterns.
+- OpenAI Codex long-horizon source emphasizes explicit specifications, task persistence,
+  verification, and alignment over long work intervals.
+- Prior social or mirrored learning-loop evidence should remain reported unless independently
+  verified against official sources or primary papers.
+planning_relevance:
+- Supports PRQ-020, PRQ-021, ARCH-015, IFACE-014, and learning-capture loop readiness.
+limitations: []

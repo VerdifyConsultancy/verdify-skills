@@ -1,0 +1,29 @@
+{
+  "skill_name": "northstar-research-ingest",
+  "evals": [
+    {
+      "id": "ingest-local-research",
+      "prompt": "Ingest a local research note about platform readiness into the North Star planning evidence folder.",
+      "expected_output": "Runs the ingest command, copies the source into collateral, writes a normalized evidence item, updates the registry, and returns a northstar:// evidence reference.",
+      "files": [],
+      "assertions": [
+        "The source file is copied into the North Star collateral folder.",
+        "A normalized evidence item is written and schema-valid.",
+        "The registry includes the evidence ID and reference URI.",
+        "The item is not converted directly into a requirement or implementation lane."
+      ]
+    },
+    {
+      "id": "query-registered-evidence",
+      "prompt": "Find all registered North Star evidence tagged gravity and matching observability.",
+      "expected_output": "Queries the evidence registry by tag and text and returns matching evidence IDs, references, titles, summaries, tags, and item paths.",
+      "files": [],
+      "assertions": [
+        "The query reads the evidence registry.",
+        "Filtering can match tags and text.",
+        "Results include stable reference URIs.",
+        "Missing registries are handled without inventing evidence."
+      ]
+    }
+  ]
+}

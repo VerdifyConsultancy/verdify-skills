@@ -1,0 +1,53 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-supply-chain-policy-knowledge-store-primary-sources
+reference: northstar://evidence/NSE-20260623-supply-chain-policy-knowledge-store-primary-sources
+title: Supply chain, policy, and knowledge store primary sources
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:42:13Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-supply-chain-policy-knowledge-store-sources.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-supply-chain-policy-knowledge-store-primary-sources-2026-06-23-supply-chain-policy-knowledge-store-s"
+  sha256: 7e80dbe4a093cf49045223722b65b42a1796804774b2b6c41e3066a6414090e0
+summary: Primary-source evidence for SLSA provenance, Tekton Chains attestations,
+  CycloneDX provenance, OPA policy-as-code, Kubernetes RBAC/multi-tenancy, and storage
+  tradeoffs for knowledge/evidence systems.
+tags:
+- cyclonedx
+- kubernetes
+- opa
+- pgvector
+- policy-as-code
+- provenance
+- qdrant
+- security
+- supply-chain
+- tekton
+claims:
+- SLSA provenance describes where, when, and how artifacts were produced so consumers
+  can verify artifacts against expectations or rebuild them if needed.
+- Tekton Chains can generate and sign in-toto attestations for images and store/query
+  attestations through a transparency log.
+- CycloneDX provenance can track origin, development, ownership, location, and modification
+  chronology of software components.
+- OPA externalizes policy decisions and can enforce policy across microservices, Kubernetes,
+  CI/CD pipelines, APIs, and gateways.
+- Kubernetes RBAC guidance emphasizes least privilege, minimizing privileged service-account
+  tokens, and treating namespace boundaries as insufficient by themselves.
+- Kubernetes multi-tenancy guidance pairs namespace access control with RBAC and ResourceQuota
+  to constrain tenant access and resource consumption.
+planning_relevance:
+- Supports distinguishing review-ready evidence from production-ready supply-chain
+  evidence.
+- Supports adding policy-as-code hooks to platform-readiness, agent-platform-control,
+  and release-verification rather than relying only on prompts.
+- Supports treating pgvector and Qdrant as tradeoff points for Gravity and evidence-system
+  retrieval.
+limitations:
+- Does not inspect local CI, Tekton availability, SBOM tooling, or the final OPA policy
+  package.
+- Does not decide the final Gravity knowledge-store architecture.

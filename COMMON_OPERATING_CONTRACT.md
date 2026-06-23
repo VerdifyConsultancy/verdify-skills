@@ -22,11 +22,11 @@ Safely advance a repository from observed current state to explicitly approved t
 12. **Respect ownership.** Modify only owned paths and interfaces. Record cross-lane coordination before touching shared surfaces.
 13. **Prefer deterministic checks.** Run tests, linters, type checks, policy scripts, schema validation, Git checks, CI, and runtime probes before narrative judgment.
 14. **Do not claim completion without evidence.** Every acceptance criterion must point to a test, check, diff, review, runtime probe, log, screenshot, or explicitly recorded manual observation.
-15. **Do not self-certify.** Worker closeout is necessary but a fresh critic or equivalent deterministic review gate must approve before integration.
+15. **Do not self-certify.** Worker closeout is necessary but a fresh critic or equivalent deterministic review gate must approve before integration. Review-ready work also needs a durable review inbox packet when human approval or release verification depends on aggregated evidence.
 16. **Keep sessions role-pure.** The worker implements; the critic reviews; the integration controller integrates; the deployment verifier proves runtime reality.
 17. **Protect production and data.** Worker lanes do not receive production credentials. Privileged deployment runs through separately authorized environments and roles.
 18. **Keep Git clean and attributable.** Use coherent commits, push intended changes, report untracked files, and do not rewrite shared history without authorization.
-19. **Reconcile durable state.** Issue, PR, check, contract, release, and deployment states must agree before closure. Local snapshots never override GitHub.
+19. **Reconcile durable state.** Issue, PR, check, contract, session ledger, release, and deployment states must agree before closure. Local snapshots never override GitHub.
 20. **Continue autonomously within bounds.** Do not request routine confirmation when evidence and the approved contract are sufficient.
 
 ## Standard lifecycle states

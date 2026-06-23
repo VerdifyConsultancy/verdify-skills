@@ -1,0 +1,54 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-agent-platform-control-implementation-be
+reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
+title: Agent Platform control implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T18:36:56Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-agent-platform-control-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-control-implementation-be-2026-06-23-agent-platform-control-best-practices"
+  sha256: cb367130644338c1fca5248866cccc5dfabe1cb9b1bf2c6e5e31c79d3433b8f9
+summary: Primary-source research for a first stable Agent Platform control request
+  contract, covering MCP tools/authorization, OpenAPI operation contracts, Kubernetes
+  authorization/SubjectAccessReview/RBAC/audit logging, GitHub REST workflow/check/deployment
+  operations, OAuth scopes, and OPA policy decision logs.
+tags:
+- agent-platform-control
+- authorization
+- github
+- kubernetes
+- mcp
+- oauth
+- opa
+- openapi
+- platform-readiness
+claims:
+- Agent Platform control requests should identify MCP tool or API operation, operation
+  ID/tool name, target, requester, authorization context, scopes, policy verdict,
+  mutation level, inputs, expected effects, evidence refs, result, review gate, and
+  handoff without copying raw tokens or payloads.
+- Protected or production-affecting control actions should remain blocked unless authorization,
+  policy decision, target identity, rollback or recovery path, and evidence capture
+  are explicit.
+- First implementation should remain a platform-readiness request artifact, deferring
+  actual Agent Platform API/MCP execution until concrete operations have a reliable
+  manual run.
+planning_relevance:
+- Supports defining `agent-platform-control-request.schema.yaml`, operation
+  identity, authorization context, policy verdict, mutation level, target,
+  inputs, expected effects, evidence refs, execution result, review gate, and
+  handoff.
+- Supports `PRQ-018`, `SURF-012`, `IFACE-012`, `ARCH-013`, platform readiness,
+  and OpenClaw MCP/API-first control.
+- Supports keeping `agent-platform-control` as a platform-readiness artifact
+  contract before adding a top-level canonical skill or executor.
+limitations:
+- This evidence defines the durable request and policy shape; it does not
+  authorize or execute Agent Platform operations.
+- Production mutation remains gated by protected environment and human approval
+  rules outside this first schema.

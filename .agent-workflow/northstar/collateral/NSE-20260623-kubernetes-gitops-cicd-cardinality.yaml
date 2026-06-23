@@ -1,0 +1,45 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-kubernetes-gitops-cicd-cardinality
+reference: northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality
+title: Kubernetes, GitOps, and CI/CD cardinality research
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T02:58:05Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-kubernetes-gitops-cicd-cardinality.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-kubernetes-gitops-cicd-cardinality-2026-06-23-kubernetes-gitops-cicd-cardinality-md"
+  sha256: 9fe2ee08ab742b3c13ac2c2a9e6f78b5aecb72b2ea055c08186749a67ffc1a29
+summary: Primary-source research supporting repo/application boundaries, environment-scoped
+  namespaces, namespace quotas/RBAC/network policy, PR preview environments, and CI/CD
+  based wave deployment.
+tags:
+- cicd
+- gitops
+- kubernetes
+- namespace
+- platform-readiness
+- security
+- wave-deployment
+claims:
+- A repository/application should be modeled as the durable product boundary while
+  dev, staging, production, and preview execution use environment-scoped namespaces
+  or namespace sets.
+- Kubernetes namespace isolation must be paired with ResourceQuota, least-privilege
+  RBAC, NetworkPolicy, and secret handling rules; namespace boundaries alone are not
+  sufficient.
+- 'CI/CD based wave deployment should be core: PR or wave branches produce CI evidence
+  and preview/review deployments, while protected environments and GitOps promotion
+  control staging and production.'
+- PR-generated preview environments are useful but require admin-controlled configuration
+  and least-privilege policies because dynamic generators can leak secrets or manage
+  unintended resources.
+planning_relevance:
+- Resolves the North Star namespace cardinality planning question and strengthens
+  the CI/CD wave deployment architecture requirement.
+limitations:
+- Primary-source docs establish platform patterns; final naming and cluster-specific
+  namespace layout still require platform inventory.

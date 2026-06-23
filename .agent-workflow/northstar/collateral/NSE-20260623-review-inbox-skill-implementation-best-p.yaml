@@ -1,0 +1,49 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-review-inbox-skill-implementation-best-p
+reference: northstar://evidence/NSE-20260623-review-inbox-skill-implementation-best-p
+title: Review inbox skill implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T18:00:57Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-review-inbox-skill-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-skill-implementation-best-p-2026-06-23-review-inbox-skill-best-practices-md"
+  sha256: 87871ca0939b39c2eeb23bb1e83fc23356923a0d3886f8e6de7bcb2dc2e70306
+summary: Primary-source research for the first stable review-inbox packet contract,
+  covering GitHub PR/check/deployment/environment APIs, GitLab review apps, Argo CD
+  pull-request preview generation and security constraints, and OpenGitOps reconciliation
+  principles.
+tags:
+- argocd
+- delivery
+- github
+- gitlab
+- gitops
+- human-review
+- review-inbox
+claims:
+- Review inbox packets should bind PR identity, exact head SHA, checks/workflow results,
+  deployment or preview environment state, reviewer state, rollback readiness, telemetry
+  links, evidence completeness, recommendation, and feedback route.
+- Preview or review environments generated from PRs require explicit traceability
+  and security controls, including source-of-truth ownership and safe generator configuration.
+- GitOps-aligned review evidence should distinguish desired state, observed runtime
+  state, and reconciliation evidence rather than treating pipeline completion as deployment
+  proof.
+planning_relevance: []
+planning_relevance:
+- Supports defining the `review-inbox` packet schema, required evidence groups,
+  completeness verdicts, recommendation states, and feedback routing.
+- Supports `SURF-004`, `IFACE-004`, `PRQ-004`, `ARCH-008`, `ARCH-009`, and the
+  `sdlc-review-inbox` OpenClaw workflow stage.
+- Supports keeping `review-inbox` as a promoted capability contract before
+  adding a top-level canonical skill.
+limitations:
+- GitHub remains the current Verdify delivery control plane; GitLab and Argo CD
+  sources are implementation examples, not approved platform migrations.
+- This evidence supports a first manual packet contract, not automatic
+  production promotion or a change to the 17-skill kernel.

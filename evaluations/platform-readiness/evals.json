@@ -1,0 +1,29 @@
+{
+  "skill_name": "platform-readiness",
+  "evals": [
+    {
+      "id": "namespace-rbac-secret-gap",
+      "prompt": "The platform has Kubernetes namespaces but no documented RBAC boundary and secrets are only described as prompt variables.",
+      "expected_output": "Marks readiness not ready, records RBAC and secret-injection blockers, and refuses to proceed to a Gravity pilot.",
+      "files": [],
+      "assertions": [
+        "RBAC and secrets are assessed as separate readiness domains.",
+        "Secret values are not requested or copied.",
+        "Gravity pilot remains blocked.",
+        "A gate or issue is recommended."
+      ]
+    },
+    {
+      "id": "non-gravity-pilot",
+      "prompt": "Agent Platform CI/CD and review environments exist, but no end-to-end non-Gravity pilot has been run.",
+      "expected_output": "Defines the minimum safe pilot and marks platform readiness incomplete until the full intake-to-review loop is proven.",
+      "files": [],
+      "assertions": [
+        "A non-Gravity pilot is required before Gravity.",
+        "CI/CD, preview, human review, and ledger evidence are included.",
+        "Production changes are not applied.",
+        "The readiness matrix stays evidence-backed."
+      ]
+    }
+  ]
+}

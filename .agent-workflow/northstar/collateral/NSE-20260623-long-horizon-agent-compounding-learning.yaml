@@ -1,0 +1,51 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: "1.0"
+id: NSE-20260623-long-horizon-agent-compounding-learning
+reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
+title: Agent loop and learning-capture patterns
+evidence_type: external_reference
+evidence_status: reported
+ingested_at: "2026-06-23T06:08:29Z"
+source:
+  uri: https://x.com/0xCodez/status/2065089060104720776
+  original_path:
+  copied_path: .agent-workflow/northstar/collateral/sources/NSE-20260623-long-horizon-agent-compounding-learning-2026-06-23-x-fable-mythos-learning.md
+  sha256: e4b0c8b6030404695aa20cd3ccec1649aec4a90382f26b972d5d7d9a62b4e73d
+summary: Reported external-reference evidence from three social posts and associated article/mirror pages that effective agent systems are loops with goals, verifiers, state, stop conditions, budgets, and evidence-backed learning capture rather than one-off chat sessions or unreviewed self-modification.
+tags:
+- agent-orchestration
+- artifacts
+- fallback
+- learning-capture
+- long-horizon-agents
+- model-routing
+- northstar
+- self-improvement
+- skill-compounding
+- verification
+claims:
+- Long-running agent systems should preserve useful memory in durable state files and skill artifacts rather than relying on transient chat history.
+- Independent verifier or critic agents reduce the bias of self-review and should be used before final lock, integration, or review-ready claims.
+- Effective planning loops should explicitly support fan-out and synthesis, adversarial review, and iterate-until-evidence workflows.
+- 'Skill improvement should be evidence-backed and reviewable: observed issue or opportunity, investigation, verification, distilled lesson, proposed artifact or skill change, risk class, and approval path.'
+- Model refusal, fallback, downgrade, and availability loss should be modeled as ordinary orchestration states.
+- UI, review-inbox, Gravity, and control-plane outcomes should use visual, browser, runtime, or telemetry evidence when text-only self-report is insufficient.
+- A loop is worth automating only when the task recurs, bad output can be rejected, the agent can complete it end-to-end, and done is objective enough to verify.
+- Reliable loop rollout should proceed from one proven manual run, to saved skill or command, to loop with gate and stop condition, and only then to scheduling.
+- Session-mining loops should scan Codex, Claude, and terminal sessions as evidence and stage proposals only; applying changes remains a human or governed decision.
+- Learning-capture proposals should route lessons to content, context files, slash commands, skills, hooks, tool/CLI fixes, config, backlog, or no-op.
+- Cost per accepted change, not raw token spend or loop count, is the most useful operational metric for recurring agent loops.
+planning_relevance:
+- Supports adding a learning-capture pattern to the North Star planning loop and skill instructions.
+- Strengthens the existing durable `.agent-workflow` artifact architecture.
+- Strengthens independent critic/verifier requirements and model-abstraction/fallback planning.
+- Adds visual/runtime verification expectations for UI and control-plane-related North Star stories.
+- Adds loop-readiness criteria and rollout sequence for future controller-loop, scheduling, and session-mining automation.
+- Supports proposal-only session mining as a future owned-IP capability for Verdify Skills, Agent Platform, and Hermes/OpenClaw.
+limitations:
+- The X posts themselves were not fully accessible through the browser session.
+- Mirror, indexed, and article pages are secondary sources and may include translation, summarization, or editorial interpretation.
+- Fable/Mythos availability and product details were volatile in June 2026; the durable planning input is the architecture pattern rather than dependence on a specific model.
+- This evidence supports proposed planning and skill changes; it is not final approval to lock the North Star.

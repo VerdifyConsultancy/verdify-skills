@@ -1,0 +1,551 @@
+---
+schema_ref: northstar-artifacts.schema.yaml
+kind: NorthStarArtifacts
+schema_version: '1.0'
+project_id: verdify-skills
+status: iterating
+iteration: 23
+generated_at: '2026-06-23T02:51:16Z'
+updated_at: '2026-06-23T20:18:26Z'
+product:
+  path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  status: draft
+  summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, Orbit daily brief, review script, planning questions, and traceability.
+  section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013]
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  - NSE-20260623-kubernetes-gitops-cicd-cardinality
+  - NSE-20260623-end-to-end-agent-based-sdlc
+  - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  - NSE-20260623-long-horizon-agent-compounding-learning
+  - NSE-20260623-agent-platform-live-state-audit
+  - NSE-20260623-gravity-remote-onyx-confirmation
+  - NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  - NSE-20260623-openclaw-hermes-local-evidence
+  - NSE-20260623-browser-terminal-security-patterns
+  - NSE-20260623-secrets-credential-injection-patterns
+  - NSE-20260623-source-control-migration-local-forges
+  - NSE-20260623-opengitops-events-session-specificity
+  - NSE-20260623-opengitops-session-shortlist
+  - NSE-20260623-long-horizon-learning-loop-source-verification
+  - NSE-20260623-review-inbox-product-examples
+  - NSE-20260623-review-inbox-skill-implementation-best-p
+  - NSE-20260623-wave-release-planning-implementation-bes
+  - NSE-20260623-observability-diagnostics-implementation
+  - NSE-20260623-session-ledger-implementation-best-pract
+  - NSE-20260623-agent-platform-control-implementation-be
+  - NSE-20260623-github-backlog-sync-implementation-best
+  - NSE-20260623-environment-gitops-implementation-best-p
+  - NSE-20260623-gravity-core-extraction-implementation-b
+  - NSE-20260623-north-star-research-queue-completion
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+architecture:
+  path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  status: draft
+  summary: Iterating architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw/Orbit planning layer, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
+  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020]
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  - NSE-20260623-kubernetes-gitops-cicd-cardinality
+  - NSE-20260623-end-to-end-agent-based-sdlc
+  - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  - NSE-20260623-long-horizon-agent-compounding-learning
+  - NSE-20260623-agent-platform-live-state-audit
+  - NSE-20260623-gravity-remote-onyx-confirmation
+  - NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  - NSE-20260623-openclaw-hermes-local-evidence
+  - NSE-20260623-browser-terminal-security-patterns
+  - NSE-20260623-secrets-credential-injection-patterns
+  - NSE-20260623-source-control-migration-local-forges
+  - NSE-20260623-opengitops-events-session-specificity
+  - NSE-20260623-opengitops-session-shortlist
+  - NSE-20260623-long-horizon-learning-loop-source-verification
+  - NSE-20260623-review-inbox-product-examples
+  - NSE-20260623-review-inbox-skill-implementation-best-p
+  - NSE-20260623-wave-release-planning-implementation-bes
+  - NSE-20260623-observability-diagnostics-implementation
+  - NSE-20260623-session-ledger-implementation-best-pract
+  - NSE-20260623-agent-platform-control-implementation-be
+  - NSE-20260623-github-backlog-sync-implementation-best
+  - NSE-20260623-environment-gitops-implementation-best-p
+  - NSE-20260623-gravity-core-extraction-implementation-b
+  - NSE-20260623-north-star-research-queue-completion
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+evidence_references:
+- id: NSE-20260623-long-horizon-agent-compounding-learning
+  reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
+  title: Agent loop and learning-capture patterns
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  reference: northstar://evidence/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  title: Agent Platform, Sunshine Gravity, OpenClaw, and owned-IP priorities
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  reference: northstar://evidence/NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  title: 'Walk transcript: Agent Platform, Gravity, and Skills'
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  reference: northstar://evidence/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  title: CI/CD, SDLC, agent orchestration, and human-governed delivery
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260623-kubernetes-gitops-cicd-cardinality
+  reference: northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality
+  title: Kubernetes, GitOps, and CI/CD cardinality research
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-end-to-end-agent-based-sdlc
+  reference: northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc
+  title: End-to-end agent-based SDLC
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260623-agent-platform-live-state-audit
+  reference: northstar://evidence/NSE-20260623-agent-platform-live-state-audit
+  title: Agent Platform live-state audit
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-gravity-remote-onyx-confirmation
+  reference: northstar://evidence/NSE-20260623-gravity-remote-onyx-confirmation
+  title: Gravity remote and Onyx confirmation
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  reference: northstar://evidence/NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  title: Sunshine Gravity extraction architecture audit
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  reference: northstar://evidence/NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  title: OpenClaw and Hermes reuse interface/security audit
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-openclaw-hermes-local-evidence
+  reference: northstar://evidence/NSE-20260623-openclaw-hermes-local-evidence
+  title: OpenClaw and Hermes local evidence
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-browser-terminal-security-patterns
+  reference: northstar://evidence/NSE-20260623-browser-terminal-security-patterns
+  title: Browser terminal security patterns
+  evidence_status: observed
+  used_in: [architecture]
+- id: NSE-20260623-secrets-credential-injection-patterns
+  reference: northstar://evidence/NSE-20260623-secrets-credential-injection-patterns
+  title: Secrets and credential injection patterns
+  evidence_status: observed
+  used_in: [architecture]
+- id: NSE-20260623-source-control-migration-local-forges
+  reference: northstar://evidence/NSE-20260623-source-control-migration-local-forges
+  title: Source-control migration and local forge patterns
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-opengitops-events-session-specificity
+  reference: northstar://evidence/NSE-20260623-opengitops-events-session-specificity
+  title: OpenGitOps event and session specificity
+  evidence_status: observed
+  used_in: [deferred]
+- id: NSE-20260623-opengitops-session-shortlist
+  reference: northstar://evidence/NSE-20260623-opengitops-session-shortlist
+  title: OpenGitOps session shortlist
+  evidence_status: observed
+  used_in: [deferred]
+- id: NSE-20260623-long-horizon-learning-loop-source-verification
+  reference: northstar://evidence/NSE-20260623-long-horizon-learning-loop-source-verification
+  title: Long-horizon learning loop source verification
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-review-inbox-product-examples
+  reference: northstar://evidence/NSE-20260623-review-inbox-product-examples
+  title: Review inbox product examples
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-review-inbox-skill-implementation-best-p
+  reference: northstar://evidence/NSE-20260623-review-inbox-skill-implementation-best-p
+  title: Review inbox skill implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-wave-release-planning-implementation-bes
+  reference: northstar://evidence/NSE-20260623-wave-release-planning-implementation-bes
+  title: Wave release planning implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-observability-diagnostics-implementation
+  reference: northstar://evidence/NSE-20260623-observability-diagnostics-implementation
+  title: Observability diagnostics implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-session-ledger-implementation-best-pract
+  reference: northstar://evidence/NSE-20260623-session-ledger-implementation-best-pract
+  title: Session ledger implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-agent-platform-control-implementation-be
+  reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
+  title: Agent Platform control implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-github-backlog-sync-implementation-best
+  reference: northstar://evidence/NSE-20260623-github-backlog-sync-implementation-best
+  title: GitHub backlog sync implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-environment-gitops-implementation-best-p
+  reference: northstar://evidence/NSE-20260623-environment-gitops-implementation-best-p
+  title: Environment GitOps implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-gravity-core-extraction-implementation-b
+  reference: northstar://evidence/NSE-20260623-gravity-core-extraction-implementation-b
+  title: Gravity core extraction implementation best practices
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-north-star-research-queue-completion
+  reference: northstar://evidence/NSE-20260623-north-star-research-queue-completion
+  title: North Star research queue completion
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260623-repo-controller-bootstrap-self-discovery
+  reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
+  title: Repo controller bootstrap and fleet self-discovery walk intake
+  evidence_status: reported
+  used_in: [both]
+cross_links:
+- from_id: PRQ-001
+  to_id: ARQ-001
+  relationship: Product North Star artifact loop requires durable product/architecture artifact architecture.
+- from_id: PRQ-002
+  to_id: ARQ-001
+  relationship: Self-improving planning loop requires loop state, question state, review state, and final signoff record.
+- from_id: PRQ-003
+  to_id: ARQ-003
+  relationship: Gravity readiness product gate requires least-privilege platform access.
+- from_id: PRQ-004
+  to_id: ARQ-002
+  relationship: Review-ready work requires Git-anchored human-governed delivery controls.
+- from_id: PRQ-004
+  to_id: ARQ-004
+  relationship: Review-ready product requirement requires observability and diagnostic coverage.
+- from_id: ARQ-004
+  to_id: schemas/observability-diagnostic-packet.schema.yaml
+  relationship: The observability architecture now has a validated diagnostic packet schema.
+- from_id: PRQ-005
+  to_id: ARQ-005
+  relationship: Traceability product requirement requires durable session and wave ledger.
+- from_id: ARQ-005
+  to_id: schemas/session-ledger.schema.yaml
+  relationship: The session and wave ledger now has a validated artifact schema.
+- from_id: SURF-004
+  to_id: IFACE-004
+  relationship: Review inbox surface defines the review inbox interface.
+- from_id: IFACE-004
+  to_id: schemas/review-inbox-packet.schema.yaml
+  relationship: The review inbox interface now has a validated packet schema.
+- from_id: WAVE-002
+  to_id: ARCH-009
+  relationship: Non-Gravity pilot wave requires preview, promotion, and rollback architecture.
+- from_id: PRQ-006
+  to_id: ARQ-006
+  relationship: CI/CD based wave deployment requires explicit release architecture.
+- from_id: ARQ-006
+  to_id: schemas/wave-release-plan.schema.yaml
+  relationship: The wave release architecture now has a validated planning schema.
+- from_id: ARQ-006
+  to_id: schemas/environment-gitops-reconciliation.schema.yaml
+  relationship: The wave release architecture now has a validated environment GitOps reconciliation schema.
+- from_id: PRQ-007
+  to_id: ARQ-007
+  relationship: Seventeen canonical skills require a package and validation architecture.
+- from_id: PRQ-008
+  to_id: ARQ-008
+  relationship: CLI product surface requires dependency-light schema-driven CLI architecture.
+- from_id: PRQ-009
+  to_id: ARQ-009
+  relationship: Machine-readable schemas require durable artifact handoff architecture.
+- from_id: PRQ-010
+  to_id: ARQ-010
+  relationship: GitHub product authority requires reconciliation architecture.
+- from_id: ARQ-010
+  to_id: schemas/github-backlog-sync.schema.yaml
+  relationship: The GitHub reconciliation architecture now has a validated backlog sync mode schema.
+- from_id: SURF-010
+  to_id: IFACE-008
+  relationship: GitHub bootstrap and reconciliation surface defines GitHub operating primitives.
+- from_id: IFACE-008
+  to_id: schemas/github-backlog-sync.schema.yaml
+  relationship: The GitHub operating interface now has a durable issue, PR, lane, delivery, action, and handoff reconciliation artifact.
+- from_id: PRQ-011
+  to_id: ARQ-011
+  relationship: Lane identity product rule requires lease and worktree enforcement.
+- from_id: PRQ-012
+  to_id: ARQ-011
+  relationship: No self-certification requires isolated critic and verifier roles.
+- from_id: PRQ-013
+  to_id: ARQ-014
+  relationship: Target repository installability requires explicit package footprint.
+- from_id: PRQ-014
+  to_id: ARQ-013
+  relationship: Readiness checks require inventory/checklist loop architecture.
+- from_id: ARQ-013
+  to_id: schemas/environment-gitops-reconciliation.schema.yaml
+  relationship: Platform readiness now has a validated environment GitOps desired/observed state and drift evidence artifact.
+- from_id: PRQ-015
+  to_id: ARQ-012
+  relationship: Evidence-backed completion requires deterministic validation coverage.
+- from_id: PRQ-016
+  to_id: ARQ-015
+  relationship: Reusable North Star interview requirement needs durable interview packet architecture.
+- from_id: SURF-011
+  to_id: IFACE-011
+  relationship: North Star interview surface defines the interview packet interface.
+- from_id: PRQ-017
+  to_id: ARQ-016
+  relationship: Self-hosted operating-plane product scope requires matching source-control, CI/CD, k3s, agent, and evidence architecture.
+- from_id: PRQ-018
+  to_id: ARQ-017
+  relationship: API/MCP-first Agent Platform surface requires an explicit control interface architecture.
+- from_id: ARQ-017
+  to_id: schemas/agent-platform-control-request.schema.yaml
+  relationship: The Agent Platform control surface now has a validated request and policy schema.
+- from_id: PRQ-019
+  to_id: ARQ-018
+  relationship: Reusable Gravity platform requirement requires a generic core and organization-pack architecture.
+- from_id: PRQ-019
+  to_id: schemas/gravity-core-extraction-plan.schema.yaml
+  relationship: Reusable Gravity planning now has a validated core extraction plan schema.
+- from_id: SURF-012
+  to_id: IFACE-012
+  relationship: Agent Platform MCP/control surface defines planning-agent operations.
+- from_id: IFACE-012
+  to_id: schemas/agent-platform-control-request.schema.yaml
+  relationship: The Agent Platform MCP/control interface now has a durable request, authorization, policy, target, result, review, and handoff artifact.
+- from_id: SURF-013
+  to_id: IFACE-013
+  relationship: Gravity core and pack surface defines the reusable evidence-engine boundary.
+- from_id: IFACE-013
+  to_id: schemas/gravity-core-extraction-plan.schema.yaml
+  relationship: Gravity core/pack interface now has a validated source-object, reuse, risk, pilot, readiness, and approval artifact.
+- from_id: WAVE-005
+  to_id: ARCH-014
+  relationship: Sunshine reuse planning requires Gravity core and pack extraction architecture.
+- from_id: PRQ-020
+  to_id: ARQ-019
+  relationship: Learning-capture product requirement requires proposal-only evidence-backed improvement architecture.
+- from_id: PRQ-021
+  to_id: ARQ-020
+  relationship: Loop-readiness product requirement requires verifier, state, stop, budget, and manual-proof architecture.
+- from_id: SURF-014
+  to_id: IFACE-014
+  relationship: Learning-capture surface defines the proposal packet interface.
+- from_id: WAVE-006
+  to_id: ARCH-015
+  relationship: Learning-capture planning wave requires loop-readiness and proposal-routing architecture.
+- from_id: PRQ-022
+  to_id: ARQ-021
+  relationship: External OpenClaw SDLC workflow skills require lifecycle contract delegation and GitHub authority preservation.
+- from_id: SURF-015
+  to_id: IFACE-015
+  relationship: OpenClaw workflow skill surface defines the SDLC workflow facade interface.
+- from_id: WAVE-007
+  to_id: ARCH-016
+  relationship: OpenClaw SDLC workflow pilot requires the workflow skill architecture.
+- from_id: PRQ-023
+  to_id: ARQ-022
+  relationship: Repo-bootstrap product requirement requires schema-backed bootstrap architecture.
+- from_id: PRQ-023
+  to_id: ARQ-023
+  relationship: Repo-bootstrap product requirement requires durable controller workspace and runtime visibility.
+- from_id: PRQ-024
+  to_id: ARQ-024
+  relationship: Safe credential discovery requires platform-mediated namespace, storage, route, secret, and image topology.
+- from_id: PRQ-025
+  to_id: ARQ-024
+  relationship: Fleet namespace/storage/image standards require platform contracts before repo-controller powers.
+- from_id: PRQ-026
+  to_id: ARQ-025
+  relationship: Controller observability product requirement requires telemetry, dashboards, alerts, and recovery architecture.
+- from_id: PRQ-028
+  to_id: ARQ-026
+  relationship: Orbit daily brief product surface requires read-only source-linked governance architecture.
+- from_id: SURF-016
+  to_id: IFACE-016
+  relationship: Repo-bootstrap surface defines the self-discovery packet interface.
+- from_id: SURF-017
+  to_id: IFACE-017
+  relationship: Fleet controller dashboard surface defines controller observability and alert routing.
+- from_id: SURF-018
+  to_id: IFACE-018
+  relationship: Orbit daily brief surface defines source-fresh read-only operating context.
+- from_id: WAVE-008
+  to_id: ARCH-017
+  relationship: Repo-controller bootstrap pilot requires bootstrap and fleet runtime architecture.
+- from_id: PRQ-029
+  to_id: ARQ-027
+  relationship: Repo-agent scope product requirement requires a typed scope, responsibility, and authority contract.
+- from_id: PRQ-029
+  to_id: schemas/repo-agent-scope.schema.yaml
+  relationship: The repo-agent scope and responsibility contract now has a validating artifact schema.
+- from_id: SURF-019
+  to_id: IFACE-019
+  relationship: Repo-agent scope surface defines the repo-agent scope contract interface.
+- from_id: IFACE-019
+  to_id: skills/repo-hygiene/assets/repo-agent-scope.template.yaml
+  relationship: Repo hygiene now provides a reusable starter template for repo-agent scope discovery.
+- from_id: WAVE-008
+  to_id: ARCH-020
+  relationship: Repo-controller bootstrap pilot requires a scope charter before controller ownership.
+open_questions:
+- id: NSQ-001
+  artifact: both
+  question: 'What exact approval rule applies to protected North Star product and architecture artifacts: Jason, James, either approver, both approvers, or change-class-specific approval?'
+  owner: Jason and James
+  blocking: false
+  status: resolved
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  proposed_resolution: The only North Star planning gate is final approval to lock the North Star and proceed to the next milestone; intermediate evidence, research, questions, design proposals, and review feedback continue through the planning loop.
+- id: NSQ-002
+  artifact: both
+  question: Should execution identity remain one issue/lane/branch/worktree/session/PR or introduce wave-level branches?
+  owner: Jason, James, and release owner
+  blocking: false
+  status: deferred
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  proposed_resolution: Treat wave as the CI/CD deployment and review unit; defer exact branch/session/worktree naming to release architecture before automation is encoded.
+- id: NSQ-005
+  artifact: architecture
+  question: What is the exact repo/application/environment/namespace cardinality for the Agent Platform pilot?
+  owner: Platform and security owner
+  blocking: false
+  status: resolved
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+  - NSE-20260623-kubernetes-gitops-cicd-cardinality
+  proposed_resolution: Model repository/application as the durable product boundary; model dev, staging, production, and preview as environment-scoped namespaces or namespace sets with ResourceQuota, RBAC, NetworkPolicy, secret references, deployment path, endpoints, and observability declared per environment.
+- id: NSQ-003
+  artifact: both
+  question: Does Gravity still depend on Onyx?
+  owner: Jason and Gravity readiness owner
+  blocking: false
+  status: resolved
+  source_ids:
+  - NSE-20260623-walk-transcript-agent-platform-gravity-skills
+  - NSE-20260623-gravity-local-repo-evidence
+  - NSE-20260623-gravity-remote-onyx-confirmation
+  proposed_resolution: Current evidence says Gravity does not depend on Onyx ingestion for the MVP. Onyx remains a separate planned or gated vault/search front door and post-MVP/control-plane concern; stale Onyx issue references should be cleaned up during Gravity readiness.
+- id: NSQ-006
+  artifact: both
+  question: Which P0 North Star interview decisions should be accepted, modified, or rejected before final lock?
+  owner: Jason and James
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-end-to-end-agent-based-sdlc
+  proposed_resolution: Use `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`; answers return to `northstar-planning` / `review-feedback` and do not themselves record final approval.
+- id: NSQ-007
+  artifact: both
+  question: What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw, and Gravity?
+  owner: Jason and architecture owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  - NSE-20260623-agent-platform-live-state-audit
+  - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
+  proposed_resolution: Skills owns lifecycle contracts and artifacts; Agent Platform owns runtime/control APIs and k3s/source-control/CI/CD operational integration; Hermes/OpenClaw owns higher-level conversation/planning orchestration constrained through MCP/API tool surfaces; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs.
+- id: NSQ-008
+  artifact: both
+  question: What is the safest extraction path from Sunshine Club into reusable Gravity core?
+  owner: Gravity readiness owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
+  - NSE-20260623-sunshine-gravity-extraction-architecture-audit
+  - NSE-20260623-gravity-core-extraction-implementation-b
+  proposed_resolution: Use `verdify_gravity` as the generic core target, keep Sunshine-specific source setup under `clients/sunshine`, validate `gravity-core-extraction-plan.yaml`, and port scanner, SHA-256/object staging, Postgres pipeline, readiness, read-only MCP, and validation contracts before client-pack behavior.
+- id: NSQ-009
+  artifact: both
+  question: Which session sources, retention windows, and redaction rules should the learning-capture loop use?
+  owner: Skills maintainer and security owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-long-horizon-agent-compounding-learning
+  - NSE-20260623-long-horizon-learning-loop-source-verification
+  proposed_resolution: Start with explicit research artifacts and local Codex/Claude/terminal session summaries that can be redacted; stage proposals only; require source scope, retention, verifier, durable state, stop condition, budget, permissions, and one manual proof before scheduling.
+- id: NSQ-010
+  artifact: architecture
+  question: What exact namespace naming convention should bind GitHub owner, organization, repository, dev, preview, staging, and production namespace identity for fleet bootstrap?
+  owner: Platform and security owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260623-environment-gitops-implementation-best-p
+  proposed_resolution: Use a collision-safe owner/repo identity plus environment suffixes where needed; validate against Kubernetes naming and existing Agent Platform conventions before rollout.
+- id: NSQ-011
+  artifact: architecture
+  question: Should repo-controller orchestration use Codex, Claude, or a controller abstraction that selects the model/tooling per task and failure mode?
+  owner: Platform architecture owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260623-openclaw-hermes-local-evidence
+  proposed_resolution: Prefer a model-neutral controller contract with Codex/Claude as interchangeable or task-specific workers; validate with a manual bootstrap pilot before scheduling.
+- id: NSQ-012
+  artifact: both
+  question: Which infrastructure domain agents are allowed broader scoped access, and what owner, audit, approval, and rollback rules apply?
+  owner: Jason, platform owner, and security owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260623-secrets-credential-injection-patterns
+  proposed_resolution: Networking, storage, backup, and platform domain agents may receive explicit scoped authority; repo-local agents remain namespace-scoped unless a gate grants more.
+- id: NSQ-013
+  artifact: architecture
+  question: What is the approved request path for repo agents to add NFS/PVC mounts, route/DNS changes, or base-image packages?
+  owner: Platform, storage, and networking owners
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260623-environment-gitops-implementation-best-p
+  proposed_resolution: Repo agents submit platform control requests or PR-reviewed desired-state changes; storage/network/image owners approve before mutation.
+- id: NSQ-014
+  artifact: product
+  question: What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use?
+  owner: Jason and Orbit/platform owner
+  blocking: false
+  status: open
+  source_ids:
+  - NSE-20260623-repo-controller-bootstrap-self-discovery
+  proposed_resolution: Start with GitHub, repo-controller state, and `.agent-workflow` records; add email/calendar only after connector scope, retention, privacy, and redaction rules are explicit.
+learning_capture:
+  status: staged
+  proposal_paths:
+  - .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
+  open_proposal_ids: [NLP-001, NLP-002]
+review:
+  requested_at: '2026-06-23T04:30:38Z'
+  reviewers: [Jason, James]
+  status: changes_requested
+  approvals: []
+  signoff_required_for_downstream: true
+handoff:
+  next_skill: northstar-planning
+  next_mode: artifact-loop
+  reason: The research queue, OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, and repo-controller bootstrap walk evidence have been synthesized into product and architecture drafts. Continue artifact-loop synthesis before requesting final lock approval.

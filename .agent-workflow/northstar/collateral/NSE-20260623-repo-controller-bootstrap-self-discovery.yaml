@@ -1,0 +1,67 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-repo-controller-bootstrap-self-discovery
+reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
+title: Repo controller bootstrap and fleet self-discovery walk intake
+evidence_type: transcript
+evidence_status: reported
+ingested_at: '2026-06-23T19:30:23Z'
+source:
+  uri:
+  original_path: docs/northstar/evidence/2026-06-23-repo-controller-bootstrap-self-discovery.md
+  copied_path: .agent-workflow/northstar/collateral/sources/NSE-20260623-repo-controller-bootstrap-self-discovery-2026-06-23-repo-controller-bootstrap-self-discovery-md
+  sha256: e7af76f8392528da8a232c63d68125cadfde6aad9956a5d89af47022e3e31180
+summary: Reported semantic walk intake for repo-controller bootstrap, fleet self-discovery,
+  namespace and storage standards, controller loops, Grafana/Prometheus observability,
+  alert-to-agent recovery, Orbit daily operating briefs, adversarial plan review,
+  and standard repo onboarding across a multi-repository agent fleet.
+tags:
+- agent-platform
+- bootstrap
+- controller-loop
+- fleet
+- grafana
+- kubernetes
+- namespaces
+- observability
+- orbit
+- repo-hygiene
+- self-discovery
+- storage
+- transcript
+claims:
+- Active repositories should eventually have controller agents with durable state,
+  structured worktree-agent control, tmux/web/API visibility, and Agent Platform
+  MCP or control operations.
+- A repo-bootstrap workflow should inventory repository content, Git history, GitHub
+  state, Kubernetes deployments, logs, metrics, routes, secret references, credential
+  validation results, storage mounts, CI/CD shape, and runtime/package needs.
+- Bootstrap output should include a standard project inventory, updated `AGENTS.md`,
+  namespace/environment mapping, gap assessment, proposed backlog issues, and a pull
+  request for repo-local planning changes.
+- Namespace, storage, route, secret, credential, and CI/CD patterns should become
+  consistent across the fleet while preserving least privilege and scoped infrastructure
+  domain-agent authority.
+- Controller loops should emit metrics, update dashboards, persist state, recover
+  from failures, and route Alertmanager events back to the responsible controller
+  when possible.
+- Planning should include adversarial Codex/Claude review, lane-owner review, and
+  stakeholder lenses before final plan consensus.
+- Orbit or an equivalent higher-level planner should aggregate cross-repo controller,
+  issue, PR, email, calendar, and agent status into a daily operating brief.
+planning_relevance:
+- Adds repo-bootstrap/self-discovery as a cross-skill workflow spanning `repo-hygiene`,
+  `platform-readiness`, `controller-loop`, `state-of-union`, and `northstar-planning`.
+- Extends Agent Platform planning with durable PVC/workspace, tmux/web/API, VS Code
+  workspace visibility, base-image recommendations, registry rollback, and alert-to-agent
+  recovery requirements.
+- Adds non-blocking questions for namespace naming, infrastructure domain-agent boundaries,
+  storage mount self-service, controller model choice, and Orbit ownership.
+limitations:
+- This is a semantic normalization of a spoken walk, not a literal transcript.
+- No live Kubernetes, GitHub fleet, credential, storage, Grafana, or Orbit state was
+  independently verified during this ingestion.
+- The VAST TCO calculator/object-storage note belongs to a separate owning repository
+  or workstream once identified.

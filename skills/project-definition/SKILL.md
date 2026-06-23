@@ -14,6 +14,12 @@ Build one traceable end-to-end project definition through four ordered modes plu
 
 ## Canonical artifacts
 
+- `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md` — signed-off product North
+  Star input when present
+- `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md` — signed-off architecture
+  North Star input when present
+- `.agent-workflow/northstar/northstar-artifacts.yaml` — signoff and open-question
+  status for North Star artifacts
 - `.agent-workflow/project/project-definition.yaml` — authoritative structured definition
 - `.agent-workflow/project/discovery.md` — generated human view
 - `.agent-workflow/project/requirements.md` — generated human view
@@ -34,7 +40,9 @@ Run the earliest incomplete mode unless the router names one:
 
 ## Discovery mode
 
-1. Inventory every supplied source: repository docs, transcripts, notes, research, prior outputs, screenshots, spreadsheets, issues, and existing specifications.
+1. Inventory every supplied source: signed-off North Star product/architecture
+   artifacts, repository docs, transcripts, notes, research, prior outputs,
+   screenshots, spreadsheets, issues, and existing specifications.
 2. Summarize what each source actually supports.
 3. Record known decisions, stated goals, constraints, assumptions, undefined terms, contradictions, relationships, and missing evidence.
 4. Reconstruct the project ecosystem: users, teams, external systems, vendors, data domains, environments, infrastructure, hosting, deployment, operations, support, governance, and approval owners when evidence exists.

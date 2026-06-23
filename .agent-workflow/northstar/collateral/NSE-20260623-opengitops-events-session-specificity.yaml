@@ -1,0 +1,33 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-opengitops-events-session-specificity
+reference: northstar://evidence/NSE-20260623-opengitops-events-session-specificity
+title: OpenGitOps event and session specificity
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:08:00Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-opengitops-events-session-specificity.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-opengitops-events-session-specificity-2026-06-23-opengitops-events-session-specificity"
+  sha256: daccd1b590a467daa76508b5035e296e8041075ae24075870f15a3e1b51855db
+summary: Primary-source research on OpenGitOps event indexes and why talk-level GitOps
+  claims need session-specific verification before becoming architecture evidence.
+tags:
+- argocd
+- events
+- flux
+- gitops
+- opengitops
+- research
+claims:
+- OpenGitOps maintains event indexes for GitOpsCon, ArgoCon, OpenGitOps, and related
+  recordings that are the right starting point for talk-level GitOps evidence.
+- Event index pages do not by themselves prove individual architecture claims; specific
+  talks need verified titles, speakers, URLs, and claim extraction.
+planning_relevance:
+- Supports the research queue for GitOps event/session specificity and future wave-release-planning
+  evidence.
+limitations: []

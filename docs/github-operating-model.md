@@ -38,3 +38,9 @@ Use GitHub environments or an equivalent deployment control with separate creden
 ## Local snapshots
 
 `bin/verdify github snapshot` writes `.agent-workflow/github/snapshot.json` as an ignored cache. Refresh it before planning or reconciliation. It never overrides live GitHub state.
+
+When a state-of-union decision depends on GitHub backlog or delivery reality,
+write `.agent-workflow/strategy/github-backlog-sync.yaml` and validate it
+against `schemas/github-backlog-sync.schema.yaml`. The artifact records
+snapshot freshness, source limitations, issue findings, PR findings, lane
+findings, delivery findings, and which control plane must carry each action.

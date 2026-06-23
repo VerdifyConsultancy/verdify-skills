@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-gravity-core-extraction-implementation-b
+reference: northstar://evidence/NSE-20260623-gravity-core-extraction-implementation-b
+title: Gravity core extraction implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T19:09:33Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-gravity-core-extraction-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-core-extraction-implementation-b-2026-06-23-gravity-core-extraction-best-practice"
+  sha256: 69f2e8a0e58c68ac778d6db546abdb40e59a21f0b4693ff32b6d773db2c3a1e4
+summary: Primary-source research for a first stable Gravity core extraction planning
+  contract, covering provenance, checksummed file manifests, resource metadata, content
+  descriptors, source/build provenance, research-object packaging, and repository
+  source refs.
+tags:
+- gravity-core-extraction
+- gravity-readiness
+- provenance
+- source-objects
+- sunshine-gravity
+claims:
+- Gravity extraction should inventory each candidate file, package, schema, prompt,
+  test, migration, or Kubernetes object as a source object with identity, provenance,
+  checksum strategy, reuse classification, and pack/core boundary decision.
+- First implementation should remain a gravity-readiness artifact that plans reusable
+  core extraction and local filesystem evidence ingestion; it does not authorize Gravity
+  feature implementation.
+planning_relevance:
+- Supports gravity-core-extraction, PRQ-019, SURF-013, IFACE-013, ARQ-018, ARCH-014,
+  Gravity readiness, and Sunshine-to-Gravity reuse planning.
+limitations:
+- This evidence defines extraction artifact shape and stop conditions; it does not
+  prove Sunshine code quality or grant Gravity implementation approval.

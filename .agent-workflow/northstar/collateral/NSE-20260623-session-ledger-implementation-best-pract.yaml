@@ -1,0 +1,54 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-session-ledger-implementation-best-pract
+reference: northstar://evidence/NSE-20260623-session-ledger-implementation-best-pract
+title: Session ledger implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T18:28:38Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-session-ledger-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-session-ledger-implementation-best-pract-2026-06-23-session-ledger-best-practices-md"
+  sha256: 6b4f885cbdce9d5101926ffe3fcbdc85b3744110df0a201d1836f17a1926e1d4
+summary: Primary-source research for a first stable session-ledger contract, covering
+  CloudEvents event envelopes, W3C Trace Context correlation, OpenTelemetry traces
+  and semantic conventions, SLSA provenance, Sigstore Rekor transparency patterns,
+  Temporal event history, LangGraph persistence, and GitHub workflow/check/deployment
+  references.
+tags:
+- audit
+- cloudevents
+- controller-loop
+- opentelemetry
+- orchestration
+- provenance
+- session-ledger
+- trace-context
+claims:
+- Session ledger events should use a stable event envelope with ID, source, type,
+  time, subject, correlation IDs, actor/session identity, artifact refs, evidence
+  refs, external refs, previous event ID, content hash, result, and summary.
+- Ledger reconstruction should be append-oriented and preserve parent/child session
+  graph, wave/session/PR/deployment/review relationships, checkpoints, handoffs, and
+  exceptions so lifecycle state survives model context loss.
+- First implementation should remain a controller-loop YAML artifact with checksum
+  and external-reference fields, while deferring storage-engine choice, signing, transparency-log
+  inclusion, and automated trace ingestion.
+planning_relevance:
+- Supports defining `session-ledger.schema.yaml`, append-oriented event fields,
+  parent/child session graph, correlation IDs, artifact/evidence/external refs,
+  checksums, and exception handling.
+- Supports `PRQ-005`, `ARQ-005`, `ARCH-008`, `sdlc-lane-dispatch`, controller
+  reconstruction, learning capture, and durable handoff after model context
+  loss.
+- Supports keeping `session-ledger` as a controller-loop artifact contract
+  before adding a top-level canonical skill.
+limitations:
+- This evidence supports a first YAML artifact contract; it does not choose a
+  long-term database, stream, signing, transparency, or automated trace-ingest
+  implementation.
+- Direct live integrations with GitHub, Agent Platform, OpenTelemetry, SLSA, or
+  Sigstore remain future work.

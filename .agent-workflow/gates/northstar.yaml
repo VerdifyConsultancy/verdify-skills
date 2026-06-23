@@ -1,0 +1,25 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: northstar-final-lock
+sprint_id: null
+lane_id: null
+type: northstar
+status: cancelled
+question: Approve the Verdify Skills product and architecture North Star for the next milestone?
+owner: Jason and James
+evidence_required:
+  - .agent-workflow/northstar/REVIEW_PLAN.md
+  - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  - .agent-workflow/northstar/northstar-artifacts.yaml
+  - .agent-workflow/northstar/northstar-plan.yaml
+allowed_decisions:
+  - approved
+  - changes_requested
+  - rejected
+decision: changes_requested
+rationale: New learning-loop evidence and Jason's current alignment request returned the North Star to artifact-loop iteration; final lock approval is no longer being requested by this gate.
+opened_at: "2026-06-23T03:13:40Z"
+resolved_at: "2026-06-23T06:22:49Z"
+resume_state: northstar-planning/artifact-loop

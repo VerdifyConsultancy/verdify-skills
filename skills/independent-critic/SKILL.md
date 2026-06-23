@@ -1,6 +1,6 @@
 ---
 name: independent-critic
-description: Performs fresh-context, evidence-based review of a completed Verdify lane against its issue, requirements, module and lane contracts, diff, tests, CI, and worker closeout. Use after worker closeout and before integration; never reuse the worker's session or worktree.
+description: Performs fresh-context, evidence-based review of a completed Verdify lane against its issue, requirements, module and lane contracts, diff, tests, CI, and worker closeout. Use after worker closeout and before review-inbox packet assembly or integration; never reuse the worker's session or worktree.
 compatibility: Requires read access to the repository, pull request, checks, contracts, and evidence. A separate detached worktree or clean clone is required.
 metadata:
   author: Verdify
@@ -49,7 +49,9 @@ Review the lane; do not become its implementer.
 6. Search for architecture drift and cross-lane integration risk.
 7. Classify each finding by severity and cite concrete file, line, command, criterion, or evidence.
 8. Write `.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` and validate against `../../schemas/critic-report.schema.yaml`.
-9. Submit the corresponding GitHub review when authorized.
+9. Preserve critic session ID, review worktree, PR/head SHA, findings, outcome,
+   and artifact refs for the session ledger.
+10. Submit the corresponding GitHub review when authorized.
 
 Read `references/critic-rubric.md` and `references/evidence-review.md`.
 
@@ -67,4 +69,5 @@ Approval means the current head SHA satisfies the contract with adequate evidenc
 
 - Fixes -> `lane-delivery` through the orchestrator
 - Material contract problem -> `sprint-planning` or `architecture-contracts`
-- Approved -> `sprint-orchestrator`, then `release-verification` when all dependencies are ready
+- Approved -> `sprint-orchestrator`, then `release-verification` review-inbox
+  packet mode when dependencies are ready

@@ -1,0 +1,29 @@
+{
+  "skill_name": "repo-hygiene",
+  "evals": [
+    {
+      "id": "secrets-exposure-blocks",
+      "prompt": "A newly inherited repo has committed environment files, stale plans, no CI, and unclear protected docs. Run Wave 0.",
+      "expected_output": "Scores the repo, blocks unsafe cleanup around secrets and protected docs, and opens issues or gates before sprint planning.",
+      "files": [],
+      "assertions": [
+        "Secrets concerns become a blocker or gate.",
+        "Ambiguous protected docs are not deleted automatically.",
+        "CI and source-of-truth gaps are recorded.",
+        "Feature work is not started."
+      ]
+    },
+    {
+      "id": "safe-cleanup-only",
+      "prompt": "A repo has generated temp files, obsolete local caches, and a duplicated private task list that conflicts with GitHub Issues.",
+      "expected_output": "Applies or proposes only mechanical cleanup, records the backlog conflict, and defines REPO_HYGIENE_COMPLETE criteria.",
+      "files": [],
+      "assertions": [
+        "Mechanical cleanup is separated from judgment calls.",
+        "GitHub Issues remain backlog truth.",
+        "Completion criteria are explicit.",
+        "A handoff is named after hygiene assessment."
+      ]
+    }
+  ]
+}

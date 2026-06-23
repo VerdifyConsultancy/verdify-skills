@@ -1,0 +1,45 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-observability-diagnostics-primary-sources
+reference: northstar://evidence/NSE-20260623-observability-diagnostics-primary-sources
+title: Observability and diagnostics primary sources
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:41:51Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-observability-diagnostics-sources.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-observability-diagnostics-primary-sources-2026-06-23-observability-diagnostics-sources-md"
+  sha256: f1007232997ffd3ba6311bd16883b6a6bbf860c3e4115f8f04df61cf6b970b26
+summary: Primary-source evidence for OpenTelemetry CI/CD and agent telemetry, Grafana
+  observability-as-code, provisioned dashboards, and diagnostics evidence required
+  by review-ready and release workflows.
+tags:
+- agents
+- cicd
+- diagnostics
+- grafana
+- observability
+- opentelemetry
+claims:
+- OpenTelemetry CI/CD semantic conventions define pipeline run states and results
+  that can be used as standard review and release evidence.
+- OpenTelemetry agent-observability work identifies a need to standardize telemetry
+  for agent applications and frameworks such as AutoGen and LangGraph.
+- Grafana AI Observability is built on OpenTelemetry and targets production LLM agents,
+  conversations, costs, quality, and performance.
+- Grafana Observability as Code supports managing dashboards, data sources, and observability
+  workflows through code, version control, automated testing, and CI/CD pipelines.
+- Grafana provisioning can load dashboards from filesystem-backed YAML/JSON definitions,
+  but UI changes do not automatically round-trip to provisioning source files.
+planning_relevance:
+- Supports promoting observability-diagnostics as a repeatable skill or mode.
+- Supports requiring telemetry links, CI/CD states, dashboard/log/trace evidence,
+  and missing-telemetry findings in review-inbox packets.
+- Supports defining agent activity and tool-call telemetry as part of Agent Platform
+  observability.
+limitations:
+- Does not inspect the local Grafana, Prometheus, or OpenTelemetry deployment.
+- OpenTelemetry agent conventions and Grafana AI Observability are evolving surfaces.

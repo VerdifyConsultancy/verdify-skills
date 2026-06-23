@@ -1,0 +1,49 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-gravity-local-repo-evidence
+reference: northstar://evidence/NSE-20260623-gravity-local-repo-evidence
+title: Gravity local repository evidence
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:47:32Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-gravity-local-repo-evidence.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-gravity-local-repo-evidence-2026-06-23-gravity-local-repo-evidence-md"
+  sha256: be73c1fb92556bd2c01b08091cae4d69c3660b6906e42909369a7e80d708f298
+summary: Observed local Gravity repository evidence for product vision, architecture
+  draft, pipeline state model, CI/CD release evidence, implementation gating, and
+  unresolved Onyx/dependency status relevant to the Verdify Skills North Star.
+tags:
+- ci-cd
+- cicd
+- evidence-ingestion
+- gravity
+- gravity-readiness
+- onyx
+- pipeline
+- readiness-gate
+- run-ledger
+claims:
+- Gravity is documented as a local-first universal evidence-ingestion platform with
+  content-addressed preservation, provenance-rich extraction, manifestation, indexing,
+  and permission-aware retrieval.
+- Gravity planning documents show substantial draft product and architecture collateral
+  but no observed product implementation or runtime/deployment evidence in the status
+  document.
+- Gravity's architecture constrains LangGraph to bounded workflow logic and keeps
+  durable state, work queue, run ledger, model registry, and review gate outside LangGraph.
+- Gravity's CI/CD planning requires docs/contracts/code/tests/migrations/release evidence,
+  provenance, SBOMs, vulnerability scans, smoke tests, and rollback paths for lane
+  PRs and deployments.
+- No direct Onyx dependency was observed in the inspected local Gravity documents,
+  so the Onyx question remains unresolved rather than answered.
+planning_relevance:
+- Supports keeping Gravity gated behind platform readiness, repo hygiene, issue/lane
+  planning, CI/CD wave deployment, observability, review workflow, and explicit readiness
+  approval.
+limitations:
+- Local repository evidence only; GitHub Issues, remote branch state, live deployments,
+  credentials, and cluster resources were not audited.

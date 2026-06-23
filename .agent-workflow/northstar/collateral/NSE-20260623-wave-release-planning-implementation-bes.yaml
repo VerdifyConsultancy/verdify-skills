@@ -1,0 +1,52 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-wave-release-planning-implementation-bes
+reference: northstar://evidence/NSE-20260623-wave-release-planning-implementation-bes
+title: Wave release planning implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T18:12:08Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-wave-release-planning-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-wave-release-planning-implementation-bes-2026-06-23-wave-release-planning-best-practices"
+  sha256: e022797a098b0bed4821a94d91865f9af76ab8090242e8a8b849ec96736f26b1
+summary: Primary-source research for a first stable wave-release-plan contract, covering
+  GitHub merge queues and environments, Argo CD sync waves, Argo Rollouts progressive
+  delivery, Flux reconciliation/remediation, Kubernetes namespace controls, and OpenGitOps
+  principles.
+tags:
+- argo-rollouts
+- argocd
+- delivery
+- flux
+- github
+- gitops
+- kubernetes
+- wave-release-planning
+claims:
+- Wave release plans should record branch or merge-queue model, required checks and
+  merge_group support, deployment environments, protection rules, CI workflows, preview/review
+  environment constraints, GitOps desired-state references, reconciliation checks,
+  deployment strategy, rollback, and release-health signals before dispatch.
+- Preview and review environments should define namespace, quota, limit, network policy,
+  TTL, secrets scope, and observed revision requirements before worker sessions begin.
+- Progressive delivery and GitOps evidence should distinguish product release waves
+  from Argo CD sync waves while preserving ordered deployment, health gates, remediation,
+  promotion criteria, and rollback readiness.
+planning_relevance:
+- Supports defining the `wave-release-plan` artifact schema, required CI/CD
+  evidence groups, environment expectations, GitOps references, release-health
+  signals, and rollback criteria.
+- Supports `PRQ-006`, `ARQ-006`, `ARCH-009`, `WAVE-002`, `WAVE-007`, and
+  the `sdlc-wave-planning` OpenClaw workflow stage.
+- Supports keeping `wave-release-planning` as a sprint-planning mode before
+  adding a top-level canonical skill.
+limitations:
+- GitHub remains the current Verdify delivery control plane; Argo CD, Argo
+  Rollouts, Flux, and Kubernetes sources are implementation patterns, not
+  approved runtime-stack choices.
+- This evidence supports a first manual artifact contract, not automatic
+  production promotion or a universal branch model.

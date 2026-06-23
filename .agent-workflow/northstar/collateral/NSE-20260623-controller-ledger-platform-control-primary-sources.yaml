@@ -1,0 +1,53 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-controller-ledger-platform-control-primary-sources
+reference: northstar://evidence/NSE-20260623-controller-ledger-platform-control-primary-sources
+title: Controller, ledger, and Agent Platform control primary sources
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:42:02Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-controller-ledger-platform-control-sources.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-controller-ledger-platform-control-primary-sources-2026-06-23-controller-ledger-platform-control-so"
+  sha256: 31ade5f2306f8ae40b6ecdb710acb4acca161e1738dfe30e25afced7251944ed
+summary: Primary-source evidence for durable agent orchestration, human-in-the-loop
+  multi-agent control, MCP/API operations, Backstage-style catalog modeling, and session-ledger
+  storage/search options.
+tags:
+- agent-platform
+- autogen
+- backstage
+- controller
+- jsonl
+- langgraph
+- mcp
+- pgvector
+- qdrant
+- session-ledger
+- sqlite
+claims:
+- LangGraph is a reference for long-running, stateful agent orchestration, but the
+  North Star should keep the controller contract framework-neutral.
+- AutoGen provides evidence for multi-agent systems that integrate LLMs, tools, humans,
+  and code, including human-in-the-loop intervention modes.
+- MCP standardizes how LLM applications connect to external data sources and tools,
+  and MCP tools expose named operations with schemas.
+- Backstage's catalog model uses components, APIs, resources, and systems as useful
+  reference concepts for Agent Platform project and application modeling.
+- SQLite JSON functions plus JSON Lines can support a low-overhead pilot ledger with
+  queryable JSON payloads and append-style event files.
+- Postgres plus pgvector and Qdrant represent different retrieval tradeoffs for semantic
+  search and filtered vector search over evidence or session records.
+planning_relevance:
+- Supports session-ledger as a separately testable contract if multiple skills write
+  audit/session events.
+- Supports agent-platform-control as an MCP/API-first skill once concrete control-plane
+  operations exist.
+- Supports treating Backstage as a reference architecture rather than an immediate
+  dependency.
+limitations:
+- Does not choose LangGraph, AutoGen, or a custom workflow engine.
+- Does not inspect local Agent Platform APIs, MCP servers, or storage workloads.

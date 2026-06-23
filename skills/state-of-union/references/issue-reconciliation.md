@@ -2,6 +2,10 @@
 
 Read live GitHub Issues when possible. Use `.agent-workflow/github/snapshot.json` only as a cache and record that limitation.
 
+When backlog sync materially affects routing or sprint candidates, record the
+classification set in `.agent-workflow/strategy/github-backlog-sync.yaml` and
+validate it against `schemas/github-backlog-sync.schema.yaml`.
+
 Classify each relevant issue:
 
 - `candidate`: ready to sequence toward the north-star goal.

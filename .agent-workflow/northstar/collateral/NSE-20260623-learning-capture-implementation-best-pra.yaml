@@ -1,0 +1,39 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-learning-capture-implementation-best-pra
+reference: northstar://evidence/NSE-20260623-learning-capture-implementation-best-pra
+title: Learning capture implementation best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T19:20:48Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-learning-capture-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-learning-capture-implementation-best-pra-2026-06-23-learning-capture-best-practices-md"
+  sha256: 3de21c5fe82429677be47b9c8f6e58308246d59e95c5266923fa0cbf51fc6a31
+summary: Primary-source research for hardening proposal-only learning capture, covering
+  OpenAI Evals, MCP evaluation consistency, LangGraph durable state, NIST privacy/data
+  minimization, and OWASP LLM prompt-injection and sensitive-information risks.
+tags:
+- evals
+- learning-capture
+- loop-readiness
+- northstar-planning
+- privacy
+- redaction
+claims:
+- Learning capture should stage proposals with explicit source scope, verifier, durable
+  state, redaction policy, stop condition, budget, permissions, manual-run evidence,
+  and review route before any recurring scan is scheduled.
+- Learning capture inputs must be treated as untrusted and minimized; raw secrets,
+  private tokens, sensitive data, and unverified instructions must not be copied into
+  proposal packets.
+planning_relevance:
+- Supports learning-capture, PRQ-020, PRQ-021, SURF-014, IFACE-014, ARCH-015, NSQ-009,
+  and northstar-planning proposal-only improvement workflows.
+limitations:
+- This evidence hardens proposal packet operation; it does not authorize reading private
+  session stores, retaining raw logs, applying proposed changes, or scheduling recurring
+  scans.

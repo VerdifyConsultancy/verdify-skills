@@ -1,0 +1,44 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-agent-platform-local-repo-evidence
+reference: northstar://evidence/NSE-20260623-agent-platform-local-repo-evidence
+title: Agent Platform local repository evidence
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:47:22Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-agent-platform-local-repo-evidence.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-agent-platform-local-repo-evidence-2026-06-23-agent-platform-local-repo-evidence-md"
+  sha256: 49e67660953d2c4b5606f03d33bb71fbd80e3019fb911b88d80aa8208914605d
+summary: Observed local Agent Platform repository evidence for pod-per-repo runtime,
+  registry source of truth, GitOps rendering, issue-scoped work identity, namespace
+  contracts, secret boundaries, and observability standards relevant to the Verdify
+  Skills North Star.
+tags:
+- agent-platform
+- control-plane
+- gitops
+- k3s
+- namespaces
+- observability
+- registry
+- review-inbox
+- wave-release-planning
+claims:
+- The Agent Platform repository describes a pod-per-repo k3s runtime and a UI/API
+  to registry to render to Argo CD to pod control flow.
+- The agent-fleet-control subtree names registry YAML as the source of truth and the
+  render-to-Argo-to-StatefulSet chain as the durable deliverable.
+- The Agent Platform docs encode GitHub issue authority, issue-scoped work identity,
+  change gates, durability re-probes, completion contracts, namespace contracts, and
+  minimum observability standards.
+planning_relevance:
+- Strengthens North Star requirements for Agent Platform control APIs, CI/CD wave
+  deployment, review inbox evidence, session/worktree traceability, namespace modeling,
+  and observability diagnostics.
+limitations:
+- Local repository evidence only; live GitHub, Argo CD, Kubernetes, and credential
+  state were not audited.

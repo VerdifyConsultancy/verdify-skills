@@ -10,8 +10,10 @@ require_relative "../lib/verdify"
 ROOT = Pathname.new(File.expand_path("..", __dir__))
 SKILL_NAME_PATTERN = /\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
 REQUIRED_SKILLS = %w[
-  project-router project-definition architecture-contracts state-of-union
-  sprint-planning sprint-orchestrator lane-delivery independent-critic release-verification
+  project-router transcript-replan northstar-research-ingest northstar-planning northstar-interview
+  project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
+  sprint-orchestrator controller-loop platform-readiness gravity-readiness lane-delivery
+  independent-critic release-verification
 ].freeze
 REQUIRED_PR_SECTIONS = [
   "Backlog issue", "Lane contract", "Outcome", "Scope proof", "Evidence", "Risk and deployment impact"

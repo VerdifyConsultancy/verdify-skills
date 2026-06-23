@@ -1,0 +1,46 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+reference: northstar://evidence/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
+title: CI/CD, SDLC, agent orchestration, and human-governed delivery
+evidence_type: research_report
+evidence_status: reported
+ingested_at: '2026-06-23T02:28:33Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/docs/northstar/research/2026-06-23-ci-cd-sdlc-agent-orchestration-human-governed-delivery.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery-2026-06-23-ci-cd-sdlc-agent-orchestration-human"
+  sha256: 272e4ad3d3274c8d678e11792ed0bcf86cb7f410d15253524385d0789b89878d
+summary: Research report supporting a Git-governed, wave-oriented, policy-enforced
+  autonomous delivery platform with human gates, GitOps reconciliation, observability,
+  least-privilege secrets handling, review inboxes, and session ledger evidence.
+tags:
+- agent-orchestration
+- cicd
+- gitops
+- human-governed-delivery
+- observability
+- platform-readiness
+- sdlc
+- security
+- session-ledger
+claims:
+- The strongest current pattern is human-governed, policy-constrained, Git-anchored
+  autonomous execution rather than fully autonomous delivery.
+- A credible architecture composes CI, GitOps reconciliation, agent orchestration,
+  observability, and a durable audit ledger instead of replacing them with one monolith.
+- Browser terminals, broad Kubernetes secret access, and dynamic preview generators
+  are high-risk surfaces that need explicit gates and least-privilege controls.
+- The near-term proving path should be a narrow non-production pilot measured by trace
+  completeness, policy conformance, rollback confidence, and review efficiency.
+planning_relevance:
+- Feeds North Star planning, platform readiness, controller-loop design, CI/CD release
+  architecture, observability requirements, RBAC/secrets policy, review inbox design,
+  and session ledger schema.
+limitations:
+- Citation handles are preserved from the supplied research text and were not independently
+  reverified during ingestion.
+- The report is framed against the named requirement set rather than a full line-by-line
+  transcript re-derivation.

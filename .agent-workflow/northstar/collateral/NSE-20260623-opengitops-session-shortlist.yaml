@@ -1,0 +1,37 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-opengitops-session-shortlist
+reference: northstar://evidence/NSE-20260623-opengitops-session-shortlist
+title: OpenGitOps session shortlist
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:17:10Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-opengitops-session-shortlist.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-opengitops-session-shortlist-2026-06-23-opengitops-session-shortlist-md"
+  sha256: 676ba156cb8b1588ad6923ebd3148787a54b809bc792a918541ada6ce7f1d557
+summary: Brave-discovered session-level OpenGitOps, GitOpsCon, Argo, Flux, and progressive
+  delivery references that turn event hubs into a concrete future research queue.
+tags:
+- argocd
+- events
+- flux
+- gitops
+- opengitops
+- research
+- wave-release-planning
+claims:
+- Official LF/OpenGitOps/CNCF/Sched pages and YouTube playlists provide a session-level
+  queue for GitOps, Argo CD, Flux, progressive delivery, platform APIs, and interoperability
+  research.
+- The shortlisted sessions are candidate sources only and should not support specific
+  architecture claims until watched or otherwise reviewed for exact claims.
+- For the current North Star, primary documentation remains stronger than video session
+  references for concrete wave-release and platform-readiness requirements.
+planning_relevance:
+- Resolves the OpenGitOps event/session specificity research gap and supports future
+  wave-release-planning and platform-readiness research.
+limitations: []

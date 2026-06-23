@@ -1,0 +1,51 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-review-inbox-wave-release-primary-sources
+reference: northstar://evidence/NSE-20260623-review-inbox-wave-release-primary-sources
+title: Review inbox and wave release primary sources
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T16:41:41Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-review-inbox-wave-release-sources.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-review-inbox-wave-release-primary-sources-2026-06-23-review-inbox-wave-release-sources-md"
+  sha256: 3c5aae58dfd058f9d8cf49c23d7488cc6b4496f8631a2ae1ac1d574385965a7b
+summary: Primary-source evidence for review-ready delivery, GitHub deployment gates,
+  issue hierarchy, merge queues, GitOps preview environments, Argo/Flux release mechanics,
+  and progressive delivery.
+tags:
+- argo
+- cicd
+- flux
+- github
+- gitops
+- review-inbox
+- wave-release-planning
+claims:
+- GitHub environments can require deployment protection rules such as manual approval,
+  wait timers, branch restrictions, and custom protection rules before deployment
+  jobs proceed.
+- GitHub Issues support dependencies, sub-issues, metadata, and CLI workflows that
+  can represent initiatives, waves, and task lanes.
+- GitHub merge queues require CI to run on merge_group events and can validate queued
+  PR changes against the latest target branch plus earlier queued changes.
+- OpenGitOps frames desired state as declarative, versioned and immutable, automatically
+  pulled, and continuously reconciled.
+- Argo CD pull request generators support per-PR test environments, while Argo CD
+  sync phases and sync waves provide deployment validation and resource sequencing
+  mechanics.
+- Argo Rollouts supports blue-green, canary, analysis, experimentation, and progressive
+  delivery capabilities for Kubernetes.
+planning_relevance:
+- Supports promoting review-inbox and wave-release-planning capabilities from the
+  SDLC skill design.
+- Supports keeping product delivery waves distinct from Argo CD sync waves while using
+  GitOps for environment reconciliation.
+- Strengthens GitHub backlog synchronization requirements for issues, sub-issues,
+  merge queues, deployments, and checks.
+limitations:
+- Does not inspect live GitHub organization settings or local CI configuration.
+- Does not choose Argo CD versus Flux for implementation.

@@ -1,0 +1,31 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260623-north-star-research-queue-completion
+reference: northstar://evidence/NSE-20260623-north-star-research-queue-completion
+title: North Star research queue completion
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-23T17:42:45Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-23-northstar-research-queue.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-north-star-research-queue-completion-2026-06-23-northstar-research-queue-md"
+  sha256: 92ec43e16677a9e2e6f82371137940d18e091474fb68073e513e0c4c2954451a
+summary: Research queue evidence showing the June 23 North Star topics were searched,
+  ingested, and left with only gate-driven follow-up work.
+tags:
+- brave-search
+- evidence-registry
+- northstar
+- research
+claims:
+- The June 23 North Star research queue records every queued topic as searched or
+  inspected and ingested into the evidence registry.
+- The queue records no pending topics remaining from the pass, with follow-up limited
+  to downstream readiness or architecture gates.
+- The Brave Search credential is persisted only as a project reference, not as a raw
+  secret in the evidence registry.
+planning_relevance: []
+limitations: []

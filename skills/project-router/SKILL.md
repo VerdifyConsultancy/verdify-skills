@@ -40,15 +40,20 @@ Decide exactly one next lifecycle action without doing that action's substantive
 
 Use the first unmet condition:
 
-1. Incomplete project understanding or design surface -> `project-definition` in the earliest incomplete mode.
-2. Missing or stale system architecture/module contracts -> `architecture-contracts`.
-3. Missing or stale backlog/north-star execution strategy -> `state-of-union`.
-4. No approved bounded sprint/lane transaction -> `sprint-planning`.
-5. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
-6. A worker lane explicitly assigned to this session -> `lane-delivery`.
-7. Worker closeout awaiting fresh review -> `independent-critic`.
-8. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
-9. Completed cycle -> route to `state-of-union` for the next outcome.
+1. Unrouted transcript or walk evidence -> `transcript-replan`.
+2. Raw research files not present in the evidence registry -> `northstar-research-ingest`.
+3. Routed or registered research, ideation, requirements, or transcript evidence
+   without signed-off `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md`, and
+   `northstar-artifacts.yaml` -> `northstar-planning`.
+4. Incomplete project understanding or design surface -> `project-definition` in the earliest incomplete mode.
+5. Missing or stale system architecture/module contracts -> `architecture-contracts`.
+6. Missing or stale backlog/north-star execution strategy -> `state-of-union`.
+7. No approved bounded sprint/lane transaction -> `sprint-planning`.
+8. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
+9. A worker lane explicitly assigned to this session -> `lane-delivery`.
+10. Worker closeout awaiting fresh review -> `independent-critic`.
+11. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
+12. Completed cycle -> route to `state-of-union` for the next outcome.
 
 An urgent incident may route directly to `release-verification` only when the repository's incident policy authorizes it and the decision is recorded.
 

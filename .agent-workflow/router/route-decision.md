@@ -1,14 +1,14 @@
 # Route decision
 
-- Current state: `PROJECT_DEFINITION_MISSING`
-- Next skill: `project-definition`
-- Next mode: `discovery`
+- Current state: `NORTHSTAR_ARTIFACTS_INCOMPLETE`
+- Next skill: `northstar-planning`
+- Next mode: `artifact-loop`
 
-No canonical project definition exists.
+Product and architecture North Star artifacts must be cross-linked and signed off before downstream lifecycle skills treat them as core planning authority.
 
 ## Missing artifacts
 
-- .agent-workflow/project/project-definition.yaml
+None.
 
 ## Open gates
 
