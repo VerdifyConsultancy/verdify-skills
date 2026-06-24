@@ -134,6 +134,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | WAVE-006 | Learning-capture loop planning | Define how Codex/Claude/terminal sessions, research, and delivery outcomes are mined for proposed improvements and loop-readiness signals. | Automatically applying mined changes or scheduling unproven loops. | Planning CI validates the learning proposal schema, template, and packets; no scheduled mutation. | Skills maintainer review. | Operator reference, proposal format, routing taxonomy, redaction rules, loop-readiness checklist, cost-per-accepted-change metric. | `ARCH-015` |
 | WAVE-007 | OpenClaw SDLC workflow pilot | Exercise the OpenClaw-facing SDLC workflow map against one non-Gravity repository from ideation through review/deployment proof. | Production autonomy, Gravity feature work, or bypassing GitHub Issues/PRs/checks/deployments. | PR/wave branch -> CI -> preview/review deployment -> protected promotion rehearsal -> release verification -> outcome record. | Review inbox, platform owner, and human release verifier. | One issue moves through branch, worktree, PR, checks, critic review, review packet, preview/review deployment, protected promotion rehearsal, release verification, outcome record, and learning proposal. | `ARCH-016` |
 | WAVE-008 | Repo-controller bootstrap pilot | Run the bootstrap workflow on one safe non-production repository and reconcile findings through issues, PRs, dashboards, and platform-readiness artifacts. | Running bootstrap across the full fleet or granting broad infrastructure access. | CI validates bootstrap artifacts; credential probes record safe metadata only; no raw secrets or production mutation. | Platform/security review and repo owner review. | Bootstrap packet, `repo-agent-scope.yaml`, AGENTS.md proposal, namespace map, storage/credential inventory, gap issues, PR, and controller observability proof. | `ARCH-017`, `ARCH-018`, `ARCH-020` |
+| WAVE-009 | Deferred Orbit daily brief contract | Explicitly defer `PRQ-028` / `IFACE-018` until the Orbit/platform owner records source scope, connector permissions, privacy, retention, source-freshness rules, and an implementation owner. | Presenting the Orbit daily brief as delivered in the current package kernel; reading email/calendar connectors; granting approval or delivery authority through the brief. | No deployment; a future planning/readiness lane must add a validated schema/reference or replace this deferral with an approved implementation plan. | Jason and Orbit/platform owner. | Follow-up artifact or issue links `PRQ-028`, `IFACE-018`, and `NSQ-014` with owner decision and validation evidence. | `ARCH-019`, `IFACE-018` |
 
 ## PRODUCT-008 Surfaces And Shapes
 
@@ -182,7 +183,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | NSQ-011 | Should repo-controller orchestration use Codex, Claude, or a controller abstraction that selects the model/tooling per task and failure mode? | Platform architecture owner | false | Proposed default: model-neutral controller contract with Codex/Claude as interchangeable or task-specific workers; validate with a manual bootstrap pilot before scheduling. | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-openclaw-hermes-local-evidence` |
 | NSQ-012 | Which infrastructure domain agents are allowed broader scoped access, and what owner, audit, approval, and rollback rules apply? | Jason, platform owner, and security owner | false | Proposed default: networking, storage, backup, and platform domain agents may receive explicit scoped authority; repo-local agents remain namespace-scoped unless a gate grants more. | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-secrets-credential-injection-patterns` |
 | NSQ-013 | What is the approved request path for repo agents to add NFS/PVC mounts, route/DNS changes, or base-image packages? | Platform, storage, and networking owners | false | Proposed default: repo agents submit platform control requests or PR-reviewed desired-state changes; storage/network/image owners approve before mutation. | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-environment-gitops-implementation-best-p` |
-| NSQ-014 | What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use? | Jason and Orbit/platform owner | false | Proposed default: start with GitHub, repo-controller state, and `.agent-workflow` records; add email/calendar only after connector scope, retention, privacy, and redaction rules are explicit. | `NSE-20260623-repo-controller-bootstrap-self-discovery` |
+| NSQ-014 | What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use? | Jason and Orbit/platform owner | false | Deferred by `WAVE-009`; proposed starting scope remains GitHub, repo-controller state, and `.agent-workflow` records, while email/calendar require explicit connector scope, retention, privacy, and redaction rules first. | `NSE-20260623-repo-controller-bootstrap-self-discovery` |
 
 ## PRODUCT-011 Traceability Index
 
@@ -261,19 +262,21 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-025` | supports namespace, storage, route, base-image, and domain-agent platform standards |
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-026` | supports controller observability, alert routing, and recovery requirements |
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-027` | supports adversarial review and stakeholder consensus requirements |
-| `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-028` | supports Orbit daily operating brief product surface |
+| `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-028` | supports Orbit daily operating brief product surface, now explicitly deferred by `WAVE-009` |
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-029` | supports standard repo-agent scope, ownership, responsibility, and escalation contracts |
 | `PRQ-023` | `ARCH-017` | requires repo-controller bootstrap architecture |
 | `PRQ-024` | `ARCH-018` | requires safe credential-reference and access-boundary architecture |
 | `PRQ-025` | `ARCH-018` | requires namespace, storage, route, and image policy architecture |
 | `PRQ-026` | `ARCH-017` | requires controller observability and recovery architecture |
 | `PRQ-028` | `ARCH-019` | requires Orbit daily brief and fleet governance architecture |
+| `PRQ-028` | `WAVE-009` | defers the Orbit daily brief contract until owner, source, privacy, retention, and schema/reference decisions are recorded |
 | `PRQ-029` | `ARCH-020` | requires repo-agent scope and responsibility architecture |
 | `PRQ-029` | `schemas/repo-agent-scope.schema.yaml` | now validates the repo-agent scope and responsibility contract |
 | `PRQ-029` | `skills/repo-hygiene/assets/repo-agent-scope.template.yaml` | now provides a starter template for repo exploration and discovery |
 | `SURF-016` | `IFACE-016` | defines the repo-bootstrap self-discovery packet |
 | `SURF-017` | `IFACE-017` | defines the fleet controller dashboard and alert surface |
 | `SURF-018` | `IFACE-018` | defines the Orbit daily operating brief surface |
+| `IFACE-018` | `WAVE-009` | defers the concrete Orbit interface until the owner and connector rules are approved |
 | `SURF-019` | `IFACE-019` | defines the repo-agent scope and responsibility charter interface |
 | `PRQ-020` | `schemas/northstar-learning-proposals.schema.yaml` | requires typed learning proposal packet validation |
 | `PRQ-020` | `skills/northstar-planning/references/learning-capture.md` | now defines learning-capture source eligibility, redaction, verifier, stop, budget, permissions, and scheduling boundaries |
