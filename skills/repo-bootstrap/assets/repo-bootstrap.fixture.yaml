@@ -1,0 +1,179 @@
+schema_ref: repo-bootstrap.schema.yaml
+kind: RepoBootstrapPacket
+schema_version: "1.0"
+repository: "VerdifyConsultancy/example-service"
+status: complete
+generated_at: "2026-06-24T18:00:00Z"
+evidence_refs:
+  - "northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery"
+inputs:
+  repo_path: "/workspace/example-service"
+  github_repository: "VerdifyConsultancy/example-service"
+  baseline_sha: "0123456789abcdef0123456789abcdef01234567"
+  issue_refs:
+    - "https://github.com/VerdifyConsultancy/example-service/issues/12"
+  live_runtime_access: snapshot
+composed_skills:
+  - project-router
+  - repo-hygiene
+  - platform-readiness
+  - northstar-planning
+  - controller-loop
+repo_inventory:
+  purpose: "Example service used to validate repo-bootstrap output shape."
+  primary_languages:
+    - Ruby
+    - JavaScript
+  important_paths:
+    - README.md
+    - AGENTS.md
+    - .github/workflows/validate.yml
+  docs:
+    - name: README.md
+      status: observed
+      evidence:
+        - "file:README.md"
+      notes: "Project overview exists."
+  git:
+    default_branch: "main"
+    current_branch: "main"
+    baseline_sha: "0123456789abcdef0123456789abcdef01234567"
+    status_summary: "Clean snapshot used for fixture validation."
+    recent_commits:
+      - "0123456 initial fixture baseline"
+  github:
+    repository: "VerdifyConsultancy/example-service"
+    issues_summary: "One bootstrap gap issue proposed in fixture data."
+    pull_requests_summary: "No open pull requests in fixture data."
+    labels_or_projects_summary: "Standard Verdify labels present in fixture data."
+  ci_cd:
+    - name: ".github/workflows/validate.yml"
+      status: observed
+      evidence:
+        - "file:.github/workflows/validate.yml"
+      notes: "Validation workflow exists."
+  planning_artifacts:
+    - name: ".agent-workflow/router/route-decision.yaml"
+      status: missing
+      evidence: []
+      notes: "Bootstrap recommends running project-router next."
+  risks:
+    - "Runtime inventory was supplied as a fixture snapshot, not live cluster data."
+runtime_inventory:
+  access_status: snapshot
+  namespaces:
+    - name: "example-dev"
+      status: observed
+      evidence:
+        - "snapshot:kubernetes/namespaces/example-dev"
+      notes: "Fixture namespace only."
+  pods:
+    - name: "example-api-7d9f"
+      status: observed
+      evidence:
+        - "snapshot:kubernetes/pods/example-api-7d9f"
+      notes: "Fixture pod only."
+  routes:
+    - name: "example.dev.internal"
+      status: unknown
+      evidence: []
+      notes: "Route/DNS ownership is still an open question."
+  storage_mounts:
+    - name: "example-cache"
+      status: not_checked
+      evidence: []
+      notes: "Storage mount request flow unresolved."
+  observability:
+    - name: "service-health-dashboard"
+      status: missing
+      evidence: []
+      notes: "KPI proposal requests dashboard coverage."
+  runtime_image_packages:
+    - name: "postgresql-client"
+      status: unknown
+      evidence: []
+      notes: "Candidate package for image review, not approved by bootstrap."
+  missing_access:
+    - "No live cluster probe was performed for this fixture."
+credential_reference_inventory:
+  policy: references_only
+  raw_values_recorded: false
+  references:
+    - id: "cred-github-actions"
+      location: "GitHub Actions secret reference EXAMPLE_SERVICE_TOKEN"
+      auth_mode: github_token
+      validation_status: not_checked
+      owner: "platform-readiness"
+      scope:
+        - "ci"
+      failure_mode: "Fixture does not validate live credentials."
+agents_delta:
+  status: proposed
+  target_path: AGENTS.md
+  summary: "Add Verdify lifecycle entrypoint, repo ownership, credential-reference rules, and escalation contacts."
+  proposed_sections:
+    - "Repository purpose"
+    - "Verdify lifecycle skills"
+    - "Credential-reference handling"
+  patch_ref: "pull-request:pending"
+kpi_proposal:
+  - id: KPI-001
+    name: "Bootstrap gap closure"
+    target: "All fail or blocked gaps have issue refs within one business day."
+    measurement_source: "GitHub Issues and repo-bootstrap packet"
+    cadence: "daily"
+    owner: "repo-controller"
+gap_backlog:
+  - id: GAP-001
+    title: "Create route decision artifact"
+    source: "repo_inventory.planning_artifacts"
+    severity: warn
+    recommended_action: "Run project-router and commit validated route-decision artifacts if authorized."
+    github_issue_ref: "https://github.com/VerdifyConsultancy/example-service/issues/12"
+    owner: "repo-controller"
+route_recommendation:
+  next_skill: project-router
+  next_mode: route
+  reason: "The fixture repository lacks a route-decision artifact."
+  evidence:
+    - "repo_inventory.planning_artifacts[0]"
+open_questions:
+  - id: RBQ-001
+    topic: namespace_naming
+    question: "What namespace naming convention binds this GitHub repository to dev, preview, staging, and production namespaces?"
+    owner: "platform-readiness"
+    blocking: true
+    default: "Use platform-readiness to propose the naming convention before broad bootstrap."
+  - id: RBQ-002
+    topic: domain_agent_authority
+    question: "Which domain agents own platform, networking, storage, backup, and credential authority for this repository?"
+    owner: "platform-readiness"
+    blocking: true
+    default: "Keep repo-controller authority proposal-only until domain owners are recorded."
+  - id: RBQ-003
+    topic: route_dns_ownership
+    question: "Who owns route, DNS, TLS, and ingress changes for this repository?"
+    owner: "platform-readiness"
+    blocking: true
+    default: "Record route and DNS changes as gaps, not repo-bootstrap mutations."
+  - id: RBQ-004
+    topic: storage_mounts
+    question: "Which storage mounts are required, and which role approves them?"
+    owner: "platform-readiness"
+    blocking: true
+    default: "Treat mounts as platform readiness requests until approved."
+  - id: RBQ-005
+    topic: runtime_image_packages
+    question: "Which runtime-image packages should be standardized instead of installed ad hoc by repo agents?"
+    owner: "platform-readiness"
+    blocking: false
+    default: "Capture package needs as recommendations for image review."
+github_outputs:
+  issues_opened:
+    - "https://github.com/VerdifyConsultancy/example-service/issues/12"
+  pull_request_ref: "https://github.com/VerdifyConsultancy/example-service/pull/13"
+  comments:
+    - "Fixture demonstrates GitHub refs without opening live issues."
+limitations:
+  - "Offline fixture does not require live cluster or secret access."
+  - "Credential references intentionally omit raw values."

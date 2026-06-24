@@ -4,6 +4,7 @@ module Verdify
   class CLI
     SKILLS = %w[
       project-router
+      repo-bootstrap
       transcript-replan
       northstar-research-ingest
       northstar-planning
