@@ -1,0 +1,86 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-controller-ownership
+status: ready_for_critic
+issue_ids:
+  - 9
+  - 23
+pull_request: 42
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "81590aa60e412faa2143af6f2348f28b8c644ebd"
+contract_hash: "a21049f95b960bb302cc7340f8e6519c533e073e5e2ad7cf972ec850fb0e1838"
+changed_paths:
+  - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md"
+validation_results:
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-controller-ownership.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:56:48Z"
+    artifact: null
+  - id: vc-adr-exists
+    command: "ls docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:52:00Z"
+    artifact: null
+  - id: vc-adr-references-issues
+    command: "grep -E '#9|#23' docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:52:00Z"
+    artifact: null
+  - id: vc-validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:52:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:52:00Z"
+    artifact: null
+  - id: pr-policy-local
+    command: "ruby scripts/pr-policy.rb --body /tmp/pr42-body.md --base fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e --head 81590aa60e412faa2143af6f2348f28b8c644ebd"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:55:00Z"
+    artifact: null
+  - id: github-checks
+    command: "gh pr checks 42 --watch --interval 10 --fail-fast"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:55:00Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/42"
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md#event-ownership-matrix"
+      - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md#handoff-sequence"
+      - "vc-adr-exists"
+      - "vc-validate-repo"
+      - "closeout-validate"
+      - "github-pr-42"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md#trigger-disambiguation"
+      - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md#child-session-launch-gate"
+      - "github-issue-9-comment-4791674377"
+      - "github-issue-23-comment-4791674397"
+      - "vc-adr-references-issues"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "Downstream skill, router, workflow, template, and example edits must conform to ADR-0012 in later implementation lanes."
+worktree_clean: true
+worker_session_id: "codex-20260624-controller"
+completed_at: "2026-06-24T16:56:48Z"
+limitations:
+  - "Per controller resolution, ADR-0011 references in the compiled lane contract were treated as ADR-0012 renumbering typos."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request body records the current branch head after closeout is pushed."
