@@ -6,8 +6,36 @@ controller_id: ""
 status: draft
 state: INTAKE
 updated_at: ""
-current_wave: null
-sessions: []
+current_wave: wave-replace-me
+waves:
+- id: wave-replace-me
+  status: planned
+  state: WAVE_PLANNED
+  started_at: null
+  completed_at: null
+  issue_ids: []
+  lane_ids: []
+  session_ids: [session-replace-me]
+  next_actions: []
+sessions:
+- id: session-replace-me
+  role: controller
+  executor: replace-me
+  repository: owner/repo
+  issue: null
+  lane_id: null
+  wave_id: wave-replace-me
+  branch: null
+  worktree: null
+  owner: replace-me
+  started_at: null
+  heartbeat_expectations:
+    cadence: every 15 minutes
+    timeout_minutes: 15
+    source: controller-loop
+  heartbeat_deadline_at: null
+  stop_condition: Replace with the condition that pauses or stops this session.
+  status: planned
 events: []
 open_gates: []
 next_actions: []

@@ -15,12 +15,14 @@ work, or bypass human gates.
 
 ## Canonical artifacts
 
-- `.agent-workflow/controller/controller-state.yaml` - durable controller state
+- `.agent-workflow/controller/controller-state.yaml` - durable controller state,
+  including current wave and wave-supervision state
 - `.agent-workflow/controller/session-ledger.yaml` - append-oriented session map
-- `.agent-workflow/controller/waves/<wave-id>.yaml` - wave state when used
 
 Validate controller state against `../../schemas/controller-state.schema.yaml`
 and the session ledger against `../../schemas/session-ledger.schema.yaml`.
+Wave-supervision mode writes wave entries into controller state; do not create
+standalone `.agent-workflow/controller/waves/<wave-id>.yaml` artifacts.
 
 ## Procedure
 
@@ -29,8 +31,10 @@ and the session ledger against `../../schemas/session-ledger.schema.yaml`.
 2. Reconstruct the current lifecycle state and pending child sessions.
 3. Validate the transition against `references/state-machine.md`.
 4. For each child loop, record session ID, executor, repository, branch,
-   worktree, issue, lane, wave, owner, start time, heartbeat expectations, and
-   stop condition.
+   worktree, issue, lane, wave ID, owner, started_at, heartbeat_expectations,
+   heartbeat_deadline_at, and stop_condition.
+   In wave-supervision mode, record wave entries in controller-state `waves`,
+   set `current_wave`, and link sessions to waves with `wave_id`.
 5. Launch child sessions only through the configured Agent Platform API, MCP
    tool, or documented manual handoff.
 6. Monitor durable events: status, blockers, closeout, critic outcome, CI,

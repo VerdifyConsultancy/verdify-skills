@@ -36,6 +36,7 @@ properties:
         executor: {type: string, minLength: 1}
         repository: {type: string, minLength: 1}
         status: {type: string, enum: [planned, active, paused, blocked, complete, failed, abandoned, superseded]}
+        owner: {type: [string, 'null']}
         started_at: {type: [string, 'null']}
         ended_at: {type: [string, 'null']}
         issue_ids: {type: array, items: {type: integer, minimum: 1}}
@@ -43,6 +44,16 @@ properties:
         wave_id: {type: [string, 'null']}
         branch: {type: [string, 'null']}
         worktree: {type: [string, 'null']}
+        heartbeat_expectations:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [cadence, timeout_minutes, source]
+          properties:
+            cadence: {type: string}
+            timeout_minutes: {type: integer, minimum: 1}
+            source: {type: [string, 'null']}
+        heartbeat_deadline_at: {type: [string, 'null']}
+        stop_condition: {type: [string, 'null']}
         pr_refs: {type: array, items: {type: string}}
         artifact_refs: {type: array, items: {type: string}}
   events:
