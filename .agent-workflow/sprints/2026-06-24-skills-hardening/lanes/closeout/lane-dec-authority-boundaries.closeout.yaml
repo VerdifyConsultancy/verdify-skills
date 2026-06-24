@@ -1,0 +1,71 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-authority-boundaries
+status: ready_for_critic
+issue_ids:
+  - 8
+pull_request: 37
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "a1a961303904beca9f518fe35497cb233daba58f"
+contract_hash: "184eebce149d50e8120b12b2173c8f4bacae69c4ee055edfc2bfa88223d00d28"
+changed_paths:
+  - "docs/decisions/ADR-0011-northstar-projectdef-architecture-authority.md"
+validation_results:
+  - id: adr-exists
+    command: "ls docs/decisions/ADR-0011-*.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:45:52Z"
+    artifact: null
+  - id: adr-references-issue
+    command: "grep -l '#8' docs/decisions/ADR-0011-*.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:45:52Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:42:15Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:43:26Z"
+    artifact: null
+  - id: issue-reference
+    command: "gh issue comment 8 --repo VerdifyConsultancy/verdify-skills --body <ADR-0011 reference>"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:45:16Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/issues/8#issuecomment-4791608103"
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-authority-boundaries.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:47:09Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "docs/decisions/ADR-0011-northstar-projectdef-architecture-authority.md"
+      - "adr-exists"
+      - "adr-references-issue"
+      - "issue-reference"
+      - "validate-repo"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic or reviewer approval is still required before integration."
+  - "ADR-0011 is not merged yet; PR #37 is open as a draft for independent criticism."
+worktree_clean: true
+worker_session_id: "codex-20260624-authority"
+completed_at: "2026-06-24T16:45:52Z"
+limitations:
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request records the current branch head after closeout is pushed."
