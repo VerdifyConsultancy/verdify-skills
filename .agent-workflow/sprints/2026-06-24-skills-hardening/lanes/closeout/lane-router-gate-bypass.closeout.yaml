@@ -1,0 +1,73 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-router-gate-bypass
+status: ready_for_critic
+issue_ids:
+  - 15
+pull_request: 50
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "791df28fec308d628e14d67e8a811aad6ac451b9"
+contract_hash: "a266b324e7a3abc1d44341a76fd3423027836e41611a5b67406c7594f769cb75"
+changed_paths:
+  - "lib/verdify/cli.rb"
+  - "tests/test_cli.sh"
+  - "tests/test_router_gate_bypass.sh"
+validation_results:
+  - id: ruby-syntax
+    command: "ruby -c lib/verdify/cli.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:50Z"
+    artifact: null
+  - id: router-regression
+    command: "bash tests/test_router_gate_bypass.sh"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:50Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:50Z"
+    artifact: null
+  - id: unit-tests
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:50Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-router-gate-bypass.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:50Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "lib/verdify/cli.rb"
+      - "tests/test_router_gate_bypass.sh"
+      - "router-regression"
+      - "validate-repo"
+      - "unit-tests"
+      - "PR #50"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "coordination-note-ac-02: controller authorization treats skills/architecture-contracts/SKILL.md as owned by another lane and satisfied-by-coordination"
+      - "PR #50 coordination note"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "The architecture-contracts skill hardening was not edited in this lane because skills/architecture-contracts/SKILL.md is owned by another lane under controller authorization."
+worktree_clean: true
+worker_session_id: "codex-20260624-gate"
+completed_at: "2026-06-24T17:33:50Z"
+limitations:
+  - "The active lease baseline is 9b0fd53f276823c9b82eaeeaded114a5af0a6c77; the compiled contract text lists fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e, with no relevant drift observed for owned code or test paths between those revisions."
+  - "The closeout head_sha records the implementation commit before this closeout metadata commit; PR #50 records the current branch head after closeout is pushed."
+  - "MANIFEST.sha256 was not manually edited; controller authorization states it is regenerated at release."
