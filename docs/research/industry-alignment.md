@@ -13,7 +13,9 @@ Verdify therefore exposes coherent lifecycle skills instead of 17 tiny skills or
 one monolith, keeps each `SKILL.md` concise, and moves detailed procedures to
 focused references. The original delivery set contained nine skills; readiness,
 North Star planning, research-ingest, and North Star interview loops now extend the package to seventeen
-while preserving progressive disclosure.
+while preserving progressive disclosure. Standalone helper skills can be
+packaged alongside the lifecycle when they serve GitHub-native work without
+changing the lifecycle graph.
 
 ## GitHub backlog and delivery primitives
 
