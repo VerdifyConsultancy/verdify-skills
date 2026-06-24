@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added `northstar-question-resolution` as a lifecycle skill for large North Star question inventories, delegated answers, research handoff, and concise human escalation packs.
+- Added the comprehensive planning/review-loop ADR for backlog, health, lane, sprint, QA, and review-packet reconciliation.
+- Reconciled package-count documentation to the validated framing: eighteen lifecycle skills plus one standalone `issue-triage` skill, 19 total skills reported by `scripts/validate-repo.rb`.
+- Indexed and traced ADR-0009 and ADR-0010 in the North Star architecture decision index.
+
 ## 1.0.0 - 2026-06-22
 
 - Replaced the single `verdify-agentic-sprint` skill with eight coherent lifecycle skills.

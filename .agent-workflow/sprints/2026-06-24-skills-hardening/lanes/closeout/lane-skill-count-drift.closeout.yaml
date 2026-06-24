@@ -1,0 +1,97 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-skill-count-drift
+status: ready_for_critic
+issue_ids:
+  - 19
+pull_request: 49
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "0a9bf4a8bbcc3eb5a921e4e6c85c57fcf6abf476"
+contract_hash: "ce2a85875d4a21cbe1b11795edc25e67c309ad51f9cd9d1fcbb0f3a00e846dcc"
+changed_paths:
+  - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+  - ".agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+  - "docs/research/industry-alignment.md"
+  - "docs/decisions/ADR-0004-readiness-loop-skills.md"
+  - "docs/decisions/ADR-0005-northstar-planning-loop.md"
+  - "docs/decisions/ADR-0006-northstar-evidence-registry.md"
+  - "docs/decisions/ADR-0008-northstar-interview-skill.md"
+  - "docs/decisions/ADR-0009-northstar-question-resolution-skill.md"
+  - "CHANGELOG.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-skill-count-drift.closeout.yaml"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:23:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:24:00Z"
+    artifact: null
+  - id: no-stale-count-governed
+    command: "! grep -rn 'seventeen' .agent-workflow/northstar/NORTHSTAR_PRODUCT.md .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md docs/decisions docs/research CHANGELOG.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: trace-skills
+    command: "grep -rn 'northstar-question-resolution\\|controller-loop' .agent-workflow/northstar/NORTHSTAR_PRODUCT.md .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md docs/research/industry-alignment.md CHANGELOG.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: trace-adrs
+    command: "grep -rn 'ADR-0009\\|ADR-0010' .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md CHANGELOG.md docs/decisions/ADR-0004-readiness-loop-skills.md docs/decisions/ADR-0005-northstar-planning-loop.md docs/decisions/ADR-0006-northstar-evidence-registry.md docs/decisions/ADR-0008-northstar-interview-skill.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-skill-count-drift.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "git-diff:.agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+      - "git-diff:.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+      - "git-diff:docs/decisions/ADR-0004-readiness-loop-skills.md"
+      - "git-diff:docs/decisions/ADR-0005-northstar-planning-loop.md"
+      - "git-diff:docs/decisions/ADR-0006-northstar-evidence-registry.md"
+      - "git-diff:docs/decisions/ADR-0008-northstar-interview-skill.md"
+      - "git-diff:docs/decisions/ADR-0009-northstar-question-resolution-skill.md"
+      - "validate-repo"
+      - "make-test"
+      - "no-stale-count-governed"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "git-diff:.agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+      - "git-diff:.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+      - "git-diff:docs/research/industry-alignment.md"
+      - "git-diff:CHANGELOG.md"
+      - "trace-skills"
+      - "trace-adrs"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "GitHub checks must be evaluated on the final pushed branch head after the closeout artifact commit."
+  - "The exact broad no-stale-count command still finds one historical raw evidence-source line outside this lane's owned paths; governed planning-authority and owned documentation surfaces have no stale 'seventeen' assertions."
+worktree_clean: true
+worker_session_id: "codex-20260624-countdrift"
+completed_at: "2026-06-24T17:30:00Z"
+limitations:
+  - "The approved lane contract records baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e, but the active lease and PR base are 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after upstream sprint lanes merged; this closeout uses the lease/PR baseline to avoid attributing other lanes' merged ADRs to this lane."
+  - "No test files were edited because this documentation-only lane's owned_paths do not include tests; deterministic validation used scripts/validate-repo.rb, make test, and grep evidence."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request records the current branch head after closeout is pushed."

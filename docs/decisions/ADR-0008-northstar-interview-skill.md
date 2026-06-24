@@ -32,8 +32,9 @@ answers, or start implementation.
 
 ## Consequences
 
-- At the time of this ADR, the package exposed seventeen canonical skills.
-  `ADR-0009` later added `northstar-question-resolution`.
+- The package now reports 19 skills: eighteen lifecycle skills after `ADR-0009`
+  adds `northstar-question-resolution`, plus one standalone `issue-triage` skill
+  outside the lifecycle graph.
 - Human review becomes easier to conduct because questions are concrete,
   prioritized, and evidence-linked.
 - The final North Star lock gate remains separate from interview answers.

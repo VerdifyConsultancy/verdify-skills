@@ -37,9 +37,11 @@ the lifecycle; they do not replace `project-definition`, `architecture-contracts
 
 ## Consequences
 
-- The package now exposes seventeen canonical skills after `ADR-0005` adds
-  `northstar-planning`, `ADR-0006` adds `northstar-research-ingest`, and
-  `ADR-0008` adds `northstar-interview`.
+- The package now reports 19 skills: eighteen lifecycle skills after `ADR-0005`
+  adds `northstar-planning`, `ADR-0006` adds `northstar-research-ingest`,
+  `ADR-0008` adds `northstar-interview`, and `ADR-0009` adds
+  `northstar-question-resolution`, plus one standalone `issue-triage` skill
+  outside the lifecycle graph.
 - Router and state-of-union handoffs may target readiness-loop skills.
 - Repo hygiene is required before sprint planning when a strategy is ready for
   feature execution.
