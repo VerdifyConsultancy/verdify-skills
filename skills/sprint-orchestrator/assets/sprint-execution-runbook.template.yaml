@@ -21,27 +21,18 @@ prerequisites:
   platform_readiness: null
   open_blockers: []
 platform:
-  mcp_server: agents.vallery.net
-  api_ref: null
+  mcp_server: in-pod-controller-mcp
+  api_ref: POST /api/repos/<owner>/<repo>/agents
   auth_mode: mcp_session
   required_tools:
-    - name: agent_platform.session.create
-      purpose: Create one lane worker session per approved lane.
-      required: true
-    - name: agent_platform.session.poll
-      purpose: Read lane status, questions, closeout, and coordination requests.
-      required: true
-    - name: agent_platform.terminal.attach
-      purpose: Attach operator-visible tmux or browser terminal views.
-      required: true
-    - name: agent_platform.session.send
-      purpose: Answer worker questions and coordination requests.
+    - name: add_worktree_agent
+      purpose: Dispatch one approved lane worker through the in-pod Agent Platform controller MCP surface.
       required: true
   terminal_access:
-    mode: both
-    operator_visible: true
+    mode: none
+    operator_visible: false
     attach_refs: []
-  fallback_policy: If Agent Platform MCP is unavailable, stop and route to platform-readiness or a gate instead of launching local workers ad hoc.
+  fallback_policy: If add_worktree_agent is unavailable, stop and route to platform-readiness or a gate instead of launching local workers ad hoc.
 cadence:
   poll_interval_minutes: 5
   heartbeat_timeout_minutes: 15
@@ -53,13 +44,13 @@ lanes: []
 coordination:
   poll_steps:
     - Refresh GitHub, lease, session, PR, and check state.
-    - Poll each Agent Platform lane session.
-    - Capture questions, blockers, closeout, and coordination requests.
+    - Observe lane progress through GitHub, PR checks, leases, closeout artifacts, and recorded Agent Platform result refs.
+    - Capture questions, blockers, closeout, and coordination requests from durable lane evidence.
     - Answer delegated questions or open gates for protected decisions.
     - Record ledger events and update sprint status.
   controller_responses:
     - Answer contract-scoped worker questions.
-    - Reconcile dependency-ready lanes and dispatch only one session per lane.
+    - Reconcile dependency-ready lanes and dispatch only one worktree agent per lane.
     - Route scope changes to sprint-planning or architecture-contracts.
   coordination_request_policy: Resolve only within approved lane contracts and delegation; route protected changes to gates.
   escalation_paths: []
@@ -93,11 +84,11 @@ ledger:
     - ci_observed
     - deployment_observed
 stop_conditions:
-  - Platform MCP operation identity is missing or unavailable.
+  - Agent Platform add_worktree_agent operation identity is missing or unavailable.
   - A lane session, issue, branch, PR, lease, or contract identity conflicts.
   - A worker asks for protected production, schema, security, migration, or destructive authority.
   - Required CI/CD, review, deployment, telemetry, or rollback evidence cannot be obtained.
 handoff:
   next_skill: sprint-orchestrator
   next_mode: platform-dispatch
-  reason: Complete the execution runbook and dispatch dependency-ready lane sessions.
+  reason: Complete the execution runbook and dispatch dependency-ready lane workers through add_worktree_agent.

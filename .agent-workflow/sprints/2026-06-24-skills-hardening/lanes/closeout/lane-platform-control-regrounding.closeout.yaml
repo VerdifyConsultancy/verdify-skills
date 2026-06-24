@@ -1,0 +1,129 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-platform-control-regrounding
+status: ready_for_critic
+issue_ids:
+  - 12
+  - 18
+  - 33
+  - 34
+pull_request: 52
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "6895b3226f4027691d60abc3ef3708a39eadf57a"
+contract_hash: "45d202e3ef09688a9b0cefff1ebc371558ccb0a818128a0aa72abd1ef1023b3e"
+changed_paths:
+  - "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml"
+  - "lib/verdify/semantic_validator.rb"
+  - "schemas/agent-platform-control-request.schema.yaml"
+  - "schemas/release-verification.schema.yaml"
+  - "scripts/launch-claude.sh"
+  - "scripts/launch-codex.sh"
+  - "skills/lane-delivery/SKILL.md"
+  - "skills/lane-delivery/references/worker-procedure.md"
+  - "skills/platform-readiness/references/agent-platform-control.md"
+  - "skills/release-verification/assets/release-verification.template.yaml"
+  - "skills/release-verification/references/deployment-verification.md"
+  - "skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml"
+  - "skills/sprint-orchestrator/references/platform-execution.md"
+  - "skills/sprint-orchestrator/scripts/build_execution_runbook.rb"
+  - "skills/sprint-orchestrator/scripts/build_platform_control_requests.rb"
+  - "tests/test_schema_validator.rb"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:17Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:17Z"
+    artifact: null
+  - id: targeted-schema-tests
+    command: "ruby tests/test_schema_validator.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:54:00Z"
+    artifact: null
+  - id: validate-contract-lease-path
+    command: "ruby bin/verdify artifact validate --file /Users/jason/repos/verdify-skills/.agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-platform-control-regrounding.contract.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:00Z"
+    artifact: null
+  - id: old-surface-grep
+    command: "if rg -n \"agent_platform\\.session|agent_platform\\.terminal|session\\.create\" skills/sprint-orchestrator/scripts/build_execution_runbook.rb skills/sprint-orchestrator/scripts/build_platform_control_requests.rb skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml skills/sprint-orchestrator/references/platform-execution.md; then exit 1; else exit 0; fi"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:35:23Z"
+    artifact: null
+  - id: add-worktree-agent-grep
+    command: "rg -n \"add_worktree_agent\" skills/sprint-orchestrator/scripts/build_execution_runbook.rb skills/sprint-orchestrator/scripts/build_platform_control_requests.rb skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml skills/sprint-orchestrator/references/platform-execution.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:35:23Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-platform-control-regrounding.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:50Z"
+    artifact: null
+  - id: fix-forward-payload-ref
+    command: "ruby tests/test_schema_validator.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:54:00Z"
+    artifact: "12 runs, 93 assertions, 0 failures, 0 errors, 0 skips"
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "old-surface-grep"
+      - "add-worktree-agent-grep"
+      - "skills/sprint-orchestrator/scripts/build_execution_runbook.rb"
+      - "skills/sprint-orchestrator/scripts/build_platform_control_requests.rb"
+      - "schemas/agent-platform-control-request.schema.yaml"
+      - "targeted-schema-tests:test_platform_control_request_uses_add_worktree_agent_and_derives_human_gate"
+      - "targeted-schema-tests:test_semantic_rejects_add_worktree_agent_without_structured_payload"
+      - "skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml"
+      - "skills/sprint-orchestrator/references/platform-execution.md"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "targeted-schema-tests:test_execution_runbook_marks_only_first_dependency_wave_ready"
+      - "skills/sprint-orchestrator/scripts/build_execution_runbook.rb"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "targeted-schema-tests:test_platform_control_request_uses_add_worktree_agent_and_derives_human_gate"
+      - "targeted-schema-tests:test_semantic_rejects_protected_control_request_without_human_approval"
+      - "lib/verdify/semantic_validator.rb"
+      - "schemas/agent-platform-control-request.schema.yaml"
+      - "skills/sprint-orchestrator/scripts/build_platform_control_requests.rb"
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids:
+      - "scripts/launch-codex.sh"
+      - "scripts/launch-claude.sh"
+      - "skills/lane-delivery/SKILL.md"
+      - "skills/lane-delivery/references/worker-procedure.md"
+      - "targeted-schema-tests:test_semantic_rejects_verified_release_without_approval_or_independent_verifier"
+      - "schemas/release-verification.schema.yaml"
+      - "skills/release-verification/references/deployment-verification.md"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "No runtime deployment was performed by this worker lane."
+worktree_clean: true
+worker_session_id: "codex-20260624-platctl"
+completed_at: "2026-06-24T17:57:17Z"
+limitations:
+  - "The active lease baseline is 9b0fd53f276823c9b82eaeeaded114a5af0a6c77; the compiled lane contract text still records the original sprint baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e."
+  - "The required relative validate-contract path is absent from this leased worktree; the lease/source-checkout contract path validated successfully and matches the compiled prompt contract hash."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request body records the current branch head after closeout is pushed."

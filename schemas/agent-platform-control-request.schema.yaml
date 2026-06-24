@@ -76,6 +76,36 @@ properties:
       evidence_refs: {type: array, items: {type: string}}
       parameters_summary: {type: string, minLength: 1}
       redacted_payload_ref: {type: [string, 'null']}
+      redacted_payload:
+        type: [object, 'null']
+        additionalProperties: false
+        required: [operation_id, branch, runtime, name, github_identity, user, idempotency_key, api_request]
+        properties:
+          operation_id: {type: string, minLength: 1}
+          branch: {type: string, minLength: 1}
+          runtime: {type: [string, 'null']}
+          name: {type: [string, 'null']}
+          github_identity: {type: [string, 'null']}
+          user: {type: [string, 'null']}
+          idempotency_key: {type: [string, 'null']}
+          api_request:
+            type: object
+            additionalProperties: false
+            required: [method, path, body]
+            properties:
+              method: {type: string, enum: [POST]}
+              path: {type: string, minLength: 1}
+              body:
+                type: object
+                additionalProperties: false
+                required: [worktree, base_ref, runtime, github_identity, user, idempotency_key]
+                properties:
+                  worktree: {type: [string, 'null']}
+                  base_ref: {type: string, minLength: 1}
+                  runtime: {type: [string, 'null']}
+                  github_identity: {type: [string, 'null']}
+                  user: {type: [string, 'null']}
+                  idempotency_key: {type: [string, 'null']}
   expected_effects:
     type: object
     additionalProperties: false

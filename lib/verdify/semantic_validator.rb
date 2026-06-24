@@ -4,6 +4,8 @@ module Verdify
   class SemanticValidator
     SHA_PATTERN = /\A[0-9a-f]{40}\z/i
     APPROVAL_REQUIRED_STATUSES = %w[approved active complete dispatched changes_requested].freeze
+    CONTROL_REQUEST_EXECUTION_STATUSES = %w[authorized executing complete].freeze
+    PROTECTED_CONTROL_MUTATIONS = %w[protected_write production_write].freeze
     PROJECT_COVERAGE_AREAS = %w[
       product_outcome
       users_stakeholders_relationships
@@ -49,6 +51,8 @@ module Verdify
         validate_critic_report(document, errors)
       when "ReleaseVerification"
         validate_release(document, errors)
+      when "AgentPlatformControlRequest"
+        validate_agent_platform_control_request(document, errors)
       when "OutcomeReview"
         validate_outcome(document, errors)
       when "HumanGate"
@@ -210,6 +214,15 @@ module Verdify
       errors << "$.deployment.deployed_at: verified release requires deployment time" if document.dig("deployment", "deployed_at").to_s.empty?
       errors << "$.verified_at: verified release requires timestamp" if document["verified_at"].to_s.empty?
       errors << "$.verifier: verified release requires independent verifier" if document["verifier"].to_s.empty?
+      errors << "$.deployment.deployer: verified release requires recorded deployer" if document.dig("deployment", "deployer").to_s.empty?
+      if !document["verifier"].to_s.empty? && document["verifier"].to_s == document.dig("deployment", "deployer").to_s
+        errors << "$.verifier: verified release verifier must differ from deployer"
+      end
+      approval = document.dig("deployment", "approval") || {}
+      errors << "$.deployment.approval.required: verified release requires deployment approval" unless approval["required"] == true
+      errors << "$.deployment.approval.approved_by: verified release requires deployment approver" if approval["approved_by"].to_s.empty?
+      errors << "$.deployment.approval.approved_at: verified release requires deployment approval timestamp" if approval["approved_at"].to_s.empty?
+      errors << "$.deployment.approval.evidence: verified release requires deployment approval evidence" if approval["evidence"].to_s.empty?
       Array(document["integration_results"]).each_with_index do |result, index|
         errors << "$.integration_results[#{index}]: verified release requires passed integration" unless result["result"] == "passed"
       end
@@ -217,6 +230,43 @@ module Verdify
         errors << "$.runtime_checks[#{index}]: verified release requires passed runtime checks" unless result["result"] == "passed"
       end
       errors << "$.runtime_checks: verified release requires runtime evidence" if Array(document["runtime_checks"]).empty?
+    end
+
+    def validate_agent_platform_control_request(document, errors)
+      mutation_level = document.dig("operation", "mutation_level").to_s
+      status = document["status"].to_s
+      validate_add_worktree_agent_payload(document, errors)
+      return unless PROTECTED_CONTROL_MUTATIONS.include?(mutation_level) && CONTROL_REQUEST_EXECUTION_STATUSES.include?(status)
+
+      review = document["review"] || {}
+      authorization = document["authorization"] || {}
+      unless review["human_gate_required"] == true
+        errors << "$.review.human_gate_required: #{mutation_level} request cannot reach #{status} without a human gate"
+      end
+      errors << "$.review.decision: #{mutation_level} request cannot reach #{status} without approved review" unless review["decision"] == "approved"
+      errors << "$.review.decided_at: #{mutation_level} request requires review decision timestamp" if review["decided_at"].to_s.empty?
+      errors << "$.authorization.approved_by: #{mutation_level} request requires recorded approver" if authorization["approved_by"].to_s.empty?
+      errors << "$.authorization.approved_at: #{mutation_level} request requires approval timestamp" if authorization["approved_at"].to_s.empty?
+    end
+
+    def validate_add_worktree_agent_payload(document, errors)
+      return unless document.dig("operation", "operation_id") == "add_worktree_agent"
+
+      payload_ref = document.dig("inputs", "redacted_payload_ref")
+      payload = document.dig("inputs", "redacted_payload")
+      errors << "$.inputs.redacted_payload_ref: add_worktree_agent requires a structured redacted payload ref" if payload_ref.to_s.empty?
+      errors << "$.inputs.redacted_payload_ref: expected #/inputs/redacted_payload" unless payload_ref == "#/inputs/redacted_payload"
+      unless payload.is_a?(Hash)
+        errors << "$.inputs.redacted_payload: add_worktree_agent requires structured redacted payload"
+        return
+      end
+
+      errors << "$.inputs.redacted_payload.operation_id: must be add_worktree_agent" unless payload["operation_id"] == "add_worktree_agent"
+      errors << "$.inputs.redacted_payload.branch: add_worktree_agent payload requires branch" if payload["branch"].to_s.empty?
+      errors << "$.inputs.redacted_payload.idempotency_key: must match operation idempotency_key" unless payload["idempotency_key"] == document.dig("operation", "idempotency_key")
+      api_body = payload.dig("api_request", "body") || {}
+      errors << "$.inputs.redacted_payload.api_request.body.base_ref: must match branch" unless api_body["base_ref"] == payload["branch"]
+      errors << "$.inputs.redacted_payload.api_request.body.idempotency_key: must match operation idempotency_key" unless api_body["idempotency_key"] == document.dig("operation", "idempotency_key")
     end
 
     def validate_outcome(document, errors)

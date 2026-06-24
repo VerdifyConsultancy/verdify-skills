@@ -35,7 +35,9 @@ operation by itself.
    private payloads into the request.
 6. Require human review for protected or production writes, broad RBAC, browser
    terminal access, secret-sensitive actions, or any policy `deny`/`blocked`
-   result.
+   result. A protected or production request cannot move to `authorized`,
+   `executing`, or `complete` unless `review.human_gate_required` is true and
+   the review decision is approved.
 7. Record result refs after execution only if execution was separately
    authorized.
 

@@ -13,7 +13,9 @@ options = {
   status: "proposed",
   policy_decision: "not_evaluated",
   approved_by: nil,
-  approved_at: nil
+  approved_at: nil,
+  mutation_level: "dev_write",
+  github_identity: nil
 }
 
 OptionParser.new do |parser|
@@ -25,6 +27,8 @@ OptionParser.new do |parser|
   parser.on("--policy-decision DECISION", "Policy decision, usually not_evaluated or allow") { |value| options[:policy_decision] = value }
   parser.on("--approved-by NAME", "Approver when creating authorized requests") { |value| options[:approved_by] = value }
   parser.on("--approved-at TIME", "Approval timestamp when authorized") { |value| options[:approved_at] = value }
+  parser.on("--mutation-level LEVEL", "Mutation level for generated requests") { |value| options[:mutation_level] = value }
+  parser.on("--github-identity IDENTITY", "Redacted GitHub identity to include in add_worktree_agent payload") { |value| options[:github_identity] = value }
   parser.on("-h", "--help") { puts parser; exit 0 }
 end.parse!
 
@@ -53,6 +57,67 @@ def compact_refs(*values)
   values.flatten.compact.reject { |value| value.to_s.empty? }.uniq
 end
 
+def protected_mutation?(mutation_level)
+  %w[protected_write production_write].include?(mutation_level.to_s)
+end
+
+def controller_api_ref(runbook)
+  explicit = runbook.dig("platform", "api_ref")
+  return explicit unless explicit.to_s.empty?
+
+  repository = runbook["repository"].to_s
+  return "POST /api/repos/<owner>/<repo>/agents" unless repository.include?("/")
+
+  owner, name = repository.split("/", 2)
+  "POST /api/repos/#{owner}/#{name}/agents"
+end
+
+def controller_api_path(runbook)
+  repository = runbook["repository"].to_s
+  return "/api/repos/<owner>/<repo>/agents" unless repository.include?("/")
+
+  owner, name = repository.split("/", 2)
+  "/api/repos/#{owner}/#{name}/agents"
+end
+
+def mcp_runtime(executor)
+  case executor.to_s
+  when "codex"
+    "codex"
+  when "claude", "claude-code"
+    "claude-code"
+  else
+    nil
+  end
+end
+
+def add_worktree_agent_payload(runbook, lane, idempotency_key, github_identity)
+  lane_id = lane["lane_id"].to_s
+  agent_name = slug(lane_id)
+  runtime = mcp_runtime(lane.dig("platform_session", "executor"))
+  {
+    "operation_id" => "add_worktree_agent",
+    "branch" => lane["branch"],
+    "runtime" => runtime,
+    "name" => agent_name,
+    "github_identity" => github_identity,
+    "user" => agent_name,
+    "idempotency_key" => idempotency_key,
+    "api_request" => {
+      "method" => "POST",
+      "path" => controller_api_path(runbook),
+      "body" => {
+        "worktree" => agent_name,
+        "base_ref" => lane["branch"],
+        "runtime" => runtime,
+        "github_identity" => github_identity,
+        "user" => agent_name,
+        "idempotency_key" => idempotency_key
+      }
+    }
+  }
+end
+
 runbook = load_yaml(runbook_path)
 abort "runbook is not a SprintExecutionRunbook" unless runbook["kind"] == "SprintExecutionRunbook"
 
@@ -61,16 +126,27 @@ output_dir = options[:output_dir] ? Pathname.new(options[:output_dir]).expand_pa
 output_dir.mkpath
 
 requested_at = Time.now.utc.iso8601
-review_decision = options[:approved_by] ? "approved" : "pending"
+human_gate_required = protected_mutation?(options[:mutation_level])
+review_decision = if options[:approved_by]
+                    "approved"
+                  elsif human_gate_required
+                    "pending"
+                  else
+                    "not_required"
+                  end
 approved_at = options[:approved_at] || (options[:approved_by] ? requested_at : nil)
-operation_id = "agent_platform.session.create"
+operation_id = "add_worktree_agent"
+api_ref = controller_api_ref(runbook)
+github_identity = options[:github_identity]
 
 Array(runbook["lanes"]).each do |lane|
   lane_id = lane["lane_id"]
-  request_id = "apc-#{slug(runbook['sprint_id'])}-#{slug(lane_id)}-session-create"
+  request_id = "apc-#{slug(runbook['sprint_id'])}-#{slug(lane_id)}-add-worktree-agent"
   target_path = lane.dig("platform_session", "create_operation_ref")
-  output_path = target_path ? repo.join(target_path) : output_dir.join("#{lane_id}-session-create.yaml")
+  output_path = target_path ? repo.join(target_path) : output_dir.join("#{lane_id}-add-worktree-agent.yaml")
   output_path.dirname.mkpath
+  idempotency_key = "#{runbook['runbook_id']}:#{lane_id}:add-worktree-agent"
+  redacted_payload = add_worktree_agent_payload(runbook, lane, idempotency_key, github_identity)
 
   request = {
     "schema_ref" => "agent-platform-control-request.schema.yaml",
@@ -83,16 +159,16 @@ Array(runbook["lanes"]).each do |lane|
       "actor" => runbook.dig("controller", "owner") || "sprint-orchestrator",
       "role" => "orchestrator",
       "session_id" => runbook.dig("controller", "session_id"),
-      "reason" => "Create the approved Agent Platform lane worker session."
+      "reason" => "Add the approved lane worker as an Agent Platform worktree agent."
     },
     "operation" => {
-      "surface" => "session",
+      "surface" => "worktree",
       "operation_id" => operation_id,
-      "method" => nil,
+      "method" => "POST",
       "tool_name" => operation_id,
-      "api_ref" => runbook.dig("platform", "api_ref"),
-      "mutation_level" => "dev_write",
-      "idempotency_key" => "#{runbook['runbook_id']}:#{lane_id}:session-create"
+      "api_ref" => api_ref,
+      "mutation_level" => options[:mutation_level],
+      "idempotency_key" => idempotency_key
     },
     "target" => {
       "repository" => runbook["repository"],
@@ -107,7 +183,7 @@ Array(runbook["lanes"]).each do |lane|
     "authorization" => {
       "auth_mode" => runbook.dig("platform", "auth_mode") || "mcp_session",
       "subject" => runbook.dig("controller", "owner"),
-      "scopes" => ["agent-platform:sessions:create", "agent-platform:terminal:attach"],
+      "scopes" => ["agent-platform:worktree-agents:add"],
       "service_account" => nil,
       "subject_access_review_required" => false,
       "approved_by" => options[:approved_by],
@@ -116,7 +192,7 @@ Array(runbook["lanes"]).each do |lane|
     "policy" => {
       "decision" => options[:policy_decision],
       "policy_decision_id" => nil,
-      "rules" => ["Use one Agent Platform worker session per approved lane."],
+      "rules" => ["Use add_worktree_agent once per dependency-ready approved lane."],
       "constraints" => [
         "Do not launch local workers as an unstated fallback.",
         "Do not mutate protected or production environments from the worker session."
@@ -134,17 +210,18 @@ Array(runbook["lanes"]).each do |lane|
         runbook.dig("ledger", "session_ledger_path")
       ),
       "evidence_refs" => [],
-      "parameters_summary" => "Create Agent Platform worker session for lane #{lane_id} on branch #{lane['branch']} using #{lane.dig('platform_session', 'executor')}.",
-      "redacted_payload_ref" => nil
+      "parameters_summary" => "Call add_worktree_agent for lane #{lane_id} on branch #{lane['branch']} using #{lane.dig('platform_session', 'executor')}.",
+      "redacted_payload_ref" => "#/inputs/redacted_payload",
+      "redacted_payload" => redacted_payload
     },
     "expected_effects" => {
       "state_changes" => [
-        "One Agent Platform worker session is created for lane #{lane_id}.",
-        "Operator-visible terminal refs are available for the lane session.",
-        "Session and terminal refs can be written back to the runbook and session ledger."
+        "One Agent Platform worktree agent is added for lane #{lane_id}.",
+        "The lane lease, prompt, contract, branch, and issue refs are bound to the platform agent.",
+        "Agent result refs can be written back to the runbook and session ledger."
       ],
-      "external_refs_expected" => ["Agent Platform session ID", "tmux or browser terminal attach ref"],
-      "rollback_or_recovery" => "If session creation fails or identity is ambiguous, mark the lane blocked and route to platform-readiness or a gate."
+      "external_refs_expected" => ["Agent Platform worktree agent ID", "GitHub PR/check refs"],
+      "rollback_or_recovery" => "If add_worktree_agent fails or identity is ambiguous, mark the lane blocked and route to platform-readiness or a gate."
     },
     "result" => {
       "status" => "not_started",
@@ -154,7 +231,7 @@ Array(runbook["lanes"]).each do |lane|
       "errors" => []
     },
     "review" => {
-      "human_gate_required" => false,
+      "human_gate_required" => human_gate_required,
       "reviewers" => compact_refs(options[:approved_by]),
       "decision" => review_decision,
       "decided_at" => approved_at
@@ -162,7 +239,7 @@ Array(runbook["lanes"]).each do |lane|
     "handoff" => {
       "next_skill" => "sprint-orchestrator",
       "next_mode" => "platform-dispatch",
-      "reason" => "Prepared session-create request records the exact Agent Platform MCP operation for dispatch."
+      "reason" => "Prepared control request records the exact add_worktree_agent operation for dispatch."
     }
   }
 
