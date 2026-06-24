@@ -11,7 +11,7 @@ loop_record:
   wave_id: wave-skills-hardening
   lane_id: lane-controller-recovery
   issue_refs: [2]
-  pull_request_refs: [52]
+  pull_request_refs: [57]
   checkpoint_path: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-003-0012.yaml
   current_objective: Route controller-loop recovery lane to critic after worker closeout.
   last_action: Attempted to reconcile PR checks before closeout artifact was pushed.
@@ -29,7 +29,7 @@ status_event:
   source: controller-loop
   references:
     issue: 2
-    pull_request: 52
+    pull_request: 57
     lease_id: lane-controller-recovery
     artifact: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-003-0012.yaml
 agent_fleet_handoff:
