@@ -1,0 +1,72 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-eval-strategy
+status: ready_for_critic
+issue_ids:
+  - 25
+pull_request: 39
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "e73709e46c1a489a22d3e26f4b0b6cd192bcfb40"
+contract_hash: "e343816f3dbf42ce90ec7c1c5c6cc00d920c827f1df19f53262073e0c98ff8bb"
+changed_paths:
+  - "docs/decisions/ADR-0015-eval-runner-strategy.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-eval-strategy.closeout.yaml"
+validation_results:
+  - id: adr-exists-owned-path
+    command: "ls docs/decisions/ADR-0015-eval-runner-strategy.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:56:13Z"
+    artifact: null
+  - id: adr-references-issue-owned-path
+    command: "grep -l '#25' docs/decisions/ADR-0015-eval-runner-strategy.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:56:13Z"
+    artifact: null
+  - id: repo-validate
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:57:14Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:57:14Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-eval-strategy.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:57:14Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "docs/decisions/ADR-0015-eval-runner-strategy.md"
+      - "adr-exists-owned-path"
+      - "adr-references-issue-owned-path"
+      - "repo-validate"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "docs/decisions/ADR-0015-eval-runner-strategy.md"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/issues/25#issuecomment-4791618021"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/pull/39"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic approval is required before integration."
+worktree_clean: true
+worker_session_id: "codex-20260624-evalstrategy"
+completed_at: "2026-06-24T16:56:13Z"
+limitations:
+  - "The recorded head SHA is the branch head before this final closeout metadata update; the pull request body records the current branch head after closeout is pushed."
+  - "Controller resolution on 2026-06-24 states ADR-0015 is authoritative and ADR-0011 references in the contract body/validation are renumbering typos; no ADR-0011 file was created."
+  - "The local .verdify dispatch metadata exists but is ignored by the git common-dir exclude and is intentionally not committed."
