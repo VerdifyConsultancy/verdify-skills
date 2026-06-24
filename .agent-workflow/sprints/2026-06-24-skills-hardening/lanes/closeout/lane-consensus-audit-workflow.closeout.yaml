@@ -1,0 +1,79 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-consensus-audit-workflow
+status: ready_for_critic
+issue_ids:
+  - 3
+pull_request: 62
+baseline_sha: "8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6"
+head_sha: "23827a835730867c879842e39d942fdef05a3849"
+contract_hash: "fbc95d824e5e8fc34c7ff45e846543e8220a02b23eaef9d226be01d924684c02"
+changed_paths:
+  - ".agents/skills/consensus-audit-workflow"
+  - ".claude/skills/consensus-audit-workflow"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-consensus-audit-workflow.closeout.yaml"
+  - "config/lifecycle.yaml"
+  - "evaluations/consensus-audit-workflow/evals.json"
+  - "lib/verdify/cli.rb"
+  - "schemas/route-decision.schema.yaml"
+  - "scripts/validate-repo.rb"
+  - "skills/consensus-audit-workflow/SKILL.md"
+  - "skills/consensus-audit-workflow/agents/openai.yaml"
+  - "skills/consensus-audit-workflow/assets/review-packet.template.yaml"
+  - "skills/consensus-audit-workflow/references/review-packet-format.md"
+  - "tests/test_schema_validator.rb"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:59:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:59:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-consensus-audit-workflow.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:59:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "git-diff:skills/consensus-audit-workflow/SKILL.md"
+      - "git-diff:skills/consensus-audit-workflow/references/review-packet-format.md"
+      - "git-diff:skills/consensus-audit-workflow/assets/review-packet.template.yaml"
+      - "git-diff:evaluations/consensus-audit-workflow/evals.json"
+      - "git-diff:config/lifecycle.yaml"
+      - "git-diff:scripts/validate-repo.rb"
+      - "git-diff:lib/verdify/cli.rb"
+      - "git-diff:schemas/route-decision.schema.yaml"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "git-diff:skills/consensus-audit-workflow/SKILL.md"
+      - "git-diff:skills/consensus-audit-workflow/references/review-packet-format.md"
+      - "registered-evidence:NSE-20260623-repo-controller-bootstrap-self-discovery"
+      - "adr:docs/decisions/ADR-0016-package-platform-skill-reconciliation.md"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "GitHub checks must be evaluated on the final pushed branch head after the closeout artifact commit."
+  - "The new review packet is documented as a skill-owned format and template, not a shared schema; a future lane can promote it to a schema if consumers need machine validation."
+worktree_clean: true
+worker_session_id: "codex-20260624-consaudit"
+completed_at: "2026-06-24T18:59:48Z"
+limitations:
+  - "The approved prompt embedded an older baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is 8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6 after upstream lifecycle and validator lanes merged, so this closeout records the active lease baseline."
+  - "The head_sha records the implementation commit before this closeout-only artifact commit; the pull request records the current branch head after closeout is pushed."

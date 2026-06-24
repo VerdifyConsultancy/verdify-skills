@@ -164,7 +164,7 @@ class SchemaValidatorTest < Minitest::Test
     modes = config["skills"].to_h { |skill| [skill["name"], skill["modes"]] }
 
     assert_equal "config/lifecycle.yaml", config["canonical_source"]
-    assert_equal (1..18).to_a, orders
+    assert_equal (1..names.length).to_a, orders
     assert_equal Verdify::CLI::SKILLS, names
     assert_equal ["issue-triage"], config["standalone_skills"].map { |skill| skill["name"] }
     assert_includes modes["release-verification"], "review-inbox"

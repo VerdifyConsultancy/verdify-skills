@@ -1,0 +1,81 @@
+packet_id: consensus-audit-replace-me
+status: draft
+scope:
+  repository: owner/repo
+  issue_refs: []
+  pull_request_refs: []
+  reviewed_artifacts: []
+  baseline_sha: replace-me
+  head_sha: replace-me
+  affected_skills: []
+  lifecycle_modes: []
+  schemas: []
+authority_boundary:
+  lane_contract: null
+  protected_paths: []
+  approval_owners: []
+  adr_refs:
+  - docs/decisions/ADR-0016-package-platform-skill-reconciliation.md
+  platform_consensus_refs: []
+evidence:
+- id: NSE-20260623-repo-controller-bootstrap-self-discovery
+  reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
+  status: registered
+  claims: []
+  quality:
+    authority: 0
+    freshness: 0
+    relevance: 0
+    corroboration: 0
+    uncertainty: 0
+    rationale: Replace with evidence scoring rationale.
+skill_boundaries: []
+consistency_checks:
+- name: validate-repo
+  command: ruby scripts/validate-repo.rb
+  status: not_run
+  observed_at: null
+  evidence: null
+machine_reviewers:
+- reviewer: codex
+  loops: []
+  final_conclusion: pending
+- reviewer: claude
+  loops: []
+  final_conclusion: pending
+human_votes:
+- voter: product
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+- voter: manager
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+- voter: finance
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+- voter: infrastructure
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+- voter: sre
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+- voter: security
+  authority: stakeholder_lens
+  vote: pending
+  rationale: null
+decisions:
+  accepted_decision: []
+  proposed_change: []
+  conflict: []
+  rejected_suggestion: []
+objections: []
+unresolved_issues: []
+approval:
+  protected_decisions_approved: false
+  human_approval_refs: []
+  machine_review_is_approval: false

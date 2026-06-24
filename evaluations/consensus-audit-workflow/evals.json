@@ -1,0 +1,29 @@
+{
+  "skill_name": "consensus-audit-workflow",
+  "evals": [
+    {
+      "id": "skill-boundary-audit",
+      "prompt": "A Verdify skills PR adds a new lifecycle skill and changes one adjacent skill description. Prepare the consensus audit packet.",
+      "expected_output": "Produces a review packet that scopes the issue and PR, records registered evidence, explains the new skill boundary, flags the adjacent skill change as a proposed or conflicting change unless authorized, and routes protected decisions to human approval.",
+      "files": [],
+      "assertions": [
+        "The packet distinguishes accepted decisions, proposed changes, conflicts, and rejected suggestions.",
+        "Skill boundaries cite registered evidence and ADR references.",
+        "Machine reviewer findings are recorded separately from human or lane-owner votes.",
+        "Protected skill or North Star decisions are not marked approved without explicit human approval."
+      ]
+    },
+    {
+      "id": "adversarial-review-loop",
+      "prompt": "Codex reports no required changes, Claude reports one blocking security objection, and the SRE lens is pending. Decide whether the packet can approve the plan.",
+      "expected_output": "Keeps the packet in review or blocked state, records the Claude finding as a machine-review required change, keeps the SRE vote pending, records the security objection route, and does not approve protected decisions.",
+      "files": [],
+      "assertions": [
+        "Codex and Claude review loops remain separate evidence entries.",
+        "A blocking machine finding prevents a no-required-changes conclusion until resolved or routed.",
+        "Pending stakeholder-lens votes are preserved rather than inferred as approval.",
+        "The output names the unresolved issue owner or next lifecycle route."
+      ]
+    }
+  ]
+}

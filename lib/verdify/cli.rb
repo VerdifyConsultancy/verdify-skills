@@ -21,6 +21,7 @@ module Verdify
       lane-delivery
       independent-critic
       release-verification
+      consensus-audit-workflow
     ].freeze
 
     def self.run(argv)
