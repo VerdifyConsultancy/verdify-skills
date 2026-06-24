@@ -1,0 +1,97 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-controller-state-fields
+status: ready_for_critic
+issue_ids:
+  - 22
+pull_request: 47
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "6a76e096309576caaaaa6558a447d1479ad10273"
+contract_hash: "dd8202e8be31c634ebaa1a64d6d14735782722ffa33cd4a041c8cc8527de0715"
+changed_paths:
+  - "schemas/controller-state.schema.yaml"
+  - "schemas/session-ledger.schema.yaml"
+  - "skills/controller-loop/SKILL.md"
+  - "skills/controller-loop/assets/controller-state.template.yaml"
+  - "skills/controller-loop/assets/session-ledger.template.yaml"
+  - "skills/controller-loop/references/session-ledger.md"
+  - "skills/controller-loop/references/state-machine.md"
+validation_results:
+  - id: validate-controller-state-schema
+    command: "ruby bin/verdify artifact validate --file skills/controller-loop/assets/controller-state.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:24:00Z"
+    artifact: null
+  - id: validate-session-ledger-schema
+    command: "ruby bin/verdify artifact validate --file skills/controller-loop/assets/session-ledger.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:24:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:24:00Z"
+    artifact: null
+  - id: test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: pr-policy-local
+    command: "ruby scripts/pr-policy.rb --body /tmp/pr47-body.md --base 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 --head 6a76e096309576caaaaa6558a447d1479ad10273"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:29:00Z"
+    artifact: null
+  - id: github-checks
+    command: "gh pr checks 47 --repo VerdifyConsultancy/verdify-skills --watch --interval 10 --fail-fast"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:00Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/47"
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-controller-state-fields.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:38Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "schemas/controller-state.schema.yaml sessions[].owner/started_at/heartbeat_expectations/heartbeat_deadline_at/stop_condition/wave_id"
+      - "schemas/session-ledger.schema.yaml sessions[].owner/heartbeat_expectations/heartbeat_deadline_at/stop_condition"
+      - "skills/controller-loop/assets/controller-state.template.yaml"
+      - "skills/controller-loop/assets/session-ledger.template.yaml"
+      - "validate-controller-state-schema"
+      - "validate-session-ledger-schema"
+      - "validate-repo"
+      - "test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md#decision"
+      - "schemas/controller-state.schema.yaml current_wave/waves"
+      - "skills/controller-loop/SKILL.md canonical artifacts and procedure step 4"
+      - "skills/controller-loop/references/state-machine.md wave-supervision persistence"
+      - "validate-controller-state-schema"
+      - "validate-repo"
+      - "github-checks"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "config/lifecycle.yaml remains unchanged because it is coordination-required read-only context for this lane."
+  - "Controller-state schema now requires top-level waves; downstream controller-state artifacts must include waves, even when empty."
+worktree_clean: true
+worker_session_id: "codex-20260624-ctrlstate"
+completed_at: "2026-06-24T17:30:38Z"
+limitations:
+  - "The compiled lane contract lists baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after merged dependency ADRs, and this closeout uses the active lease baseline."
+  - "config/lifecycle.yaml was treated as read-only coordination context; wave-supervision remains valid through the owned controller-state schema and controller-loop skill contract."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request body records the current branch head after closeout is pushed."
