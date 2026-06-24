@@ -42,12 +42,22 @@ properties:
   deployment:
     type: object
     additionalProperties: false
-    required: [environment, deployment_id, deployed_at, observed_revision]
+    required: [environment, deployment_id, deployed_at, observed_revision, deployer, approval]
     properties:
       environment: {type: string, minLength: 1}
       deployment_id: {type: [string, integer, 'null']}
       deployed_at: {type: [string, 'null']}
       observed_revision: {type: [string, 'null']}
+      deployer: {type: [string, 'null']}
+      approval:
+        type: object
+        additionalProperties: false
+        required: [required, approved_by, approved_at, evidence]
+        properties:
+          required: {type: boolean}
+          approved_by: {type: [string, 'null']}
+          approved_at: {type: [string, 'null']}
+          evidence: {type: [string, 'null']}
   runtime_checks:
     type: array
     items:

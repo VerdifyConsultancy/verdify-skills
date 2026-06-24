@@ -33,6 +33,8 @@ Read `references/worker-procedure.md` before implementation.
 - Modify only owned paths/interfaces unless a recorded coordination rule permits otherwise.
 - Preserve public/module contracts.
 - Use the lease's isolated database, container, cache, port, and namespace values.
+- Start workers with the approved allowlisted environment only; worker lanes do
+  not inherit production credentials and must not request them.
 - Run validation incrementally.
 - Keep commits coherent and attributable.
 - Create or update one PR linked to the issue and lane contract.

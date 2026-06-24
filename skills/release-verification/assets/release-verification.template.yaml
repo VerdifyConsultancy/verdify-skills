@@ -14,6 +14,12 @@ deployment:
   deployment_id: null
   deployed_at: null
   observed_revision: null
+  deployer: null
+  approval:
+    required: true
+    approved_by: null
+    approved_at: null
+    evidence: null
 runtime_checks: []
 migrations: []
 rollback:

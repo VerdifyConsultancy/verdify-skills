@@ -13,7 +13,7 @@ options = {
   output: nil,
   controller_session_id: nil,
   controller_owner: "sprint-orchestrator",
-  mcp_server: "agents.vallery.net",
+  mcp_server: "in-pod-controller-mcp",
   api_ref: nil,
   executor: "agent-platform-worker",
   model: nil,
@@ -66,6 +66,25 @@ def repo_path(root, artifact_path)
   root.join(value)
 end
 
+def lane_completed?(lane)
+  lane["dependency_state"] == "complete" ||
+    lane["status"] == "complete" ||
+    lane.dig("platform_session", "status") == "complete"
+end
+
+def dependency_state_for(lane_id, dependency_order, completed_lane_ids)
+  return "ready" if dependency_order.empty?
+  return "complete" if completed_lane_ids.include?(lane_id)
+
+  wave_index = dependency_order.index { |wave| wave.include?(lane_id) }
+  return "ready" if wave_index.nil?
+
+  first_open_wave = dependency_order.index { |wave| (wave - completed_lane_ids).any? }
+  return "complete" if first_open_wave.nil?
+
+  wave_index == first_open_wave ? "ready" : "waiting"
+end
+
 plan = load_yaml(plan_path)
 abort "sprint plan is not a SprintPlan" unless plan["kind"] == "SprintPlan"
 
@@ -73,25 +92,31 @@ controller_session = options[:controller_session_id] || "controller-#{options[:s
 runbook_id = "exec-#{options[:sprint]}"
 output_path = options[:output] ? Pathname.new(options[:output]).expand_path : sprint_dir.join("execution/sprint-execution-runbook.yaml")
 output_path.dirname.mkpath
+existing_runbook = output_path.file? ? load_yaml(output_path) : nil
+existing_lanes = existing_runbook.is_a?(Hash) ? Array(existing_runbook["lanes"]) : []
+completed_lane_ids = existing_lanes.select { |lane| lane_completed?(lane) }.map { |lane| lane["lane_id"].to_s }
+dependency_order = Array(plan["dependency_order"]).map { |wave| Array(wave).map(&:to_s) }.reject(&:empty?)
+api_ref = options[:api_ref] || "POST /api/repos/<owner>/<repo>/agents"
 
 lane_records = Array(plan["lanes"]).map do |lane|
   contract_path = repo_path(repo, lane["contract_path"])
   contract_hash = contract_path.file? ? Digest::SHA256.file(contract_path).hexdigest : nil
   prompt_base = sprint_dir.join("prompts", "#{lane['lane_id']}.worker")
+  dependency_state = dependency_state_for(lane["lane_id"].to_s, dependency_order, completed_lane_ids)
   {
     "lane_id" => lane["lane_id"],
     "issue_ids" => Array(lane["issue_ids"]),
     "contract_path" => lane["contract_path"],
     "branch" => lane["branch"],
     "owner" => lane["owner"] || "worker",
-    "dependency_state" => "ready",
+    "dependency_state" => dependency_state,
     "platform_session" => {
-      "create_operation_ref" => ".agent-workflow/sprints/#{options[:sprint]}/execution/control-requests/#{lane['lane_id']}-session-create.yaml",
+      "create_operation_ref" => ".agent-workflow/sprints/#{options[:sprint]}/execution/control-requests/#{lane['lane_id']}-add-worktree-agent.yaml",
       "session_id" => nil,
       "executor" => options[:executor],
       "model" => options[:model],
       "effort" => options[:effort],
-      "status" => "planned"
+      "status" => dependency_state == "complete" ? "complete" : "planned"
     },
     "prompt" => {
       "prompt_path" => rel("#{prompt_base}.md", repo),
@@ -101,9 +126,9 @@ lane_records = Array(plan["lanes"]).map do |lane|
     "terminal" => {
       "tmux_session" => nil,
       "browser_terminal_url" => nil,
-      "operator_attach_required" => true
+      "operator_attach_required" => false
     },
-    "status" => "planned"
+    "status" => dependency_state == "complete" ? "complete" : "planned"
   }
 end
 
@@ -126,8 +151,8 @@ runbook = {
   "controller" => {
     "session_id" => controller_session,
     "owner" => options[:controller_owner],
-    "authority" => "Coordinate lane sessions, answer delegated lane questions, reconcile CI/CD, and stop at protected gates.",
-    "interfaces" => %w[agent_platform_mcp tmux_terminal browser_terminal github ci gitops telemetry],
+    "authority" => "Coordinate Agent Platform worktree-agent dispatch, answer delegated lane questions, reconcile CI/CD, and stop at protected gates.",
+    "interfaces" => %w[agent_platform_mcp github ci gitops telemetry],
     "poll_interval_minutes" => options[:poll_minutes],
     "delegation_policy" => "Full delegated authority inside approved lane contracts; protected decisions remain gated."
   },
@@ -140,20 +165,17 @@ runbook = {
   },
   "platform" => {
     "mcp_server" => options[:mcp_server],
-    "api_ref" => options[:api_ref],
+    "api_ref" => api_ref,
     "auth_mode" => "mcp_session",
     "required_tools" => [
-      { "name" => "agent_platform.session.create", "purpose" => "Create one lane worker session per approved lane.", "required" => true },
-      { "name" => "agent_platform.session.poll", "purpose" => "Read lane status, questions, closeout, and coordination requests.", "required" => true },
-      { "name" => "agent_platform.terminal.attach", "purpose" => "Attach operator-visible tmux or browser terminal views.", "required" => true },
-      { "name" => "agent_platform.session.send", "purpose" => "Answer worker questions and coordination requests.", "required" => true }
+      { "name" => "add_worktree_agent", "purpose" => "Dispatch one approved lane worker through the in-pod Agent Platform controller MCP surface.", "required" => true }
     ],
     "terminal_access" => {
-      "mode" => "both",
-      "operator_visible" => true,
+      "mode" => "none",
+      "operator_visible" => false,
       "attach_refs" => []
     },
-    "fallback_policy" => "If Agent Platform MCP is unavailable, stop and route to platform-readiness or a gate instead of launching local workers ad hoc."
+    "fallback_policy" => "If add_worktree_agent is unavailable, stop and route to platform-readiness or a gate instead of launching local workers ad hoc."
   },
   "cadence" => {
     "poll_interval_minutes" => options[:poll_minutes],
@@ -169,14 +191,14 @@ runbook = {
   "coordination" => {
     "poll_steps" => [
       "Refresh GitHub, lease, session, PR, check, and deployment state.",
-      "Poll each Agent Platform lane session through MCP.",
-      "Capture questions, blockers, closeout, and coordination requests.",
+      "Observe lane progress through GitHub, PR checks, leases, closeout artifacts, and recorded Agent Platform result refs.",
+      "Capture questions, blockers, closeout, and coordination requests from durable lane evidence.",
       "Answer delegated questions or open gates for protected decisions.",
       "Record controller and session-ledger events, then update sprint status."
     ],
     "controller_responses" => [
       "Answer contract-scoped worker questions.",
-      "Dispatch only dependency-ready lanes with no active worker session.",
+      "Dispatch only dependency-ready lanes with no active worker lease or recorded worktree-agent result.",
       "Route scope changes to sprint-planning or architecture-contracts.",
       "Route closeout to independent-critic and approved lanes to review-inbox."
     ],
@@ -209,7 +231,7 @@ runbook = {
     "required_events" => %w[lane_dispatched prompt_compiled worker_status worker_closeout critic_reviewed review_packet_created ci_observed deployment_observed]
   },
   "stop_conditions" => [
-    "Platform MCP operation identity is missing or unavailable.",
+    "Agent Platform add_worktree_agent operation identity is missing or unavailable.",
     "A lane session, issue, branch, PR, lease, or contract identity conflicts.",
     "A worker asks for protected production, schema, security, migration, or destructive authority.",
     "Required CI/CD, review, deployment, telemetry, or rollback evidence cannot be obtained."
@@ -217,7 +239,7 @@ runbook = {
   "handoff" => {
     "next_skill" => "sprint-orchestrator",
     "next_mode" => "platform-dispatch",
-    "reason" => "Dispatch dependency-ready lane sessions through Agent Platform MCP and supervise execution."
+    "reason" => "Dispatch dependency-ready lane workers through add_worktree_agent and supervise execution from GitHub and durable evidence."
   }
 }
 
