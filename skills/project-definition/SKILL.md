@@ -5,7 +5,6 @@ compatibility: Requires access to supplied project sources and permission to wri
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "2"
 ---
 
 # Project Definition

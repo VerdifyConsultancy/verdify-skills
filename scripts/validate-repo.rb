@@ -27,6 +27,13 @@ REQUIRED_SKILLS = %w[
   sprint-orchestrator controller-loop platform-readiness gravity-readiness lane-delivery
   independent-critic release-verification issue-triage
 ].freeze
+STANDALONE_SKILLS = %w[issue-triage].freeze
+STANDARD_LIFECYCLE_STATES = %w[
+  NOT_STARTED ORIENTING DEFINING ARCHITECTING PLANNING AWAITING_APPROVAL READY IMPLEMENTING
+  VALIDATING BLOCKED DECISION_REQUIRED READY_FOR_CRITIC CHANGES_REQUESTED READY_FOR_INTEGRATION
+  INTEGRATING READY_FOR_DEPLOYMENT DEPLOYING VERIFYING_DEPLOYMENT AWAITING_OUTCOME_ACCEPTANCE
+  COMPLETE FAILED CANCELLED
+].freeze
 REQUIRED_PR_SECTIONS = [
   "Backlog issue", "Lane contract", "Outcome", "Scope proof", "Evidence", "Risk and deployment impact"
 ].freeze
@@ -44,9 +51,11 @@ class RepoValidator
     validate_required_files
     validate_parseable_files
     validate_schemas
+    validate_lifecycle_config
     validate_skills
     validate_host_links
     validate_workflow
+    validate_cli_lifecycle_alignment
     validate_github_templates
     validate_evaluations
     validate_scripts
@@ -83,6 +92,40 @@ class RepoValidator
   rescue JSON::ParserError => e
     error(path, "JSON parse failed: #{e.message}")
     nil
+  end
+
+  def lifecycle_config
+    @lifecycle_config ||= begin
+      config = load_yaml(ROOT.join("config/lifecycle.yaml"))
+      config.is_a?(Hash) ? config : {}
+    end
+  end
+
+  def canonical_lifecycle_skills
+    @canonical_lifecycle_skills ||= Array(lifecycle_config["skills"]).map { |entry| entry["name"].to_s }
+  end
+
+  def standalone_skill_names
+    @standalone_skill_names ||= Array(lifecycle_config["standalone_skills"]).map { |entry| entry["name"].to_s }
+  end
+
+  def lifecycle_modes
+    @lifecycle_modes ||= Array(lifecycle_config["skills"]).each_with_object({}) do |entry, modes|
+      modes[entry["name"].to_s] = Array(entry["modes"]).map(&:to_s)
+    end
+  end
+
+  def validate_mode_membership(path, skill, mode, context)
+    skill = skill.to_s
+    mode = mode.to_s
+    modes = lifecycle_modes[skill]
+    if modes.nil?
+      error(path, "#{context} references non-lifecycle skill #{skill}")
+    elsif mode.empty?
+      error(path, "#{context} has no mode")
+    elsif !modes.include?(mode)
+      error(path, "#{context} mode #{mode.inspect} is not declared for #{skill} in config/lifecycle.yaml")
+    end
   end
 
   def validate_required_files
@@ -129,6 +172,50 @@ class RepoValidator
     end
   end
 
+  def validate_lifecycle_config
+    path = ROOT.join("config/lifecycle.yaml")
+    config = lifecycle_config
+    return if config.empty?
+
+    unless config["canonical_source"] == "config/lifecycle.yaml"
+      error(path, "canonical_source must name config/lifecycle.yaml")
+    end
+
+    unless Array(config["standard_states"]) == STANDARD_LIFECYCLE_STATES
+      error(path, "standard_states must match COMMON_OPERATING_CONTRACT.md lifecycle states")
+    end
+
+    skills = Array(config["skills"])
+    names = skills.map { |entry| entry["name"].to_s }
+    lifecycle_required = REQUIRED_SKILLS - STANDALONE_SKILLS
+    missing = lifecycle_required - names
+    extra = names - lifecycle_required
+    error(path, "skills missing lifecycle skills: #{missing.join(', ')}") unless missing.empty?
+    error(path, "skills contains non-lifecycle skills: #{extra.join(', ')}") unless extra.empty?
+    error(path, "skills must not contain duplicates") unless names.uniq.length == names.length
+
+    orders = skills.map { |entry| entry["order"] }
+    unless orders == (1..skills.length).to_a
+      error(path, "skills order must be contiguous 1..#{skills.length} in canonical lifecycle order")
+    end
+    skills.each do |entry|
+      modes = Array(entry["modes"]).map(&:to_s)
+      error(path, "#{entry['name']} must declare at least one mode") if modes.empty?
+      error(path, "#{entry['name']} modes must be unique") unless modes.uniq.length == modes.length
+    end
+
+    expected_cycle = names + ["project-router"]
+    error(path, "default_cycle must follow canonical skill order and return to project-router") unless Array(config["default_cycle"]) == expected_cycle
+
+    standalone = Array(config["standalone_skills"])
+    standalone_names = standalone.map { |entry| entry["name"].to_s }
+    error(path, "standalone_skills must be exactly: #{STANDALONE_SKILLS.join(', ')}") unless standalone_names == STANDALONE_SKILLS
+    standalone.each do |entry|
+      error(path, "#{entry['name']} standalone entry must have category standalone") unless entry["category"] == "standalone"
+      error(path, "#{entry['name']} standalone entry must not declare lifecycle order") if entry.key?("order")
+    end
+  end
+
   def parse_frontmatter(path)
     content = File.binread(path).force_encoding(Encoding::UTF_8)
     unless content.valid_encoding?
@@ -160,6 +247,7 @@ class RepoValidator
       frontmatter, content = parse_frontmatter(skill)
       fm_name = frontmatter["name"].to_s
       description = frontmatter["description"].to_s
+      lifecycle_order = frontmatter.dig("metadata", "lifecycle-order")
       error(skill, "name must match directory") unless fm_name == name
       error(skill, "invalid skill name") unless fm_name.match?(SKILL_NAME_PATTERN) && !fm_name.include?("--") && fm_name.length <= 64
       error(skill, "description is required") if description.empty?
@@ -167,6 +255,13 @@ class RepoValidator
       error(skill, "description should state when the skill applies") unless description.match?(/\bUse\b/i)
       error(skill, "SKILL.md exceeds the progressive-disclosure limit of 500 lines") if content.lines.length > 500
       error(skill, "metadata.version must match VERSION") unless frontmatter.dig("metadata", "version").to_s == Verdify::VERSION
+      error(skill, "metadata.lifecycle-order must be omitted; config/lifecycle.yaml is canonical") unless lifecycle_order.nil?
+      if STANDALONE_SKILLS.include?(name)
+        error(skill, "standalone skill must declare metadata.category: standalone") unless frontmatter.dig("metadata", "category") == "standalone"
+      else
+        error(skill, "lifecycle skill must not declare standalone category") if frontmatter.dig("metadata", "category") == "standalone"
+        error(skill, "lifecycle skill missing from config/lifecycle.yaml") unless canonical_lifecycle_skills.include?(name)
+      end
       error(skill, "missing agents/openai.yaml") unless dir.join("agents/openai.yaml").file?
       error(skill, "skill should have at least one reference") if Dir[dir.join("references/*")].empty?
 
@@ -355,6 +450,9 @@ class RepoValidator
     workflow = load_yaml(path)
     return unless workflow.is_a?(Hash)
 
+    error(path, "canonical_lifecycle_source must be config/lifecycle.yaml") unless workflow["canonical_lifecycle_source"] == "config/lifecycle.yaml"
+    error(path, "outline_stage_model must be legacy_17_stage_compatibility") unless workflow["outline_stage_model"] == "legacy_17_stage_compatibility"
+
     stages = workflow["outline_stages"]
     unless stages.is_a?(Array) && stages.length == 17
       error(path, "outline_stages must contain exactly 17 original lifecycle stages")
@@ -363,8 +461,8 @@ class RepoValidator
     ids = stages.map { |stage| stage["id"] }
     error(path, "outline stage IDs must be 1..17") unless ids == (1..17).to_a
     stages.each do |stage|
-      error(path, "stage #{stage['id']} references unknown skill #{stage['skill']}") unless REQUIRED_SKILLS.include?(stage["skill"])
-      error(path, "stage #{stage['id']} has no mode") if stage["mode"].to_s.empty?
+      error(path, "stage #{stage['id']} references unknown lifecycle skill #{stage['skill']}") unless canonical_lifecycle_skills.include?(stage["skill"])
+      validate_mode_membership(path, stage["skill"], stage["mode"], "outline stage #{stage['id']}")
     end
 
     machine = workflow["state_machine"]
@@ -377,7 +475,10 @@ class RepoValidator
     error(path, "initial state does not exist") unless states.key?(initial)
     states.each do |name, node|
       next unless node.is_a?(Hash)
-      error(path, "state #{name} references unknown skill") if node["skill"] && !REQUIRED_SKILLS.include?(node["skill"])
+      if node["skill"]
+        error(path, "state #{name} references unknown lifecycle skill") unless canonical_lifecycle_skills.include?(node["skill"])
+        validate_mode_membership(path, node["skill"], node["mode"], "state #{name}")
+      end
       Array(node["transitions"]).each do |target|
         error(path, "state #{name} transitions to unknown state #{target}") unless states.key?(target)
       end
@@ -394,6 +495,26 @@ class RepoValidator
       end
     else
       error(path, "lane_child_workflow.states is required")
+    end
+  end
+
+  def validate_cli_lifecycle_alignment
+    path = ROOT.join("lib/verdify/cli.rb")
+    unless Verdify::CLI::SKILLS == canonical_lifecycle_skills
+      error(path, "Verdify::CLI::SKILLS must match config/lifecycle.yaml skills order")
+    end
+
+    content = path.read
+    content.scan(/route_hash\(\s*repo,\s*"[^"]+",\s*"([^"]+)",\s*"([^"]+)"/m).each do |skill, mode|
+      validate_mode_membership(path, skill, mode, "route_hash")
+    end
+
+    workflow = load_yaml(ROOT.join("verdify.workflow.yaml"))
+    return unless workflow.is_a?(Hash)
+
+    Array(workflow["gate_types"]).each do |type|
+      skill, mode = Verdify::CLI.new([]).send(:route_for_gate, type)
+      validate_mode_membership(path, skill, mode, "route_for_gate #{type}")
     end
   end
 

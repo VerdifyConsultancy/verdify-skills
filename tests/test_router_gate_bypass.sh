@@ -38,7 +38,7 @@ ruby -rjson -e '
   route = JSON.parse(File.read(ARGV[0]))
   abort "expected PROJECT_DEFINITION_GATE, got #{route["current_state"]}" unless route["current_state"] == "PROJECT_DEFINITION_GATE"
   abort "expected project-definition, got #{route["next_skill"]}" unless route["next_skill"] == "project-definition"
-  abort "expected gate-resolution, got #{route["next_mode"]}" unless route["next_mode"] == "gate-resolution"
+  abort "expected design-surface, got #{route["next_mode"]}" unless route["next_mode"] == "design-surface"
   abort "must not advance to architecture-contracts" if route["next_skill"] == "architecture-contracts"
 ' "$TMP/self-cert-route.json"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/router/route-decision.yaml" >/dev/null

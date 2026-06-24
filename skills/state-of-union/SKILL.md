@@ -5,7 +5,6 @@ compatibility: Requires repository read access and GitHub issue access or a curr
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "4"
 ---
 
 # State Of Union

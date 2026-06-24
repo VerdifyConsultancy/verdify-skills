@@ -1122,7 +1122,7 @@ module Verdify
       unless project.dig("approval", "status") == "approved" || approved_gate?(project_gate_path, "project_definition")
         missing << project_gate_path.relative_path_from(repo.root).to_s
         evidence << { "source" => project_path.relative_path_from(repo.root).to_s, "finding" => "approval.status is #{project.dig('approval', 'status').inspect}" }
-        return route_hash(repo, "PROJECT_DEFINITION_GATE", "project-definition", "gate-resolution", "Project-definition stages are approved, but human approval is not recorded.", evidence, missing, open_gates)
+        return route_hash(repo, "PROJECT_DEFINITION_GATE", "project-definition", "design-surface", "Project-definition stages are approved, but human approval is not recorded.", evidence, missing, open_gates)
       end
 
       architecture_path = root.join("architecture/architecture.yaml")
@@ -1177,7 +1177,7 @@ module Verdify
         closeout_path = plan_path.dirname.join("lanes/closeout/#{lane_id}.closeout.yaml")
         unless closeout_path.file?
           missing << closeout_path.relative_path_from(repo.root).to_s
-          return route_hash(repo, "LANES_REQUIRE_ORCHESTRATION", "sprint-orchestrator", "dispatch-or-monitor", "At least one approved lane has no worker closeout.", evidence, missing, open_gates)
+          return route_hash(repo, "LANES_REQUIRE_ORCHESTRATION", "sprint-orchestrator", "platform-dispatch", "At least one approved lane has no worker closeout.", evidence, missing, open_gates)
         end
         critic_path = plan_path.dirname.join("critic/#{lane_id}.critic.yaml")
         unless critic_path.file?
@@ -1387,6 +1387,8 @@ module Verdify
     end
 
     def route_hash(repo, state, skill, mode, reason, evidence, missing, open_gates)
+      ensure_declared_lifecycle_mode!(skill, mode)
+
       {
         "schema_ref" => "route-decision.schema.yaml",
         "kind" => "RouteDecision",
@@ -1403,17 +1405,33 @@ module Verdify
       }
     end
 
+    def ensure_declared_lifecycle_mode!(skill, mode)
+      modes = lifecycle_modes[skill.to_s]
+      return if modes&.include?(mode.to_s)
+
+      raise UsageError, "route next_mode #{mode.inspect} is not declared for #{skill} in config/lifecycle.yaml"
+    end
+
+    def lifecycle_modes
+      @lifecycle_modes ||= begin
+        config = Verdify.safe_load_yaml(Verdify::ROOT.join("config/lifecycle.yaml"))
+        Array(config["skills"]).to_h { |entry| [entry["name"].to_s, Array(entry["modes"]).map(&:to_s)] }
+      end
+    end
+
     def route_for_gate(type)
       case type
-      when "project_definition" then ["project-definition", "gate-resolution"]
+      when "project_definition" then ["project-definition", "design-surface"]
       when "northstar" then ["northstar-planning", "human-review"]
-      when "architecture" then ["architecture-contracts", "gate-resolution"]
+      when "architecture" then ["architecture-contracts", "north-star-architecture"]
       when "strategy" then ["state-of-union", "gate-resolution"]
-      when "repo_hygiene" then ["repo-hygiene", "gate-resolution"]
-      when "platform_readiness" then ["platform-readiness", "gate-resolution"]
-      when "gravity_readiness" then ["gravity-readiness", "gate-resolution"]
+      when "repo_hygiene" then ["repo-hygiene", "compliance-gate"]
+      when "platform_readiness" then ["platform-readiness", "readiness-gate"]
+      when "gravity_readiness" then ["gravity-readiness", "readiness-checklist"]
       when "plan_approval" then ["sprint-planning", "plan-approval"]
-      when "deployment_approval", "incident", "outcome_acceptance" then ["release-verification", "gate-resolution"]
+      when "deployment_approval" then ["release-verification", "deployment-verification"]
+      when "incident" then ["release-verification", "observability-diagnostics"]
+      when "outcome_acceptance" then ["release-verification", "outcome-review"]
       else ["sprint-orchestrator", "gate-management"]
       end
     end

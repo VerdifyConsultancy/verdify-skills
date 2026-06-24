@@ -4,6 +4,8 @@ Verdify is an end-to-end, GitHub-native operating system for moving software wor
 
 The repository is deliberately not one giant sprint prompt. Lifecycle skills own bounded responsibilities, consume durable artifacts, produce durable artifacts, and hand off without relying on hidden chat history. Standalone skills support adjacent GitHub-native work without entering the lifecycle graph.
 
+`config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, ordering, and standalone skill treatment. `verdify.workflow.yaml`, router behavior, docs, and SKILL.md frontmatter are derived views that must validate against that config.
+
 ## Lifecycle
 
 ```text
@@ -40,7 +42,7 @@ project-router
   -> project-router
 ```
 
-The 17 detailed delivery stages from the original outline remain represented in `verdify.workflow.yaml`; readiness and controller-loop skills add the gates needed to turn transcript-driven planning into safe autonomous execution.
+The 17 detailed delivery stages from the original outline remain represented in `verdify.workflow.yaml` as a legacy compatibility outline with canonical skill/mode pairs; readiness and controller-loop skills add the gates needed to turn transcript-driven planning into safe autonomous execution.
 
 ## Non-negotiable operating model
 

@@ -5,7 +5,6 @@ compatibility: Requires an approved project definition and repository access. Ma
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "3"
 ---
 
 # Architecture and Module Contracts

@@ -5,7 +5,6 @@ compatibility: Requires a target repository initialized with Verdify or permissi
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "2a"
 ---
 
 # North Star Research Ingest

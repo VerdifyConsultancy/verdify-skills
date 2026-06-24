@@ -5,7 +5,6 @@ compatibility: Requires read access to the repository, pull request, checks, con
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "8"
 ---
 
 # Independent Critic

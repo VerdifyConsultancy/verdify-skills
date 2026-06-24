@@ -5,7 +5,6 @@ compatibility: Requires Git, an active Verdify worker lease, repository build to
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "7"
 ---
 
 # Lane Delivery
