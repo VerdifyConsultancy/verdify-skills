@@ -3,58 +3,46 @@ kind: LaneCloseout
 schema_version: "1.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-eval-strategy
-status: decision_required
+status: ready_for_critic
 issue_ids:
   - 25
 pull_request: 39
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "7cb46b1d32d3985f2d5668935d0caa718334dcfd"
+head_sha: "e73709e46c1a489a22d3e26f4b0b6cd192bcfb40"
 contract_hash: "e343816f3dbf42ce90ec7c1c5c6cc00d920c827f1df19f53262073e0c98ff8bb"
 changed_paths:
   - "docs/decisions/ADR-0015-eval-runner-strategy.md"
   - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-eval-strategy.closeout.yaml"
 validation_results:
-  - id: adr-exists-contract-pattern
-    command: "ls docs/decisions/ADR-0011-*.md"
-    exit_status: 1
-    result: failed
-    executed_at: "2026-06-24T16:44:00Z"
-    artifact: null
-  - id: adr-references-issue-contract-pattern
-    command: "grep -l '#25' docs/decisions/ADR-0011-*.md"
-    exit_status: 1
-    result: failed
-    executed_at: "2026-06-24T16:44:00Z"
-    artifact: null
   - id: adr-exists-owned-path
     command: "ls docs/decisions/ADR-0015-eval-runner-strategy.md"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T16:44:00Z"
+    executed_at: "2026-06-24T16:56:13Z"
     artifact: null
   - id: adr-references-issue-owned-path
     command: "grep -l '#25' docs/decisions/ADR-0015-eval-runner-strategy.md"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T16:44:00Z"
+    executed_at: "2026-06-24T16:56:13Z"
     artifact: null
   - id: repo-validate
     command: "ruby scripts/validate-repo.rb"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T16:48:00Z"
+    executed_at: "2026-06-24T16:57:14Z"
     artifact: null
   - id: make-test
     command: "make test"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T16:48:00Z"
+    executed_at: "2026-06-24T16:57:14Z"
     artifact: null
   - id: closeout-validate
     command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-eval-strategy.closeout.yaml"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T16:48:00Z"
+    executed_at: "2026-06-24T16:57:14Z"
     artifact: null
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -65,7 +53,7 @@ acceptance_evidence:
       - "repo-validate"
       - "make-test"
       - "closeout-validate"
-    assessment: uncertain
+    assessment: satisfied
   - criterion_id: LANE-AC-02
     evidence_ids:
       - "docs/decisions/ADR-0015-eval-runner-strategy.md"
@@ -75,12 +63,10 @@ acceptance_evidence:
 discovered_issues: []
 residual_risks:
   - "Fresh critic approval is required before integration."
-  - "Human/orchestrator decision is required before READY_FOR_CRITIC because the approved owned path and the required ADR-0011 validation commands disagree."
-  - "The lane contract's acceptance commands use docs/decisions/ADR-0011-*.md, but the owned path is docs/decisions/ADR-0015-eval-runner-strategy.md and ADR-0011 is owned by another decision lane."
 worktree_clean: true
 worker_session_id: "codex-20260624-evalstrategy"
-completed_at: "2026-06-24T16:47:02Z"
+completed_at: "2026-06-24T16:56:13Z"
 limitations:
-  - "The implementation head SHA is the ADR commit before the closeout metadata commit; the pull request body records the current branch head after closeout is pushed."
-  - "The contract-pattern ADR checks were run and failed because creating ADR-0011 would violate this lane's owned path and collide with another lane."
+  - "The recorded head SHA is the branch head before this final closeout metadata update; the pull request body records the current branch head after closeout is pushed."
+  - "Controller resolution on 2026-06-24 states ADR-0015 is authoritative and ADR-0011 references in the contract body/validation are renumbering typos; no ADR-0011 file was created."
   - "The local .verdify dispatch metadata exists but is ignored by the git common-dir exclude and is intentionally not committed."
