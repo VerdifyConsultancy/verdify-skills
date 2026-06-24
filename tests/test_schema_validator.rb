@@ -4,6 +4,12 @@
 require "minitest/autorun"
 require_relative "../lib/verdify"
 
+Dir[File.join(__dir__, "test_*.rb")].sort.each do |path|
+  next if File.expand_path(path) == File.expand_path(__FILE__)
+
+  require path
+end
+
 class SchemaValidatorTest < Minitest::Test
   def validator
     Verdify::SchemaValidator.new

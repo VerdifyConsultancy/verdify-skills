@@ -1,0 +1,87 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-schema-contradictions
+status: ready_for_critic
+issue_ids:
+  - 28
+pull_request: 51
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "86bf11340edcc8e8aee3bf6a5fb4a0227ec70b4a"
+contract_hash: "8ef4fba9ee7d5209b037fb8cc7b8d0ad0c4c083a4a352d3f931b09b58e0cbcce"
+changed_paths:
+  - "schemas/critic-report.schema.yaml"
+  - "schemas/transcript-replan.schema.yaml"
+  - "skills/independent-critic/assets/critic-report.template.yaml"
+  - "skills/northstar-planning/references/planning-contract.md"
+  - "skills/project-definition/SKILL.md"
+  - "skills/transcript-replan/references/routing-contract.md"
+  - "tests/test_lane_schema_contradictions.rb"
+  - "tests/test_schema_validator.rb"
+validation_results:
+  - id: lane-regression-tests
+    command: "ruby tests/test_lane_schema_contradictions.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:29:00Z"
+    artifact: null
+  - id: critic-template-validates
+    command: "ruby bin/verdify artifact validate --file skills/independent-critic/assets/critic-report.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:31:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:31:00Z"
+    artifact: null
+  - id: tests
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:31:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-schema-contradictions.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:34:35Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "schemas/critic-report.schema.yaml"
+      - "schemas/transcript-replan.schema.yaml"
+      - "skills/independent-critic/assets/critic-report.template.yaml"
+      - "skills/northstar-planning/references/planning-contract.md"
+      - "skills/project-definition/SKILL.md"
+      - "skills/transcript-replan/references/routing-contract.md"
+      - "lane-regression-tests"
+      - "critic-template-validates"
+      - "validate-repo"
+      - "tests"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "tests/test_lane_schema_contradictions.rb"
+      - "tests/test_schema_validator.rb"
+      - "lane-regression-tests"
+      - "validate-repo"
+      - "tests"
+      - "closeout-validate"
+      - "coordination-validator-engine"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic approval is still required before integration."
+  - "The scripts/validate-repo.rb drift-check implementation belongs to lane-validator-engine and was not edited in this lane."
+worktree_clean: true
+worker_session_id: "codex-20260624-schemacontra"
+completed_at: "2026-06-24T17:33:56Z"
+limitations:
+  - "Controller authorization required scripts/validate-repo.rb acceptance to be recorded as satisfied-by-coordination for lane-validator-engine, not implemented by this lane."
+  - "The closeout head_sha records the implementation commit before the closeout-only metadata commit; PR #51 records the current branch head after closeout is pushed."
