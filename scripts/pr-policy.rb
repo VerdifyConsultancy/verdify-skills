@@ -7,7 +7,7 @@ require "pathname"
 require "yaml"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
-options = { event: ENV["GITHUB_EVENT_PATH"], body: nil, base: nil, head: nil }
+options = { event: nil, body: nil, base: nil, head: nil }
 OptionParser.new do |o|
   o.banner = "Usage: ruby scripts/pr-policy.rb --event EVENT.json | --body FILE [--base SHA --head SHA]"
   o.on("--event PATH") { |v| options[:event] = v }
@@ -16,20 +16,21 @@ OptionParser.new do |o|
   o.on("--head SHA") { |v| options[:head] = v }
   o.on("-h", "--help") { puts o; exit 0 }
 end.parse!
+options[:event] ||= ENV["GITHUB_EVENT_PATH"] if options[:body].nil?
 
 errors = []
 body = ""
 base_sha = options[:base]
 head_sha = options[:head]
 
-if options[:event]
+if options[:body]
+  body = File.read(options[:body])
+elsif options[:event]
   payload = JSON.parse(File.read(options[:event]))
   pr = payload.fetch("pull_request")
   body = pr["body"].to_s
   base_sha ||= pr.dig("base", "sha")
   head_sha ||= pr.dig("head", "sha")
-elsif options[:body]
-  body = File.read(options[:body])
 else
   warn "--event or --body is required"
   exit 2

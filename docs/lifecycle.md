@@ -1,6 +1,6 @@
 # Lifecycle and handoffs
 
-Verdify exposes seventeen skills but preserves the detailed lifecycle as explicit modes. A skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied.
+Verdify exposes seventeen lifecycle skills but preserves the detailed lifecycle as explicit modes. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
 
 ## 1. Project router
 

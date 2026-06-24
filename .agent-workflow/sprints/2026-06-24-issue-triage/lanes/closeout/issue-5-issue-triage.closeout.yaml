@@ -1,0 +1,93 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-issue-triage
+lane_id: issue-5-issue-triage
+status: ready_for_critic
+issue_ids:
+  - 5
+pull_request: 6
+baseline_sha: "11470a91318d7c3102a6b5d1b49d8d839e0e26be"
+head_sha: "df1007b5d3ce4a29f7f100c072db090fbb4fccce"
+contract_hash: "cd6c1626e6d71b0e2ef12983318886fe978bcb6bc8ebe0d9f172ac9b0a29b2c8"
+changed_paths:
+  - ".agent-workflow/sprints/2026-06-24-issue-triage/lanes/contracts/issue-5-issue-triage.contract.yaml"
+  - ".agents/skills/issue-triage"
+  - ".claude/skills/issue-triage"
+  - "README.md"
+  - "docs/lifecycle.md"
+  - "docs/research/industry-alignment.md"
+  - "evaluations/issue-triage/evals.json"
+  - "scripts/pr-policy.rb"
+  - "scripts/validate-repo.rb"
+  - "skills/issue-triage/SKILL.md"
+  - "skills/issue-triage/agents/openai.yaml"
+  - "skills/issue-triage/references/issue-record-contract.md"
+  - "tests/test_pr_policy.sh"
+validation_results:
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-issue-triage/lanes/closeout/issue-5-issue-triage.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T04:04:03Z"
+    artifact: null
+  - id: skill-quick-validate
+    command: "python3 /Users/james-vallery/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/issue-triage"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T03:54:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T04:04:03Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T04:04:03Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "skills/issue-triage/SKILL.md"
+      - "skills/issue-triage/agents/openai.yaml"
+      - "skills/issue-triage/references/issue-record-contract.md"
+      - ".agents/skills/issue-triage"
+      - ".claude/skills/issue-triage"
+      - "validate-repo"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "skills/issue-triage/SKILL.md"
+      - "skills/issue-triage/references/issue-record-contract.md"
+      - "evaluations/issue-triage/evals.json"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "skills/issue-triage/SKILL.md"
+      - "evaluations/issue-triage/evals.json"
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids:
+      - "skills/issue-triage/references/issue-record-contract.md"
+      - "evaluations/issue-triage/evals.json"
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids:
+      - "closeout-validate"
+      - "make-test"
+      - "validate-repo"
+      - "scripts/pr-policy.rb"
+      - "tests/test_pr_policy.sh"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic or reviewer approval is still required before integration."
+worktree_clean: true
+worker_session_id: "codex-20260624-issue-5"
+completed_at: "2026-06-24T04:04:03Z"
+limitations:
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request body records the current branch head after closeout is pushed."
