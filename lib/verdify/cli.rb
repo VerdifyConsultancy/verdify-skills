@@ -24,6 +24,19 @@ module Verdify
       release-verification
       consensus-audit-workflow
     ].freeze
+    SECRET_SCAN_LINE_PATTERNS = [
+      ["private key block", /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----/],
+      ["AWS access key ID", /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/],
+      ["Google API key", /\bAIza[0-9A-Za-z_-]{35}\b/],
+      ["GitHub token", /\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36,}\b/],
+      ["GitHub fine-grained token", /\bgithub_pat_[A-Za-z0-9_]{20,}_[A-Za-z0-9_]{20,}\b/],
+      ["OpenAI API key", /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/],
+      ["Slack token", /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/],
+      ["JWT bearer token", /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/],
+      ["US Social Security number", /\b(?!000|666|9\d\d)\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b/]
+    ].freeze
+    SECRET_ASSIGNMENT_PATTERN = /\b(?:api[_-]?key|access[_-]?key|secret(?:[_-]?key)?|client[_-]?secret|auth[_-]?token|refresh[_-]?token|password|passwd|pwd|bearer[_-]?token|private[_-]?key)\b\s*(?:=|:|=>)\s*["']?([A-Za-z0-9+\/=_\-.]{20,})["']?/i
+    CREDIT_CARD_CANDIDATE_PATTERN = /\b(?:\d[ -]*?){13,19}\b/
 
     def self.run(argv)
       new(argv.dup).run
@@ -163,7 +176,7 @@ module Verdify
       FileUtils.mkdir_p(root)
 
       files = {
-        root.join(".gitignore") => "github/snapshot.json\nruntime/\n*.tmp\n",
+        root.join(".gitignore") => "github/snapshot.json\nruntime/\n*.tmp\nnorthstar/collateral/sources/\n",
         root.join("README.md") => <<~MD,
           # Verdify project artifacts
 
@@ -332,6 +345,7 @@ module Verdify
       repo = GitRepository.new(options[:repo])
       source = Pathname.new(options[:file]).expand_path
       raise UsageError, "research file does not exist: #{source}" unless source.file?
+      scan_research_source_for_secrets!(source)
 
       root = repo.root.join(".agent-workflow/northstar")
       collateral_dir = root.join("collateral")
@@ -1667,6 +1681,74 @@ module Verdify
         Array(entry["planning_relevance"]).join(" ")
       ].compact.join(" ").downcase
       haystack.include?(query)
+    end
+
+    def scan_research_source_for_secrets!(path)
+      findings = research_source_secret_findings(path)
+      return if findings.empty?
+
+      shown = findings.first(5).map { |finding| "#{finding[:type]} at line #{finding[:line]}" }
+      suffix = findings.length > shown.length ? "; #{findings.length - shown.length} more" : ""
+      raise UsageError, "research source failed secret scan: #{shown.join('; ')}#{suffix}. Remove secrets/PII or record a gate instead."
+    end
+
+    def research_source_secret_findings(path)
+      text = File.binread(path).encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+      findings = []
+      text.each_line.with_index(1) do |line, line_number|
+        SECRET_SCAN_LINE_PATTERNS.each do |type, pattern|
+          findings << { type: type, line: line_number } if line.match?(pattern)
+        end
+        if (match = line.match(SECRET_ASSIGNMENT_PATTERN)) && secret_like_value?(match[1])
+          findings << { type: "credential assignment", line: line_number }
+        end
+        line.scan(CREDIT_CARD_CANDIDATE_PATTERN) do |candidate|
+          findings << { type: "payment card number", line: line_number } if payment_card_number?(candidate)
+        end
+      end
+      findings
+    end
+
+    def secret_like_value?(value)
+      normalized = value.to_s.gsub(/\A["']|["',;]\z/, "")
+      return false if normalized.length < 20
+      return false if normalized.match?(/\A(?:redacted|example|placeholder|changeme|dummy|test|x+)\z/i)
+
+      normalized.match?(/[A-Z]/) && normalized.match?(/[a-z]/) && normalized.match?(/[0-9]/) ||
+        shannon_entropy(normalized) >= 3.5
+    end
+
+    def shannon_entropy(value)
+      chars = value.each_char.to_a
+      return 0.0 if chars.empty?
+
+      counts = chars.tally
+      counts.values.sum do |count|
+        probability = count.to_f / chars.length
+        -probability * Math.log2(probability)
+      end
+    end
+
+    def payment_card_number?(candidate)
+      digits = candidate.gsub(/\D/, "")
+      return false unless digits.length.between?(13, 19)
+      return false if digits.chars.uniq.length == 1
+      return false unless digits.match?(/\A(?:4|5[1-5]|2[2-7]|3[47]|6(?:011|5)|35)/)
+
+      luhn_checksum_valid?(digits)
+    end
+
+    def luhn_checksum_valid?(digits)
+      sum = digits.reverse.chars.each_with_index.sum do |char, index|
+        digit = char.to_i
+        if index.odd?
+          doubled = digit * 2
+          doubled > 9 ? doubled - 9 : doubled
+        else
+          digit
+        end
+      end
+      (sum % 10).zero?
     end
 
     def resolve_repo_path(repo, value)
