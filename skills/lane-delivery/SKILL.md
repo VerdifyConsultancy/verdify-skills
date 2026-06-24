@@ -54,13 +54,13 @@ Closeout is the final worker action, not a separate skill.
 4. Confirm commits are pushed and PR/head SHA are current.
 5. Record untracked files, residual risks, discovered issues, and deployment implications.
 6. Write `.agent-workflow/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml` and validate it against `../../schemas/lane-closeout.schema.yaml`.
-7. Set the lane to `READY_FOR_CRITIC`; do not mark it integrated or complete.
+7. Write the closeout file with `status: ready_for_critic`; the route engine treats closeout-file presence with no critic file as readiness for criticism. Do not write any integrated or complete status.
 
 Read `references/closeout-procedure.md`.
 
 ## Fix-forward mode
 
-When the critic requests contract-scoped fixes, use a newly authorized coding session according to lease policy. Address only cited findings, rerun affected and required validation, update the closeout, and return to fresh criticism.
+When the critic requests contract-scoped fixes, the controller uses one canonical worktree/lease procedure: release the prior worker lease with `bin/verdify lane release --keep-worktree`, then create one new sequential worker lease for the same lane and worktree path with a new `--session-id`. The fix-forward worker starts only after `bin/verdify lane inspect` shows that new lease is active and no other active worker lease owns the lane/worktree. Address only cited findings, rerun affected and required validation, update the closeout, and return to fresh criticism.
 
 ## Handoff
 
