@@ -62,6 +62,7 @@ acceptance_evidence:
     evidence_ids:
       - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:5"
       - "https://github.com/VerdifyConsultancy/verdify-skills/pull/38"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/issues/10#issuecomment-4791636100"
     assessment: satisfied
 discovered_issues: []
 residual_risks:
