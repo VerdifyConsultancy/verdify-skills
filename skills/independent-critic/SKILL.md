@@ -54,6 +54,43 @@ Review the lane; do not become its implementer.
 
 Read `references/critic-rubric.md` and `references/evidence-review.md`.
 
+## GitHub review submission
+
+Submit a PR review only when all authorization checks are true:
+
+- the critic report validates and records the current PR head SHA;
+- the review checkout, PR head SHA, worker closeout head SHA, and critic report
+  reviewed head SHA match;
+- the lane contract, issue, PR, required checks, and evidence are available for
+  the current head;
+- repository policy, a lane contract, or an orchestrator handoff authorizes this
+  critic session to submit a GitHub review for that PR; and
+- no unresolved material scope, security, migration, deployment, or human-only
+  approval gate remains open.
+
+Use one of these commands, with the body file containing the critic outcome,
+findings, evidence summary, limitations, and artifact refs:
+
+```bash
+gh pr review <pr-number> --approve --body-file <critic-review-body.md>
+gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>
+gh pr review <pr-number> --comment --body-file <critic-review-body.md>
+```
+
+Map critic outcomes to GitHub review events as follows:
+
+| Critic outcome | GitHub review event | Command |
+| --- | --- | --- |
+| `approve` | Approve | `gh pr review <pr-number> --approve --body-file <critic-review-body.md>` |
+| `approve_with_risks` | Approve, only when residual-risk acceptance is authorized by policy or handoff; otherwise use `needs_human_review` | `gh pr review <pr-number> --approve --body-file <critic-review-body.md>` |
+| `request_fixes` | Request changes | `gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>` |
+| `block_integration` | Request changes | `gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>` |
+| `needs_human_review` | Comment | `gh pr review <pr-number> --comment --body-file <critic-review-body.md>` |
+
+If any authorization check fails, do not submit a PR review. Finish the critic
+report, record the missing authorization or gate, and hand off to
+`sprint-orchestrator`, `release-verification`, or the configured human reviewer.
+
 ## Outcomes
 
 - `approve`

@@ -30,7 +30,10 @@ Define the system before dividing implementation work. Architecture describes th
 3. Define system context, components, runtime topology, data flow, storage, external integrations, trust/security boundaries, deployment model, observability, failure modes, and major tradeoffs.
 4. Record material choices as ADRs with alternatives and consequences.
 5. Trace components and risks to requirements and design surfaces.
-6. Validate `architecture.yaml` against `../../schemas/architecture.schema.yaml`.
+6. Start `architecture.yaml` from `assets/architecture.template.yaml` and compare
+   against the worked example at
+   `examples/minimal-project/.agent-workflow/architecture/architecture.yaml`.
+7. Validate `architecture.yaml` against `../../schemas/architecture.schema.yaml`.
 
 Read `references/architecture-mode.md` for decision coverage.
 

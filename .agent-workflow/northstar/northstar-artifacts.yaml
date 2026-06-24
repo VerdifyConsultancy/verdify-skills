@@ -10,7 +10,7 @@ updated_at: '2026-06-23T20:18:26Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   status: draft
-  summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, Orbit daily brief, review script, planning questions, and traceability.
+  summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, explicit Orbit daily brief deferral, review script, planning questions, and traceability.
   section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
@@ -45,7 +45,7 @@ product:
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
   status: draft
-  summary: Iterating architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw/Orbit planning layer, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
+  summary: Iterating architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw planning layer, deferred Orbit daily brief boundary, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
   section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
@@ -375,6 +375,9 @@ cross_links:
 - from_id: PRQ-028
   to_id: ARQ-026
   relationship: Orbit daily brief product surface requires read-only source-linked governance architecture.
+- from_id: PRQ-028
+  to_id: WAVE-009
+  relationship: Orbit daily brief is explicitly deferred until source scope, connector permissions, privacy, retention, source-freshness rules, and owner approval are recorded.
 - from_id: SURF-016
   to_id: IFACE-016
   relationship: Repo-bootstrap surface defines the self-discovery packet interface.
@@ -384,6 +387,9 @@ cross_links:
 - from_id: SURF-018
   to_id: IFACE-018
   relationship: Orbit daily brief surface defines source-fresh read-only operating context.
+- from_id: IFACE-018
+  to_id: WAVE-009
+  relationship: Concrete Orbit interface implementation is deferred until the Orbit/platform owner approves connector and privacy rules.
 - from_id: WAVE-008
   to_id: ARCH-017
   relationship: Repo-controller bootstrap pilot requires bootstrap and fleet runtime architecture.
@@ -530,10 +536,10 @@ open_questions:
   question: What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use?
   owner: Jason and Orbit/platform owner
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
-  proposed_resolution: Start with GitHub, repo-controller state, and `.agent-workflow` records; add email/calendar only after connector scope, retention, privacy, and redaction rules are explicit.
+  proposed_resolution: Deferred by `WAVE-009` until the Orbit/platform owner records source scope, connector permissions, privacy, retention, source-freshness rules, and implementation ownership. Proposed starting scope remains GitHub, repo-controller state, and `.agent-workflow` records; email/calendar require explicit connector policy first.
 learning_capture:
   status: staged
   proposal_paths:

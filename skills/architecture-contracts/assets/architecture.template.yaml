@@ -1,0 +1,40 @@
+schema_ref: architecture.schema.yaml
+kind: ArchitectureDefinition
+schema_version: "1.0"
+architecture_id: replace-me
+status: draft
+baseline_sha: replace-with-baseline-sha
+requirement_ids:
+  - REQ-001
+system_context: Describe the system boundary, users, operators, runtime context, and external systems.
+components:
+  - id: CMP-001
+    name: Replace me
+    responsibility: Describe this component's black-box responsibility.
+    requirement_ids:
+      - REQ-001
+runtime_topology:
+  - Describe the runtime process, container, service, job, or hosted component topology.
+data_flows:
+  - from: external-actor-or-component
+    to: CMP-001
+    data: Describe the data or request.
+    transport: Describe the transport or protocol.
+storage:
+  - Describe durable, cached, or ephemeral storage, or use [] when none exists.
+security_boundaries:
+  - Describe trust, credential, tenancy, or data-sensitivity boundaries.
+integrations:
+  - Describe external services, APIs, queues, repositories, or platforms, or use [] when none exists.
+deployment:
+  - Describe the build, release, environment, or rollback path.
+observability:
+  - Describe logs, metrics, traces, health checks, dashboards, or alerts.
+risks:
+  - Describe architecture, delivery, security, data, or operational risks.
+decision_ids:
+  - ADR-0000
+approval:
+  status: pending
+  approver: null
+  approved_at: null
