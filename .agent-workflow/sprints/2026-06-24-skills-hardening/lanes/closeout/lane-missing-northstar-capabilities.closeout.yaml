@@ -1,0 +1,81 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-missing-northstar-capabilities
+status: ready_for_critic
+issue_ids:
+  - 35
+pull_request: 61
+baseline_sha: "8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6"
+head_sha: "03dfe7489e1c969928803eb4e153932084d52d5b"
+contract_hash: "86f81933c312a952f63951602c9530360b4a2335213a80dcfa9ded6c7b91f778"
+changed_paths:
+  - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+  - ".agent-workflow/northstar/northstar-artifacts.yaml"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-missing-northstar-capabilities.closeout.yaml"
+  - "skills/architecture-contracts/SKILL.md"
+  - "skills/architecture-contracts/assets/architecture.template.yaml"
+  - "skills/independent-critic/SKILL.md"
+validation_results:
+  - id: validate-architecture-template
+    command: "ruby bin/verdify artifact validate --file skills/architecture-contracts/assets/architecture.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:53:00Z"
+    artifact: "valid /Users/jason/repos/verdify-worktrees/2026-06-24-skills-hardening/lane-missing-northstar-capabilities/skills/architecture-contracts/assets/architecture.template.yaml (architecture.schema.yaml)"
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:53:00Z"
+    artifact: "Verdify repository validation passed (19 skills, 44 schemas)."
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:53:00Z"
+    artifact: "Agent host links valid; validator passed; 35 Ruby tests / 378 assertions passed; CLI, PR policy, and npm install tests passed."
+  - id: validate-northstar-artifacts
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/northstar/northstar-artifacts.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:53:00Z"
+    artifact: "valid .agent-workflow/northstar/northstar-artifacts.yaml (northstar-artifacts.schema.yaml)"
+  - id: orbit-deferral-grep
+    command: "rg -n \"Orbit daily brief|Orbit daily operating brief|PRQ-028|IFACE-018|WAVE-009|status: deferred\" .agent-workflow/northstar/northstar-artifacts.yaml .agent-workflow/northstar/NORTHSTAR_PRODUCT.md -S"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:53:00Z"
+    artifact: "Found WAVE-009 deferral links for PRQ-028/IFACE-018 and NSQ-014 status: deferred in northstar-artifacts.yaml."
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "git-diff:skills/independent-critic/SKILL.md#GitHub-review-submission"
+      - "validate-repo"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "git-diff:.agent-workflow/northstar/NORTHSTAR_PRODUCT.md#WAVE-009"
+      - "git-diff:.agent-workflow/northstar/northstar-artifacts.yaml#NSQ-014"
+      - "orbit-deferral-grep"
+      - "validate-northstar-artifacts"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "git-diff:skills/architecture-contracts/assets/architecture.template.yaml"
+      - "git-diff:skills/architecture-contracts/SKILL.md#Mode-1"
+      - "validate-architecture-template"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic review is still required before integration."
+  - "GitHub checks must be evaluated on the final pushed branch head after the closeout metadata commit."
+  - "Orbit daily brief implementation remains deferred until the Orbit/platform owner records source scope, connector permissions, privacy, retention, source-freshness rules, and implementation ownership."
+worktree_clean: true
+worker_session_id: "codex-20260624-missns"
+completed_at: "2026-06-24T18:56:08Z"
+limitations:
+  - "The closeout head_sha records the implementation commit before this closeout-only metadata commit; PR #61 includes the closeout commit after the reviewed code head."
+  - "North Star deferral edits touch coordination-required paths under the approved issue #35 lane contract; no owner skill implementation was added."
+  - "No runtime deployment was performed because this lane changes repository guidance, templates, schema-valid assets, and draft planning markers only."
