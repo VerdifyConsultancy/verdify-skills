@@ -13,6 +13,18 @@ metadata:
 Own durable orchestration state. Do not implement lane code, review your own
 work, or bypass human gates.
 
+## Operating model
+
+Controller-loop owns the long-running repo controller contract for outer loops,
+inner loops, cron wakes, context-window resets, and recovery handoffs. A loop
+must reconstruct from durable artifacts, write a checkpoint before context
+reset or sleep, and resume from a prompt generated from trusted refs rather than
+hidden chat history.
+
+Read `references/recovery-contract.md` before defining controller loops,
+resume prompts, loop KPIs, Agent Fleet metrics, alert handling, context reset
+thresholds, or recoverable failure behavior.
+
 ## Canonical artifacts
 
 - `.agent-workflow/controller/controller-state.yaml` - durable controller state,
@@ -29,20 +41,23 @@ standalone `.agent-workflow/controller/waves/<wave-id>.yaml` artifacts.
 1. Read the approved project definition, architecture, module contracts,
    state-of-union, sprint artifacts, gates, and current GitHub state.
 2. Reconstruct the current lifecycle state and pending child sessions.
-3. Validate the transition against `references/state-machine.md`.
-4. For each child loop, record session ID, executor, repository, branch,
+3. Define or refresh the active loop record with status, owner, repository,
+   issue refs, PR refs, checkpoint path, current objective, last action, last
+   error, and next prompt.
+4. Validate the transition against `references/state-machine.md`.
+5. For each child loop, record session ID, executor, repository, branch,
    worktree, issue, lane, wave ID, owner, started_at, heartbeat_expectations,
    heartbeat_deadline_at, and stop_condition.
    In wave-supervision mode, record wave entries in controller-state `waves`,
    set `current_wave`, and link sessions to waves with `wave_id`.
-5. Launch child sessions only through the configured Agent Platform API, MCP
+6. Launch child sessions only through the configured Agent Platform API, MCP
    tool, or documented manual handoff.
-6. Monitor durable events: status, blockers, closeout, critic outcome, CI,
+7. Monitor durable events: status, blockers, closeout, critic outcome, CI,
    deployment, review feedback, gate decisions, and session loss.
-7. Pause at human gates and protected transitions.
-8. Append session-ledger events for lifecycle-significant transitions and
+8. Pause at human gates and protected transitions.
+9. Append session-ledger events for lifecycle-significant transitions and
    record explicit exceptions for missing coverage.
-9. Write updated controller state and session ledger.
+10. Write updated controller state and session ledger.
 
 Read `references/session-ledger.md` before creating or reconciling
 `.agent-workflow/controller/session-ledger.yaml`.
@@ -57,3 +72,6 @@ worker, or the controller would need to make a protected design decision.
 
 - Read `references/state-machine.md` before defining transitions, waves, or
   failure recovery.
+- Read `references/recovery-contract.md` before writing loop records, status
+  events, resume prompts, context reset checkpoints, or Agent Fleet telemetry
+  handoffs.

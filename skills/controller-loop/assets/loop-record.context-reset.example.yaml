@@ -1,0 +1,39 @@
+kind: ControllerLoopRecordExample
+schema_version: "1.0"
+example: context-reset
+loop_record:
+  loop_id: loop-20260624-002
+  loop_type: outer
+  status: active
+  owner: controller-loop
+  repository: VerdifyConsultancy/verdify-skills
+  sprint_id: 2026-06-24-skills-hardening
+  wave_id: wave-skills-hardening
+  lane_id: null
+  issue_refs: [2]
+  pull_request_refs: []
+  checkpoint_path: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-002-0007.yaml
+  current_objective: Reconstruct sprint status and route lanes with missing critic handoff.
+  last_action: Wrote checkpoint at 85 percent context-window usage before starting another lane poll batch.
+  last_error: null
+  next_prompt: Resume from checkpoint 0007, reload controller state and session ledger, then poll only lanes listed in the checkpoint next_actions.
+status_event:
+  schema_ref: status-event.schema.yaml
+  kind: VerdifyStatusEvent
+  schema_version: "1.0"
+  event_id: evt-20260624-controller-context-reset
+  sprint_id: 2026-06-24-skills-hardening
+  lane_id: null
+  type: CONTEXT_RESET_CHECKPOINTED
+  occurred_at: "2026-06-24T18:15:00Z"
+  source: controller-loop
+  references:
+    issue: 2
+    pull_request: null
+    lease_id: null
+    artifact: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-002-0007.yaml
+agent_fleet_handoff:
+  metrics:
+    verdify_controller_context_resets_total: 1
+    verdify_controller_last_successful_checkpoint_timestamp_seconds: 1782324900
+  alert_summary: Context reset was planned and checkpointed; no operator action required.

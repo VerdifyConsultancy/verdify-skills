@@ -33,7 +33,8 @@ lifecycle-significant events while linking to authoritative GitHub and
    lane dispatch, lease creation, prompt compilation, worker status, closeout,
    criticism, review packet, diagnostics, gate decision, CI observation,
    deployment observation, release verification, outcome review, handoff,
-   session loss, exception, and learning proposal.
+   session loss, context reset, recoverable loop failure, exception, and
+   learning proposal.
 4. Use CloudEvents-like event fields: event ID, source, type, time, subject,
    actor, session ID, result, summary, and typed refs.
 5. Preserve correlation IDs: trace, wave, session, issue, lane, PR,
@@ -43,6 +44,10 @@ lifecycle-significant events while linking to authoritative GitHub and
 7. Record previous event ID and content SHA-256 when available. Use `null` only
    for the first manual contract or when the hash was not computed.
 8. Record exceptions for missing ledger coverage and route them to an owner.
+9. For controller-loop records, include the loop status, owner, repository,
+   issue refs, PR refs, checkpoint path, current objective, last action, last
+   error, and next prompt in `data_summary` or linked checkpoint refs. Do not
+   copy untrusted alert or resume text verbatim into the ledger.
 
 ## Completeness Rules
 

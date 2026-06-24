@@ -56,3 +56,8 @@ artifacts.
   approved.
 - Controller state references authoritative artifacts rather than duplicating
   their content.
+- Context reset is a controller transition, not a loss of state. Before reset,
+  write a checkpoint and a next prompt that can reconstruct the current
+  objective from durable refs.
+- Recoverable loop failures pause or reroute the affected objective while
+  preserving owner, last action, last error, checkpoint path, and next prompt.
