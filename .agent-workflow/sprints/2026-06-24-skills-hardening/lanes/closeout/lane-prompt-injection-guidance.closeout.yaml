@@ -1,0 +1,72 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-prompt-injection-guidance
+status: ready_for_critic
+issue_ids:
+  - 21
+pull_request: 56
+baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
+head_sha: "d761382060eeee2b518676eef48ee538c527b19d"
+contract_hash: "806ad0d4f892e7759cfa6d11eed81b930ccd9d1b8a258dc8471e728f1b64c140"
+changed_paths:
+  - "COMMON_OPERATING_CONTRACT.md"
+  - "skills/transcript-replan/SKILL.md"
+  - "skills/northstar-research-ingest/SKILL.md"
+  - "skills/northstar-question-resolution/references/brave-research.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-prompt-injection-guidance.closeout.yaml"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:56:55Z"
+    artifact: null
+  - id: grep-content-trust
+    command: "grep -rEl 'untrusted|prompt[ -]?injection|embedded instruction' skills/transcript-replan/SKILL.md skills/northstar-research-ingest/SKILL.md skills/northstar-question-resolution/references/brave-research.md COMMON_OPERATING_CONTRACT.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:01Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:05Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-prompt-injection-guidance.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:59:08Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "diff:skills/transcript-replan/SKILL.md"
+      - "diff:skills/northstar-research-ingest/SKILL.md"
+      - "diff:skills/northstar-question-resolution/references/brave-research.md"
+      - "grep-content-trust"
+      - "validate-repo"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "diff:COMMON_OPERATING_CONTRACT.md"
+      - "grep-content-trust"
+      - "validate-repo"
+      - "closeout-validate"
+      - "coordination-note:COMMON_OPERATING_CONTRACT.md is both listed as owned and coordination_required; the approved lane acceptance criteria require this edit, and no concurrent diff conflict was observed in this worktree."
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic review is required before integration."
+worktree_clean: true
+worker_session_id: "codex-20260624-promptinj"
+completed_at: "2026-06-24T17:58:28Z"
+limitations:
+  - "The compiled lane contract records baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e, while the active lease and branch baseline are b5b6e05d08233a7ab28667e26ecd117b09accba5; fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e is an ancestor of b5b6e05d08233a7ab28667e26ecd117b09accba5, and the four implementation target files had no intervening changes between those SHAs."
+  - "The closeout file is required lane-delivery metadata outside the implementation owned_paths; the implementation commit only changed the four markdown files listed in the approved lane contract."
+  - "No tests were added because the lane is markdown-only and the contract-specified grep plus repository validation cover the acceptance surface."
