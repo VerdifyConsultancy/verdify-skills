@@ -1,0 +1,73 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-issue-action-boundary
+status: ready_for_critic
+issue_ids:
+  - 11
+pull_request: 40
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "fe88344a0fbaa31d3822c6a28795e8c6cbcb2fb0"
+contract_hash: "ce0f2879644e06c819f2b78c4fab398b38193c87c37ea3758f9890832e8a0ebf"
+changed_paths:
+  - "docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-issue-action-boundary.closeout.yaml"
+validation_results:
+  - id: adr-exists
+    command: "ls docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:51:20Z"
+    artifact: null
+  - id: adr-references-issue
+    command: "grep -RIl '#11' docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:51:20Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:53:24Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:54:26Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-issue-action-boundary.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:54:26Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
+      - "ADR Decision section"
+      - "adr-exists"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
+      - "ADR GitHub Issue Action Rule section"
+      - "adr-references-issue"
+      - "GitHub issue #11 comment: https://github.com/VerdifyConsultancy/verdify-skills/issues/11#issuecomment-4791661443"
+      - "Pull request #40: https://github.com/VerdifyConsultancy/verdify-skills/pull/40"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic approval is still required before integration."
+  - "ADR is not merged yet; self-merge is prohibited by lane policy."
+worktree_clean: true
+worker_session_id: "codex-20260624-issueaction"
+completed_at: "2026-06-24T16:52:12Z"
+limitations:
+  - "Controller resolution declared the contract validation glob incorrect; the closeout records that glob as skipped and validates the authoritative owned ADR path instead."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; the pull request will record the current branch head after closeout is pushed."
