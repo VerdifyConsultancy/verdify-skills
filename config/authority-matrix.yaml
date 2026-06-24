@@ -41,6 +41,11 @@ authorities:
     owner: github_deployment_or_platform_deployment_record
   verified_runtime_outcome:
     owner: deployment_evidence_plus_outcome_acceptance
+  incident_policy:
+    owner: config/authority-matrix.yaml
+    authorized_resolver: outcome_owner_or_repository_policy_named_incident_commander
+    recording_requirement: ".agent-workflow/gates/<incident-gate-id>.yaml validated against human-gate.schema.yaml, with linked GitHub issue, PR, deployment, or runtime evidence as applicable."
+    notes: "Repository incident policy: an urgent incident may bypass normal planning only after the authorized resolver records an incident gate decision. Router, orchestrator, worker, critic, and verifier sessions may observe or route from that decision but may not self-authorize the bypass."
   local_github_snapshot:
     owner: none
     notes: "Ignored cache. Refresh rather than resolving conflicts in favor of it."

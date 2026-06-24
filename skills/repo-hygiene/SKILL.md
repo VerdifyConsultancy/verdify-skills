@@ -20,10 +20,15 @@ small safe cleanup; escalate ambiguous deletion, ownership, or policy changes.
 - `.agent-workflow/hygiene/repo-agent-scope.yaml` - repo-associated agent scope,
   ownership, responsibility, authority, and escalation contract when a
   controller or long-lived repo agent is assigned
+- `.agent-workflow/gates/repo-hygiene.yaml` - repo hygiene gate for ambiguous
+  deletes, protected docs, secrets exposure, missing approval semantics,
+  cross-lane ownership conflicts, production policy changes, or cleanup that
+  could hide evidence
 - Proposed cleanup PRs or GitHub Issues for non-automatic work
 
 Validate YAML against `../../schemas/repo-hygiene.schema.yaml` and, when
-present, `../../schemas/repo-agent-scope.schema.yaml`.
+present, `../../schemas/repo-agent-scope.schema.yaml`. Validate the repo
+hygiene gate against `../../schemas/human-gate.schema.yaml`.
 
 ## Procedure
 
@@ -52,9 +57,11 @@ present, `../../schemas/repo-agent-scope.schema.yaml`.
 
 ## Stop conditions
 
-Open a gate for ambiguous deletes, protected docs, secrets exposure, missing
-approval semantics, cross-lane ownership conflicts, production policy changes,
-or any cleanup that could hide evidence.
+Open or update `.agent-workflow/gates/repo-hygiene.yaml` for ambiguous deletes,
+protected docs, secrets exposure, missing approval semantics, cross-lane
+ownership conflicts, production policy changes, or any cleanup that could hide
+evidence. The gate must use `repo_hygiene` type and validate against
+`../../schemas/human-gate.schema.yaml`.
 
 ## Load references only when needed
 

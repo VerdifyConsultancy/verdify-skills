@@ -1,0 +1,93 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-orphan-artifacts
+status: ready_for_critic
+issue_ids:
+  - 29
+pull_request: 48
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "3374f0a1f8776ab4a1cd97a7f83f453f35005abd"
+contract_hash: "c0d826af94680ea577363a440173cdd490b9b6759bb71c89bbd559e4d0eb5473"
+changed_paths:
+  - "config/authority-matrix.yaml"
+  - "schemas/status-event.schema.yaml"
+  - "skills/northstar-planning/SKILL.md"
+  - "skills/project-router/references/routing-rules.md"
+  - "skills/repo-hygiene/SKILL.md"
+  - "skills/sprint-orchestrator/SKILL.md"
+  - "skills/sprint-orchestrator/assets/status-event.example.yaml"
+  - "skills/sprint-planning/SKILL.md"
+  - "skills/sprint-planning/assets/lane-map.template.yaml"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:22Z"
+    artifact: "Verdify repository validation passed (19 skills, 41 schemas)."
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:22Z"
+    artifact: "7 runs, 60 assertions, 0 failures, 0 errors, 0 skips; CLI lifecycle, PR policy, and npm install tests passed."
+  - id: artifact-validate-status-event
+    command: "ruby bin/verdify artifact validate --file skills/sprint-orchestrator/assets/status-event.example.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:22Z"
+    artifact: "valid skills/sprint-orchestrator/assets/status-event.example.yaml (status-event.schema.yaml)"
+  - id: artifact-validate-lane-map
+    command: "ruby bin/verdify artifact validate --file skills/sprint-planning/assets/lane-map.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:22Z"
+    artifact: "valid skills/sprint-planning/assets/lane-map.template.yaml (lane-map.schema.yaml)"
+  - id: grep-orphan-resolution
+    command: "rg -n \"incident policy|incident_policy|authorized_resolver|VerdifyStatusEvent|status-event\\.schema|lane-map\\.schema|lane-map\\.template|repo-hygiene\\.yaml|northstar-plan\\.yaml\" config/authority-matrix.yaml skills/sprint-planning skills/northstar-planning skills/sprint-orchestrator skills/project-router/references/routing-rules.md skills/project-router/SKILL.md skills/repo-hygiene schemas/status-event.schema.yaml verdify.workflow.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:22Z"
+    artifact: "Output shows incident_policy and authorized_resolver in config/authority-matrix.yaml, VerdifyStatusEvent in schemas/status-event.schema.yaml and the example asset, lane-map schema/template wiring, northstar-plan.yaml producer wiring, repo-hygiene gate wiring, and existing workflow outputs."
+  - id: scope-diff
+    command: "git diff --name-only 9b0fd53f276823c9b82eaeeaded114a5af0a6c77..3374f0a1f8776ab4a1cd97a7f83f453f35005abd"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:29:09Z"
+    artifact: "Diff limited to the nine changed paths listed in changed_paths; no prohibited paths or coordination-required files were edited."
+  - id: github-checks
+    command: "gh pr checks 48 --repo VerdifyConsultancy/verdify-skills --watch=false"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:29:09Z"
+    artifact: "validate and pull-request-policy checks passed on PR #48 for head 3374f0a1f8776ab4a1cd97a7f83f453f35005abd."
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-orphan-artifacts.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:29:09Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "validate-repo"
+      - "make-test"
+      - "artifact-validate-status-event"
+      - "artifact-validate-lane-map"
+      - "grep-orphan-resolution"
+      - "scope-diff"
+      - "github-checks"
+      - "closeout-validate"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic review is still required before integration."
+  - "No runtime deployment target exists for this lane; deployment verification is not applicable to these lifecycle skill, schema, and policy documentation changes."
+worktree_clean: true
+worker_session_id: "codex-20260624-orphan"
+completed_at: "2026-06-24T17:29:09Z"
+limitations:
+  - "The active lease baseline is 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after the dependency ADR merge; the compiled lane contract still names fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e as an older ancestor baseline."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; PR #48 records the current branch head after closeout is pushed."

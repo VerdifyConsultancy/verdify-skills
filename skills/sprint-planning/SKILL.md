@@ -38,19 +38,23 @@ Perform these steps as one transaction:
 1. **Issue readiness.** Verify each candidate issue describes a problem/outcome, acceptance intent, risk, dependencies, and exclusions. Create or propose missing issues rather than inventing private backlog items.
 2. **Sprint selection.** Choose a bounded outcome and explicit non-goals. Record milestone/Project links, baseline, acceptance criteria, risks, deployment expectations, and human gates.
 3. **Lane topology.** Assign each issue to exactly one lane by default. Decide parallel versus serial execution based on contracts and dependency risk, not desired agent count.
-4. **Lane contracts.** Compile objective, ownership, dependencies, runtime namespace policy, validation, evidence, Git policy, escalation triggers, and definition of done.
-5. **Cross-lane review.** Detect overlapping paths, interfaces, runtime resources, database migrations, and incompatible baselines.
-6. **Review and reporting plan.** Record the stakeholder-readable answer:
+4. **Lane map.** Write
+   `.agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml` from
+   `assets/lane-map.template.yaml`. Record each lane, issue IDs, module
+   contracts, contract path, parallel group, and dependency order.
+5. **Lane contracts.** Compile objective, ownership, dependencies, runtime namespace policy, validation, evidence, Git policy, escalation triggers, and definition of done.
+6. **Cross-lane review.** Detect overlapping paths, interfaces, runtime resources, database migrations, and incompatible baselines.
+7. **Review and reporting plan.** Record the stakeholder-readable answer:
    included work, deferred work, lane owners, reviewers, responsibility
    summaries, dependency order, QA milestones, human review milestones, review
    packet paths, and user stories that will be completed for review.
-7. **Wave release planning.** For deployment-affecting work, record branch or
+8. **Wave release planning.** For deployment-affecting work, record branch or
    merge queue model, required checks/events, CI workflows, preview/review
    environments, GitOps desired state, deployment strategy, observability,
    rollback, release-health signals, and review inbox handoff.
-8. **Validation.** Validate the sprint plan, every lane contract, and any wave
-   release plan.
-9. **Approval.** Present the complete plan, topology, contracts, review plan,
+9. **Validation.** Validate the sprint plan, lane map, every lane contract, and
+   any wave release plan.
+10. **Approval.** Present the complete plan, topology, contracts, review plan,
    release plan, risks, and exceptions as one gate. Do not dispatch before
    approval.
 
@@ -69,6 +73,7 @@ Read `references/issue-readiness.md`, `references/planning-method.md`,
   when release/review/deployment evidence is in scope
 
 Use `../../schemas/sprint-plan.schema.yaml`,
+`../../schemas/lane-map.schema.yaml`,
 `../../schemas/lane-contract.schema.yaml`,
 `../../schemas/human-gate.schema.yaml`, and
 `../../schemas/wave-release-plan.schema.yaml` when applicable.

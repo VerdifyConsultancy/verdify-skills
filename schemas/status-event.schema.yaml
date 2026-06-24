@@ -1,0 +1,25 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/status-event.schema.yaml
+title: Verdify Status Event
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, event_id, sprint_id, lane_id, type, occurred_at, source, references]
+properties:
+  schema_ref: {const: status-event.schema.yaml}
+  kind: {const: VerdifyStatusEvent}
+  schema_version: {const: "1.0"}
+  event_id: {type: string, minLength: 1}
+  sprint_id: {type: string, minLength: 1}
+  lane_id: {type: [string, 'null']}
+  type: {type: string, minLength: 1}
+  occurred_at: {type: string, minLength: 1}
+  source: {type: string, minLength: 1}
+  references:
+    type: object
+    additionalProperties: false
+    required: [issue, pull_request, lease_id, artifact]
+    properties:
+      issue: {type: [integer, 'null'], minimum: 1}
+      pull_request: {type: [integer, 'null'], minimum: 1}
+      lease_id: {type: [string, 'null']}
+      artifact: {type: [string, 'null']}

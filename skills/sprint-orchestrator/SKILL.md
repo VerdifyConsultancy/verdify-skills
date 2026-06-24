@@ -27,7 +27,8 @@ agents, CI/CD, review deployment readiness, and handoffs from durable evidence.
   authorization, target, result, and review records.
 
 Validate the runbook against
-`../../schemas/sprint-execution-runbook.schema.yaml`.
+`../../schemas/sprint-execution-runbook.schema.yaml`. Validate typed status
+event examples against `../../schemas/status-event.schema.yaml`.
 
 ## Start
 
