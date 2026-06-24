@@ -1,0 +1,104 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-lane-delivery-correctness
+status: ready_for_critic
+issue_ids:
+  - 26
+pull_request: 55
+baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
+head_sha: "53c980888db3ee9b8fc577454d72895eb5365233"
+contract_hash: "dff65bda30983ec62cd0e65e14469c8701678af594fd75972a0d20137706517b"
+changed_paths:
+  - "skills/lane-delivery/SKILL.md"
+  - "evaluations/lane-delivery/evals.json"
+  - "tests/test_lane_delivery_correctness.rb"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-lane-delivery-correctness.closeout.yaml"
+validation_results:
+  - id: lane-delivery-correctness-test
+    command: "ruby tests/test_lane_delivery_correctness.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:54:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:55:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:56:00Z"
+    artifact: null
+  - id: closeout-enum-grep
+    command: "! grep -q 'complete-with-risks' evaluations/lane-delivery/evals.json"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:54:00Z"
+    artifact: null
+  - id: status-grounding-grep
+    command: "grep -q 'ready_for_critic' skills/lane-delivery/SKILL.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:54:00Z"
+    artifact: null
+  - id: pr-policy-local
+    command: "ruby scripts/pr-policy.rb --body <pr-body> --base b5b6e05d08233a7ab28667e26ecd117b09accba5 --head 53c980888db3ee9b8fc577454d72895eb5365233"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:59:00Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/55"
+  - id: github-validate
+    command: "gh pr checks 55 --json name,state,workflow,link,startedAt,completedAt"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:58:00Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28118857428/job/83265292998"
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-lane-delivery-correctness.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:00:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "git-diff:skills/lane-delivery/SKILL.md"
+      - "status-grounding-grep"
+      - "lane-delivery-correctness-test"
+      - "validate-repo"
+      - "make-test"
+      - "PR #55"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "git-diff:skills/lane-delivery/SKILL.md"
+      - "lane-delivery-correctness-test"
+      - "validate-repo"
+      - "make-test"
+      - "PR #55"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "git-diff:evaluations/lane-delivery/evals.json"
+      - "closeout-enum-grep"
+      - "lane-delivery-correctness-test"
+      - "validate-repo"
+      - "make-test"
+      - "PR #55"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "GitHub checks must be evaluated on the final pushed branch head after the closeout metadata commit."
+worktree_clean: true
+worker_session_id: "codex-20260624-lanedeliv"
+completed_at: "2026-06-24T18:00:00Z"
+limitations:
+  - "The compiled lane contract in .verdify/worker-prompt.md lists baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e, but the active lease baseline is b5b6e05d08233a7ab28667e26ecd117b09accba5 after upstream sprint lanes merged; this closeout uses the active lease baseline."
+  - "The closeout records the implementation head SHA before the closeout-only metadata commit; PR #55 records the current branch head after closeout is pushed."
+  - "The closeout file is standard worker handoff metadata outside the implementation owned paths; implementation changes are limited to the two owned lane-delivery artifacts plus the allowed regression test."

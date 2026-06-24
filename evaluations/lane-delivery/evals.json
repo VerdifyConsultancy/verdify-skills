@@ -15,7 +15,7 @@
     {
       "id": "evidence-backed-closeout",
       "prompt": "A lane passes tests but has an untracked generated file and no current-head CI evidence. Close it out.",
-      "expected_output": "Does not claim clean completion; records limitations and remains blocked or complete-with-risks as schema permits.",
+      "expected_output": "Does not claim clean completion; records limitations and uses only the lane-closeout status enum: ready_for_critic when all readiness evidence is present, otherwise blocked, failed, or decision_required.",
       "files": [],
       "assertions": [
         "Untracked files are recorded.",
