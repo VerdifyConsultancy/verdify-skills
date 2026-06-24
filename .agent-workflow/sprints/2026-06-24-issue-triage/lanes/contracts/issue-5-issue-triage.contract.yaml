@@ -1,0 +1,131 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-06-24-issue-triage
+lane_id: issue-5-issue-triage
+title: "Add standalone issue triage skill"
+status: approved
+issue_ids:
+  - 5
+coupling_justification: null
+objective: "Add a standalone `issue-triage` skill for researching user-reported problems, finding existing GitHub issues, and creating well-populated issue-template records."
+desired_outcome: "Agents can use the packaged skill to investigate problem lists, de-duplicate against existing issues, audit relevant implementation and evidence, summarize likely fixes, and publish or update GitHub Issues as the backlog source of truth."
+non_goals:
+  - "Do not replace GitHub Issues with private chat state or local-only backlog files."
+  - "Do not add an external issue tracker integration."
+  - "Do not change lifecycle routing semantics beyond packaging and validating the standalone skill."
+baseline_sha: 11470a91318d7c3102a6b5d1b49d8d839e0e26be
+branch: lane/issue-5-issue-triage
+module_contracts:
+  - "skills/issue-triage/SKILL.md"
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+    - "Standalone issue triage skill packaging"
+  owned_paths:
+    - "skills/issue-triage/**"
+    - "evaluations/issue-triage/**"
+    - ".agents/skills/issue-triage"
+    - ".claude/skills/issue-triage"
+    - "scripts/validate-repo.rb"
+    - "README.md"
+    - "docs/lifecycle.md"
+    - "docs/research/industry-alignment.md"
+    - ".agent-workflow/router/route-decision.yaml"
+    - ".agent-workflow/sprints/2026-06-24-issue-triage/**"
+  prohibited_paths:
+    - "skills/project-router/**"
+    - "skills/project-definition/**"
+    - "skills/architecture-contracts/**"
+    - "skills/state-of-union/**"
+    - "skills/sprint-planning/**"
+    - "skills/sprint-orchestrator/**"
+    - "skills/lane-delivery/**"
+    - "skills/independent-critic/**"
+    - "skills/release-verification/**"
+    - "schemas/**"
+    - "lib/**"
+    - "bin/**"
+  coordination_required_paths:
+    - "verdify.workflow.yaml"
+    - "config/**"
+    - ".github/**"
+  owned_interfaces:
+    - "Skill discovery metadata for issue-triage"
+    - "Repository validator required skill registry"
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: "A new `issue-triage` skill exists with concise instructions, OpenAI metadata, host discovery links, and at least one reference file."
+    sprint_acceptance_ids:
+      - "ISSUE-5-AC-01"
+    evidence_required:
+      - "File diff"
+      - "ruby scripts/validate-repo.rb"
+  - id: LANE-AC-02
+    statement: "The skill instructs agents to search existing GitHub issues before creating new ones and to update/comment when a duplicate or related issue exists."
+    sprint_acceptance_ids:
+      - "ISSUE-5-AC-02"
+    evidence_required:
+      - "File diff"
+      - "Evaluation assertions"
+  - id: LANE-AC-03
+    statement: "The skill covers code/test/log/evidence investigation, impact, likely cause, fix options, adversarial audit findings, and evidence confidence."
+    sprint_acceptance_ids:
+      - "ISSUE-5-AC-03"
+    evidence_required:
+      - "File diff"
+      - "Evaluation assertions"
+  - id: LANE-AC-04
+    statement: "The skill requires discovering and using repository issue templates, with fallback behavior when templates are missing or unsuitable."
+    sprint_acceptance_ids:
+      - "ISSUE-5-AC-04"
+    evidence_required:
+      - "File diff"
+      - "Evaluation assertions"
+  - id: LANE-AC-05
+    statement: "Repository validation and tests pass after package registry, evaluation, and documentation updates."
+    sprint_acceptance_ids:
+      - "ISSUE-5-AC-05"
+    evidence_required:
+      - "make test"
+validation_commands:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    purpose: "Validate skill package structure, links, metadata, evaluations, and schemas."
+    required: true
+  - id: make-test
+    command: "make test"
+    purpose: "Run the repository validation and test suite."
+    required: true
+required_evidence:
+  - "Current-head `make test` output"
+  - "Diff review showing owned-path scope"
+  - "PR linked to issue #5"
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - "A required public lifecycle interface or schema must change."
+  - "The validator requires broad changes outside owned paths."
+  - "GitHub issue creation or PR creation fails due to permissions."
+definition_of_done:
+  - "Issue #5 is linked from the PR."
+  - "The new skill is discoverable by Codex and Claude host links."
+  - "Repository tests pass locally."
+  - "Worker closeout records evidence and residual risk."
+approval:
+  status: approved
+  approver: "user-request"
+  approved_at: "2026-06-24T03:48:50Z"
