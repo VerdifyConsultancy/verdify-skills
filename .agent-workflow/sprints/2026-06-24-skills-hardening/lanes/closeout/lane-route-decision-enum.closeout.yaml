@@ -1,0 +1,72 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-route-decision-enum
+status: ready_for_critic
+issue_ids:
+  - 13
+pull_request: 45
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "8129ff2e91fff1f1303b897ccd1a8e6c5fe0fba4"
+contract_hash: "a981ba09f5fa3c44df1a0ae54f102f4c8bddabf0d59098e0c9919abb7cfa41cd"
+changed_paths:
+  - "schemas/route-decision.schema.yaml"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-route-decision-enum.closeout.yaml"
+validation_results:
+  - id: enum-cross-check
+    command: "ruby -ryaml -e 'route=YAML.load_file(\"schemas/route-decision.schema.yaml\").dig(\"properties\",\"next_skill\",\"enum\"); sou=YAML.load_file(\"schemas/state-of-union.schema.yaml\").dig(\"properties\",\"handoff\",\"properties\",\"next_skill\",\"enum\"); puts \"route=#{route.length} state_of_union=#{sou.length}\"; puts \"missing_in_route=#{(sou-route).join(\",\")}\"; puts \"extra_in_route=#{(route-sou).join(\",\")}\"; abort \"enum mismatch\" unless route == sou'"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:37Z"
+    artifact: null
+  - id: route-smoke
+    command: "temporary-repo smoke test for bin/verdify route handoffs to northstar-interview and northstar-question-resolution"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:37Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:37Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:37Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-route-decision-enum.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:27:55Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "schemas/route-decision.schema.yaml"
+      - "enum-cross-check"
+      - "route-smoke"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "controller-resolution: validator assertion transferred to lane-validator-engine"
+      - "coordination_required_paths: scripts/validate-repo.rb left unchanged"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Validator drift assertion for scripts/validate-repo.rb remains to be implemented by lane-validator-engine per controller resolution; this lane intentionally did not edit that coordination-required file."
+  - "Fresh critic or reviewer approval is still required before integration."
+  - "Worker authority stops at the pushed pull request; self-merge is not allowed."
+worktree_clean: true
+worker_session_id: "codex-20260624-route"
+completed_at: "2026-06-24T17:26:44Z"
+limitations:
+  - "Controller resolution narrowed this lane to the owned schema enum fix only; scripts/validate-repo.rb was treated as read-only and left for lane-validator-engine."
+  - "The optional contract command `ruby bin/verdify artifact validate --file schemas/route-decision.schema.yaml` is not applicable to a schema file because schemas do not carry schema_ref; repository validation covered schema parsing and consistency."
+  - "The closeout head_sha records the schema implementation commit before this closeout-only metadata commit; the pull request body is updated after the final branch head is pushed."
