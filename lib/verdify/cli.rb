@@ -1109,6 +1109,13 @@ module Verdify
         return route_hash(repo, "PROJECT_DEFINITION_INCOMPLETE", "project-definition", incomplete[1], "The earliest project-definition mode is not approved.", evidence, missing, open_gates)
       end
 
+      project_gate_path = root.join("gates/project-definition.yaml")
+      unless project.dig("approval", "status") == "approved" || approved_gate?(project_gate_path, "project_definition")
+        missing << project_gate_path.relative_path_from(repo.root).to_s
+        evidence << { "source" => project_path.relative_path_from(repo.root).to_s, "finding" => "approval.status is #{project.dig('approval', 'status').inspect}" }
+        return route_hash(repo, "PROJECT_DEFINITION_GATE", "project-definition", "gate-resolution", "Project-definition stages are approved, but human approval is not recorded.", evidence, missing, open_gates)
+      end
+
       architecture_path = root.join("architecture/architecture.yaml")
       unless architecture_path.file? && Verdify.safe_load_yaml(architecture_path).dig("approval", "status") == "approved"
         missing << architecture_path.relative_path_from(repo.root).to_s
@@ -1400,6 +1407,15 @@ module Verdify
       when "deployment_approval", "incident", "outcome_acceptance" then ["release-verification", "gate-resolution"]
       else ["sprint-orchestrator", "gate-management"]
       end
+    end
+
+    def approved_gate?(path, type)
+      return false unless path.file?
+
+      gate = Verdify.safe_load_yaml(path)
+      gate["type"] == type && gate["status"] == "approved"
+    rescue Error
+      false
     end
 
     def resolve_contract_path(repo, sprint, lane_id, supplied)
