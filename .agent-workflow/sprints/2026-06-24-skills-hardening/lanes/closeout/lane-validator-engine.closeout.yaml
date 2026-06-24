@@ -9,7 +9,7 @@ issue_ids:
   - 31
 pull_request: 44
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "02f73bb2d3374dd48c37b2bdc33b778eeac67fdb"
+head_sha: "e7e697982d0c24e72a245e806267a55cc3dc61a9"
 contract_hash: "d9b64b7f9f68314124585963156a54897e499d708e5a23656c12967e95d47d26"
 changed_paths:
   - "scripts/validate-repo.rb"
@@ -23,37 +23,37 @@ validation_results:
     command: "ruby scripts/validate-repo.rb"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:49:00Z"
+    executed_at: "2026-06-24T18:09:00Z"
     artifact: null
   - id: make-test
     command: "make test"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:49:00Z"
+    executed_at: "2026-06-24T18:09:00Z"
     artifact: null
   - id: skill-reference-probe
     command: "ruby -I. -e <cross-skill SKILL reference probe>"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:50:24Z"
+    executed_at: "2026-06-24T18:09:00Z"
     artifact: "tokens=references/environment-gitops.md,../platform-readiness/references/environment-gitops.md,skills/platform-readiness/references/environment-gitops.md; errors=skills/release-verification/SKILL.md: referenced path does not exist: skills/platform-readiness/references/environment-gitops.md"
   - id: route-enum-probe
     command: "ruby -ryaml -e <route-decision next_skill enum drift probe>"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:50:24Z"
+    executed_at: "2026-06-24T18:09:00Z"
     artifact: "missing=; extra="
   - id: schema-keyword-probe
     command: "ruby -I. -e <SchemaValidator draft keyword probe>"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:50:24Z"
+    executed_at: "2026-06-24T18:09:00Z"
     artifact: "$: property \"credit_card\" requires property \"billing_address\" | $.contact: does not match format \"email\" | $.x-id: expected type string, got integer"
   - id: closeout-validate
     command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-validator-engine.closeout.yaml"
     exit_status: 0
     result: passed
-    executed_at: "2026-06-24T17:50:44Z"
+    executed_at: "2026-06-24T18:09:29Z"
     artifact: null
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -83,8 +83,8 @@ residual_risks:
   - "No runtime deployment is involved; merge success still needs normal GitHub checks."
 worktree_clean: true
 worker_session_id: "codex-20260624-validator"
-completed_at: "2026-06-24T17:50:24Z"
+completed_at: "2026-06-24T18:09:10Z"
 limitations:
-  - "The closeout records post-merge implementation head SHA 02f73bb2d3374dd48c37b2bdc33b778eeac67fdb before the closeout-only metadata commit; the PR body records the final branch head after closeout is pushed."
+  - "The closeout records rebased implementation head SHA e7e697982d0c24e72a245e806267a55cc3dc61a9 before the closeout-only metadata commit; the PR body records the final branch head after closeout is pushed."
   - "The release-verification Mode 2 environment GitOps reference now points to in-skill `references/environment-gitops.md`; `skills/platform-readiness/references/environment-gitops.md` is captured and rejected because it does not resolve from the skill directory."
   - "External `$ref` URLs are intentionally rejected by repository schema auditing; local `#...` references are enforced."
