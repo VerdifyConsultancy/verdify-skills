@@ -5,7 +5,6 @@ compatibility: Requires fresh integration context, GitHub checks/reviews, reposi
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "9"
 ---
 
 # Release Verification

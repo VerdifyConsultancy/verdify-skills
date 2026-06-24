@@ -5,7 +5,6 @@ compatibility: Requires authorized read access to platform repositories, Kuberne
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "6b"
 ---
 
 # Platform Readiness

@@ -5,7 +5,6 @@ compatibility: Requires repository read access, Git, Verdify CLI, and GitHub CLI
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "4a"
 ---
 
 # Repo Hygiene

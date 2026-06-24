@@ -5,7 +5,6 @@ compatibility: Requires repository read access. Git is required; GitHub CLI is r
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "1"
 ---
 
 # Project Router
@@ -38,6 +37,16 @@ Decide exactly one next lifecycle action without doing that action's substantive
 
 ## Routing order
 
+`config/lifecycle.yaml` is the canonical source for lifecycle skills, modes,
+states, and order. This routing order is a derived decision procedure over that
+model; `issue-triage` is standalone and not directly routed by the lifecycle
+router.
+
+`repo-hygiene`, `controller-loop`, `platform-readiness`, and
+`gravity-readiness` are reached through approved state-of-union handoffs or
+open gates when their authority-owned evidence is required. The router does not
+invent platform or Gravity readiness requirements from local file absence alone.
+
 Use the first unmet condition:
 
 1. Unrouted transcript or walk evidence -> `transcript-replan`.
@@ -51,10 +60,13 @@ Use the first unmet condition:
 7. No approved bounded sprint/lane transaction -> `sprint-planning`.
 8. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
 9. A worker lane explicitly assigned to this session -> `lane-delivery`.
-10. Worker closeout awaiting fresh review -> `independent-critic`.
-11. Critic-approved lane or wave missing a review inbox packet -> `release-verification` in `review-inbox` mode.
-12. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
-13. Completed cycle -> route to `state-of-union` for the next outcome.
+10. Controller/session ledger or wave supervision evidence missing or stale -> `controller-loop`.
+11. Required Agent Platform or non-Gravity pilot readiness missing -> `platform-readiness`.
+12. Gravity pilot readiness missing -> `gravity-readiness`.
+13. Worker closeout awaiting fresh review -> `independent-critic`.
+14. Critic-approved lane or wave missing a review inbox packet -> `release-verification` in `review-inbox` mode.
+15. Approved lanes awaiting integration, observability diagnostics, deployment proof, or outcome acceptance -> `release-verification`.
+16. Completed cycle -> route to `state-of-union` for the next outcome.
 
 An urgent incident may route directly to `release-verification` only when the repository's incident policy authorizes it and the decision is recorded.
 

@@ -5,7 +5,6 @@ compatibility: Requires read access to the Gravity repository, relevant Agent Pl
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "6c"
 ---
 
 # Gravity Readiness

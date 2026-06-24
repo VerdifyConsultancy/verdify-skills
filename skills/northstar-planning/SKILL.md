@@ -15,7 +15,6 @@ description: >-
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "2b"
 ---
 
 # North Star Planning

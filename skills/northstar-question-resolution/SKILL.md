@@ -4,7 +4,6 @@ description: Inventories, clusters, researches, and resolves large sets of human
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "2d"
 ---
 
 # North Star Question Resolution

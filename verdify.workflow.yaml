@@ -2,6 +2,8 @@ version: "1.0"
 kind: VerdifyLifecycleWorkflow
 entrypoint: ROUTE
 control_plane: GitHub
+canonical_lifecycle_source: config/lifecycle.yaml
+outline_stage_model: legacy_17_stage_compatibility
 principles:
   - "GitHub Issues are the backlog and GitHub is the delivery control plane."
   - "One authoritative owner exists for each information type."
@@ -34,7 +36,7 @@ outline_stages:
   - {id: 6, outline_name: north-star-architecture, skill: architecture-contracts, mode: north-star-architecture}
   - {id: 7, outline_name: module-contracts, skill: architecture-contracts, mode: module-contracts}
   - {id: 8, outline_name: sprint-planning, skill: sprint-planning, mode: sprint-plan}
-  - {id: 9, outline_name: sprint-orchestrator, skill: sprint-orchestrator, mode: execution-runbook-platform-dispatch-or-monitor}
+  - {id: 9, outline_name: sprint-orchestrator, skill: sprint-orchestrator, mode: execution-runbook}
   - {id: 10, outline_name: lane-decomposition, skill: sprint-planning, mode: lane-transaction}
   - {id: 11, outline_name: lane-contracts, skill: sprint-planning, mode: lane-transaction}
   - {id: 12, outline_name: lane-implementation, skill: lane-delivery, mode: implementation}
@@ -56,31 +58,31 @@ state_machine:
     TRANSCRIPT_REPLAN:
       actor: planner
       skill: transcript-replan
-      mode: ingest-or-route-proposals
+      mode: ingest
       outputs: [.agent-workflow/intake/transcript-replan.yaml]
       transitions: [NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, DEFINE_PROJECT, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
     NORTHSTAR_RESEARCH_INGEST:
       actor: planner
       skill: northstar-research-ingest
-      mode: ingest-research-or-evidence-list
+      mode: ingest-research
       outputs: [.agent-workflow/northstar/evidence-registry.yaml, .agent-workflow/northstar/collateral]
       transitions: [NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, NORTHSTAR_QUESTION_RESOLUTION, DEFINE_PROJECT, REVIEW_STRATEGY, ROUTE]
     NORTHSTAR_PLANNING:
       actor: planner
       skill: northstar-planning
-      mode: intake-synthesis-artifact-loop-research-loop-or-review-feedback
+      mode: artifact-loop
       outputs: [.agent-workflow/northstar/northstar-plan.yaml, .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml]
       transitions: [NORTHSTAR_INTERVIEW, NORTHSTAR_QUESTION_RESOLUTION, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
     NORTHSTAR_INTERVIEW:
       actor: planner
       skill: northstar-interview
-      mode: review-question-pack-answer-capture-or-feedback-routing
+      mode: question-pack
       outputs: [.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md]
       transitions: [NORTHSTAR_PLANNING, NORTHSTAR_QUESTION_RESOLUTION, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, ROUTE]
     NORTHSTAR_QUESTION_RESOLUTION:
       actor: planner
       skill: northstar-question-resolution
-      mode: inventory-cluster-research-answer-or-planning-handoff
+      mode: inventory
       outputs: [.agent-workflow/northstar/question-resolution/<run-id>/inventory.yaml, .agent-workflow/northstar/question-resolution/<run-id>/resolution-register.yaml, .agent-workflow/northstar/research-inbox]
       transitions: [NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, NORTHSTAR_GATE, ROUTE]
     NORTHSTAR_GATE:
@@ -92,7 +94,7 @@ state_machine:
     DEFINE_PROJECT:
       actor: planner
       skill: project-definition
-      mode: earliest-incomplete
+      mode: discovery
       outputs: [.agent-workflow/project/project-definition.yaml]
       transitions: [PROJECT_DEFINITION_GATE, DEFINE_ARCHITECTURE, ROUTE]
     PROJECT_DEFINITION_GATE:
@@ -103,7 +105,7 @@ state_machine:
     DEFINE_ARCHITECTURE:
       actor: planner
       skill: architecture-contracts
-      mode: north-star-architecture-or-module-contracts
+      mode: north-star-architecture
       outputs: [.agent-workflow/architecture/architecture.yaml, .agent-workflow/modules/contracts]
       transitions: [ARCHITECTURE_GATE, REVIEW_STRATEGY, ROUTE]
     ARCHITECTURE_GATE:
@@ -114,7 +116,7 @@ state_machine:
     REVIEW_STRATEGY:
       actor: planner
       skill: state-of-union
-      mode: strategy-review-or-comprehensive-replan
+      mode: strategy-review
       outputs: [.agent-workflow/strategy/state-of-union.yaml, .agent-workflow/strategy/github-backlog-sync.yaml]
       transitions: [STRATEGY_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, PLAN_SPRINT, ROUTE]
     STRATEGY_GATE:
@@ -125,7 +127,7 @@ state_machine:
     REPO_HYGIENE:
       actor: planner
       skill: repo-hygiene
-      mode: assess-or-safe-cleanup
+      mode: assess
       outputs: [.agent-workflow/hygiene/repo-hygiene.yaml]
       transitions: [HYGIENE_GATE, REVIEW_STRATEGY, PLAN_SPRINT, ROUTE]
     HYGIENE_GATE:
@@ -136,7 +138,7 @@ state_machine:
     PLAN_SPRINT:
       actor: planner
       skill: sprint-planning
-      mode: issue-readiness-lane-transaction-review-plan-and-wave-release-plan
+      mode: sprint-plan
       outputs: [.agent-workflow/sprints/<sprint-id>/sprint-plan.yaml, .agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml, .agent-workflow/sprints/<sprint-id>/lanes/contracts, .agent-workflow/sprints/<sprint-id>/release/wave-release-plan.yaml]
       transitions: [PLAN_APPROVAL_GATE, ROUTE]
     PLAN_APPROVAL_GATE:
@@ -147,19 +149,19 @@ state_machine:
     ORCHESTRATE:
       actor: orchestrator
       skill: sprint-orchestrator
-      mode: execution-runbook-platform-dispatch-or-monitor
+      mode: execution-runbook
       outputs: [.agent-workflow/sprints/<sprint-id>/execution/sprint-execution-runbook.yaml, .agent-workflow/sprints/<sprint-id>/status.yaml]
       transitions: [CONTROLLER_LOOP, LANE_WORK, CRITIC_REVIEW, RESOLVE_GATE, INTEGRATE, CANCELLED]
     CONTROLLER_LOOP:
       actor: orchestrator
       skill: controller-loop
-      mode: state-machine-or-wave-supervision
+      mode: state-machine
       outputs: [.agent-workflow/controller/controller-state.yaml]
       transitions: [ORCHESTRATE, RESOLVE_GATE, REVIEW_STRATEGY, PLAN_SPRINT, PLATFORM_READINESS, GRAVITY_READINESS, CANCELLED]
     PLATFORM_READINESS:
       actor: planner
       skill: platform-readiness
-      mode: inventory-or-readiness-gate
+      mode: inventory
       outputs: [.agent-workflow/platform/platform-readiness.yaml]
       transitions: [PLATFORM_READINESS_GATE, REPO_HYGIENE, CONTROLLER_LOOP, GRAVITY_READINESS, ROUTE]
     PLATFORM_READINESS_GATE:
@@ -170,7 +172,7 @@ state_machine:
     GRAVITY_READINESS:
       actor: planner
       skill: gravity-readiness
-      mode: inventory-or-readiness-checklist
+      mode: inventory
       outputs: [.agent-workflow/gravity/gravity-readiness.yaml]
       transitions: [GRAVITY_READINESS_GATE, PLATFORM_READINESS, PLAN_SPRINT, ROUTE]
     GRAVITY_READINESS_GATE:
@@ -181,7 +183,7 @@ state_machine:
     LANE_WORK:
       actor: worker
       skill: lane-delivery
-      mode: implementation-and-closeout
+      mode: implementation
       lease_required: worker
       worktree_required: true
       outputs: [.agent-workflow/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml]

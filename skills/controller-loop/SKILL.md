@@ -5,7 +5,6 @@ compatibility: Requires approved lifecycle prerequisites, repository artifacts, 
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "6a"
 ---
 
 # Controller Loop

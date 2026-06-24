@@ -1,0 +1,121 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-canonical-lifecycle
+status: ready_for_critic
+issue_ids:
+  - 7
+  - 20
+  - 30
+pull_request: 60
+baseline_sha: "1c79c1d03d2aae1fb77f71a737fbaa46635d4338"
+head_sha: "5c83accb162bc1a66a6cbc58828f9f471356d3bd"
+contract_hash: "e9fe07c6dff6133119922df53d5223535cf1d267ff8869591562062af486e286"
+changed_paths:
+  - "README.md"
+  - "config/lifecycle.yaml"
+  - "docs/lifecycle.md"
+  - "lib/verdify/cli.rb"
+  - "scripts/validate-repo.rb"
+  - "skills/architecture-contracts/SKILL.md"
+  - "skills/controller-loop/SKILL.md"
+  - "skills/gravity-readiness/SKILL.md"
+  - "skills/independent-critic/SKILL.md"
+  - "skills/lane-delivery/SKILL.md"
+  - "skills/northstar-interview/SKILL.md"
+  - "skills/northstar-planning/SKILL.md"
+  - "skills/northstar-question-resolution/SKILL.md"
+  - "skills/northstar-research-ingest/SKILL.md"
+  - "skills/platform-readiness/SKILL.md"
+  - "skills/project-definition/SKILL.md"
+  - "skills/project-router/SKILL.md"
+  - "skills/release-verification/SKILL.md"
+  - "skills/repo-hygiene/SKILL.md"
+  - "skills/sprint-orchestrator/SKILL.md"
+  - "skills/sprint-planning/SKILL.md"
+  - "skills/state-of-union/SKILL.md"
+  - "skills/transcript-replan/SKILL.md"
+  - "tests/test_router_gate_bypass.sh"
+  - "tests/test_schema_validator.rb"
+  - "verdify.workflow.yaml"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-canonical-lifecycle.closeout.yaml"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:29:30Z"
+    artifact: "Verdify repository validation passed (19 skills, 44 schemas)."
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:30:00Z"
+    artifact: "Agent host links valid; validator passed; 35 Ruby tests / 378 assertions passed; CLI, PR policy, and npm install tests passed."
+  - id: route-modes
+    command: "ruby bin/verdify route --write && ruby bin/verdify artifact validate --file .agent-workflow/router/route-decision.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:29:49Z"
+    artifact: "Route emitted next_skill=northstar-planning next_mode=artifact-loop; route-decision artifact validated."
+  - id: injected-mode-drift
+    command: "temporarily replace workflow mode execution-runbook with dispatch-or-monitor, run ruby scripts/validate-repo.rb, restore workflow, rerun validator"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:28:00Z"
+    artifact: "Validator rejected: outline stage 9 mode \"dispatch-or-monitor\" is not declared for sprint-orchestrator in config/lifecycle.yaml; validator passed after restore."
+  - id: coordination-validator-engine
+    command: "git log --oneline --grep='Harden validator reference and schema checks' -1 -- scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:31:57Z"
+    artifact: "585d1cc [codex] Harden validator reference and schema checks (#44); route-decision (#45), CLI hardening (#58), and skill-count drift (#49) changes are also present in the branch history before this lane commit."
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-canonical-lifecycle.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:35:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "git-diff:config/lifecycle.yaml"
+      - "git-diff:verdify.workflow.yaml"
+      - "git-diff:skills/project-router/SKILL.md"
+      - "git-diff:README.md"
+      - "git-diff:docs/lifecycle.md"
+      - "validate-repo"
+      - "route-modes"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "git-diff:lib/verdify/cli.rb"
+      - "git-diff:scripts/validate-repo.rb"
+      - "git-diff:tests/test_schema_validator.rb"
+      - "injected-mode-drift"
+      - "route-modes"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "git-diff:skills/*/SKILL.md"
+      - "git-diff:config/lifecycle.yaml#standalone_skills"
+      - "git-diff:scripts/validate-repo.rb#metadata.lifecycle-order"
+      - "git-diff:tests/test_schema_validator.rb#frontmatter"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "GitHub checks must be evaluated on the final pushed branch head after the closeout metadata commit."
+  - "External consumers of SKILL.md metadata.lifecycle-order must migrate to config/lifecycle.yaml; no in-repository consumers were found."
+worktree_clean: true
+worker_session_id: "codex-20260624-canonical"
+completed_at: "2026-06-24T18:35:00Z"
+limitations:
+  - "The closeout head_sha records the implementation commit before the closeout-only metadata commit; PR #60 is updated after the closeout commit is pushed."
+  - "MANIFEST.sha256 was intentionally not edited per user instruction; release regeneration remains outside this lane."
+  - "The required route --write validation updated only route-decision generated_at; the timestamp churn was restored and the command output is recorded as validation evidence."
+  - "scripts/validate-repo.rb and lib/verdify/cli.rb are coordination-required paths; dependency lane outputs were merged to main before this lease baseline, and this lane extended those files without unresolved conflicts."

@@ -5,7 +5,6 @@ compatibility: Requires Git, approved project/module artifacts, and GitHub issue
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "5"
 ---
 
 # Sprint Planning

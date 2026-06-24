@@ -1,5 +1,29 @@
 version: "1.0"
+canonical_source: config/lifecycle.yaml
 entrypoint: project-router
+standard_states:
+  - NOT_STARTED
+  - ORIENTING
+  - DEFINING
+  - ARCHITECTING
+  - PLANNING
+  - AWAITING_APPROVAL
+  - READY
+  - IMPLEMENTING
+  - VALIDATING
+  - BLOCKED
+  - DECISION_REQUIRED
+  - READY_FOR_CRITIC
+  - CHANGES_REQUESTED
+  - READY_FOR_INTEGRATION
+  - INTEGRATING
+  - READY_FOR_DEPLOYMENT
+  - DEPLOYING
+  - VERIFYING_DEPLOYMENT
+  - AWAITING_OUTCOME_ACCEPTANCE
+  - COMPLETE
+  - FAILED
+  - CANCELLED
 skills:
   - name: project-router
     order: 1
@@ -55,6 +79,10 @@ skills:
   - name: release-verification
     order: 18
     modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
+standalone_skills:
+  - name: issue-triage
+    category: standalone
+    reason: Supports GitHub backlog investigation and issue creation outside the ordered lifecycle graph.
 default_cycle:
   - project-router
   - transcript-replan

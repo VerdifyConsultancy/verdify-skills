@@ -1,6 +1,6 @@
 # Lifecycle and handoffs
 
-Verdify exposes eighteen lifecycle skills but preserves the detailed lifecycle as explicit modes. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
+Verdify exposes eighteen lifecycle skills but preserves the detailed lifecycle as explicit modes. `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, order, and standalone skill treatment. `verdify.workflow.yaml`, router emissions, this document, and SKILL.md frontmatter are derived views and must validate against that config. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
 
 ## 1. Project router
 
@@ -84,6 +84,10 @@ Runs Wave 0 compliance before feature work. It assesses source-of-truth
 discipline, docs, tests, CI, GitHub state, stale branches, secrets exposure,
 environment declarations, observability expectations, and ownership boundaries.
 It applies only safe cleanup and opens gates for ambiguous or protected changes.
+
+## Legacy delivery outline
+
+`verdify.workflow.yaml` also retains the original 17 delivery stages as `outline_stages` for compatibility with older consumers. Those outline stages are not a second lifecycle order; each stage must reference a skill and mode declared in `config/lifecycle.yaml`.
 
 ## 11. Sprint planning transaction
 

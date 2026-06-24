@@ -5,7 +5,6 @@ compatibility: Requires access to the transcript source, target repositories or 
 metadata:
   author: Verdify
   version: "1.0.0"
-  lifecycle-order: "2a"
 ---
 
 # Transcript Replan

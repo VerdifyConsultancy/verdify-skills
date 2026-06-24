@@ -157,6 +157,72 @@ class SchemaValidatorTest < Minitest::Test
     assert repo_validator.errors.any? { |e| e.include?("properties.next_skill.enum missing canonical skills: issue-triage") }
   end
 
+  def test_lifecycle_config_is_canonical_source_for_order_and_modes
+    config = Verdify.safe_load_yaml(Verdify::ROOT.join("config/lifecycle.yaml"))
+    names = config["skills"].map { |skill| skill["name"] }
+    orders = config["skills"].map { |skill| skill["order"] }
+    modes = config["skills"].to_h { |skill| [skill["name"], skill["modes"]] }
+
+    assert_equal "config/lifecycle.yaml", config["canonical_source"]
+    assert_equal (1..18).to_a, orders
+    assert_equal Verdify::CLI::SKILLS, names
+    assert_equal ["issue-triage"], config["standalone_skills"].map { |skill| skill["name"] }
+    assert_includes modes["release-verification"], "review-inbox"
+    assert_includes modes["release-verification"], "observability-diagnostics"
+    refute_includes modes["sprint-orchestrator"], "dispatch-or-monitor"
+  end
+
+  def test_validate_repo_rejects_noncanonical_lifecycle_modes
+    repo_validator = RepoValidator.new
+    path = Verdify::ROOT.join("verdify.workflow.yaml")
+
+    repo_validator.send(:validate_mode_membership, path, "sprint-orchestrator", "dispatch-or-monitor", "fixture route_hash")
+    repo_validator.send(:validate_mode_membership, path, "release-verification", "gate-resolution", "fixture route_for_gate")
+
+    assert repo_validator.errors.any? { |e| e.include?("fixture route_hash mode \"dispatch-or-monitor\" is not declared for sprint-orchestrator") }
+    assert repo_validator.errors.any? { |e| e.include?("fixture route_for_gate mode \"gate-resolution\" is not declared for release-verification") }
+  end
+
+  def test_validate_repo_rejects_lifecycle_order_frontmatter_drift
+    repo_validator = RepoValidator.new
+    config = Verdify.safe_load_yaml(Verdify::ROOT.join("config/lifecycle.yaml"))
+    skill_paths = Dir[Verdify::ROOT.join("skills/*/SKILL.md")]
+
+    skill_paths.each do |path|
+      frontmatter, = repo_validator.send(:parse_frontmatter, Pathname.new(path))
+      refute frontmatter.dig("metadata", "lifecycle-order"), "#{path} must not carry legacy lifecycle-order"
+    end
+    refute_includes config["skills"].map { |skill| skill["name"] }, "issue-triage"
+    assert_equal "standalone", config["standalone_skills"].first["category"]
+  end
+
+  def test_validate_repo_checks_cli_route_modes_against_lifecycle_config
+    repo_validator = RepoValidator.new
+
+    repo_validator.send(:validate_cli_lifecycle_alignment)
+
+    assert_empty repo_validator.errors
+  end
+
+  def test_cli_route_hash_rejects_dynamic_noncanonical_mode
+    repo = Struct.new(:github_slug, :root).new("example/repo", Verdify::ROOT)
+    error = assert_raises(Verdify::UsageError) do
+      Verdify::CLI.new([]).send(
+        :route_hash,
+        repo,
+        "TEST",
+        "sprint-orchestrator",
+        "dispatch-or-monitor",
+        "test",
+        [],
+        [],
+        []
+      )
+    end
+
+    assert_includes error.message, 'route next_mode "dispatch-or-monitor" is not declared for sprint-orchestrator'
+  end
+
   def test_validates_all_example_artifacts
     root = Verdify::ROOT.join("examples/minimal-project/.agent-workflow")
     artifacts = Dir[root.join("**/*.{yaml,yml,json}")]
