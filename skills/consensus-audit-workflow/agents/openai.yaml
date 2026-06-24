@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Consensus Audit"
+  short_description: "Skill audits and consensus review packets"
+  default_prompt: "Use $consensus-audit-workflow to audit a Verdify skill architecture, run adversarial review, and prepare a consensus-ready packet."
+policy:
+  allow_implicit_invocation: false
