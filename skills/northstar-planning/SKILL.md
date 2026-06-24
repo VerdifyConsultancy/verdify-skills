@@ -37,7 +37,6 @@ needed.
 - `.agent-workflow/northstar/northstar-artifacts.yaml` - loop state, evidence,
   open questions, cross-links, review, and signoff
 - `.agent-workflow/northstar/northstar-plan.yaml` - structured synthesis/index
-- `.agent-workflow/northstar/northstar-plan.md` - human-readable synthesis
 - `.agent-workflow/northstar/evidence-registry.yaml` - registered research
   references consumed during synthesis
 - `.agent-workflow/northstar/learning-capture/*.yaml` - proposal-only learning
@@ -57,27 +56,33 @@ packets against `../../schemas/northstar-learning-proposals.schema.yaml`.
    state-of-union, issues, and PRs when available.
 3. Inventory sources as evidence, not conclusions. Mark each claim `verified`,
    `observed`, `reported`, `inferred`, or `unknown`.
-4. Create or update `NORTHSTAR_PRODUCT.md` from
+4. Create or update `.agent-workflow/northstar/northstar-plan.yaml` from
+   `assets/northstar-plan.template.yaml`. Keep it as the structured
+   synthesis/index: source inventory, goals, requirements, stories,
+   architecture principles, milestones, risks, review findings, open questions,
+   conflicts, traceability, proposed artifact changes, issue and gate
+   recommendations, handoff, and approval state.
+5. Create or update `NORTHSTAR_PRODUCT.md` from
    `assets/NORTHSTAR_PRODUCT.template.md`. Include PRD summary, users,
    stories, requirements, milestones, waves, surfaces/shapes, review script,
    open questions, and traceability.
-5. Create or update `NORTHSTAR_ARCHITECTURE.md` from
+6. Create or update `NORTHSTAR_ARCHITECTURE.md` from
    `assets/NORTHSTAR_ARCHITECTURE.template.md`. Include architecture stories,
    requirements, high-level design, infrastructure, interfaces, security/RBAC,
    observability, delivery/release/rollback, ADR index, open questions, and
    traceability.
-6. Maintain `.agent-workflow/northstar/northstar-artifacts.yaml` from
+7. Maintain `.agent-workflow/northstar/northstar-artifacts.yaml` from
    `assets/northstar-artifacts.template.yaml`. Record loop status, iteration,
    evidence references, product/architecture section IDs, cross-links, open
    questions, review state, approvals, and handoff.
-7. Cross-link product intent to architecture inputs. Every architecture input
+8. Cross-link product intent to architecture inputs. Every architecture input
    must explain the user, operator, security, delivery, or cost purpose it
    serves.
-8. Turn unresolved material gaps into `NSQ-*` planning questions. Do not stop
+9. Turn unresolved material gaps into `NSQ-*` planning questions. Do not stop
    the loop merely because questions exist. Answer questions from registered
    evidence where possible, propose follow-up research where evidence is thin,
    and keep iterating the drafts.
-9. Run a learning-capture pass when new evidence, review feedback, session
+10. Run a learning-capture pass when new evidence, review feedback, session
    history, tool friction, or repeated corrections reveal reusable lessons.
    Stage proposals in `.agent-workflow/northstar/learning-capture/` unless an
    explicit current request authorizes applying a low-risk repo-local artifact
@@ -86,15 +91,15 @@ packets against `../../schemas/northstar-learning-proposals.schema.yaml`.
    content, context file, slash command, skill, hook, tool/CLI fix, config,
    backlog, artifact schema, product shape, architecture, or no-op, and state
    risk class plus approval requirement.
-10. For recurring loop proposals, check recurrence, verifier, durable state,
+11. For recurring loop proposals, check recurrence, verifier, durable state,
     stop condition, budget, objective done criteria, permissions, one reliable
     manual run, and handoff summary before recommending scheduling.
-11. Mark protected changes as proposed. Do not edit protected North Star content
-   or mark `DESIGN_COMMITTED` without the configured approval rule.
-12. Request human review only when both markdown artifacts are coherent,
+12. Mark protected changes as proposed. Do not edit protected North Star content
+    or mark `DESIGN_COMMITTED` without the configured approval rule.
+13. Request human review only when both markdown artifacts are coherent,
     cross-linked, and ready for Jason/James feedback. If feedback requests
     changes, route back to `artifact-loop` and iterate again.
-13. Hand off to `project-definition`, `architecture-contracts`,
+14. Hand off to `project-definition`, `architecture-contracts`,
     `state-of-union`, `repo-hygiene`, `platform-readiness`, or
     `gravity-readiness` with one explicit next action only after final North
     Star lock approval for the next milestone.

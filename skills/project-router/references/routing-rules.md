@@ -2,7 +2,8 @@
 
 ## Precedence
 
-1. Safety and incident policy.
+1. Safety and incident policy defined by
+   `../../config/authority-matrix.yaml` `authorities.incident_policy`.
 2. Open human/policy gate that blocks the requested transition.
 3. Live GitHub and Git state.
 4. Approved default-branch artifacts.
@@ -14,7 +15,12 @@
 - A worker may invoke `lane-delivery` directly only with an approved contract, active lease, and explicit assignment.
 - A fresh critic may invoke `independent-critic` directly only with worker closeout and a separate session/worktree.
 - A deployment verifier may invoke `release-verification` directly only with an integrated revision and authorized environment.
-- An incident may bypass normal planning only under the repository incident policy; follow-up definition and contracts are still required.
+- An incident may bypass normal planning only when
+  `../../config/authority-matrix.yaml` `authorities.incident_policy` names the
+  resolver and that resolver records an incident gate decision in
+  `.agent-workflow/gates/<incident-gate-id>.yaml` validated against
+  `../../schemas/human-gate.schema.yaml`; follow-up definition and contracts are
+  still required.
 
 ## Staleness
 
