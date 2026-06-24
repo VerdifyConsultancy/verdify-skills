@@ -96,6 +96,10 @@ module Verdify
       return unless document["status"] == "approved"
 
       validate_approval(document, errors)
+      errors << "$.source_freshness: approved state of union requires at least one source freshness record" if Array(document["source_freshness"]).empty?
+      errors << "$.planning_inventory: approved state of union requires at least one planning inventory record" if Array(document["planning_inventory"]).empty?
+      errors << "$.delivery_health: approved state of union requires delivery health status" if document.dig("delivery_health", "status").to_s.empty?
+
       open_blocking = Array(document["gaps"]).select { |gap| gap["blocking"] == true }
       unless open_blocking.empty?
         ids = open_blocking.map { |gap| gap["id"] }.join(", ")
@@ -131,9 +135,21 @@ module Verdify
       end
 
       lane_ids = Array(document["lanes"]).map { |lane| lane["lane_id"] }
+      Array(document["lanes"]).each_with_index do |lane, index|
+        errors << "$.lanes[#{index}].owner: approved sprint lane requires an owner" if lane["owner"].to_s.strip.empty?
+        errors << "$.lanes[#{index}].reviewer: approved sprint lane requires a reviewer" if lane["reviewer"].to_s.strip.empty?
+      end
       Array(document["acceptance_criteria"]).each_with_index do |criterion, index|
         unknown = Array(criterion["lane_ids"]) - lane_ids
         errors << "$.acceptance_criteria[#{index}].lane_ids: unknown lanes #{unknown.join(', ')}" unless unknown.empty?
+      end
+
+      review_plan = document["review_plan"] || {}
+      if Array(review_plan["user_stories_for_review"]).empty?
+        errors << "$.review_plan.user_stories_for_review: approved/active/complete sprint requires at least one reviewable user story"
+      end
+      if Array(review_plan["human_review_milestones"]).empty?
+        errors << "$.review_plan.human_review_milestones: approved/active/complete sprint requires a human review milestone"
       end
     end
 

@@ -11,6 +11,10 @@ principles:
   - "Research sources become registered, queryable North Star evidence before synthesis."
   - "North Star planning runs a self-improving evidence, research, question, design, and feedback loop before final approval locks product and architecture artifacts for the next milestone."
   - "North Star interview turns review-ready drafts and new evidence into prioritized human Q&A without recording approval."
+  - "Large North Star question corpora are inventoried, clustered, researched, and resolved under delegated authority before humans receive only thematic escalations."
+  - "Comprehensive replans reconstruct source freshness, backlog, planning artifacts, delivery health, discovered health issues, lanes, waves, QA, and review milestones through durable control-plane records."
+  - "Review-ready claims require a review inbox packet with exact revision, checks, deployment or explicit non-environment rationale, telemetry, rollback, questions, and feedback route before integration proceeds."
+  - "Sprint execution uses an approved execution runbook and Agent Platform MCP/API sessions for lane workers; ad hoc local worker spawning is a gated fallback, not the default path."
   - "Repo hygiene and platform readiness gate feature work when evidence says they are required."
 roles:
   router: {may_write_code: false, may_approve_own_work: false}
@@ -30,7 +34,7 @@ outline_stages:
   - {id: 6, outline_name: north-star-architecture, skill: architecture-contracts, mode: north-star-architecture}
   - {id: 7, outline_name: module-contracts, skill: architecture-contracts, mode: module-contracts}
   - {id: 8, outline_name: sprint-planning, skill: sprint-planning, mode: sprint-plan}
-  - {id: 9, outline_name: sprint-orchestrator, skill: sprint-orchestrator, mode: dispatch-or-monitor}
+  - {id: 9, outline_name: sprint-orchestrator, skill: sprint-orchestrator, mode: execution-runbook-platform-dispatch-or-monitor}
   - {id: 10, outline_name: lane-decomposition, skill: sprint-planning, mode: lane-transaction}
   - {id: 11, outline_name: lane-contracts, skill: sprint-planning, mode: lane-transaction}
   - {id: 12, outline_name: lane-implementation, skill: lane-delivery, mode: implementation}
@@ -48,7 +52,7 @@ state_machine:
       skill: project-router
       mode: route
       outputs: [.agent-workflow/router/route-decision.yaml]
-      transitions: [TRANSCRIPT_REPLAN, NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLAN_SPRINT, ORCHESTRATE, CONTROLLER_LOOP, PLATFORM_READINESS, GRAVITY_READINESS, CRITIC_REVIEW, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
+      transitions: [TRANSCRIPT_REPLAN, NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, NORTHSTAR_QUESTION_RESOLUTION, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLAN_SPRINT, ORCHESTRATE, CONTROLLER_LOOP, PLATFORM_READINESS, GRAVITY_READINESS, CRITIC_REVIEW, REVIEW_INBOX, INTEGRATE, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, RESOLVE_GATE]
     TRANSCRIPT_REPLAN:
       actor: planner
       skill: transcript-replan
@@ -60,19 +64,25 @@ state_machine:
       skill: northstar-research-ingest
       mode: ingest-research-or-evidence-list
       outputs: [.agent-workflow/northstar/evidence-registry.yaml, .agent-workflow/northstar/collateral]
-      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, DEFINE_PROJECT, REVIEW_STRATEGY, ROUTE]
+      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, NORTHSTAR_QUESTION_RESOLUTION, DEFINE_PROJECT, REVIEW_STRATEGY, ROUTE]
     NORTHSTAR_PLANNING:
       actor: planner
       skill: northstar-planning
       mode: intake-synthesis-artifact-loop-research-loop-or-review-feedback
       outputs: [.agent-workflow/northstar/northstar-plan.yaml, .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml]
-      transitions: [NORTHSTAR_INTERVIEW, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
+      transitions: [NORTHSTAR_INTERVIEW, NORTHSTAR_QUESTION_RESOLUTION, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, ROUTE]
     NORTHSTAR_INTERVIEW:
       actor: planner
       skill: northstar-interview
       mode: review-question-pack-answer-capture-or-feedback-routing
       outputs: [.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md]
-      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, ROUTE]
+      transitions: [NORTHSTAR_PLANNING, NORTHSTAR_QUESTION_RESOLUTION, NORTHSTAR_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, ROUTE]
+    NORTHSTAR_QUESTION_RESOLUTION:
+      actor: planner
+      skill: northstar-question-resolution
+      mode: inventory-cluster-research-answer-or-planning-handoff
+      outputs: [.agent-workflow/northstar/question-resolution/<run-id>/inventory.yaml, .agent-workflow/northstar/question-resolution/<run-id>/resolution-register.yaml, .agent-workflow/northstar/research-inbox]
+      transitions: [NORTHSTAR_RESEARCH_INGEST, NORTHSTAR_PLANNING, NORTHSTAR_INTERVIEW, NORTHSTAR_GATE, ROUTE]
     NORTHSTAR_GATE:
       actor: outcome_owner
       gate: northstar
@@ -104,8 +114,8 @@ state_machine:
     REVIEW_STRATEGY:
       actor: planner
       skill: state-of-union
-      mode: strategy-review
-      outputs: [.agent-workflow/strategy/state-of-union.yaml]
+      mode: strategy-review-or-comprehensive-replan
+      outputs: [.agent-workflow/strategy/state-of-union.yaml, .agent-workflow/strategy/github-backlog-sync.yaml]
       transitions: [STRATEGY_GATE, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REPO_HYGIENE, PLATFORM_READINESS, GRAVITY_READINESS, PLAN_SPRINT, ROUTE]
     STRATEGY_GATE:
       actor: outcome_owner
@@ -126,8 +136,8 @@ state_machine:
     PLAN_SPRINT:
       actor: planner
       skill: sprint-planning
-      mode: issue-readiness-and-lane-transaction
-      outputs: [.agent-workflow/sprints/<sprint-id>/sprint-plan.yaml, .agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml, .agent-workflow/sprints/<sprint-id>/lanes/contracts]
+      mode: issue-readiness-lane-transaction-review-plan-and-wave-release-plan
+      outputs: [.agent-workflow/sprints/<sprint-id>/sprint-plan.yaml, .agent-workflow/sprints/<sprint-id>/lanes/lane-map.yaml, .agent-workflow/sprints/<sprint-id>/lanes/contracts, .agent-workflow/sprints/<sprint-id>/release/wave-release-plan.yaml]
       transitions: [PLAN_APPROVAL_GATE, ROUTE]
     PLAN_APPROVAL_GATE:
       actor: outcome_owner
@@ -137,7 +147,8 @@ state_machine:
     ORCHESTRATE:
       actor: orchestrator
       skill: sprint-orchestrator
-      mode: dispatch-or-monitor
+      mode: execution-runbook-platform-dispatch-or-monitor
+      outputs: [.agent-workflow/sprints/<sprint-id>/execution/sprint-execution-runbook.yaml, .agent-workflow/sprints/<sprint-id>/status.yaml]
       transitions: [CONTROLLER_LOOP, LANE_WORK, CRITIC_REVIEW, RESOLVE_GATE, INTEGRATE, CANCELLED]
     CONTROLLER_LOOP:
       actor: orchestrator
@@ -182,12 +193,19 @@ state_machine:
       lease_required: critic
       separate_worktree_required: true
       outputs: [.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml]
-      transitions: [LANE_WORK, RESOLVE_GATE, ORCHESTRATE, INTEGRATE]
+      transitions: [LANE_WORK, RESOLVE_GATE, ORCHESTRATE, REVIEW_INBOX]
     RESOLVE_GATE:
       actor: outcome_owner
       skill: sprint-orchestrator
       mode: gate-management
-      transitions: [NORTHSTAR_PLANNING, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
+      transitions: [NORTHSTAR_PLANNING, DEFINE_PROJECT, DEFINE_ARCHITECTURE, REVIEW_STRATEGY, PLAN_SPRINT, LANE_WORK, CRITIC_REVIEW, REVIEW_INBOX, VERIFY_DEPLOYMENT, REVIEW_OUTCOME, CANCELLED]
+    REVIEW_INBOX:
+      actor: integrator
+      skill: release-verification
+      mode: review-inbox
+      fresh_session_required: true
+      outputs: [.agent-workflow/sprints/<sprint-id>/review/review-inbox-packet.yaml]
+      transitions: [INTEGRATE, LANE_WORK, PLAN_SPRINT, RESOLVE_GATE, CANCELLED]
     INTEGRATE:
       actor: integrator
       skill: release-verification

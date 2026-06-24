@@ -32,7 +32,8 @@ answers, or start implementation.
 
 ## Consequences
 
-- The package now exposes seventeen canonical skills.
+- At the time of this ADR, the package exposed seventeen canonical skills.
+  `ADR-0009` later added `northstar-question-resolution`.
 - Human review becomes easier to conduct because questions are concrete,
   prioritized, and evidence-linked.
 - The final North Star lock gate remains separate from interview answers.

@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-06-23T19:30:23Z'
+updated_at: '2026-06-24T14:52:36Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -822,62 +822,6 @@ evidence:
   planning_relevance:
   - Supports PRQ-018, SURF-012, IFACE-012, ARCH-013, ARCH-007, and future agent-platform-control/session-ledger
     contracts.
-- id: NSE-20260623-repo-controller-bootstrap-self-discovery
-  reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
-  title: Repo controller bootstrap and fleet self-discovery walk intake
-  evidence_type: transcript
-  evidence_status: reported
-  ingested_at: '2026-06-23T19:30:23Z'
-  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml"
-  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-repo-controller-bootstrap-self-discovery-2026-06-23-repo-controller-bootstrap-self-discovery-md"
-  source_uri:
-  source_sha256: e7af76f8392528da8a232c63d68125cadfde6aad9956a5d89af47022e3e31180
-  summary: Reported semantic walk intake for repo-controller bootstrap, fleet self-discovery,
-    namespace and storage standards, controller loops, Grafana/Prometheus observability,
-    alert-to-agent recovery, Orbit daily operating briefs, adversarial plan review,
-    and standard repo onboarding across a multi-repository agent fleet.
-  tags:
-  - agent-platform
-  - bootstrap
-  - controller-loop
-  - fleet
-  - grafana
-  - kubernetes
-  - namespaces
-  - observability
-  - orbit
-  - repo-hygiene
-  - self-discovery
-  - storage
-  - transcript
-  claims:
-  - Active repositories should eventually have controller agents with durable state,
-    structured worktree-agent control, tmux/web/API visibility, and Agent Platform
-    MCP or control operations.
-  - A repo-bootstrap workflow should inventory repository content, Git history, GitHub
-    state, Kubernetes deployments, logs, metrics, routes, secret references, credential
-    validation results, storage mounts, CI/CD shape, and runtime/package needs.
-  - Bootstrap output should include a standard project inventory, updated `AGENTS.md`,
-    namespace/environment mapping, gap assessment, proposed backlog issues, and a pull
-    request for repo-local planning changes.
-  - Namespace, storage, route, secret, credential, and CI/CD patterns should become
-    consistent across the fleet while preserving least privilege and scoped infrastructure
-    domain-agent authority.
-  - Controller loops should emit metrics, update dashboards, persist state, recover
-    from failures, and route Alertmanager events back to the responsible controller
-    when possible.
-  - Planning should include adversarial Codex/Claude review, lane-owner review, and
-    stakeholder lenses before final plan consensus.
-  - Orbit or an equivalent higher-level planner should aggregate cross-repo controller,
-    issue, PR, email, calendar, and agent status into a daily operating brief.
-  planning_relevance:
-  - Adds repo-bootstrap/self-discovery as a cross-skill workflow spanning `repo-hygiene`,
-    `platform-readiness`, `controller-loop`, `state-of-union`, and `northstar-planning`.
-  - Extends Agent Platform planning with durable PVC/workspace, tmux/web/API, VS Code
-    workspace visibility, base-image recommendations, registry rollback, and alert-to-agent
-    recovery requirements.
-  - Adds non-blocking questions for namespace naming, infrastructure domain-agent boundaries,
-    storage mount self-service, controller model choice, and Orbit ownership.
 - id: NSE-20260623-opengitops-events-session-specificity
   reference: northstar://evidence/NSE-20260623-opengitops-events-session-specificity
   title: OpenGitOps event and session specificity
@@ -937,6 +881,62 @@ evidence:
   planning_relevance:
   - Resolves the OpenGitOps event/session specificity research gap and supports future
     wave-release-planning and platform-readiness research.
+- id: NSE-20260623-repo-controller-bootstrap-self-discovery
+  reference: northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery
+  title: Repo controller bootstrap and fleet self-discovery walk intake
+  evidence_type: transcript
+  evidence_status: reported
+  ingested_at: '2026-06-23T19:30:23Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260623-repo-controller-bootstrap-self-discovery-2026-06-23-repo-controller-bootstrap-self-discovery-md"
+  source_uri:
+  source_sha256: e7af76f8392528da8a232c63d68125cadfde6aad9956a5d89af47022e3e31180
+  summary: Reported semantic walk intake for repo-controller bootstrap, fleet self-discovery,
+    namespace and storage standards, controller loops, Grafana/Prometheus observability,
+    alert-to-agent recovery, Orbit daily operating briefs, adversarial plan review,
+    and standard repo onboarding across a multi-repository agent fleet.
+  tags:
+  - agent-platform
+  - bootstrap
+  - controller-loop
+  - fleet
+  - grafana
+  - kubernetes
+  - namespaces
+  - observability
+  - orbit
+  - repo-hygiene
+  - self-discovery
+  - storage
+  - transcript
+  claims:
+  - Active repositories should eventually have controller agents with durable state,
+    structured worktree-agent control, tmux/web/API visibility, and Agent Platform
+    MCP or control operations.
+  - A repo-bootstrap workflow should inventory repository content, Git history, GitHub
+    state, Kubernetes deployments, logs, metrics, routes, secret references, credential
+    validation results, storage mounts, CI/CD shape, and runtime/package needs.
+  - Bootstrap output should include a standard project inventory, updated `AGENTS.md`,
+    namespace/environment mapping, gap assessment, proposed backlog issues, and a
+    pull request for repo-local planning changes.
+  - Namespace, storage, route, secret, credential, and CI/CD patterns should become
+    consistent across the fleet while preserving least privilege and scoped infrastructure
+    domain-agent authority.
+  - Controller loops should emit metrics, update dashboards, persist state, recover
+    from failures, and route Alertmanager events back to the responsible controller
+    when possible.
+  - Planning should include adversarial Codex/Claude review, lane-owner review, and
+    stakeholder lenses before final plan consensus.
+  - Orbit or an equivalent higher-level planner should aggregate cross-repo controller,
+    issue, PR, email, calendar, and agent status into a daily operating brief.
+  planning_relevance:
+  - Adds repo-bootstrap/self-discovery as a cross-skill workflow spanning `repo-hygiene`,
+    `platform-readiness`, `controller-loop`, `state-of-union`, and `northstar-planning`.
+  - Extends Agent Platform planning with durable PVC/workspace, tmux/web/API, VS Code
+    workspace visibility, base-image recommendations, registry rollback, and alert-to-agent
+    recovery requirements.
+  - Adds non-blocking questions for namespace naming, infrastructure domain-agent
+    boundaries, storage mount self-service, controller model choice, and Orbit ownership.
 - id: NSE-20260623-review-inbox-product-examples
   reference: northstar://evidence/NSE-20260623-review-inbox-product-examples
   title: Review inbox product examples
@@ -1343,3 +1343,64 @@ evidence:
     OpenClaw workflow stage.
   - Supports keeping `wave-release-planning` as a sprint-planning mode before adding
     a top-level canonical skill.
+- id: NSE-20260624-comprehensive-planning-and-review-loop-b
+  reference: northstar://evidence/NSE-20260624-comprehensive-planning-and-review-loop-b
+  title: Comprehensive planning and review loop Brave research
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-24T14:52:36Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260624-comprehensive-planning-and-review-loop-b.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-comprehensive-planning-and-review-loop-b-2026-06-24-comprehensive-planning-review-loop-br"
+  source_uri:
+  source_sha256: b7137a856a805104a0cee28fe35328799f0f9cd47196f8759277e8326079ad0d
+  summary: Supports reworking planning and review skills into an evidence-backed loop
+    that reconciles GitHub backlog, planning artifacts, deployment/log health, lanes,
+    waves, QA, and human review packets.
+  tags:
+  - brave-research
+  - planning-review-loop
+  - release-verification
+  - sprint-planning
+  - state-of-union
+  claims:
+  - Comprehensive project replan prompts should execute through durable GitHub and
+    Verdify lifecycle artifacts rather than private chat state.
+  - State-of-union should record source freshness, backlog reconciliation, planning
+    artifact state, deployment/log health, gaps, actions, candidate sequences, and
+    one handoff.
+  - Sprint planning should record included and deferred work, lanes, owners, dependency
+    order, QA and human review milestones, user stories for review, release expectations,
+    risks, and approval gate.
+  - Review readiness should require an exact reviewed revision, checks, deployment
+    or explicit non-environment rationale, telemetry, rollback, questions, and feedback
+    route.
+  planning_relevance: []
+- id: NSE-20260624-question-resolution-workflow-brave-resea
+  reference: northstar://evidence/NSE-20260624-question-resolution-workflow-brave-resea
+  title: Question resolution workflow Brave research
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-06-24T01:08:38Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260624-question-resolution-workflow-brave-resea.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-question-resolution-workflow-brave-resea-2026-06-24-question-resolution-workflow-brave-re"
+  source_uri:
+  source_sha256: bad371d8b74233a5b4003649cc61032ceef14afde2dd223c923d3eda3ffbf39e
+  summary: Brave Search API research supporting a durable workflow for clustering
+    large human-gated question corpora, recording delegated answers, and handing evidence-backed
+    resolutions to North Star planning.
+  tags:
+  - adr
+  - brave-search
+  - docs-as-code
+  - question-resolution
+  claims:
+  - Large question corpora should be inventoried and clustered into shared decisions
+    before humans receive escalation packs.
+  - ADR-style records are suitable for material architecture decisions because they
+    preserve context, selected decision, options, consequences, and review hooks.
+  - Docs-as-code practices support keeping question inventories and resolution registers
+    in version control with review and automation.
+  planning_relevance:
+  - 'Supports the northstar-question-resolution skill and issue #4.'
+  - Supports using a resolution register plus North Star evidence ingestion before
+    northstar-planning updates artifacts.

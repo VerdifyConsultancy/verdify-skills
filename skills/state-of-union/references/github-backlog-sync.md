@@ -15,8 +15,9 @@ each proposed action.
   `.agent-workflow/github/snapshot.json` with its capture timestamp and known
   limitations.
 - North Star, project definition, architecture contracts, state-of-union,
-  sprint plan, lane contracts, leases, PRs, checks, review packets, deployment
-  evidence, and outcome records.
+  sprint plan, lane contracts, leases, PRs, checks, review packets, diagnostic
+  packets, deployment evidence, runtime/log health evidence, and outcome
+  records.
 - GitHub Issues, sub-issues, dependencies, labels, assignees, milestones,
   Projects fields, PR branches, PR body links, check/workflow run status,
   deployment status, and environment records when available.
@@ -34,8 +35,9 @@ each proposed action.
    state, check status, deployment status, and review/release evidence.
 5. Reconcile lane contracts against issue IDs, branch, PR refs, duplicate issue
    assignment, and current sprint/orchestrator state.
-6. Record delivery findings separately from PR state. A merge is not deployment
-   verification.
+6. Record delivery and runtime-health findings separately from PR state. A
+   merge is not deployment verification, and CI success is not log or telemetry
+   health proof.
 7. Record actions with the control plane that must apply them: GitHub issue,
    dependency, Project, PR, durable gate, state-of-union, sprint-orchestrator,
    or release-verification.

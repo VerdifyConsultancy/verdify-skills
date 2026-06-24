@@ -52,6 +52,10 @@ rollback, and outcome review.
 9. Route feedback to exactly one next action: fix lane, replan, architecture
    review, release verification, human signoff, issue creation, or hold.
 
+Critic approval is necessary but not sufficient for integration. Integration
+waits for a complete review packet with an approve recommendation, or an
+explicit policy exception recorded through the appropriate gate.
+
 ## Completeness Rules
 
 Mark `evidence_completeness.verdict` as `complete` only when:

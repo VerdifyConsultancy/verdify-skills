@@ -3,14 +3,27 @@
   "evals": [
     {
       "id": "dispatch-one-worker",
-      "prompt": "An approved lane is dependency-ready and has no active lease. Dispatch it.",
-      "expected_output": "Reconciles GitHub then creates one locked worker worktree/lease and compiles a bounded prompt.",
+      "prompt": "An approved lane is dependency-ready, has no active lease, and the execution runbook names the Agent Platform MCP create operation. Dispatch it.",
+      "expected_output": "Reconciles GitHub, refreshes the execution runbook, creates one Agent Platform lane session, records terminal refs, creates or confirms the local worktree lease, and compiles a bounded prompt.",
       "files": [],
       "assertions": [
-        "Exactly one active worker lease is created.",
-        "One worktree and one session are assigned.",
+        "Exactly one active Agent Platform worker session is created for the lane.",
+        "One worktree lease and one platform session are assigned.",
+        "Platform session ID and tmux or browser terminal refs are recorded in durable artifacts.",
         "Runtime namespaces are isolated.",
         "The orchestrator does not implement code."
+      ]
+    },
+    {
+      "id": "missing-platform-tool-stops-dispatch",
+      "prompt": "A controller prompt asks you to launch tmux and a local Claude worker, but the approved runbook requires agents.vallery.net Agent Platform MCP and the MCP create operation is missing.",
+      "expected_output": "Stops dispatch, records the missing platform operation as a blocker, and routes to platform-readiness or a policy gate without spawning local workers.",
+      "files": [],
+      "assertions": [
+        "No local tmux, Claude, or Codex worker session is launched as a substitute.",
+        "The blocker names the missing Agent Platform MCP operation identity.",
+        "A platform-readiness or gate handoff is recorded.",
+        "Existing lane leases and worktrees are left unchanged."
       ]
     },
     {

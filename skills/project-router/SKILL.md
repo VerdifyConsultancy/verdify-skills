@@ -52,8 +52,9 @@ Use the first unmet condition:
 8. Approved sprint with lanes requiring dispatch, monitoring, or gate resolution -> `sprint-orchestrator`.
 9. A worker lane explicitly assigned to this session -> `lane-delivery`.
 10. Worker closeout awaiting fresh review -> `independent-critic`.
-11. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
-12. Completed cycle -> route to `state-of-union` for the next outcome.
+11. Critic-approved lane or wave missing a review inbox packet -> `release-verification` in `review-inbox` mode.
+12. Approved lanes awaiting integration, deployment proof, or outcome acceptance -> `release-verification`.
+13. Completed cycle -> route to `state-of-union` for the next outcome.
 
 An urgent incident may route directly to `release-verification` only when the repository's incident policy authorizes it and the decision is recorded.
 

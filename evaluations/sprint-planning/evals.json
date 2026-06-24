@@ -23,6 +23,18 @@
         "The common acceptance and merge boundary is explained.",
         "The full plan transaction is revalidated and approved."
       ]
+    },
+    {
+      "id": "reviewable-sprint-summary",
+      "prompt": "Plan the next sprint from ready issues and report what's in, what's deferred, the lanes, owners, next QA/human review milestone, and user stories completed for review.",
+      "expected_output": "Creates a sprint transaction whose sprint-plan.yaml records included/deferred work, lane owners and reviewers, dependency order, QA milestones, human review milestones, review packet path, and user stories for review before stopping at plan approval.",
+      "files": [],
+      "assertions": [
+        "The sprint plan includes review_plan.qa_milestones and review_plan.human_review_milestones.",
+        "Every lane has an owner, reviewer, branch, and contract path.",
+        "User stories for review map to issue IDs, lane IDs, and acceptance refs.",
+        "The final report does not introduce scope absent from the sprint artifacts."
+      ]
     }
   ]
 }

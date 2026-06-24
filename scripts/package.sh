@@ -14,12 +14,12 @@ done
 make -C "$ROOT" test
 mkdir -p "$OUT" "$STAGE/$NAME"
 rsync -a \
-  --exclude '.git' \
-  --exclude '.agent-skills' \
-  --exclude '.agent-workflow' \
-  --exclude 'dist' \
-  --exclude 'MANIFEST.sha256' \
-  --exclude 'node_modules' \
+  --exclude '/.git' \
+  --exclude '/.agent-skills' \
+  --exclude '/.agent-workflow' \
+  --exclude '/dist' \
+  --exclude '/MANIFEST.sha256' \
+  --exclude '/node_modules' \
   "$ROOT/" "$STAGE/$NAME/"
 (
   cd "$STAGE/$NAME"

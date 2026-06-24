@@ -11,7 +11,7 @@ ROOT = Pathname.new(File.expand_path("..", __dir__))
 SKILL_NAME_PATTERN = /\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
 REQUIRED_SKILLS = %w[
   project-router transcript-replan northstar-research-ingest northstar-planning northstar-interview
-  project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
+  northstar-question-resolution project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
   sprint-orchestrator controller-loop platform-readiness gravity-readiness lane-delivery
   independent-critic release-verification issue-triage
 ].freeze
@@ -290,11 +290,15 @@ class RepoValidator
   end
 
   def validate_scripts
-    %w[
+    script_paths = %w[
       bin/verdify scripts/setup-agent-hosts.rb scripts/validate-repo.rb scripts/pr-policy.rb
       scripts/bootstrap-agent-session.sh scripts/launch-codex.sh scripts/launch-claude.sh scripts/package.sh scripts/verify-package.sh
       npm/bin/verdify.js tests/test_npm_install.sh
-    ].each do |relative|
+    ].map { |relative| ROOT.join(relative) }
+    script_paths += Dir[ROOT.join("skills/*/scripts/*")].sort.map { |path| Pathname.new(path) }.select(&:file?)
+
+    script_paths.each do |path|
+      relative = rel(path)
       path = ROOT.join(relative)
       next unless path.file?
       error(path, "must be executable") unless path.executable?
@@ -342,6 +346,12 @@ class RepoValidator
     if %w[approved active complete].include?(plan["status"])
       %w[issue_ids scope acceptance_criteria lanes].each do |field|
         error(plan_path, "approved sprint requires non-empty #{field}") if Array(plan[field]).empty?
+      end
+      if Array(plan.dig("review_plan", "user_stories_for_review")).empty?
+        error(plan_path, "approved sprint requires review_plan.user_stories_for_review")
+      end
+      if Array(plan.dig("review_plan", "human_review_milestones")).empty?
+        error(plan_path, "approved sprint requires review_plan.human_review_milestones")
       end
       error(plan_path, "approved sprint requires approved approval") unless plan.dig("approval", "status") == "approved"
     end

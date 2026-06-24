@@ -30,6 +30,13 @@ Mandatory repository rules:
 - Use `$northstar-interview` when review-ready North Star drafts or new evidence
   need prioritized human questions, proposed defaults, tradeoffs, and answer
   capture before final lock approval.
+- Use `$northstar-question-resolution` when a repo has many human-gated or open
+  planning questions that should be inventoried, clustered, researched with
+  registered evidence, answered under delegated authority, and reduced to a
+  short human escalation pack.
+- Use `$state-of-union` for comprehensive project triage or replanning across
+  GitHub backlog, planning artifacts, sprint artifacts, deployment/log health,
+  discovered health issues, execution sequence, and next sprint candidates.
 - Run `$repo-hygiene` before feature execution when a repo has not passed Wave 0
   compliance.
 - Keep Gravity implementation blocked until `$platform-readiness` and

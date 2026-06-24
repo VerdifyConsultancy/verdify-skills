@@ -1,0 +1,40 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260624-comprehensive-planning-and-review-loop-b
+reference: northstar://evidence/NSE-20260624-comprehensive-planning-and-review-loop-b
+title: Comprehensive planning and review loop Brave research
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-24T14:52:36Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-24-comprehensive-planning-review-loop-brave-research.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-comprehensive-planning-and-review-loop-b-2026-06-24-comprehensive-planning-review-loop-br"
+  sha256: b7137a856a805104a0cee28fe35328799f0f9cd47196f8759277e8326079ad0d
+summary: Supports reworking planning and review skills into an evidence-backed loop
+  that reconciles GitHub backlog, planning artifacts, deployment/log health, lanes,
+  waves, QA, and human review packets.
+tags:
+- brave-research
+- planning-review-loop
+- release-verification
+- sprint-planning
+- state-of-union
+claims:
+- Comprehensive project replan prompts should execute through durable GitHub and Verdify
+  lifecycle artifacts rather than private chat state.
+- State-of-union should record source freshness, backlog reconciliation, planning
+  artifact state, deployment/log health, gaps, actions, candidate sequences, and one
+  handoff.
+- Sprint planning should record included and deferred work, lanes, owners, dependency
+  order, QA and human review milestones, user stories for review, release expectations,
+  risks, and approval gate.
+- Review readiness should require an exact reviewed revision, checks, deployment or
+  explicit non-environment rationale, telemetry, rollback, questions, and feedback
+  route.
+planning_relevance: []
+limitations:
+- Research validates workflow shape; each target repository still requires live GitHub,
+  CI/CD, deployment, log, and telemetry evidence at triage time.

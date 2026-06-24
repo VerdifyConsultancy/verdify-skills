@@ -23,6 +23,18 @@
         "The handoff names exactly one next skill and mode.",
         "The strategy does not silently invent billing requirements."
       ]
+    },
+    {
+      "id": "comprehensive-operating-replan",
+      "prompt": "Familiarize yourself with this project, triage open issues, backlog, planning docs, sprint docs, North Star, live deployment, and recent logs. Add discovered health issues to GitHub tracking and propose the next sprint.",
+      "expected_output": "Creates a state-of-union strategy and, when material, a github-backlog-sync/diagnostic trail that records source freshness, planning inventory, delivery health, issue classifications, discovered health issue actions, recommended sequence, next sprint candidates, and one handoff without creating lane contracts.",
+      "files": [],
+      "assertions": [
+        "Source freshness covers GitHub, planning artifacts, sprint artifacts, deployment/log/telemetry surfaces, and limitations.",
+        "Discovered health work becomes proposed or applied GitHub issue actions.",
+        "Delivery health is not inferred from CI or merge state alone.",
+        "The strategy proposes candidates for sprint-planning but does not create lanes."
+      ]
     }
   ]
 }

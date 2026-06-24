@@ -1,6 +1,6 @@
 ---
 name: release-verification
-description: Assembles review-ready evidence packets, integrates critic-approved lanes, validates the whole system, verifies the intended revision in an authorized deployment environment, and completes human outcome review. Use after critic review, when a lane or wave claims review-ready status, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
+description: Assembles review-ready evidence packets, records observability diagnostics for planning/review/release health, integrates critic-approved lanes, validates the whole system, verifies the intended revision in an authorized deployment environment, and completes human outcome review. Use after critic review, when a lane or wave claims review-ready status, when planning or state-of-union needs live deployment/log health evidence, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
 compatibility: Requires fresh integration context, GitHub checks/reviews, repository release tooling, and separately authorized deployment access. Production credentials must not come from worker lanes.
 metadata:
   author: Verdify
@@ -30,16 +30,16 @@ Read `references/review-inbox.md`.
 
 ## Cross-mode: observability diagnostics
 
-1. Use diagnostics when review-ready status, release health, platform readiness,
-   or user feedback depends on runtime evidence.
+1. Use diagnostics when strategy refresh, review-ready status, release health,
+   platform readiness, or user feedback depends on runtime evidence.
 2. Record scope, correlation IDs, hypotheses, telemetry links, signal
    assessments, runtime checks, deployment markers, findings, missing
    instrumentation, recommendation, and feedback route.
 3. Write
    `.agent-workflow/sprints/<sprint-id>/release/observability-diagnostic-packet.yaml`
    and validate against `../../schemas/observability-diagnostic-packet.schema.yaml`.
-4. Route to review inbox, release verification, platform readiness, lane
-   delivery, sprint planning, incident handling, or no action.
+4. Route to state-of-union, review inbox, release verification, platform
+   readiness, lane delivery, sprint planning, incident handling, or no action.
 
 Read `references/observability-diagnostics.md`.
 

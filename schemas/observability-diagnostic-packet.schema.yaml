@@ -135,7 +135,7 @@ properties:
     additionalProperties: false
     required: [route, instructions, target_refs]
     properties:
-      route: {type: string, enum: [review_inbox, release_verification, platform_readiness, lane_delivery, sprint_planning, incident, no_action]}
+      route: {type: string, enum: [state_of_union, review_inbox, release_verification, platform_readiness, lane_delivery, sprint_planning, incident, no_action]}
       instructions: {type: string, minLength: 1}
       target_refs: {type: array, items: {type: string}}
   prepared_at: {type: string, minLength: 1}

@@ -2,7 +2,7 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-06-23T20:16:44Z'
+generated_at: '2026-06-24T15:13:12Z'
 repository: VerdifyConsultancy/verdify-skills
 current_state: NORTHSTAR_ARTIFACTS_INCOMPLETE
 next_skill: northstar-planning
@@ -13,7 +13,7 @@ evidence:
 - source: ".agent-workflow/intake/transcript-replan.yaml"
   finding: transcript-replan status is "routed"
 - source: ".agent-workflow/northstar/evidence-registry.yaml"
-  finding: registered North Star evidence count is 36
+  finding: registered North Star evidence count is 38
 - source: ".agent-workflow/northstar/northstar-plan.yaml"
   finding: northstar-plan status is "proposed"
 - source: ".agent-workflow/northstar/northstar-artifacts.yaml"

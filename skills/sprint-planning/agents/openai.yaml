@@ -1,6 +1,6 @@
 interface:
   display_name: "Verdify Sprint Planning"
-  short_description: "Plan issues, lanes, contracts, and wave release"
-  default_prompt: "Plan a bounded sprint from ready GitHub Issues. Create the lane topology, contracts, and wave release plan in one transaction, then stop at plan approval without creating worktrees."
+  short_description: "Plan lanes, owners, review, and release"
+  default_prompt: "Use $sprint-planning to plan a bounded sprint from ready GitHub Issues, including lanes, owners, QA milestones, human review, lane contracts, and wave release plan, then stop at plan approval."
 policy:
   allow_implicit_invocation: true

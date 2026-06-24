@@ -17,6 +17,15 @@ risks: []
 lanes: []
 dependency_order: []
 deployment_expectations: []
+review_plan:
+  qa_milestones: []
+  human_review_milestones: []
+  user_stories_for_review: []
+  reporting_summary:
+    included: []
+    deferred: []
+    ownership: []
+    next_review: ""
 approval:
   status: pending
   approver: null

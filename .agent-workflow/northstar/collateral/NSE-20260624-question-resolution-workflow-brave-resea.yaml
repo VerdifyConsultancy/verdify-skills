@@ -1,0 +1,37 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260624-question-resolution-workflow-brave-resea
+reference: northstar://evidence/NSE-20260624-question-resolution-workflow-brave-resea
+title: Question resolution workflow Brave research
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-24T01:08:38Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-24-question-resolution-workflow-brave-research.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-question-resolution-workflow-brave-resea-2026-06-24-question-resolution-workflow-brave-re"
+  sha256: bad371d8b74233a5b4003649cc61032ceef14afde2dd223c923d3eda3ffbf39e
+summary: Brave Search API research supporting a durable workflow for clustering large
+  human-gated question corpora, recording delegated answers, and handing evidence-backed
+  resolutions to North Star planning.
+tags:
+- adr
+- brave-search
+- docs-as-code
+- question-resolution
+claims:
+- Large question corpora should be inventoried and clustered into shared decisions
+  before humans receive escalation packs.
+- ADR-style records are suitable for material architecture decisions because they
+  preserve context, selected decision, options, consequences, and review hooks.
+- Docs-as-code practices support keeping question inventories and resolution registers
+  in version control with review and automation.
+planning_relevance:
+- 'Supports the northstar-question-resolution skill and issue #4.'
+- Supports using a resolution register plus North Star evidence ingestion before northstar-planning
+  updates artifacts.
+limitations:
+- Brave Search result ordering is not evidence of authority; primary sources should
+  be preferred for each detailed Gravity decision.

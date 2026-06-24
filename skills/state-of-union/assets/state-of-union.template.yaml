@@ -7,6 +7,8 @@ repository: replace-me
 baseline_sha: replace-me
 assessed_at: replace-me
 inputs: []
+source_freshness: []
+planning_inventory: []
 north_star:
   goal: ""
   alignment_status: unknown
@@ -17,6 +19,13 @@ current_state:
   active_sprint: null
   open_gates: []
   delivery_risks: []
+delivery_health:
+  status: unknown
+  diagnostic_refs: []
+  deployment_refs: []
+  log_refs: []
+  telemetry_refs: []
+  discovered_health_issues: []
 issue_inventory: []
 gaps: []
 recommended_sequence: []

@@ -21,3 +21,9 @@ Classify each relevant issue:
 Prefer issue updates over strategy-only notes. A strategy recommendation is not executable until backlog intent lives in GitHub or a durable Verdify artifact.
 
 For each issue, record the evidence used, why it matters to the north-star goal, and the next action required before sprint planning.
+
+When triage discovers runtime, log, deployment, telemetry, documentation, or
+planning health work with no GitHub Issue, classify it as `missing` and record a
+create-issue action. The proposed issue should include observed evidence,
+severity, acceptance intent, owner/routing skill, and whether it blocks sprint
+planning, review readiness, deployment verification, or outcome acceptance.

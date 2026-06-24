@@ -22,6 +22,17 @@
         "Health alone is insufficient.",
         "Rollback or incident evidence is recorded."
       ]
+    },
+    {
+      "id": "planning-health-diagnostic",
+      "prompt": "State-of-union needs live deployment and recent log evidence before it can replan the sprint.",
+      "expected_output": "Runs observability-diagnostics mode, records runtime identity, log/metric/trace/probe findings, missing instrumentation, and routes evidence back to state-of-union or a tracked issue.",
+      "files": [],
+      "assertions": [
+        "Diagnostic evidence distinguishes runtime identity from behavior.",
+        "Logs and telemetry limitations are explicit.",
+        "Findings route to state_of_union, sprint_planning, issue creation, incident, or no action."
+      ]
     }
   ]
 }

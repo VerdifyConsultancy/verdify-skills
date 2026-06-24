@@ -22,6 +22,38 @@ inputs:
     location: https://github.com/example/example-service/issues/123
     summary: Issue #123 requests an auditable health endpoint.
     evidence_status: reported
+source_freshness:
+  - surface: git
+    source_ref: main
+    status: fresh
+    captured_at: "2026-06-22T10:40:00Z"
+    limitation: Example baseline is synthetic.
+  - surface: github_issues
+    source_ref: https://github.com/example/example-service/issues/123
+    status: fresh
+    captured_at: "2026-06-22T10:40:00Z"
+    limitation: Example issue state is illustrative.
+  - surface: deployment_runtime
+    source_ref: .agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml
+    status: not_applicable
+    captured_at: null
+    limitation: No sprint has been planned at this strategy point.
+planning_inventory:
+  - artifact_type: project_definition
+    location: .agent-workflow/project/project-definition.yaml
+    status: current
+    finding: Approved project definition covers operator-visible health evidence.
+    action: Use as an input to strategy.
+  - artifact_type: architecture
+    location: .agent-workflow/architecture/architecture.yaml
+    status: current
+    finding: Approved architecture defines the API adapter runtime revision expectation.
+    action: Use as an input to strategy.
+  - artifact_type: sprint_plan
+    location: .agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml
+    status: not_applicable
+    finding: Sprint planning has not yet started for this strategy.
+    action: Hand off to sprint-planning after approval.
 north_star:
   goal: Operators can verify service health and running revision through auditable runtime evidence.
   alignment_status: aligned
@@ -33,6 +65,13 @@ current_state:
   open_gates: []
   delivery_risks:
     - Runtime revision injection must be verified after deployment.
+delivery_health:
+  status: not_applicable
+  diagnostic_refs: []
+  deployment_refs: []
+  log_refs: []
+  telemetry_refs: []
+  discovered_health_issues: []
 issue_inventory:
   - issue: 123
     title: Expose auditable health endpoint

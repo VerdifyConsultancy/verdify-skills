@@ -1,7 +1,7 @@
 # Observability Diagnostics
 
-Use this reference when review-ready status, release health, platform readiness,
-or user feedback depends on runtime evidence.
+Use this reference when strategy refresh, review-ready status, release health,
+platform readiness, or user feedback depends on runtime evidence.
 
 `observability-diagnostics` is a promoted capability contract owned first by
 `release-verification`. It remains a mode, not a standalone canonical skill,
@@ -17,7 +17,7 @@ until one reliable manual run proves the packet shape and owner.
 - Runtime telemetry links: dashboards, metrics, logs, traces, alerts, events,
   probes, endpoint checks, pod status, restarts, and Kubernetes events.
 - User feedback, release-health alerts, incident notes, missing instrumentation,
-  and platform-readiness gaps.
+  state-of-union questions, and platform-readiness gaps.
 
 ## Procedure
 
@@ -34,8 +34,8 @@ until one reliable manual run proves the packet shape and owner.
    `.agent-workflow/sprints/<sprint-id>/release/observability-diagnostic-packet.yaml`
    or an equivalent readiness path, then validate it against
    `../../schemas/observability-diagnostic-packet.schema.yaml`.
-8. Route to review inbox, release verification, platform readiness, lane
-   delivery, sprint planning, incident handling, or no action.
+8. Route to state-of-union, review inbox, release verification, platform
+   readiness, lane delivery, sprint planning, incident handling, or no action.
 
 ## Completeness Rules
 
@@ -51,8 +51,8 @@ Mark a packet `ready` only when:
 
 ## Stop Conditions
 
-Stop and route to `instrument_first`, `hold`, `platform_readiness`, or
-`incident` when:
+Stop and route to `instrument_first`, `hold`, `state_of_union`,
+`platform_readiness`, or `incident` when:
 
 - the running revision cannot be identified;
 - required telemetry is missing for a safety-critical review or release gate;

@@ -5,8 +5,10 @@ module Verdify
     SKILLS = %w[
       project-router
       transcript-replan
-      northstar-planning
       northstar-research-ingest
+      northstar-planning
+      northstar-interview
+      northstar-question-resolution
       project-definition
       architecture-contracts
       state-of-union
@@ -515,6 +517,17 @@ module Verdify
         "lanes" => [],
         "dependency_order" => [],
         "deployment_expectations" => [],
+        "review_plan" => {
+          "qa_milestones" => [],
+          "human_review_milestones" => [],
+          "user_stories_for_review" => [],
+          "reporting_summary" => {
+            "included" => [],
+            "deferred" => [],
+            "ownership" => [],
+            "next_review" => ""
+          }
+        },
         "approval" => { "status" => "pending", "approver" => nil, "approved_at" => nil }
       }
       gate = {
@@ -1159,6 +1172,19 @@ module Verdify
         unless %w[approve approve_with_risks].include?(critic["outcome"])
           return route_hash(repo, "CRITIC_ACTION_REQUIRED", "sprint-orchestrator", "gate-management", "A critic outcome requires fixes, blocking, or human review.", evidence, missing, open_gates)
         end
+      end
+
+      review_path = plan_path.dirname.join("review/review-inbox-packet.yaml")
+      unless review_path.file?
+        missing << review_path.relative_path_from(repo.root).to_s
+        return route_hash(repo, "REVIEW_INBOX_REQUIRED", "release-verification", "review-inbox", "Critic-approved lanes need a review inbox packet before integration or human review.", evidence, missing, open_gates)
+      end
+      review = Verdify.safe_load_yaml(review_path)
+      evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => "review packet status is #{review['status'].inspect}, evidence verdict is #{review.dig('evidence_completeness', 'verdict').inspect}, recommendation is #{review.dig('recommendation', 'outcome').inspect}" }
+      unless %w[ready approved].include?(review["status"]) &&
+             review.dig("evidence_completeness", "verdict") == "complete" &&
+             review.dig("recommendation", "outcome") == "approve"
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet is missing complete evidence or an approve recommendation.", evidence, missing, open_gates)
       end
 
       release_path = plan_path.dirname.join("release/release-verification.yaml")

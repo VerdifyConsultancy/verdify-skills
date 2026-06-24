@@ -1,0 +1,29 @@
+{
+  "skill_name": "northstar-question-resolution",
+  "evals": [
+    {
+      "id": "large-docs-question-corpus",
+      "prompt": "A repository docs tree has hundreds of [QUESTION:*] markers and human-gate notes. Inventory, cluster, research, and answer the questions under delegated authority.",
+      "expected_output": "Creates a deterministic inventory, clusters questions by shared decision, researches missing evidence, ingests source-backed notes through northstar-research-ingest, records delegated answers with confidence, and produces a short remaining human escalation pack.",
+      "files": [],
+      "assertions": [
+        "The output includes a stable question inventory and grouped decision clusters.",
+        "Delegated answers cite evidence refs and record confidence.",
+        "Protected decisions remain escalated unless evidence and delegation support a safe default.",
+        "The human escalation pack is thematic rather than a raw dump of all questions."
+      ]
+    },
+    {
+      "id": "brave-research-evidence-handoff",
+      "prompt": "Several architecture questions need current external research before the North Star can answer them.",
+      "expected_output": "Uses configured Brave Search credentials without exposing secrets, prefers primary sources, writes research notes, ingests them into the North Star evidence registry, and hands resolved questions back to northstar-planning.",
+      "files": [],
+      "assertions": [
+        "Raw credential values are never printed, copied, committed, or summarized.",
+        "Primary or official sources are preferred for technical claims.",
+        "Research notes include queries, sources, claims, limitations, and recommended defaults.",
+        "The final handoff points northstar-planning to evidence-backed question resolutions."
+      ]
+    }
+  ]
+}
