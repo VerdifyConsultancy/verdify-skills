@@ -3,6 +3,7 @@
 
 require "minitest/autorun"
 require_relative "../lib/verdify"
+require_relative "test_lane_qr_schemarefs"
 
 class SchemaValidatorTest < Minitest::Test
   def validator

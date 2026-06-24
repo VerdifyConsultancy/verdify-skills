@@ -209,7 +209,7 @@ clusters = (CLUSTERS + [FALLBACK]).map do |cluster|
 end.compact
 
 cluster_map = {
-  "schema_ref" => "northstar-question-cluster-map.v1",
+  "schema_ref" => "northstar-question-cluster-map.schema.yaml",
   "kind" => "NorthStarQuestionClusterMap",
   "schema_version" => "1.0",
   "run_id" => options[:run_id] || File.basename(inventory_path.dirname.to_s),

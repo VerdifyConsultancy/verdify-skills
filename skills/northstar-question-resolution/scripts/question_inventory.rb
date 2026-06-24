@@ -142,7 +142,7 @@ priorities = questions.group_by { |q| q["priority"] }.transform_values(&:length)
 source_types = questions.group_by { |q| q["source_type"] }.transform_values(&:length).sort.to_h
 
 inventory = {
-  "schema_ref" => "northstar-question-inventory.v1",
+  "schema_ref" => "northstar-question-inventory.schema.yaml",
   "kind" => "NorthStarQuestionInventory",
   "schema_version" => "1.0",
   "generated_at" => Time.now.utc.iso8601,

@@ -1,0 +1,92 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/northstar-question-cluster-map.schema.yaml
+title: Verdify North Star Question Cluster Map
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, run_id, target_repository, inventory_path, generated_at, summary, clusters]
+properties:
+  schema_ref: {const: northstar-question-cluster-map.schema.yaml}
+  kind: {const: NorthStarQuestionClusterMap}
+  schema_version: {const: "1.0"}
+  run_id: {type: string, minLength: 1}
+  target_repository: {type: string, minLength: 1}
+  inventory_path: {type: string, minLength: 1}
+  generated_at: {type: string, minLength: 1}
+  summary:
+    type: object
+    additionalProperties: false
+    required: [total_questions, clusters, unclassified_questions, protected_candidates]
+    properties:
+      total_questions: {type: integer, minimum: 0}
+      clusters: {type: integer, minimum: 0}
+      unclassified_questions: {type: integer, minimum: 0}
+      protected_candidates: {type: integer, minimum: 0}
+  clusters:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [cluster_id, theme, decision_class, description, status, protected_decision, question_count, priority_counts, domains, question_ids, affected_artifacts, research_queries, evidence_refs, options, selected_answer, planning_handoff]
+      properties:
+        cluster_id: {type: string, minLength: 1}
+        theme: {type: string, minLength: 1}
+        decision_class: {type: string, enum: [product, architecture, schema, storage, security, delivery, operations, platform, research, governance, other]}
+        description: {type: string, minLength: 1}
+        status: {type: string, enum: [research-needed, researching, answered, human-escalation, deferred]}
+        protected_decision: {type: boolean}
+        question_count: {type: integer, minimum: 1}
+        priority_counts:
+          type: object
+          additionalProperties: {type: integer, minimum: 0}
+        domains:
+          type: object
+          additionalProperties: {type: integer, minimum: 0}
+        question_ids:
+          type: array
+          items: {type: string}
+        affected_artifacts:
+          type: array
+          items: {type: string}
+        research_queries:
+          type: array
+          items: {type: string}
+        evidence_refs:
+          type: array
+          items: {type: string}
+        options:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [option_id, summary, tradeoffs]
+            properties:
+              option_id: {type: string, minLength: 1}
+              summary: {type: string}
+              tradeoffs:
+                type: array
+                items: {type: string}
+        selected_answer:
+          type: object
+          additionalProperties: false
+          required: [summary, rationale, confidence, delegated_authority_rationale, human_escalation, escalation_reason]
+          properties:
+            summary: {type: [string, 'null']}
+            rationale: {type: [string, 'null']}
+            confidence: {type: string, enum: [high, medium, low]}
+            delegated_authority_rationale: {type: [string, 'null']}
+            human_escalation: {type: boolean}
+            escalation_reason: {type: [string, 'null']}
+        planning_handoff:
+          type: object
+          additionalProperties: false
+          required: [northstar_question_ids, proposed_artifact_updates, issue_recommendations]
+          properties:
+            northstar_question_ids:
+              type: array
+              items: {type: string}
+            proposed_artifact_updates:
+              type: array
+              items: {type: string}
+            issue_recommendations:
+              type: array
+              items: {type: string}
