@@ -51,6 +51,12 @@ validation_results:
     result: passed
     executed_at: "2026-06-24T17:34:00Z"
     artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-qr-schemarefs.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:38:52Z"
+    artifact: null
 acceptance_evidence:
   - criterion_id: LANE-AC-01
     evidence_ids:
@@ -84,4 +90,4 @@ completed_at: "2026-06-24T17:36:58Z"
 limitations:
   - "Controller authorization allowed lane-specific tests under tests/ and directed this lane not to edit lib/verdify/semantic_validator.rb, scripts/validate-repo.rb, other skills' SKILL.md files, or MANIFEST.sha256."
   - "The compiled lane contract in .verdify/worker-prompt.md listed baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease and PR base are 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after main advanced before this worker ran."
-  - "The closeout head SHA records the implementation commit before this closeout-only metadata commit; the PR body records the current branch head after closeout is pushed."
+  - "The closeout head SHA records the implementation commit before closeout-only metadata commits; the PR body records the current branch head after closeout is pushed."
