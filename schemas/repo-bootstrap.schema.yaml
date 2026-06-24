@@ -1,0 +1,188 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/repo-bootstrap.schema.yaml
+title: Verdify Repo Bootstrap Packet
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, repository, status, generated_at, evidence_refs, inputs, composed_skills, repo_inventory, runtime_inventory, credential_reference_inventory, agents_delta, kpi_proposal, gap_backlog, route_recommendation, open_questions, github_outputs, limitations]
+properties:
+  schema_ref: {const: repo-bootstrap.schema.yaml}
+  kind: {const: RepoBootstrapPacket}
+  schema_version: {const: "1.0"}
+  repository: {type: string, minLength: 1}
+  status: {type: string, enum: [draft, complete, blocked, superseded]}
+  generated_at: {type: string, minLength: 1}
+  evidence_refs:
+    type: array
+    items: {type: string}
+  inputs:
+    type: object
+    additionalProperties: false
+    required: [repo_path, github_repository, baseline_sha, issue_refs, live_runtime_access]
+    properties:
+      repo_path: {type: string, minLength: 1}
+      github_repository: {type: string, minLength: 1}
+      baseline_sha: {type: string, minLength: 1}
+      issue_refs: {type: array, items: {type: string}}
+      live_runtime_access: {type: string, enum: [none, snapshot, read_only, authorized_probe, blocked]}
+  composed_skills:
+    type: array
+    minItems: 5
+    uniqueItems: true
+    items:
+      type: string
+      enum: [project-router, repo-hygiene, platform-readiness, northstar-planning, controller-loop]
+  repo_inventory:
+    type: object
+    additionalProperties: false
+    required: [purpose, primary_languages, important_paths, docs, git, github, ci_cd, planning_artifacts, risks]
+    properties:
+      purpose: {type: string, minLength: 1}
+      primary_languages: {type: array, items: {type: string}}
+      important_paths: {type: array, items: {type: string}}
+      docs: {type: array, items: {$ref: '#/$defs/inventory_item'}}
+      git:
+        type: object
+        additionalProperties: false
+        required: [default_branch, current_branch, baseline_sha, status_summary, recent_commits]
+        properties:
+          default_branch: {type: string, minLength: 1}
+          current_branch: {type: string, minLength: 1}
+          baseline_sha: {type: string, minLength: 1}
+          status_summary: {type: string, minLength: 1}
+          recent_commits: {type: array, items: {type: string}}
+      github:
+        type: object
+        additionalProperties: false
+        required: [repository, issues_summary, pull_requests_summary, labels_or_projects_summary]
+        properties:
+          repository: {type: string, minLength: 1}
+          issues_summary: {type: string, minLength: 1}
+          pull_requests_summary: {type: string, minLength: 1}
+          labels_or_projects_summary: {type: string, minLength: 1}
+      ci_cd: {type: array, items: {$ref: '#/$defs/inventory_item'}}
+      planning_artifacts: {type: array, items: {$ref: '#/$defs/inventory_item'}}
+      risks: {type: array, items: {type: string}}
+  runtime_inventory:
+    type: object
+    additionalProperties: false
+    required: [access_status, namespaces, pods, routes, storage_mounts, observability, runtime_image_packages, missing_access]
+    properties:
+      access_status: {type: string, enum: [not_requested, unavailable, snapshot, read_only, blocked]}
+      namespaces: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      pods: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      routes: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      storage_mounts: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      observability: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      runtime_image_packages: {type: array, items: {$ref: '#/$defs/runtime_item'}}
+      missing_access: {type: array, items: {type: string}}
+  credential_reference_inventory:
+    type: object
+    additionalProperties: false
+    required: [policy, raw_values_recorded, references]
+    properties:
+      policy: {const: references_only}
+      raw_values_recorded: {const: false}
+      references:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required: [id, location, auth_mode, validation_status, owner, scope, failure_mode]
+          properties:
+            id: {type: string, minLength: 1}
+            location: {type: string, minLength: 1}
+            auth_mode: {type: string, enum: [none, oauth2, oidc, github_token, kubernetes_service_account, mcp_session, local_operator, file_reference, keychain_reference, other]}
+            validation_status: {type: string, enum: [not_checked, valid, invalid, expired, blocked, unknown]}
+            owner: {type: [string, 'null']}
+            scope: {type: array, items: {type: string}}
+            failure_mode: {type: [string, 'null']}
+  agents_delta:
+    type: object
+    additionalProperties: false
+    required: [status, target_path, summary, proposed_sections, patch_ref]
+    properties:
+      status: {type: string, enum: [none_needed, proposed, applied, blocked]}
+      target_path: {type: string, minLength: 1}
+      summary: {type: string, minLength: 1}
+      proposed_sections: {type: array, items: {type: string}}
+      patch_ref: {type: [string, 'null']}
+  kpi_proposal:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, name, target, measurement_source, cadence, owner]
+      properties:
+        id: {type: string, pattern: '^KPI-[0-9]{3,}$'}
+        name: {type: string, minLength: 1}
+        target: {type: string, minLength: 1}
+        measurement_source: {type: string, minLength: 1}
+        cadence: {type: string, minLength: 1}
+        owner: {type: string, minLength: 1}
+  gap_backlog:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, title, source, severity, recommended_action, github_issue_ref, owner]
+      properties:
+        id: {type: string, pattern: '^GAP-[0-9]{3,}$'}
+        title: {type: string, minLength: 1}
+        source: {type: string, minLength: 1}
+        severity: {type: string, enum: [info, warn, fail, blocked]}
+        recommended_action: {type: string, minLength: 1}
+        github_issue_ref: {type: [string, 'null']}
+        owner: {type: [string, 'null']}
+  route_recommendation:
+    type: object
+    additionalProperties: false
+    required: [next_skill, next_mode, reason, evidence]
+    properties:
+      next_skill: {type: string, minLength: 1}
+      next_mode: {type: string, minLength: 1}
+      reason: {type: string, minLength: 1}
+      evidence: {type: array, items: {type: string}}
+  open_questions:
+    type: array
+    minItems: 5
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, topic, question, owner, blocking, default]
+      properties:
+        id: {type: string, pattern: '^RBQ-[0-9]{3,}$'}
+        topic: {type: string, enum: [namespace_naming, domain_agent_authority, route_dns_ownership, storage_mounts, runtime_image_packages]}
+        question: {type: string, minLength: 1}
+        owner: {type: [string, 'null']}
+        blocking: {type: boolean}
+        default: {type: [string, 'null']}
+  github_outputs:
+    type: object
+    additionalProperties: false
+    required: [issues_opened, pull_request_ref, comments]
+    properties:
+      issues_opened: {type: array, items: {type: string}}
+      pull_request_ref: {type: [string, 'null']}
+      comments: {type: array, items: {type: string}}
+  limitations:
+    type: array
+    items: {type: string}
+$defs:
+  inventory_item:
+    type: object
+    additionalProperties: false
+    required: [name, status, evidence, notes]
+    properties:
+      name: {type: string, minLength: 1}
+      status: {type: string, enum: [observed, missing, stale, unknown, blocked]}
+      evidence: {type: array, items: {type: string}}
+      notes: {type: string}
+  runtime_item:
+    type: object
+    additionalProperties: false
+    required: [name, status, evidence, notes]
+    properties:
+      name: {type: string, minLength: 1}
+      status: {type: string, enum: [observed, missing, not_checked, unknown, blocked]}
+      evidence: {type: array, items: {type: string}}
+      notes: {type: string}

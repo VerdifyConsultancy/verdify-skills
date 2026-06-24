@@ -1,0 +1,100 @@
+schema_ref: repo-bootstrap.schema.yaml
+kind: RepoBootstrapPacket
+schema_version: "1.0"
+repository: "OWNER/REPOSITORY"
+status: draft
+generated_at: "YYYY-MM-DDTHH:MM:SSZ"
+evidence_refs: []
+inputs:
+  repo_path: "."
+  github_repository: "OWNER/REPOSITORY"
+  baseline_sha: "BASELINE_SHA"
+  issue_refs: []
+  live_runtime_access: none
+composed_skills:
+  - project-router
+  - repo-hygiene
+  - platform-readiness
+  - northstar-planning
+  - controller-loop
+repo_inventory:
+  purpose: "TBD"
+  primary_languages: []
+  important_paths: []
+  docs: []
+  git:
+    default_branch: "main"
+    current_branch: "main"
+    baseline_sha: "BASELINE_SHA"
+    status_summary: "TBD"
+    recent_commits: []
+  github:
+    repository: "OWNER/REPOSITORY"
+    issues_summary: "TBD"
+    pull_requests_summary: "TBD"
+    labels_or_projects_summary: "TBD"
+  ci_cd: []
+  planning_artifacts: []
+  risks: []
+runtime_inventory:
+  access_status: not_requested
+  namespaces: []
+  pods: []
+  routes: []
+  storage_mounts: []
+  observability: []
+  runtime_image_packages: []
+  missing_access: []
+credential_reference_inventory:
+  policy: references_only
+  raw_values_recorded: false
+  references: []
+agents_delta:
+  status: proposed
+  target_path: AGENTS.md
+  summary: "TBD"
+  proposed_sections: []
+  patch_ref:
+kpi_proposal: []
+gap_backlog: []
+route_recommendation:
+  next_skill: project-router
+  next_mode: route
+  reason: "TBD"
+  evidence: []
+open_questions:
+  - id: RBQ-001
+    topic: namespace_naming
+    question: "What namespace naming convention binds this GitHub repository to dev, preview, staging, and production namespaces?"
+    owner:
+    blocking: true
+    default:
+  - id: RBQ-002
+    topic: domain_agent_authority
+    question: "Which domain agents own platform, networking, storage, backup, and credential authority for this repository?"
+    owner:
+    blocking: true
+    default:
+  - id: RBQ-003
+    topic: route_dns_ownership
+    question: "Who owns route, DNS, TLS, and ingress changes for this repository?"
+    owner:
+    blocking: true
+    default:
+  - id: RBQ-004
+    topic: storage_mounts
+    question: "Which storage mounts are required, and which role approves them?"
+    owner:
+    blocking: true
+    default:
+  - id: RBQ-005
+    topic: runtime_image_packages
+    question: "Which runtime-image packages should be standardized instead of installed ad hoc by repo agents?"
+    owner:
+    blocking: false
+    default:
+github_outputs:
+  issues_opened: []
+  pull_request_ref:
+  comments: []
+limitations: []

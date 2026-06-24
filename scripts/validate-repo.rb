@@ -22,7 +22,7 @@ SUPPORTED_SCHEMA_KEYWORDS = %w[
   anyOf oneOf format if then else
 ].freeze
 REQUIRED_SKILLS = %w[
-  project-router transcript-replan northstar-research-ingest northstar-planning northstar-interview
+  project-router repo-bootstrap transcript-replan northstar-research-ingest northstar-planning northstar-interview
   northstar-question-resolution project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
   sprint-orchestrator controller-loop platform-readiness gravity-readiness lane-delivery
   independent-critic release-verification consensus-audit-workflow issue-triage

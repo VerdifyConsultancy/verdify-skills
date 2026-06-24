@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Repo Bootstrap"
+  short_description: "Bootstrap a repo with a safe discovery packet"
+  default_prompt: "Use $repo-bootstrap to inventory this repository, runtime references, credential references, AGENTS.md needs, KPIs, gaps, and the next Verdify route without exposing raw secrets."
+policy:
+  allow_implicit_invocation: true
