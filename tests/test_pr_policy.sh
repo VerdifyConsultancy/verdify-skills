@@ -39,6 +39,9 @@ EOF
 
 ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/valid.md" --base "$BASE" --head "$HEAD"
 
+printf '{"pull_request":{"body":"stale event body","base":{"sha":"%s"},"head":{"sha":"3333333333333333333333333333333333333333"}}}\n' "$BASE" > "$TMP/event.json"
+GITHUB_EVENT_PATH="$TMP/event.json" ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/valid.md" --base "$BASE" --head "$HEAD"
+
 cp "$TMP/valid.md" "$TMP/invalid.md"
 ruby -0pi -e 'gsub("Closes #123", "Related issue #123")' "$TMP/invalid.md"
 if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/invalid.md" --base "$BASE" --head "$HEAD" >/dev/null 2>&1; then

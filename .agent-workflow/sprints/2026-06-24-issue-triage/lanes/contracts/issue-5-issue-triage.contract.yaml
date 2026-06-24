@@ -35,10 +35,11 @@ ownership:
     - ".agents/skills/issue-triage"
     - ".claude/skills/issue-triage"
     - "scripts/validate-repo.rb"
+    - "scripts/pr-policy.rb"
+    - "tests/test_pr_policy.sh"
     - "README.md"
     - "docs/lifecycle.md"
     - "docs/research/industry-alignment.md"
-    - ".agent-workflow/router/route-decision.yaml"
     - ".agent-workflow/sprints/2026-06-24-issue-triage/**"
   prohibited_paths:
     - "skills/project-router/**"
