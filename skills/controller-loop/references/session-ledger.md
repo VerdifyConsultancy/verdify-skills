@@ -25,7 +25,9 @@ lifecycle-significant events while linking to authoritative GitHub and
 1. Maintain `.agent-workflow/controller/session-ledger.yaml` as append-oriented
    state and validate it against `../../schemas/session-ledger.schema.yaml`.
 2. Record each parent or child session with role, executor, repository, issue,
-   lane, wave, branch, worktree, PR refs, artifact refs, status, start, and end.
+   lane, `wave_id`, branch, worktree, owner, `heartbeat_expectations`,
+   `heartbeat_deadline_at`, `stop_condition`, PR refs, artifact refs, status,
+   start, and end.
 3. Append one ledger event for every lifecycle-significant transition:
    routing, research ingest, planning update, sprint plan, wave release plan,
    lane dispatch, lease creation, prompt compilation, worker status, closeout,

@@ -18,13 +18,20 @@ sessions:
   executor: replace-me
   repository: owner/repo
   status: planned
+  owner: replace-me
   started_at: null
   ended_at: null
   issue_ids: []
   lane_id: null
-  wave_id: null
+  wave_id: wave-replace-me
   branch: null
   worktree: null
+  heartbeat_expectations:
+    cadence: every 15 minutes
+    timeout_minutes: 15
+    source: controller-loop
+  heartbeat_deadline_at: null
+  stop_condition: Replace with the condition that pauses or stops this session.
   pr_refs: []
   artifact_refs: []
 events:
@@ -40,7 +47,7 @@ events:
   session_id: replace-me
   correlation:
     trace_id: null
-    wave_id: null
+    wave_id: wave-replace-me
     session_ids: [replace-me]
     issue_ids: []
     lane_ids: []

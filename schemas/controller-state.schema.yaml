@@ -3,7 +3,7 @@ $id: https://verdify.example/schemas/controller-state.schema.yaml
 title: Verdify Controller State
 type: object
 additionalProperties: false
-required: [schema_ref, kind, schema_version, project_id, controller_id, status, state, updated_at, current_wave, sessions, events, open_gates, next_actions, handoff, approval]
+required: [schema_ref, kind, schema_version, project_id, controller_id, status, state, updated_at, current_wave, waves, sessions, events, open_gates, next_actions, handoff, approval]
 properties:
   schema_ref: {const: controller-state.schema.yaml}
   kind: {const: ControllerState}
@@ -14,6 +14,30 @@ properties:
   state: {type: string}
   updated_at: {type: string}
   current_wave: {type: [string, 'null']}
+  waves:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, status, state, started_at, completed_at, issue_ids, lane_ids, session_ids, next_actions]
+      properties:
+        id: {type: string}
+        status: {type: string, enum: [planned, active, paused, blocked, complete, superseded]}
+        state: {type: string}
+        started_at: {type: [string, 'null']}
+        completed_at: {type: [string, 'null']}
+        issue_ids:
+          type: array
+          items: {type: integer, minimum: 1}
+        lane_ids:
+          type: array
+          items: {type: string}
+        session_ids:
+          type: array
+          items: {type: string}
+        next_actions:
+          type: array
+          items: {type: string}
   sessions:
     type: array
     items:
@@ -27,8 +51,21 @@ properties:
         repository: {type: string}
         issue: {type: [integer, 'null']}
         lane_id: {type: [string, 'null']}
+        wave_id: {type: [string, 'null']}
         branch: {type: [string, 'null']}
         worktree: {type: [string, 'null']}
+        owner: {type: [string, 'null']}
+        started_at: {type: [string, 'null']}
+        heartbeat_expectations:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [cadence, timeout_minutes, source]
+          properties:
+            cadence: {type: string}
+            timeout_minutes: {type: integer, minimum: 1}
+            source: {type: [string, 'null']}
+        heartbeat_deadline_at: {type: [string, 'null']}
+        stop_condition: {type: [string, 'null']}
         status: {type: string}
   events:
     type: array

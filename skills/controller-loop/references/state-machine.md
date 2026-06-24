@@ -42,6 +42,11 @@ NORTH_STAR_PROVEN
 IDLE_UNTIL_NEW_REQUIREMENTS
 ```
 
+Persist wave-supervision state in `.agent-workflow/controller/controller-state.yaml`
+with `current_wave` and `waves` entries, and link supervised sessions with
+`wave_id`. Do not write standalone `.agent-workflow/controller/waves/<wave-id>.yaml`
+artifacts.
+
 ## Invariants
 
 - State must survive session restarts.
