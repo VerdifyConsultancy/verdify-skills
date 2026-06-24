@@ -1,0 +1,91 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-cli-hardening
+status: ready_for_critic
+issue_ids:
+  - 32
+pull_request: 58
+baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
+head_sha: "afb4b22331ddb8a0a5f97d9c4b65f08c276ff816"
+contract_hash: "13ca37ea2b8187c7c5ba99ac60123d11c1f87a5ef80e75803067eaf6c1dbb753"
+changed_paths:
+  - "lib/verdify/cli.rb"
+  - "tests/test_cli.sh"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-cli-hardening.closeout.yaml"
+validation_results:
+  - id: ruby-syntax
+    command: "ruby -c lib/verdify/cli.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+  - id: cli-regression
+    command: "bash tests/test_cli.sh"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+  - id: unit-tests
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+  - id: contract-canonical-validate
+    command: "ruby bin/verdify artifact validate --file /Users/jason/repos/verdify-skills/.agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-cli-hardening.contract.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-cli-hardening.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:03:57Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "lib/verdify/cli.rb:655"
+      - "lib/verdify/cli.rb:1526"
+      - "tests/test_cli.sh:277"
+      - "cli-regression"
+      - "unit-tests"
+      - "PR #58"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "lib/verdify/cli.rb:445"
+      - "tests/test_cli.sh:176"
+      - "cli-regression"
+      - "unit-tests"
+      - "PR #58"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "lib/verdify/cli.rb:1558"
+      - "tests/test_cli.sh:303"
+      - "cli-regression"
+      - "unit-tests"
+      - "PR #58"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "The generated worktree-relative lane contract validation command fails because this lane worktree does not contain .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-cli-hardening.contract.yaml; the lease's canonical contract path validates."
+worktree_clean: true
+worker_session_id: "codex-20260624-clihard"
+completed_at: "2026-06-24T18:03:57Z"
+limitations:
+  - "The compiled lane contract text lists baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e, while the active lease baseline is b5b6e05d08233a7ab28667e26ecd117b09accba5 after the hard dependency lane-router-gate-bypass was merged into origin/main; no out-of-scope drift was observed in the owned CLI/test surface."
+  - "The generated command `ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-cli-hardening.contract.yaml` was run and exited 2 because that contract file is absent from this lane worktree; the canonical contract path from the active lease validates and the missing worktree file was treated as a coordination note rather than patched outside lane scope."
+  - "The closeout head_sha records implementation commit afb4b22331ddb8a0a5f97d9c4b65f08c276ff816 before this closeout metadata commit; PR #58 records the current branch head after closeout is pushed."
+  - "MANIFEST.sha256 was not manually edited, per lane instructions."
