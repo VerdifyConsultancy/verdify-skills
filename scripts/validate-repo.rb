@@ -9,6 +9,18 @@ require_relative "../lib/verdify"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
 SKILL_NAME_PATTERN = /\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/
+SKILL_REFERENCE_PATTERN = /\A(?:
+  (?:references|assets|scripts)\/[^`\s]+|
+  \.\.\/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\/(?:references|assets|scripts)\/[^`\s]+|
+  skills\/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\/(?:references|assets|scripts)\/[^`\s]+|
+  \.\.\/\.\.\/(?:schemas|bin)\/[^`\s]+
+)\z/x
+SUPPORTED_SCHEMA_KEYWORDS = %w[
+  $schema $id $defs $ref title description type const enum required properties
+  additionalProperties items prefixItems minItems maxItems uniqueItems pattern
+  patternProperties dependentRequired minLength maxLength minimum maximum allOf
+  anyOf oneOf format if then else
+].freeze
 REQUIRED_SKILLS = %w[
   project-router transcript-replan northstar-research-ingest northstar-planning northstar-interview
   northstar-question-resolution project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
@@ -112,6 +124,8 @@ class RepoValidator
       error(path, "top-level schema must be an object") unless schema["type"] == "object"
       error(path, "top-level schema must close unknown properties") unless schema["additionalProperties"] == false
       error(path, "schema_ref const should equal filename") unless schema.dig("properties", "schema_ref", "const") == path.basename.to_s
+      validate_schema_keyword_support(path, schema)
+      validate_route_decision_skill_enum(path, schema) if path.basename.to_s == "route-decision.schema.yaml"
     end
   end
 
@@ -156,12 +170,7 @@ class RepoValidator
       error(skill, "missing agents/openai.yaml") unless dir.join("agents/openai.yaml").file?
       error(skill, "skill should have at least one reference") if Dir[dir.join("references/*")].empty?
 
-      content.scan(/`((?:references|assets)\/[^`\s]+|\.\.\/\.\.\/(?:schemas|bin)\/[^`\s]+)`/).flatten.each do |raw|
-        next if raw.include?("<") || raw.include?("*")
-        clean = raw.sub(/[.,;:]\z/, "")
-        target = dir.join(clean).cleanpath
-        error(skill, "referenced path does not exist: #{clean}") unless target.exist?
-      end
+      validate_skill_references(skill, dir, content)
 
       metadata_path = dir.join("agents/openai.yaml")
       metadata = load_yaml(metadata_path)
@@ -173,6 +182,154 @@ class RepoValidator
       implicit = metadata.dig("policy", "allow_implicit_invocation")
       error(metadata_path, "allow_implicit_invocation must be boolean") unless [true, false].include?(implicit)
     end
+  end
+
+  def extract_skill_reference_tokens(content)
+    content.scan(/`([^`\n]+)`/).flatten.select { |raw| raw.match?(SKILL_REFERENCE_PATTERN) }
+  end
+
+  def validate_skill_references(skill, dir, content)
+    extract_skill_reference_tokens(content).each do |raw|
+      next if raw.include?("<") || raw.include?("*")
+
+      clean = raw.sub(/[.,;:]\z/, "")
+      target = resolve_skill_reference(dir, clean)
+      unless target == ROOT || target.to_s.start_with?("#{ROOT}/")
+        error(skill, "referenced path escapes repository root: #{clean}")
+        next
+      end
+      error(skill, "referenced path does not exist: #{clean}") unless target.exist?
+    end
+  end
+
+  def resolve_skill_reference(skill_dir, raw)
+    skill_dir.join(raw).cleanpath
+  end
+
+  def validate_schema_keyword_support(path, schema)
+    scan_schema_keywords(path, schema, schema, "#")
+  end
+
+  def validate_route_decision_skill_enum(path, schema)
+    enum = Array(schema.dig("properties", "next_skill", "enum"))
+    missing = REQUIRED_SKILLS - enum
+    extra = enum - REQUIRED_SKILLS
+    unless missing.empty?
+      error(path, "properties.next_skill.enum missing canonical skills: #{missing.join(', ')}")
+    end
+    unless extra.empty?
+      error(path, "properties.next_skill.enum contains non-canonical skills: #{extra.join(', ')}")
+    end
+  end
+
+  def scan_schema_keywords(path, node, root_schema, pointer)
+    return unless node.is_a?(Hash)
+
+    node.each_key do |key|
+      error(path, "unsupported JSON Schema keyword at #{pointer}: #{key}") unless SUPPORTED_SCHEMA_KEYWORDS.include?(key.to_s)
+    end
+
+    validate_schema_type(path, node, pointer) if node.key?("type")
+    validate_schema_format(path, node, pointer) if node.key?("format")
+    validate_schema_pattern(path, node, pointer, "pattern", node["pattern"]) if node.key?("pattern")
+    validate_schema_ref(path, root_schema, pointer, node["$ref"]) if node.key?("$ref")
+    validate_schema_pattern_properties(path, node, root_schema, pointer)
+    validate_schema_dependent_required(path, node, pointer)
+
+    scan_schema_map(path, node["$defs"], root_schema, "#{pointer}/$defs")
+    scan_schema_map(path, node["properties"], root_schema, "#{pointer}/properties")
+    scan_schema_value(path, node["additionalProperties"], root_schema, "#{pointer}/additionalProperties")
+    scan_schema_value(path, node["items"], root_schema, "#{pointer}/items")
+    Array(node["prefixItems"]).each_with_index { |item, index| scan_schema_value(path, item, root_schema, "#{pointer}/prefixItems/#{index}") }
+    %w[allOf anyOf oneOf].each do |keyword|
+      Array(node[keyword]).each_with_index { |item, index| scan_schema_value(path, item, root_schema, "#{pointer}/#{keyword}/#{index}") }
+    end
+    %w[if then else].each { |keyword| scan_schema_value(path, node[keyword], root_schema, "#{pointer}/#{keyword}") }
+  end
+
+  def scan_schema_map(path, map, root_schema, pointer)
+    return unless map.is_a?(Hash)
+
+    map.each do |key, child|
+      scan_schema_value(path, child, root_schema, "#{pointer}/#{escape_json_pointer(key)}")
+    end
+  end
+
+  def scan_schema_value(path, value, root_schema, pointer)
+    return if value == true || value == false
+
+    if value.is_a?(Hash)
+      scan_schema_keywords(path, value, root_schema, pointer)
+    elsif !value.nil?
+      error(path, "expected schema object or boolean at #{pointer}")
+    end
+  end
+
+  def validate_schema_type(path, node, pointer)
+    types = Array(node["type"]).map(&:to_s)
+    unsupported = types - Verdify::SchemaValidator::TYPE_CHECKS.keys
+    error(path, "unsupported JSON Schema type at #{pointer}: #{unsupported.join(', ')}") unless unsupported.empty?
+  end
+
+  def validate_schema_format(path, node, pointer)
+    format = node["format"].to_s
+    unless Verdify::SchemaValidator::SUPPORTED_FORMATS.include?(format)
+      error(path, "unsupported JSON Schema format at #{pointer}: #{format}")
+    end
+  end
+
+  def validate_schema_pattern(path, _node, pointer, keyword, pattern)
+    Regexp.new(pattern.to_s)
+  rescue RegexpError => e
+    error(path, "invalid JSON Schema #{keyword} at #{pointer}: #{e.message}")
+  end
+
+  def validate_schema_ref(path, root_schema, pointer, ref)
+    unless ref.is_a?(String) && ref.start_with?("#")
+      error(path, "unsupported JSON Schema $ref at #{pointer}: #{ref.inspect}")
+      return
+    end
+
+    error(path, "unresolved JSON Schema $ref at #{pointer}: #{ref}") if resolve_json_pointer(root_schema, ref.delete_prefix("#")).nil?
+  end
+
+  def validate_schema_pattern_properties(path, node, root_schema, pointer)
+    return unless node["patternProperties"].is_a?(Hash)
+
+    node["patternProperties"].each do |pattern, child|
+      validate_schema_pattern(path, node, pointer, "patternProperties #{pattern.inspect}", pattern)
+      scan_schema_value(path, child, root_schema, "#{pointer}/patternProperties/#{escape_json_pointer(pattern)}")
+    end
+  end
+
+  def validate_schema_dependent_required(path, node, pointer)
+    return unless node["dependentRequired"].is_a?(Hash)
+
+    node["dependentRequired"].each do |key, dependents|
+      unless dependents.is_a?(Array) && dependents.all? { |item| item.is_a?(String) }
+        error(path, "dependentRequired #{key.inspect} at #{pointer} must be an array of property names")
+      end
+    end
+  end
+
+  def resolve_json_pointer(root, pointer)
+    return root if pointer == ""
+    return nil unless pointer.start_with?("/")
+
+    pointer.split("/").drop(1).reduce(root) do |current, token|
+      key = token.gsub("~1", "/").gsub("~0", "~")
+      if current.is_a?(Hash) && current.key?(key)
+        current[key]
+      elsif current.is_a?(Array) && key.match?(/\A\d+\z/) && current[key.to_i]
+        current[key.to_i]
+      else
+        return nil
+      end
+    end
+  end
+
+  def escape_json_pointer(value)
+    value.to_s.gsub("~", "~0").gsub("/", "~1")
   end
 
   def validate_host_links
@@ -410,4 +567,4 @@ class RepoValidator
   end
 end
 
-RepoValidator.new.run
+RepoValidator.new.run if $PROGRAM_NAME == __FILE__
