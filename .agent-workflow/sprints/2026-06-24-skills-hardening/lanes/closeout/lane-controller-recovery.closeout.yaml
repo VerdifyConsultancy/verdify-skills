@@ -1,0 +1,93 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-controller-recovery
+status: ready_for_critic
+issue_ids:
+  - 2
+pull_request: 57
+baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
+head_sha: "e30f0a19042551a6299ec463d0afc3432e6bac4b"
+contract_hash: "ca4a4016a052ca1f576b37fa6f29f272c4e973b0fbf273c373fa36c5a7ba2e8b"
+changed_paths:
+  - "skills/controller-loop/SKILL.md"
+  - "skills/controller-loop/assets/loop-record.context-reset.example.yaml"
+  - "skills/controller-loop/assets/loop-record.interrupted.example.yaml"
+  - "skills/controller-loop/assets/loop-record.recoverable-failure.example.yaml"
+  - "skills/controller-loop/references/recovery-contract.md"
+  - "skills/controller-loop/references/session-ledger.md"
+  - "skills/controller-loop/references/state-machine.md"
+  - "tests/test_lane_controller_recovery.rb"
+validation_results:
+  - id: validate-controller-state-template
+    command: "ruby bin/verdify artifact validate --file skills/controller-loop/assets/controller-state.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:55:00Z"
+    artifact: null
+  - id: lane-controller-recovery-test
+    command: "ruby tests/test_lane_controller_recovery.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:55:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:57:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-controller-recovery.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:01:25Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "skills/controller-loop/SKILL.md#operating-model"
+      - "skills/controller-loop/references/recovery-contract.md#loop-types"
+      - "skills/controller-loop/references/recovery-contract.md#loop-record"
+      - "skills/controller-loop/references/recovery-contract.md#checkpoints-and-context-reset"
+      - "skills/controller-loop/references/recovery-contract.md#resume-prompts"
+      - "skills/controller-loop/references/session-ledger.md controller-loop data_summary/checkpoint refs"
+      - "skills/controller-loop/references/state-machine.md context reset/recoverable failure invariants"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "skills/controller-loop/references/recovery-contract.md#plan-kpis-and-agent-fleet-metrics"
+      - "skills/controller-loop/references/recovery-contract.md#alert-and-resume-safety"
+      - "skills/controller-loop/references/recovery-contract.md#failure-reporting-and-observability-handoff"
+      - "skills/controller-loop/assets/loop-record.interrupted.example.yaml"
+      - "skills/controller-loop/assets/loop-record.context-reset.example.yaml"
+      - "skills/controller-loop/assets/loop-record.recoverable-failure.example.yaml"
+      - "tests/test_lane_controller_recovery.rb"
+      - "lane-controller-recovery-test"
+      - "validate-controller-state-template"
+      - "validate-repo"
+      - "make-test"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic review is still required before integration."
+  - "Runtime Agent Fleet controller observability implementation remains out of scope for this skills-repo contract lane."
+  - "Loop-record fields are documented at the controller-loop contract and example-asset layer; no controller-state or session-ledger schema edits were made because those paths are coordination-required for this lane."
+  - "The closeout artifact is outside implementation owned_paths; it is recorded as required lane-delivery metadata, not as controller-loop implementation scope."
+worktree_clean: true
+worker_session_id: "codex-20260624-ctrlrecov"
+completed_at: "2026-06-24T18:00:32Z"
+limitations:
+  - "The compiled lane contract lists baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is b5b6e05d08233a7ab28667e26ecd117b09accba5 after dependency lanes merged, and this closeout uses the active lease baseline."
+  - "No schema edits were made to schemas/controller-state.schema.yaml or schemas/session-ledger.schema.yaml; those coordination_required_paths remained read-only."
+  - "MANIFEST.sha256 was not edited per lane instruction."
+  - "The closeout head_sha records the implementation commit before this closeout-only metadata commit; PR #57 records the current branch head after closeout is pushed."
