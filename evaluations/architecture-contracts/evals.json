@@ -23,6 +23,19 @@
         "Parallelism is not forced.",
         "A durable ADR or contract change is required for the resolution."
       ]
+    },
+    {
+      "id": "north-star-architecture-schema-validity",
+      "prompt": "Approved North Star product and architecture artifacts plus an approved project definition are present. Produce the north-star architecture for a system with API, worker, database, external identity provider, deployment, and observability requirements.",
+      "expected_output": "Creates a schema-valid architecture artifact and companion architecture narrative that cover system context, components, topology, data flow, trust boundaries, observability, failure modes, ADR-backed decisions, and traceability without creating sprint lanes.",
+      "files": [],
+      "assertions": [
+        "NORTHSTAR_PRODUCT.md, NORTHSTAR_ARCHITECTURE.md, northstar-artifacts.yaml, and project definition approval are verified before architecture output is treated as authoritative.",
+        "architecture.yaml declares schema_ref architecture.schema.yaml and is validated against the architecture schema.",
+        "The architecture covers components, runtime topology, data ownership, integrations, trust and secret boundaries, deployment model, observability, failure modes, and major tradeoffs.",
+        "Material architecture choices are recorded as ADRs with alternatives, consequences, and revisit triggers.",
+        "No sprint lane, worktree, or implementation branch is created by the architecture-contracts skill."
+      ]
     }
   ]
 }
