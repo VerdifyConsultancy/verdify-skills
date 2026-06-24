@@ -1,0 +1,74 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-validator-engine
+status: ready_for_critic
+issue_ids:
+  - 17
+  - 31
+pull_request: 44
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "b176e4ef17de97630b18ce99e6a1bd8dd77e93bb"
+contract_hash: "d9b64b7f9f68314124585963156a54897e499d708e5a23656c12967e95d47d26"
+changed_paths:
+  - "scripts/validate-repo.rb"
+  - "lib/verdify/schema_validator.rb"
+  - "tests/test_schema_validator.rb"
+validation_results:
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:22:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:22:00Z"
+    artifact: null
+  - id: skill-reference-probe
+    command: "ruby -I. -e <cross-skill SKILL reference probe>"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:22:00Z"
+    artifact: "tokens=skills/platform-readiness/references/environment-gitops.md,../platform-readiness/references/environment-gitops.md,skills/platform-readiness/references/missing.md; errors=skills/release-verification/SKILL.md: referenced path does not exist: skills/platform-readiness/references/missing.md"
+  - id: schema-keyword-probe
+    command: "ruby -I. -e <SchemaValidator draft keyword probe>"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:22:00Z"
+    artifact: "$: property \"credit_card\" requires property \"billing_address\" | $.contact: does not match format \"email\" | $.x-id: expected type string, got integer"
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-validator-engine.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:23:47Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "validate-repo"
+      - "make-test"
+      - "skill-reference-probe"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "validate-repo"
+      - "make-test"
+      - "schema-keyword-probe"
+      - "closeout-validate"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic approval is still required before integration."
+  - "No runtime deployment is involved; merge success still needs normal GitHub checks."
+worktree_clean: true
+worker_session_id: "codex-20260624-validator"
+completed_at: "2026-06-24T17:23:01Z"
+limitations:
+  - "The closeout records implementation head SHA b176e4ef17de97630b18ce99e6a1bd8dd77e93bb before the closeout-only metadata commit; the PR body records the final branch head after closeout is pushed."
+  - "The release-verification SKILL body was not edited; its Mode 2 `skills/platform-readiness/references/environment-gitops.md` token now resolves and is existence-checked as a repo-root cross-skill reference."
+  - "External `$ref` URLs are intentionally rejected by repository schema auditing; local `#...` references are enforced."
