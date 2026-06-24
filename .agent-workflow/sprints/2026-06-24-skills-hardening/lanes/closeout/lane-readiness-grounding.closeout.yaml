@@ -1,0 +1,103 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-readiness-grounding
+status: ready_for_critic
+issue_ids:
+  - 27
+pull_request: 59
+baseline_sha: "79c4b63418edfdfdbbaf29718a11ee3e3506434f"
+head_sha: "a69607e8f265fdb560d500aaab2fa2957b966d45"
+contract_hash: "0f7214e47648de9e91e525890a733120ed61fc106a006c7eff04b7d59f05a872"
+changed_paths:
+  - "skills/platform-readiness/SKILL.md"
+  - "skills/platform-readiness/references/readiness-domains.md"
+  - "skills/gravity-readiness/SKILL.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-readiness-grounding.closeout.yaml"
+validation_results:
+  - id: no-cloudflare
+    command: "! grep -ri cloudflare skills/"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:04:00Z"
+    artifact: null
+  - id: platform-modes-grep
+    command: "grep -nE 'Mode [0-9]: (inventory|target-contract|readiness-gate|pilot-plan)' skills/platform-readiness/SKILL.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:04:00Z"
+    artifact: null
+  - id: gravity-evidence-grep
+    command: "grep -nE 'ADR-0013|platform-readiness.yaml|approval.status|worktree/session orchestration|credentials and RBAC|namespaces and quotas|CI/CD and review environment|rollback|observability and diagnostics|browser inspection' skills/gravity-readiness/SKILL.md"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:04:00Z"
+    artifact: null
+  - id: diff-check
+    command: "git diff --check"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:04:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:04:30Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:05:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-readiness-grounding.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T18:08:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "skills/platform-readiness/references/readiness-domains.md:11"
+      - "skills/platform-readiness/references/readiness-domains.md:13"
+      - "no-cloudflare"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "skills/platform-readiness/SKILL.md:36"
+      - "skills/platform-readiness/SKILL.md:50"
+      - "skills/platform-readiness/SKILL.md:65"
+      - "skills/platform-readiness/SKILL.md:80"
+      - "platform-modes-grep"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:21"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:28"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:35"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:43"
+      - "skills/gravity-readiness/SKILL.md:30"
+      - "skills/gravity-readiness/SKILL.md:33"
+      - "skills/gravity-readiness/SKILL.md:45"
+      - "skills/gravity-readiness/SKILL.md:46"
+      - "skills/gravity-readiness/SKILL.md:47"
+      - "skills/gravity-readiness/SKILL.md:48"
+      - "skills/gravity-readiness/SKILL.md:49"
+      - "skills/gravity-readiness/SKILL.md:50"
+      - "skills/gravity-readiness/SKILL.md:51"
+      - "gravity-evidence-grep"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic review is still required before integration."
+  - "GitHub PR checks must be evaluated on the final pushed closeout commit before integration."
+worktree_clean: true
+worker_session_id: "codex-20260624-readygnd"
+completed_at: "2026-06-24T18:08:00Z"
+limitations:
+  - "No tests were added because the lane is prose-only and tests/ is outside owned_paths; coverage is through contract greps, validate-repo, make test, and closeout validation."
+  - "The compiled lane contract records sprint baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lane lease was created from 79c4b63418edfdfdbbaf29718a11ee3e3506434f after dependency ADR work landed, so closeout diff scope uses the lease baseline."
+  - "head_sha records the implementation commit before the closeout metadata commit; PR #59 will be updated with the final branch head after closeout is pushed."
