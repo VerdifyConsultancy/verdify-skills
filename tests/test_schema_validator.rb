@@ -153,21 +153,46 @@ class SchemaValidatorTest < Minitest::Test
         "--runbook",
         runbook_path.to_s,
         "--mutation-level",
-        "protected_write"
+        "protected_write",
+        "--github-identity",
+        "jvallery"
       )
 
       assert status.success?, stderr
       output_path = Pathname.new(stdout.lines.first.strip)
       request = YAML.safe_load(output_path.read, permitted_classes: [], aliases: false)
+      schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/agent-platform-control-request.schema.yaml"))
 
+      assert_empty validator.validate(request, schema)
       assert_equal "add_worktree_agent", request.dig("operation", "operation_id")
       assert_equal "add_worktree_agent", request.dig("operation", "tool_name")
       assert_equal "POST", request.dig("operation", "method")
       assert_equal "protected_write", request.dig("operation", "mutation_level")
       assert_equal true, request.dig("review", "human_gate_required")
+      assert_equal "#/inputs/redacted_payload", request.dig("inputs", "redacted_payload_ref")
+      assert_equal "lane/a", request.dig("inputs", "redacted_payload", "branch")
+      assert_equal "codex", request.dig("inputs", "redacted_payload", "runtime")
+      assert_equal "jvallery", request.dig("inputs", "redacted_payload", "github_identity")
+      assert_equal "lane-a", request.dig("inputs", "redacted_payload", "user")
+      assert_equal request.dig("operation", "idempotency_key"), request.dig("inputs", "redacted_payload", "idempotency_key")
+      assert_equal "/api/repos/example/repo/agents", request.dig("inputs", "redacted_payload", "api_request", "path")
+      assert_equal "lane/a", request.dig("inputs", "redacted_payload", "api_request", "body", "base_ref")
       refute_includes output_path.read, "agent_platform.session"
       refute_includes output_path.read, "agent_platform.terminal"
     end
+  end
+
+  def test_semantic_rejects_add_worktree_agent_without_structured_payload
+    document = minimal_control_request
+    document["operation"]["operation_id"] = "add_worktree_agent"
+    document["operation"]["tool_name"] = "add_worktree_agent"
+    document["operation"]["idempotency_key"] = "exec-sprint:lane-a:add-worktree-agent"
+    document["inputs"]["redacted_payload_ref"] = nil
+
+    errors = Verdify::SemanticValidator.validate(document)
+
+    assert errors.any? { |e| e.include?("$.inputs.redacted_payload_ref") }
+    assert errors.any? { |e| e.include?("$.inputs.redacted_payload") }
   end
 
   def test_semantic_rejects_protected_control_request_without_human_approval
@@ -289,7 +314,7 @@ class SchemaValidatorTest < Minitest::Test
           "platform_session" => {
             "create_operation_ref" => ".agent-workflow/sprints/sprint-deps/execution/control-requests/lane-a-add-worktree-agent.yaml",
             "session_id" => nil,
-            "executor" => "agent-platform-worker",
+            "executor" => "codex",
             "model" => nil,
             "effort" => nil,
             "status" => "planned"

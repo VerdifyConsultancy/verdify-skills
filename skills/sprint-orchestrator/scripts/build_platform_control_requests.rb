@@ -14,7 +14,8 @@ options = {
   policy_decision: "not_evaluated",
   approved_by: nil,
   approved_at: nil,
-  mutation_level: "dev_write"
+  mutation_level: "dev_write",
+  github_identity: nil
 }
 
 OptionParser.new do |parser|
@@ -27,6 +28,7 @@ OptionParser.new do |parser|
   parser.on("--approved-by NAME", "Approver when creating authorized requests") { |value| options[:approved_by] = value }
   parser.on("--approved-at TIME", "Approval timestamp when authorized") { |value| options[:approved_at] = value }
   parser.on("--mutation-level LEVEL", "Mutation level for generated requests") { |value| options[:mutation_level] = value }
+  parser.on("--github-identity IDENTITY", "Redacted GitHub identity to include in add_worktree_agent payload") { |value| options[:github_identity] = value }
   parser.on("-h", "--help") { puts parser; exit 0 }
 end.parse!
 
@@ -70,6 +72,52 @@ def controller_api_ref(runbook)
   "POST /api/repos/#{owner}/#{name}/agents"
 end
 
+def controller_api_path(runbook)
+  repository = runbook["repository"].to_s
+  return "/api/repos/<owner>/<repo>/agents" unless repository.include?("/")
+
+  owner, name = repository.split("/", 2)
+  "/api/repos/#{owner}/#{name}/agents"
+end
+
+def mcp_runtime(executor)
+  case executor.to_s
+  when "codex"
+    "codex"
+  when "claude", "claude-code"
+    "claude-code"
+  else
+    nil
+  end
+end
+
+def add_worktree_agent_payload(runbook, lane, idempotency_key, github_identity)
+  lane_id = lane["lane_id"].to_s
+  agent_name = slug(lane_id)
+  runtime = mcp_runtime(lane.dig("platform_session", "executor"))
+  {
+    "operation_id" => "add_worktree_agent",
+    "branch" => lane["branch"],
+    "runtime" => runtime,
+    "name" => agent_name,
+    "github_identity" => github_identity,
+    "user" => agent_name,
+    "idempotency_key" => idempotency_key,
+    "api_request" => {
+      "method" => "POST",
+      "path" => controller_api_path(runbook),
+      "body" => {
+        "worktree" => agent_name,
+        "base_ref" => lane["branch"],
+        "runtime" => runtime,
+        "github_identity" => github_identity,
+        "user" => agent_name,
+        "idempotency_key" => idempotency_key
+      }
+    }
+  }
+end
+
 runbook = load_yaml(runbook_path)
 abort "runbook is not a SprintExecutionRunbook" unless runbook["kind"] == "SprintExecutionRunbook"
 
@@ -89,6 +137,7 @@ review_decision = if options[:approved_by]
 approved_at = options[:approved_at] || (options[:approved_by] ? requested_at : nil)
 operation_id = "add_worktree_agent"
 api_ref = controller_api_ref(runbook)
+github_identity = options[:github_identity]
 
 Array(runbook["lanes"]).each do |lane|
   lane_id = lane["lane_id"]
@@ -96,6 +145,8 @@ Array(runbook["lanes"]).each do |lane|
   target_path = lane.dig("platform_session", "create_operation_ref")
   output_path = target_path ? repo.join(target_path) : output_dir.join("#{lane_id}-add-worktree-agent.yaml")
   output_path.dirname.mkpath
+  idempotency_key = "#{runbook['runbook_id']}:#{lane_id}:add-worktree-agent"
+  redacted_payload = add_worktree_agent_payload(runbook, lane, idempotency_key, github_identity)
 
   request = {
     "schema_ref" => "agent-platform-control-request.schema.yaml",
@@ -117,7 +168,7 @@ Array(runbook["lanes"]).each do |lane|
       "tool_name" => operation_id,
       "api_ref" => api_ref,
       "mutation_level" => options[:mutation_level],
-      "idempotency_key" => "#{runbook['runbook_id']}:#{lane_id}:add-worktree-agent"
+      "idempotency_key" => idempotency_key
     },
     "target" => {
       "repository" => runbook["repository"],
@@ -160,7 +211,8 @@ Array(runbook["lanes"]).each do |lane|
       ),
       "evidence_refs" => [],
       "parameters_summary" => "Call add_worktree_agent for lane #{lane_id} on branch #{lane['branch']} using #{lane.dig('platform_session', 'executor')}.",
-      "redacted_payload_ref" => nil
+      "redacted_payload_ref" => "#/inputs/redacted_payload",
+      "redacted_payload" => redacted_payload
     },
     "expected_effects" => {
       "state_changes" => [
