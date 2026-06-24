@@ -7,6 +7,7 @@ require "open3"
 require "tmpdir"
 require "yaml"
 require_relative "../lib/verdify"
+require_relative "../scripts/validate-repo"
 require_relative "test_lane_qr_schemarefs"
 
 Dir[File.join(__dir__, "test_*.rb")].sort.each do |path|
@@ -41,6 +42,104 @@ class SchemaValidatorTest < Minitest::Test
     errors = validator.validate(["valid", "valid", "NotValid"], schema)
     assert errors.any? { |e| e.include?("items must be unique") }
     assert errors.any? { |e| e.include?("does not match") }
+  end
+
+  def test_honors_ref_and_format
+    schema = {
+      "$defs" => {
+        "email" => { "type" => "string", "format" => "email" }
+      },
+      "type" => "object",
+      "required" => ["contact"],
+      "properties" => {
+        "contact" => { "$ref" => "#/$defs/email" }
+      }
+    }
+
+    assert_empty validator.validate({ "contact" => "ops@example.com" }, schema)
+
+    errors = validator.validate({ "contact" => "not-an-email" }, schema)
+    assert errors.any? { |e| e.include?("$.contact") && e.include?("format \"email\"") }
+  end
+
+  def test_honors_pattern_properties_and_dependent_required
+    schema = {
+      "type" => "object",
+      "additionalProperties" => false,
+      "patternProperties" => {
+        "^x-" => { "type" => "string" }
+      },
+      "dependentRequired" => {
+        "credit_card" => ["billing_address"]
+      }
+    }
+
+    errors = validator.validate({ "x-trace" => 123, "credit_card" => "4111" }, schema)
+
+    assert errors.any? { |e| e.include?("$.x-trace") && e.include?("expected type string") }
+    assert errors.any? { |e| e.include?("credit_card") && e.include?("billing_address") }
+    refute errors.any? { |e| e.include?("unexpected property \"x-trace\"") }
+  end
+
+  def test_honors_prefix_items_and_conditionals
+    tuple_schema = {
+      "type" => "array",
+      "prefixItems" => [
+        { "type" => "string" },
+        { "type" => "integer" }
+      ],
+      "items" => false
+    }
+
+    tuple_errors = validator.validate(["ok", "bad", "extra"], tuple_schema)
+    assert tuple_errors.any? { |e| e.include?("$[1]") && e.include?("expected type integer") }
+    assert tuple_errors.any? { |e| e.include?("$[2]") && e.include?("boolean schema false") }
+
+    conditional_schema = {
+      "type" => "object",
+      "if" => {
+        "required" => ["kind"],
+        "properties" => { "kind" => { "const" => "strict" } }
+      },
+      "then" => { "required" => ["approved"] },
+      "else" => { "required" => ["note"] }
+    }
+
+    then_errors = validator.validate({ "kind" => "strict" }, conditional_schema)
+    else_errors = validator.validate({ "kind" => "loose" }, conditional_schema)
+    assert then_errors.any? { |e| e.include?("missing required property \"approved\"") }
+    assert else_errors.any? { |e| e.include?("missing required property \"note\"") }
+  end
+
+  def test_validate_repo_checks_cross_skill_reference_tokens
+    repo_validator = RepoValidator.new
+    skill = Verdify::ROOT.join("skills/release-verification/SKILL.md")
+    dir = skill.dirname
+    content = <<~MARKDOWN
+      Read `skills/platform-readiness/references/environment-gitops.md`,
+      `../platform-readiness/references/environment-gitops.md`, and
+      `skills/platform-readiness/references/missing.md`.
+    MARKDOWN
+
+    tokens = repo_validator.send(:extract_skill_reference_tokens, content)
+    assert_includes tokens, "skills/platform-readiness/references/environment-gitops.md"
+    assert_includes tokens, "../platform-readiness/references/environment-gitops.md"
+
+    repo_validator.send(:validate_skill_references, skill, dir, content)
+    assert repo_validator.errors.any? { |e| e.include?("referenced path does not exist: skills/platform-readiness/references/missing.md") }
+    refute repo_validator.errors.any? { |e| e.include?("environment-gitops.md") }
+  end
+
+  def test_validate_repo_rejects_unsupported_schema_keywords
+    repo_validator = RepoValidator.new
+    schema = {
+      "type" => "object",
+      "unsupportedKeyword" => true
+    }
+
+    repo_validator.send(:validate_schema_keyword_support, Verdify::ROOT.join("schemas/example.schema.yaml"), schema)
+
+    assert repo_validator.errors.any? { |e| e.include?("unsupported JSON Schema keyword at #: unsupportedKeyword") }
   end
 
   def test_validates_all_example_artifacts
