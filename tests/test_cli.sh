@@ -17,6 +17,7 @@ BASE="$(git -C "$REPO" rev-parse HEAD)"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["checks"].any? { |c| c["name"] == "git_repository" && c["ok"] }' "$TMP/doctor.json"
 
 "$ROOT/bin/verdify" init --repo "$REPO" >/dev/null
+git -C "$REPO" check-ignore -q .agent-workflow/northstar/collateral/sources/example-source.md
 "$ROOT/bin/verdify" route --repo "$REPO" --write --json > "$TMP/route.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["next_skill"] == "project-definition" && d["next_mode"] == "discovery"' "$TMP/route.json"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/router/route-decision.yaml" >/dev/null
@@ -157,9 +158,11 @@ ruby -rjson -e '
   abort unless d["reference"].start_with?("northstar://evidence/NSE-")
   abort unless d["item_path"].end_with?(".yaml")
   File.write(ARGV[1], d["item_path"])
-' "$TMP/research-ingest.json" "$TMP/research-item-path"
+  File.write(ARGV[2], d["copied_source_path"])
+' "$TMP/research-ingest.json" "$TMP/research-item-path" "$TMP/research-source-path"
 "$ROOT/bin/verdify" artifact validate --file "$REPO_WITH_EVIDENCE/.agent-workflow/northstar/evidence-registry.yaml" >/dev/null
 "$ROOT/bin/verdify" artifact validate --file "$REPO_WITH_EVIDENCE/$(cat "$TMP/research-item-path")" >/dev/null
+git -C "$REPO_WITH_EVIDENCE" check-ignore -q "$(cat "$TMP/research-source-path")"
 "$ROOT/bin/verdify" northstar evidence list \
   --repo "$REPO_WITH_EVIDENCE" \
   --query observability \
@@ -172,6 +175,30 @@ ruby -rjson -e '
   abort unless e["reference"].start_with?("northstar://evidence/NSE-")
   abort unless e["tags"].include?("platform") && e["tags"].include?("observability")
 ' "$TMP/research-list.json"
+
+{
+  printf '# Secret fixture\n\n'
+  printf 'Leaked token: %s%s%s\n' "gh" "p_" "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+} > "$TMP/secret-research.md"
+if "$ROOT/bin/verdify" northstar ingest-research \
+  --repo "$REPO_WITH_EVIDENCE" \
+  --file "$TMP/secret-research.md" \
+  --id NSE-20260624-secret-fixture \
+  --title "Secret fixture" \
+  --summary "Should be blocked before source copy." \
+  --tag security \
+  --claim "This fixture should not be ingested." \
+  --json > "$TMP/secret-ingest.out" 2> "$TMP/secret-ingest.err"; then
+  echo "expected secret-bearing research ingest to fail" >&2
+  exit 1
+fi
+grep -q '^verdify: research source failed secret scan:' "$TMP/secret-ingest.err"
+[[ ! -e "$REPO_WITH_EVIDENCE/.agent-workflow/northstar/collateral/sources/NSE-20260624-secret-fixture-secret-research-md" ]]
+[[ ! -e "$REPO_WITH_EVIDENCE/.agent-workflow/northstar/collateral/NSE-20260624-secret-fixture.yaml" ]]
+if grep -q 'NSE-20260624-secret-fixture' "$REPO_WITH_EVIDENCE/.agent-workflow/northstar/evidence-registry.yaml"; then
+  echo "expected rejected secret fixture to be absent from evidence registry" >&2
+  exit 1
+fi
 
 MALFORMED_EVIDENCE_REPO="$TMP/project-with-malformed-evidence"
 mkdir -p "$MALFORMED_EVIDENCE_REPO"
