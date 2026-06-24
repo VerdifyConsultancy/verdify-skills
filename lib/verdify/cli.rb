@@ -442,7 +442,7 @@ module Verdify
       parse_options(parser)
       repo = GitRepository.new(options[:repo])
       registry_path = repo.root.join(".agent-workflow/northstar/evidence-registry.yaml")
-      registry = registry_path.file? ? Verdify.safe_load_yaml(registry_path) : empty_northstar_registry(repo, Verdify.utc_now)
+      registry = load_northstar_registry(repo, registry_path, Verdify.utc_now)
       entries = Array(registry["evidence"])
       query = options[:query].to_s.downcase
       tags = normalize_tags(options[:tags])
@@ -618,15 +618,8 @@ module Verdify
         raise UsageError, "resolved base #{resolved_base} does not match contract baseline #{contract['baseline_sha']}"
       end
 
-      expire_stale_leases!(repo)
-      conflict = all_leases(repo).find do |lease|
-        lease["role"] == "worker" && lease["lane_id"] == options[:lane_id] && lease["status"] == "active"
-      end
-      raise UsageError, "lane already has active worker lease #{conflict['lease_id']}" if conflict
-
       branch = contract["branch"]
       path = options[:path] ? Pathname.new(options[:path]).expand_path : default_worktree_path(repo, options[:lane_id])
-      raise UsageError, "worktree path already exists: #{path}" if path.exist?
 
       lease = build_lease(
         repo: repo,
@@ -645,6 +638,13 @@ module Verdify
       )
 
       if options[:dry_run]
+        with_lease_lock(repo) do
+          expire_stale_leases!(repo)
+          conflict = active_worker_lease(repo, options[:lane_id])
+          raise UsageError, "lane already has active worker lease #{conflict['lease_id']}" if conflict
+          raise UsageError, "worktree path already exists: #{path}" if path.exist?
+        end
+
         puts "DRY RUN"
         puts "git worktree add #{repo.branch_exists?(branch) ? '' : "-b #{branch} "}#{path} #{repo.branch_exists?(branch) ? branch : resolved_base}".strip
         puts "git worktree lock --reason #{Shellwords.escape("Verdify worker #{options[:lane_id]} session #{options[:session_id]}")} #{path}"
@@ -652,14 +652,21 @@ module Verdify
         return 0
       end
 
-      repo.add_worktree(path: path, branch: branch, base: resolved_base)
-      begin
-        repo.lock_worktree(path, "Verdify worker #{options[:lane_id]} session #{options[:session_id]}")
-        write_lease(repo, lease)
-      rescue StandardError
-        repo.unlock_worktree(path)
-        repo.remove_worktree(path, force: true) if path.exist?
-        raise
+      with_lease_lock(repo) do
+        expire_stale_leases!(repo)
+        conflict = active_worker_lease(repo, options[:lane_id])
+        raise UsageError, "lane already has active worker lease #{conflict['lease_id']}" if conflict
+        raise UsageError, "worktree path already exists: #{path}" if path.exist?
+
+        repo.add_worktree(path: path, branch: branch, base: resolved_base)
+        begin
+          repo.lock_worktree(path, "Verdify worker #{options[:lane_id]} session #{options[:session_id]}")
+          write_lease(repo, lease)
+        rescue StandardError
+          repo.unlock_worktree(path)
+          repo.remove_worktree(path, force: true) if path.exist?
+          raise
+        end
       end
 
       print_lease_summary(lease)
@@ -696,11 +703,7 @@ module Verdify
       end
 
       lease_id = "critic-#{options[:lane_id]}-#{Verdify.slug(options[:session_id], max: 24)}"
-      existing = lease_path(repo, lease_id)
-      raise UsageError, "critic lease already exists: #{lease_id}" if existing.exist? && load_json(existing)["status"] == "active"
-
       path = options[:path] ? Pathname.new(options[:path]).expand_path : default_review_path(repo, options[:lane_id], options[:session_id])
-      raise UsageError, "review worktree path already exists: #{path}" if path.exist?
       branch = contract["branch"]
       repo.head_sha(branch)
 
@@ -720,14 +723,20 @@ module Verdify
         ttl_hours: contract.dig("lease_policy", "critic_ttl_hours") || 8
       )
 
-      repo.add_worktree(path: path, branch: branch, base: branch, detach: true)
-      begin
-        repo.lock_worktree(path, "Verdify critic #{options[:lane_id]} session #{options[:session_id]}")
-        write_lease(repo, lease)
-      rescue StandardError
-        repo.unlock_worktree(path)
-        repo.remove_worktree(path, force: true) if path.exist?
-        raise
+      with_lease_lock(repo) do
+        existing = lease_path(repo, lease_id)
+        raise UsageError, "critic lease already exists: #{lease_id}" if existing.exist? && load_json(existing)["status"] == "active"
+        raise UsageError, "review worktree path already exists: #{path}" if path.exist?
+
+        repo.add_worktree(path: path, branch: branch, base: branch, detach: true)
+        begin
+          repo.lock_worktree(path, "Verdify critic #{options[:lane_id]} session #{options[:session_id]}")
+          write_lease(repo, lease)
+        rescue StandardError
+          repo.unlock_worktree(path)
+          repo.remove_worktree(path, force: true) if path.exist?
+          raise
+        end
       end
 
       print_lease_summary(lease)
@@ -1514,10 +1523,26 @@ module Verdify
       lease_dir(repo).join("#{Verdify.slug(lease_id, max: 96)}.json")
     end
 
+    def with_lease_lock(repo)
+      FileUtils.mkdir_p(lease_dir(repo))
+      File.open(lease_dir(repo).join(".lease.lock"), File::RDWR | File::CREAT, 0o600) do |file|
+        file.flock(File::LOCK_EX)
+        yield
+      ensure
+        file.flock(File::LOCK_UN) unless file.closed?
+      end
+    end
+
     def write_lease(repo, lease)
       validate_hash!(lease, "lane-lease.schema.yaml", "lane lease")
       FileUtils.mkdir_p(lease_dir(repo))
       Verdify.atomic_write(lease_path(repo, lease["lease_id"]), JSON.pretty_generate(lease) + "\n")
+    end
+
+    def active_worker_lease(repo, lane_id)
+      all_leases(repo).find do |lease|
+        lease["role"] == "worker" && lease["lane_id"] == lane_id && lease["status"] == "active"
+      end
     end
 
     def all_leases(repo)
@@ -1536,7 +1561,7 @@ module Verdify
         next unless Time.parse(lease["expires_at"]) <= Time.now.utc
         lease["status"] = "expired"
         write_lease(repo, lease)
-      rescue ArgumentError
+      rescue StandardError
         next
       end
     end

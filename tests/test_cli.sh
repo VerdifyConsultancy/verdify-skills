@@ -173,6 +173,49 @@ ruby -rjson -e '
   abort unless e["tags"].include?("platform") && e["tags"].include?("observability")
 ' "$TMP/research-list.json"
 
+MALFORMED_EVIDENCE_REPO="$TMP/project-with-malformed-evidence"
+mkdir -p "$MALFORMED_EVIDENCE_REPO"
+git -C "$MALFORMED_EVIDENCE_REPO" init -q -b main
+git -C "$MALFORMED_EVIDENCE_REPO" config user.name "Verdify Test"
+git -C "$MALFORMED_EVIDENCE_REPO" config user.email "verdify-test@example.invalid"
+printf '# Malformed evidence project\n' > "$MALFORMED_EVIDENCE_REPO/README.md"
+git -C "$MALFORMED_EVIDENCE_REPO" add README.md
+git -C "$MALFORMED_EVIDENCE_REPO" commit -qm "initial"
+"$ROOT/bin/verdify" init --repo "$MALFORMED_EVIDENCE_REPO" >/dev/null
+cat > "$MALFORMED_EVIDENCE_REPO/.agent-workflow/northstar/evidence-registry.yaml" <<YAML
+schema_ref: northstar-evidence-registry.schema.yaml
+kind: NorthStarEvidenceRegistry
+schema_version: "1.0"
+project_id: local/malformed
+generated_at: "2026-06-24T00:00:00Z"
+updated_at: "2026-06-24T00:00:00Z"
+evidence:
+  - id: NSE-20260624-malformed-title
+    reference: northstar://evidence/NSE-20260624-malformed-title
+    title:
+    evidence_type: research_note
+    evidence_status: observed
+    ingested_at: "2026-06-24T00:00:00Z"
+    item_path: .agent-workflow/northstar/collateral/NSE-20260624-malformed-title.yaml
+    copied_source_path: .agent-workflow/northstar/collateral/sources/malformed.md
+    source_uri:
+    source_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    summary: Malformed title fixture.
+    tags: []
+    claims: []
+    planning_relevance: []
+YAML
+if "$ROOT/bin/verdify" northstar evidence list --repo "$MALFORMED_EVIDENCE_REPO" > "$TMP/malformed-evidence.out" 2> "$TMP/malformed-evidence.err"; then
+  echo "expected malformed evidence registry to fail with a typed error" >&2
+  exit 1
+fi
+grep -q '^verdify: northstar evidence registry failed validation:' "$TMP/malformed-evidence.err"
+if grep -Eq 'NoMethodError|lib/verdify/cli\.rb:[0-9]+:in' "$TMP/malformed-evidence.err"; then
+  echo "expected malformed evidence registry error without a Ruby stack trace" >&2
+  cat "$TMP/malformed-evidence.err" >&2
+  exit 1
+fi
+
 REPO_WITH_RAW_RESEARCH="$TMP/project-with-raw-research"
 mkdir -p "$REPO_WITH_RAW_RESEARCH/docs/northstar/research"
 git -C "$REPO_WITH_RAW_RESEARCH" init -q -b main
@@ -203,6 +246,20 @@ ruby -rtime -ryaml -e '
 ' "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml" \
   "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" "$BASE"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" >/dev/null
+ruby -rtime -ryaml -e '
+  src, dst, sha = ARGV
+  d = YAML.safe_load(File.read(src), permitted_classes: [], aliases: false)
+  d["sprint_id"] = "sprint-a"
+  d["lane_id"] = "issue-124-race"
+  d["issue_ids"] = [124]
+  d["status"] = "approved"
+  d["baseline_sha"] = sha
+  d["branch"] = "lane/124-race"
+  d["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
+  File.write(dst, YAML.dump(d))
+' "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" "$BASE"
+"$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" >/dev/null
 
 WORKTREE="$TMP/worker"
 "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-123-api --issue 123 \
@@ -216,6 +273,86 @@ if "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id is
   echo "expected duplicate worker lease to be rejected" >&2
   exit 1
 fi
+
+RACE_WORKTREE_A="$TMP/race-worker-a"
+RACE_WORKTREE_B="$TMP/race-worker-b"
+"$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-124-race --issue 124 \
+  --session-id race-worker-a --agent test-agent --path "$RACE_WORKTREE_A" > "$TMP/race-a.out" 2> "$TMP/race-a.err" &
+RACE_PID_A=$!
+"$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-124-race --issue 124 \
+  --session-id race-worker-b --agent test-agent --path "$RACE_WORKTREE_B" > "$TMP/race-b.out" 2> "$TMP/race-b.err" &
+RACE_PID_B=$!
+RACE_STATUS_A=0
+RACE_STATUS_B=0
+wait "$RACE_PID_A" || RACE_STATUS_A=$?
+wait "$RACE_PID_B" || RACE_STATUS_B=$?
+if [[ $(( (RACE_STATUS_A == 0) + (RACE_STATUS_B == 0) )) -ne 1 ]]; then
+  echo "expected exactly one concurrent lane create to succeed" >&2
+  cat "$TMP/race-a.err" "$TMP/race-b.err" >&2
+  exit 1
+fi
+grep -h 'verdify: lane already has active worker lease issue-124-race' "$TMP/race-a.err" "$TMP/race-b.err" >/dev/null
+ruby -rjson -e '
+  repo, common = ARGV
+  common = File.expand_path(common, repo) unless common.start_with?("/")
+  leases = Dir[File.join(common, "verdify/leases/*.json")].map { |path| JSON.parse(File.read(path)) }
+  active = leases.count { |lease| lease["role"] == "worker" && lease["lane_id"] == "issue-124-race" && lease["status"] == "active" }
+  abort "expected one active race worker lease, got #{active}" unless active == 1
+' "$REPO" "$(git -C "$REPO" rev-parse --git-common-dir)"
+
+ruby -rjson -rfileutils -e '
+  repo, common = ARGV
+  common = File.expand_path(common, repo) unless common.start_with?("/")
+  dir = File.join(common, "verdify/leases")
+  FileUtils.mkdir_p(dir)
+  runtime = {
+    "compose_project"=>"verdify_stale_valid",
+    "database_suffix"=>"stale_valid",
+    "kubernetes_namespace"=>"lane-stale-valid",
+    "port_offset"=>1234,
+    "cache_prefix"=>"verdify:stale-valid:"
+  }
+  valid = {
+    "schema_ref"=>"lane-lease.schema.yaml",
+    "kind"=>"LaneLease",
+    "schema_version"=>"1.0",
+    "lease_id"=>"stale-valid",
+    "sprint_id"=>"sprint-a",
+    "lane_id"=>"stale-valid",
+    "issue_ids"=>[125],
+    "role"=>"worker",
+    "agent"=>"test-agent",
+    "session_id"=>"stale-valid",
+    "branch"=>"lane/stale-valid",
+    "baseline_sha"=>"test-baseline",
+    "contract_path"=>File.join(repo, ".agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml"),
+    "contract_hash"=>"test-contract-hash",
+    "worktree_path"=>File.join(repo, "stale-valid-worktree"),
+    "created_at"=>"2026-06-23T00:00:00Z",
+    "expires_at"=>"2026-06-23T00:00:00Z",
+    "released_at"=>nil,
+    "status"=>"active",
+    "runtime_namespace"=>runtime
+  }
+  invalid = valid.merge(
+    "lease_id"=>"stale-invalid",
+    "lane_id"=>"stale-invalid",
+    "session_id"=>"stale-invalid"
+  )
+  invalid.delete("runtime_namespace")
+  File.write(File.join(dir, "stale-valid.json"), JSON.pretty_generate(valid) + "\n")
+  File.write(File.join(dir, "stale-invalid.json"), JSON.pretty_generate(invalid) + "\n")
+' "$REPO" "$(git -C "$REPO" rev-parse --git-common-dir)"
+"$ROOT/bin/verdify" lane list --repo "$REPO" > "$TMP/lane-list-with-invalid-lease.out"
+ruby -rjson -e '
+  repo, common = ARGV
+  common = File.expand_path(common, repo) unless common.start_with?("/")
+  dir = File.join(common, "verdify/leases")
+  valid = JSON.parse(File.read(File.join(dir, "stale-valid.json")))
+  invalid = JSON.parse(File.read(File.join(dir, "stale-invalid.json")))
+  abort "expected valid stale lease to expire" unless valid["status"] == "expired"
+  abort "expected malformed stale lease to remain readable" unless invalid["status"] == "active"
+' "$REPO" "$(git -C "$REPO" rev-parse --git-common-dir)"
 
 "$ROOT/bin/verdify" prompt compile --repo "$REPO" \
   --contract .agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml \
