@@ -1,0 +1,39 @@
+kind: ControllerLoopRecordExample
+schema_version: "1.0"
+example: interrupted-loop
+loop_record:
+  loop_id: loop-20260624-001
+  loop_type: inner
+  status: paused
+  owner: controller-loop
+  repository: VerdifyConsultancy/verdify-skills
+  sprint_id: 2026-06-24-skills-hardening
+  wave_id: wave-skills-hardening
+  lane_id: lane-controller-recovery
+  issue_refs: [2]
+  pull_request_refs: []
+  checkpoint_path: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-001-0003.yaml
+  current_objective: Monitor lane-controller-recovery until worker closeout is ready for critic.
+  last_action: Child worker heartbeat missed while waiting for lane closeout evidence.
+  last_error: null
+  next_prompt: Resume by inspecting the checkpoint, lease, branch, issue 2, and latest worker status event before polling again.
+status_event:
+  schema_ref: status-event.schema.yaml
+  kind: VerdifyStatusEvent
+  schema_version: "1.0"
+  event_id: evt-20260624-controller-interrupted
+  sprint_id: 2026-06-24-skills-hardening
+  lane_id: lane-controller-recovery
+  type: LOOP_INTERRUPTED_RECOVERABLE
+  occurred_at: "2026-06-24T18:00:00Z"
+  source: controller-loop
+  references:
+    issue: 2
+    pull_request: null
+    lease_id: lane-controller-recovery
+    artifact: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-001-0003.yaml
+agent_fleet_handoff:
+  metrics:
+    verdify_controller_alert_count: 1
+    verdify_controller_active_child_sessions: 1
+  alert_summary: Child heartbeat missed; resume from checkpoint and verify lease before continuing.

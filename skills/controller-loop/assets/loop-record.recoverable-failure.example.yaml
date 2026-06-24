@@ -1,0 +1,39 @@
+kind: ControllerLoopRecordExample
+schema_version: "1.0"
+example: recoverable-failure
+loop_record:
+  loop_id: loop-20260624-003
+  loop_type: outer
+  status: recoverable_failure
+  owner: controller-loop
+  repository: VerdifyConsultancy/verdify-skills
+  sprint_id: 2026-06-24-skills-hardening
+  wave_id: wave-skills-hardening
+  lane_id: lane-controller-recovery
+  issue_refs: [2]
+  pull_request_refs: [57]
+  checkpoint_path: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-003-0012.yaml
+  current_objective: Route controller-loop recovery lane to critic after worker closeout.
+  last_action: Attempted to reconcile PR checks before closeout artifact was pushed.
+  last_error: PR head SHA did not match the closeout head SHA.
+  next_prompt: Resume by comparing the checkpoint, PR head SHA, and closeout head SHA; if they match, hand off to independent-critic.
+status_event:
+  schema_ref: status-event.schema.yaml
+  kind: VerdifyStatusEvent
+  schema_version: "1.0"
+  event_id: evt-20260624-controller-recoverable-failure
+  sprint_id: 2026-06-24-skills-hardening
+  lane_id: lane-controller-recovery
+  type: OUTER_LOOP_FAILED_RECOVERABLE
+  occurred_at: "2026-06-24T18:30:00Z"
+  source: controller-loop
+  references:
+    issue: 2
+    pull_request: 57
+    lease_id: lane-controller-recovery
+    artifact: .agent-workflow/controller/checkpoints/controller-main/loop-20260624-003-0012.yaml
+agent_fleet_handoff:
+  metrics:
+    verdify_controller_loop_failures_total: 1
+    verdify_controller_active_child_sessions: 0
+  alert_summary: Reconciliation failed because local closeout evidence lagged PR head; recover by refreshing refs.
