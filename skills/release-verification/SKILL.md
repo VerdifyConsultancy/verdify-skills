@@ -67,7 +67,7 @@ Read `references/integration.md`.
 7. Write `.agent-workflow/sprints/<sprint-id>/release/release-verification.yaml` and validate against `../../schemas/release-verification.schema.yaml`.
 
 Read `references/deployment-verification.md`,
-`skills/platform-readiness/references/environment-gitops.md`, and
+`references/environment-gitops.md`, and
 `references/rollback.md`.
 
 ## Mode 3: outcome review

@@ -116,18 +116,20 @@ class SchemaValidatorTest < Minitest::Test
     skill = Verdify::ROOT.join("skills/release-verification/SKILL.md")
     dir = skill.dirname
     content = <<~MARKDOWN
-      Read `skills/platform-readiness/references/environment-gitops.md`,
+      Read `references/environment-gitops.md`,
       `../platform-readiness/references/environment-gitops.md`, and
-      `skills/platform-readiness/references/missing.md`.
+      `skills/platform-readiness/references/environment-gitops.md`.
     MARKDOWN
 
     tokens = repo_validator.send(:extract_skill_reference_tokens, content)
+    assert_includes tokens, "references/environment-gitops.md"
     assert_includes tokens, "skills/platform-readiness/references/environment-gitops.md"
     assert_includes tokens, "../platform-readiness/references/environment-gitops.md"
 
     repo_validator.send(:validate_skill_references, skill, dir, content)
-    assert repo_validator.errors.any? { |e| e.include?("referenced path does not exist: skills/platform-readiness/references/missing.md") }
-    refute repo_validator.errors.any? { |e| e.include?("environment-gitops.md") }
+    assert repo_validator.errors.any? { |e| e.include?("referenced path does not exist: skills/platform-readiness/references/environment-gitops.md") }
+    refute repo_validator.errors.any? { |e| e.include?("referenced path does not exist: references/environment-gitops.md") }
+    refute repo_validator.errors.any? { |e| e.include?("referenced path does not exist: ../platform-readiness/references/environment-gitops.md") }
   end
 
   def test_validate_repo_rejects_unsupported_schema_keywords
@@ -140,6 +142,19 @@ class SchemaValidatorTest < Minitest::Test
     repo_validator.send(:validate_schema_keyword_support, Verdify::ROOT.join("schemas/example.schema.yaml"), schema)
 
     assert repo_validator.errors.any? { |e| e.include?("unsupported JSON Schema keyword at #: unsupportedKeyword") }
+  end
+
+  def test_validate_repo_rejects_route_decision_skill_enum_drift
+    path = Verdify::ROOT.join("schemas/route-decision.schema.yaml")
+    schema = Verdify.safe_load_yaml(path)
+    repo_validator = RepoValidator.new
+
+    repo_validator.send(:validate_route_decision_skill_enum, path, schema)
+    assert_empty repo_validator.errors
+
+    schema.dig("properties", "next_skill", "enum").delete("issue-triage")
+    repo_validator.send(:validate_route_decision_skill_enum, path, schema)
+    assert repo_validator.errors.any? { |e| e.include?("properties.next_skill.enum missing canonical skills: issue-triage") }
   end
 
   def test_validates_all_example_artifacts

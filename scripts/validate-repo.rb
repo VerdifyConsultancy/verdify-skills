@@ -125,6 +125,7 @@ class RepoValidator
       error(path, "top-level schema must close unknown properties") unless schema["additionalProperties"] == false
       error(path, "schema_ref const should equal filename") unless schema.dig("properties", "schema_ref", "const") == path.basename.to_s
       validate_schema_keyword_support(path, schema)
+      validate_route_decision_skill_enum(path, schema) if path.basename.to_s == "route-decision.schema.yaml"
     end
   end
 
@@ -202,15 +203,23 @@ class RepoValidator
   end
 
   def resolve_skill_reference(skill_dir, raw)
-    if raw.start_with?("skills/")
-      ROOT.join(raw).cleanpath
-    else
-      skill_dir.join(raw).cleanpath
-    end
+    skill_dir.join(raw).cleanpath
   end
 
   def validate_schema_keyword_support(path, schema)
     scan_schema_keywords(path, schema, schema, "#")
+  end
+
+  def validate_route_decision_skill_enum(path, schema)
+    enum = Array(schema.dig("properties", "next_skill", "enum"))
+    missing = REQUIRED_SKILLS - enum
+    extra = enum - REQUIRED_SKILLS
+    unless missing.empty?
+      error(path, "properties.next_skill.enum missing canonical skills: #{missing.join(', ')}")
+    end
+    unless extra.empty?
+      error(path, "properties.next_skill.enum contains non-canonical skills: #{extra.join(', ')}")
+    end
   end
 
   def scan_schema_keywords(path, node, root_schema, pointer)
