@@ -1,0 +1,92 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-repo-bootstrap-skill
+status: ready_for_critic
+issue_ids:
+  - 1
+pull_request: 63
+baseline_sha: "8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6"
+head_sha: "a8906920e53c8a3178f556afaa5cceac783ebfbd"
+contract_hash: "a9ae6fe902c358b260674ebe2dc7ddf118d7b84bf7faab0e3c33ae15e943d9c7"
+changed_paths:
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-repo-bootstrap-skill.closeout.yaml"
+  - ".agents/skills/repo-bootstrap"
+  - ".claude/skills/repo-bootstrap"
+  - "config/lifecycle.yaml"
+  - "evaluations/repo-bootstrap/evals.json"
+  - "lib/verdify/cli.rb"
+  - "schemas/repo-bootstrap.schema.yaml"
+  - "schemas/route-decision.schema.yaml"
+  - "scripts/validate-repo.rb"
+  - "skills/repo-bootstrap/SKILL.md"
+  - "skills/repo-bootstrap/agents/openai.yaml"
+  - "skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml"
+  - "skills/repo-bootstrap/assets/repo-bootstrap.template.yaml"
+  - "skills/repo-bootstrap/references/bootstrap-packet.md"
+  - "tests/test_schema_validator.rb"
+validation_results:
+  - id: validate-fixture
+    command: "ruby bin/verdify artifact validate --file skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml --schema schemas/repo-bootstrap.schema.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T19:14:50Z"
+    artifact: "valid skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml (repo-bootstrap.schema.yaml)"
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T19:13:00Z"
+    artifact: "Verdify repository validation passed (21 skills, 45 schemas)."
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T19:14:00Z"
+    artifact: "35 schema-validator runs / 380 assertions plus CLI, PR policy, and npm install tests passed."
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-repo-bootstrap-skill.closeout.yaml --schema schemas/lane-closeout.schema.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T19:15:00Z"
+    artifact: "valid .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-repo-bootstrap-skill.closeout.yaml (lane-closeout.schema.yaml)"
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "skills/repo-bootstrap/SKILL.md"
+      - "skills/repo-bootstrap/references/bootstrap-packet.md"
+      - "config/lifecycle.yaml"
+      - "scripts/validate-repo.rb"
+      - "validate-repo"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "schemas/repo-bootstrap.schema.yaml"
+      - "skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml"
+      - "validate-fixture"
+      - "validate-repo"
+      - "closeout-validate"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "skills/repo-bootstrap/assets/repo-bootstrap.template.yaml"
+      - "skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml"
+      - "skills/repo-bootstrap/references/bootstrap-packet.md"
+      - "validate-fixture"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic or reviewer approval is still required before integration."
+  - "Project-router routing behavior was not changed to automatically select repo-bootstrap; this lane registers the skill and packet contract for discoverability."
+  - "Narrative README/docs counts that mention eighteen lifecycle skills remain outside this lane's scope."
+worktree_clean: true
+worker_session_id: "codex-20260624-repoboot"
+completed_at: "2026-06-24T19:15:00Z"
+limitations:
+  - "Closeout records the rebased implementation head SHA before this closeout-only metadata commit; the pull request records the current branch head after closeout is pushed."
+  - "No live cluster or secret access was used; the fixture validates offline bootstrap output only."
