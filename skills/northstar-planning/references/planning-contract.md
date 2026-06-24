@@ -42,9 +42,10 @@ relevant:
 - security/privacy.
 
 Each finding needs a disposition: `accepted`, `rejected`, `deferred`,
-`needs_research`, or `final_lock_required`. Use `needs_research` for ordinary
-uncertainty; reserve `final_lock_required` for the review point that locks the
-North Star for the next milestone.
+`needs_research`, or `gate_required`. Use `needs_research` for ordinary
+uncertainty; use `gate_required` when a human gate must approve a lock or
+review point before the North Star can be treated as final for the next
+milestone.
 
 ## Milestones and waves
 

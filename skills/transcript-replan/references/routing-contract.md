@@ -31,7 +31,7 @@ Every material item needs:
 - evidence status;
 - target repository or `multi_repo`;
 - lifecycle phase;
-- affected skill or lane;
+- affected skill or lane (`affected_skill_or_lane`);
 - proposed next action;
 - protected-artifact impact.
 

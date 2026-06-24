@@ -85,7 +85,7 @@ Before final approval, read `references/lifecycle-coverage.md` and update `lifec
 
 ## Traceability
 
-Use stable IDs such as `SRC-001`, `DEC-001`, `FR-001`, `NFR-001`, `AC-001`, `USR-001`, `FLOW-001`, `COV-001`, `REL-001`, and `GAP-001`. Every requirement must trace to evidence or an approved decision; every product, design, lifecycle coverage, relationship, and handoff element must trace to requirements, evidence, or an approved decision. Read `references/traceability.md` before final approval.
+Use stable IDs such as `SRC-001`, `DEC-001`, `ASM-001`, `CON-001`, `FR-001`, `NFR-001`, `CST-001`, `AC-001`, `USR-001`, `FLOW-001`, `MET-001`, `SURF-001`, `COV-001`, `REL-001`, and `GAP-001`. Every requirement must trace to evidence or an approved decision; every product, design, lifecycle coverage, relationship, and handoff element must trace to requirements, evidence, or an approved decision. Read `references/traceability.md` before final approval.
 
 ## Approval and handoff
 

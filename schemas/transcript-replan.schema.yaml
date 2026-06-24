@@ -28,6 +28,7 @@ properties:
         evidence_status: {type: string, enum: [verified, observed, reported, inferred, unknown]}
         target_repository: {type: string, minLength: 1}
         lifecycle_phase: {type: string, minLength: 1}
+        affected_skill_or_lane: {type: string, minLength: 1}
         next_action: {type: string, minLength: 1}
         protected_artifact_impact: {type: string, enum: [none, proposed_change, approval_required]}
   conflicts:
