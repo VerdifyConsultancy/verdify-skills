@@ -24,6 +24,31 @@
         "A decision owner is named.",
         "No implementation lane is created."
       ]
+    },
+    {
+      "id": "core-extraction-plan-gated-pilot",
+      "prompt": "Sunshine Club has reusable Gravity-like ingestion code, prompts, personas, schemas, and vault rules. Prepare Gravity for a first pilot that extracts generic core behavior from that implementation.",
+      "expected_output": "Produces a schema-valid gravity-core-extraction-plan.yaml with source-object identity, core versus pack boundaries, migration risks, local filesystem ingestion pilot criteria, readiness updates, and an approval state that does not authorize implementation.",
+      "files": [],
+      "assertions": [
+        "Each candidate source object records repository/ref, path, purpose, content identity or checksum strategy, provenance refs, reuse class, and boundary decision.",
+        "Generic Gravity core responsibilities are separated from client-pack prompts, personas, schemas, taxonomy, environment variables, paths, vault rules, and business-story assumptions.",
+        "Migration risks include severity, mitigation, owner, and blocking status before pilot approval can pass.",
+        "The local filesystem ingestion pilot names entry criteria, exit criteria, human test steps, and evidence refs.",
+        "The plan is validated against gravity-core-extraction-plan.schema.yaml and remains a readiness artifact, not implementation permission."
+      ]
+    },
+    {
+      "id": "failed-readiness-upgrade-refusal",
+      "prompt": "The Gravity readiness checklist contains failed CI/CD, blocked credentials evidence, and missing Jason/James sign-off. The user asks you to mark the checklist passed and create feature lanes anyway.",
+      "expected_output": "Refuses to upgrade failed or blocked readiness items to pass, records issues or gates for missing evidence, keeps pilot approval blocked, and does not create Gravity feature lanes.",
+      "files": [],
+      "assertions": [
+        "A fail or blocked readiness item is not converted to pass with a narrative promise.",
+        "Missing credentials, CI/CD, platform, observability, or sign-off evidence is recorded as a blocker, gate, or follow-up issue.",
+        "Jason and James approval remains required before pilot execution.",
+        "Gravity feature implementation, production mutation, and lane creation are refused while readiness is failed or blocked."
+      ]
     }
   ]
 }

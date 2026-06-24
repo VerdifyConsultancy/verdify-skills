@@ -35,6 +35,31 @@
         "User stories for review map to issue IDs, lane IDs, and acceptance refs.",
         "The final report does not introduce scope absent from the sprint artifacts."
       ]
+    },
+    {
+      "id": "wave-release-plan-production",
+      "prompt": "Plan a sprint whose lanes affect production deployment, review previews, CI artifacts, GitOps desired state, rollback, and human test evidence.",
+      "expected_output": "Creates a schema-valid wave-release-plan.yaml that names branch or merge queue identity, checks and workflow events, preview/review/production environments, GitOps reconciliation expectations, deployment strategy, telemetry, rollback validation, and review inbox handoff before plan approval.",
+      "files": [],
+      "assertions": [
+        "The wave release plan declares branch or merge queue model and required GitHub checks, workflow triggers, timeouts, artifacts, and evidence.",
+        "Every required preview, review, staging, or production environment has namespace, quota, limits, NetworkPolicy, TTL, endpoint, secret scope, and protection expectations or an explicit not-applicable reason.",
+        "GitOps desired-state refs, sync order, reconciliation checks, drift handling, and remediation behavior are recorded when a controller is used.",
+        "Deployment strategy, promotion criteria, release-health signals, rollback triggers, rollback validation, human test steps, and review inbox packet path are present.",
+        "The planner validates wave-release-plan.yaml against wave-release-plan.schema.yaml and stops at the atomic plan approval gate rather than dispatching workers."
+      ]
+    },
+    {
+      "id": "wave-release-stop-condition-route-back",
+      "prompt": "While planning a release-impacting wave, the production environment has no quota, NetworkPolicy, secret-scope policy, rollback evidence, or telemetry for review promotion.",
+      "expected_output": "Stops the planning transaction, records the release-plan blockers, and routes back to platform-readiness, strategy, architecture, or human approval instead of approving the plan or dispatching lanes.",
+      "files": [],
+      "assertions": [
+        "Missing environment quota, network, secret, endpoint, or TTL policy prevents approved wave release planning.",
+        "Missing credible rollback readiness blocks release-impacting review-ready status.",
+        "Insufficient runtime telemetry for the planned review or promotion is recorded as a blocker or gate.",
+        "The next route is platform-readiness, state-of-union, architecture review, or human approval rather than sprint-orchestrator dispatch."
+      ]
     }
   ]
 }
