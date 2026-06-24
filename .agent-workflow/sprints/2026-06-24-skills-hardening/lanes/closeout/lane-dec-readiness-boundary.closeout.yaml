@@ -1,0 +1,75 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-readiness-boundary
+status: ready_for_critic
+issue_ids:
+  - 10
+pull_request: 38
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+head_sha: "03fc78dd2f9834931dff483e3c1f989a08ffaf50"
+contract_hash: "d324a53750433c11e6f7d233bd21b02537a8b1987f17eea99872938b81c0f62e"
+changed_paths:
+  - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md"
+validation_results:
+  - id: adr-exists
+    command: "ls docs/decisions/ | grep -E 'readiness'"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:46:54Z"
+    artifact: null
+  - id: adr-references-issue
+    command: "grep -rn '#10\\|issue 10\\|gravity-readiness\\|platform-readiness' docs/decisions/"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:46:54Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:46:54Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:46:54Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-readiness-boundary.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T16:47:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:21"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:28"
+      - "validate-repo"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:35"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:43"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:53"
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:64"
+      - "make-test"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md:5"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/pull/38"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh critic or reviewer approval is still required before integration."
+  - "Worker authority stops at the pushed pull request; self-merge is not allowed."
+worktree_clean: true
+worker_session_id: "codex-20260624-readiness"
+completed_at: "2026-06-24T16:47:00Z"
+limitations:
+  - "The closeout head_sha records the implementation commit before this closeout-only metadata commit; the pull request body records the final branch head after closeout is pushed."
+  - ".verdify/ dispatch metadata is intentionally not part of the pull request."
