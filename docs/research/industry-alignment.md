@@ -9,13 +9,15 @@ The Agent Skills specification defines a skill as a directory containing `SKILL.
 - https://agentskills.io/specification
 - https://agentskills.io/skill-creation/best-practices
 
-Verdify therefore exposes coherent lifecycle skills instead of 17 tiny skills or
-one monolith, keeps each `SKILL.md` concise, and moves detailed procedures to
-focused references. The original delivery set contained nine skills; readiness,
-North Star planning, research-ingest, and North Star interview loops now extend the package to seventeen
-while preserving progressive disclosure. Standalone helper skills can be
-packaged alongside the lifecycle when they serve GitHub-native work without
-changing the lifecycle graph.
+Verdify therefore exposes coherent lifecycle skills instead of an atomized set
+or one monolith, keeps each `SKILL.md` concise, and moves detailed procedures to
+focused references. The original delivery set later gained readiness,
+controller-loop, North Star planning, research-ingest, North Star interview, and
+North Star question-resolution loops, bringing the lifecycle package to eighteen
+skills while preserving progressive disclosure. Standalone helper skills such as
+`issue-triage` can be packaged alongside the lifecycle when they serve
+GitHub-native work without changing the lifecycle graph, so repository
+validation reports 19 total skills.
 
 ## GitHub backlog and delivery primitives
 

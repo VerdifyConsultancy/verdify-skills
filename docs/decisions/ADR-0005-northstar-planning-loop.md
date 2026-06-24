@@ -49,5 +49,7 @@ the next milestone.
   rather than raw ideation.
 - Protected North Star edits remain proposed until the final lock approval rule
   is satisfied.
-- The package now exposes seventeen canonical skills after `ADR-0008` adds
-  `northstar-interview`.
+- The package now reports 19 skills: eighteen lifecycle skills after `ADR-0008`
+  adds `northstar-interview` and `ADR-0009` adds
+  `northstar-question-resolution`, plus one standalone `issue-triage` skill
+  outside the lifecycle graph.

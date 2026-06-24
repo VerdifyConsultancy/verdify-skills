@@ -39,7 +39,8 @@ operations, external dependencies, or deployment risk.
 
 ## Consequences
 
-- The package now exposes eighteen canonical skills.
+- The package now reports 19 skills: eighteen lifecycle skills plus one
+  standalone `issue-triage` skill outside the lifecycle graph.
 - Large question sets can converge without overwhelming human reviewers.
 - Human attention shifts from raw question triage to short thematic escalation
   packs.

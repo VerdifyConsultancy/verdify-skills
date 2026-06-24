@@ -27,7 +27,9 @@ The command:
 - Research becomes durable planning collateral before synthesis.
 - North Star planning consumes registered evidence instead of unstructured file
   discovery.
-- The package now exposes seventeen canonical skills after `ADR-0008` adds
-  `northstar-interview`.
+- The package now reports 19 skills: eighteen lifecycle skills after `ADR-0008`
+  adds `northstar-interview` and `ADR-0009` adds
+  `northstar-question-resolution`, plus one standalone `issue-triage` skill
+  outside the lifecycle graph.
 - Research containing secrets, regulated data, or unclear provenance must be
   stopped before ingestion and handled through a gate or question.
