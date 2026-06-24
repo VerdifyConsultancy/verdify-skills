@@ -72,5 +72,5 @@ worktree_clean: true
 worker_session_id: "codex-20260624-readiness"
 completed_at: "2026-06-24T16:47:00Z"
 limitations:
-  - "The closeout head_sha records the implementation commit before this closeout-only metadata commit; the pull request body records the final branch head after closeout is pushed."
+  - "The closeout head_sha records the implementation commit before closeout-only metadata commits; the pull request body records the final branch head after closeout is pushed."
   - ".verdify/ dispatch metadata is intentionally not part of the pull request."
