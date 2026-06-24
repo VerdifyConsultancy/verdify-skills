@@ -233,4 +233,6 @@ CRITIC_LEASE="critic-issue-123-api-critic-test"
 [[ ! -e "$WORKTREE" ]]
 [[ ! -e "$REVIEW" ]]
 
+bash "$ROOT/tests/test_router_gate_bypass.sh"
+
 echo "CLI lifecycle tests passed."
