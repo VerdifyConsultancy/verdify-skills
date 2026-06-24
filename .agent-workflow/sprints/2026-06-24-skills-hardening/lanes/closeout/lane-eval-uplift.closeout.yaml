@@ -1,0 +1,86 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-eval-uplift
+status: ready_for_critic
+issue_ids:
+  - 24
+pull_request: 46
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "9052fe49a304be900db8652de75a07efdaa3b30e"
+contract_hash: "b96ddeb37f48407f8f795fe53645179dd806749421c66eb472b14f600adcd077"
+changed_paths:
+  - "evaluations/architecture-contracts/evals.json"
+  - "evaluations/gravity-readiness/evals.json"
+  - "evaluations/northstar-research-ingest/evals.json"
+  - "evaluations/release-verification/evals.json"
+  - "evaluations/sprint-orchestrator/evals.json"
+  - "evaluations/sprint-planning/evals.json"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-eval-uplift.closeout.yaml"
+validation_results:
+  - id: eval-pack-json-parse
+    command: "ruby -rjson -e \"Dir['evaluations/*/evals.json'].each { |f| JSON.parse(File.read(f)) }\""
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:25:00Z"
+    artifact: null
+  - id: make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:55Z"
+    artifact: null
+  - id: owned-path-diff-review
+    command: "git diff --name-only | while read -r f; do case \"$f\" in evaluations/architecture-contracts/*|evaluations/gravity-readiness/*|evaluations/release-verification/*|evaluations/sprint-planning/*|evaluations/sprint-orchestrator/*|evaluations/northstar-research-ingest/*) ;; *) echo \"OUT_OF_SCOPE:$f\";; esac; done"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:26:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-eval-uplift.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:28:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "diff:evaluations/architecture-contracts/evals.json#north-star-architecture-schema-validity"
+      - "diff:evaluations/gravity-readiness/evals.json#core-extraction-plan-gated-pilot"
+      - "diff:evaluations/gravity-readiness/evals.json#failed-readiness-upgrade-refusal"
+      - "diff:evaluations/release-verification/evals.json#review-inbox-sha-mismatch-block"
+      - "diff:evaluations/release-verification/evals.json#integration-new-commit-revalidation"
+      - "diff:evaluations/release-verification/evals.json#worker-self-deploy-refusal"
+      - "diff:evaluations/sprint-planning/evals.json#wave-release-plan-production"
+      - "diff:evaluations/sprint-planning/evals.json#wave-release-stop-condition-route-back"
+      - "diff:evaluations/northstar-research-ingest/evals.json#secret-source-refusal"
+      - "diff:evaluations/northstar-research-ingest/evals.json#unknown-provenance-refusal"
+      - "diff:evaluations/sprint-orchestrator/evals.json#reconcile-pr-check-state"
+      - "diff:evaluations/sprint-orchestrator/evals.json#gate-management-policy-boundary"
+      - "owned-path-diff-review"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "eval-pack-json-parse"
+      - "validate-repo"
+      - "make-test"
+      - "closeout-validate"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic review is required before integration."
+  - "Evaluation packs remain behavioral spec examples, not executable model-run evals, under ADR-0015."
+worktree_clean: true
+worker_session_id: "codex-20260624-evaluplift"
+completed_at: "2026-06-24T17:28:00Z"
+limitations:
+  - "The lane contract in the compiled prompt records baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after dependency ADR lanes landed on main, and scope was reviewed against the lease baseline."
+  - "The recorded head SHA is the implementation commit before this final closeout metadata commit; the pull request body records the current branch head after closeout is pushed."
+  - "No mode field, eval schema change, or executable eval runner was added because those surfaces are explicitly out of scope for this lane."
