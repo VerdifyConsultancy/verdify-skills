@@ -3,6 +3,7 @@
 
 require "minitest/autorun"
 require_relative "../lib/verdify"
+require_relative "test_lane_qr_schemarefs"
 
 Dir[File.join(__dir__, "test_*.rb")].sort.each do |path|
   next if File.expand_path(path) == File.expand_path(__FILE__)

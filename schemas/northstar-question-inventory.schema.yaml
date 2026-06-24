@@ -1,0 +1,44 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/northstar-question-inventory.schema.yaml
+title: Verdify North Star Question Inventory
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, generated_at, root, summary, questions]
+properties:
+  schema_ref: {const: northstar-question-inventory.schema.yaml}
+  kind: {const: NorthStarQuestionInventory}
+  schema_version: {const: "1.0"}
+  generated_at: {type: string, minLength: 1}
+  root: {type: string, minLength: 1}
+  summary:
+    type: object
+    additionalProperties: false
+    required: [total_questions, domains, priorities, source_types, protected_candidates]
+    properties:
+      total_questions: {type: integer, minimum: 0}
+      domains:
+        type: object
+        additionalProperties: {type: integer, minimum: 0}
+      priorities:
+        type: object
+        additionalProperties: {type: integer, minimum: 0}
+      source_types:
+        type: object
+        additionalProperties: {type: integer, minimum: 0}
+      protected_candidates: {type: integer, minimum: 0}
+  questions:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, source_type, question, file, line, domain, priority, protected_candidate, context]
+      properties:
+        id: {type: string, minLength: 1}
+        source_type: {type: string, enum: [marker, inline-id, inferred]}
+        question: {type: string, minLength: 1}
+        file: {type: string, minLength: 1}
+        line: {type: integer, minimum: 1}
+        domain: {type: string, minLength: 1}
+        priority: {type: string, enum: [P0, P1, P2]}
+        protected_candidate: {type: boolean}
+        context: {type: string}

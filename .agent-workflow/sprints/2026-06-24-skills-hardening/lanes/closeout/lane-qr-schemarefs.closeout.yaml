@@ -1,0 +1,93 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-qr-schemarefs
+status: ready_for_critic
+issue_ids:
+  - 14
+pull_request: 53
+baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
+head_sha: "8875153d39f063c89d4ea5aced89ea9ddfb510a6"
+contract_hash: "ea7e4442ce8c5eafd072f47f73e79513ee2a59ab6a20ca9c3ac19ff468da285a"
+changed_paths:
+  - "skills/northstar-question-resolution/assets/resolution-register.template.yaml"
+  - "skills/northstar-question-resolution/scripts/question_inventory.rb"
+  - "skills/northstar-question-resolution/scripts/cluster_questions.rb"
+  - "schemas/northstar-question-inventory.schema.yaml"
+  - "schemas/northstar-question-cluster-map.schema.yaml"
+  - "schemas/northstar-question-resolution-register.schema.yaml"
+  - "tests/test_lane_qr_schemarefs.rb"
+  - "tests/test_schema_validator.rb"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-qr-schemarefs.closeout.yaml"
+validation_results:
+  - id: vc-validate-produced-artifacts
+    command: "Generate a sample inventory and cluster map with the northstar-question-resolution scripts, then run ruby bin/verdify artifact validate --file for the generated inventory, generated cluster map, and resolution-register template."
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:32:00Z"
+    artifact: null
+  - id: vc-validate-template
+    command: "ruby bin/verdify artifact validate --file skills/northstar-question-resolution/assets/resolution-register.template.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:00Z"
+    artifact: null
+  - id: vc-lane-test
+    command: "ruby tests/test_lane_qr_schemarefs.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:30:00Z"
+    artifact: null
+  - id: vc-validate-repo
+    command: "ruby scripts/validate-repo.rb"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:33:00Z"
+    artifact: null
+  - id: vc-make-test
+    command: "make test"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:34:00Z"
+    artifact: null
+  - id: closeout-validate
+    command: "ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-qr-schemarefs.closeout.yaml"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-24T17:38:52Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - "diff:skills/northstar-question-resolution/assets/resolution-register.template.yaml"
+      - "diff:skills/northstar-question-resolution/scripts/question_inventory.rb"
+      - "diff:skills/northstar-question-resolution/scripts/cluster_questions.rb"
+      - "schemas/northstar-question-inventory.schema.yaml"
+      - "schemas/northstar-question-cluster-map.schema.yaml"
+      - "schemas/northstar-question-resolution-register.schema.yaml"
+      - "vc-validate-produced-artifacts"
+      - "vc-validate-template"
+      - "vc-validate-repo"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - "vc-validate-produced-artifacts"
+      - "vc-lane-test"
+      - "vc-validate-repo"
+      - "vc-make-test"
+      - "coordination-note:SemanticValidator cases remain owned by lane-platform-control-regrounding per controller authorization"
+      - "coordination-note:MANIFEST.sha256 is release-regenerated and was not manually edited per controller authorization"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "Fresh independent critic approval is still required before integration."
+  - "SemanticValidator cases for the three NorthStarQuestion* kinds remain a coordination item for lane-platform-control-regrounding."
+  - "MANIFEST.sha256 entries for the new schemas remain a release-regeneration item and were intentionally not manually edited."
+worktree_clean: true
+worker_session_id: "codex-20260624-qr"
+completed_at: "2026-06-24T17:36:58Z"
+limitations:
+  - "Controller authorization allowed lane-specific tests under tests/ and directed this lane not to edit lib/verdify/semantic_validator.rb, scripts/validate-repo.rb, other skills' SKILL.md files, or MANIFEST.sha256."
+  - "The compiled lane contract in .verdify/worker-prompt.md listed baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease and PR base are 9b0fd53f276823c9b82eaeeaded114a5af0a6c77 after main advanced before this worker ran."
+  - "The closeout head SHA records the implementation commit before closeout-only metadata commits; the PR body records the current branch head after closeout is pushed."

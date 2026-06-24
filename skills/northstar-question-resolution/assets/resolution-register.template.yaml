@@ -1,4 +1,4 @@
-schema_ref: northstar-question-resolution-register.v1
+schema_ref: northstar-question-resolution-register.schema.yaml
 kind: NorthStarQuestionResolutionRegister
 schema_version: "1.0"
 run_id: "YYYY-MM-DD-target"

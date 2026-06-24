@@ -1,0 +1,121 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/northstar-question-resolution-register.schema.yaml
+title: Verdify North Star Question Resolution Register
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, run_id, target_repository, target_corpus, status, generated_at, updated_at, delegation, summary, themes, clusters, remaining_human_questions, validation]
+properties:
+  schema_ref: {const: northstar-question-resolution-register.schema.yaml}
+  kind: {const: NorthStarQuestionResolutionRegister}
+  schema_version: {const: "1.0"}
+  run_id: {type: string, minLength: 1}
+  target_repository: {type: string, minLength: 1}
+  target_corpus:
+    type: object
+    additionalProperties: false
+    required: [root, inventory_path]
+    properties:
+      root: {type: string, minLength: 1}
+      inventory_path: {type: string, minLength: 1}
+  status: {type: string, enum: [inventory, researching, answering, planning-handoff, blocked]}
+  generated_at: {type: string, minLength: 1}
+  updated_at: {type: string, minLength: 1}
+  delegation:
+    type: object
+    additionalProperties: false
+    required: [delegated_authority, authority_source, protected_decision_policy]
+    properties:
+      delegated_authority: {type: boolean}
+      authority_source: {type: string}
+      protected_decision_policy: {type: string}
+  summary:
+    type: object
+    additionalProperties: false
+    required: [total_questions, clusters, answered, research_needed, human_escalations]
+    properties:
+      total_questions: {type: integer, minimum: 0}
+      clusters: {type: integer, minimum: 0}
+      answered: {type: integer, minimum: 0}
+      research_needed: {type: integer, minimum: 0}
+      human_escalations: {type: integer, minimum: 0}
+  themes:
+    type: array
+    items: {type: string}
+  clusters:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [cluster_id, theme, decision_class, protected_decision, status, question_ids, affected_artifacts, research_queries, evidence_refs, options, selected_answer, planning_handoff]
+      properties:
+        cluster_id: {type: string, minLength: 1}
+        theme: {type: string, minLength: 1}
+        decision_class: {type: string, enum: [product, architecture, schema, storage, security, delivery, operations, platform, research, governance, other]}
+        protected_decision: {type: boolean}
+        status: {type: string, enum: [research-needed, researching, answered, human-escalation, deferred]}
+        question_ids:
+          type: array
+          items: {type: string}
+        affected_artifacts:
+          type: array
+          items: {type: string}
+        research_queries:
+          type: array
+          items: {type: string}
+        evidence_refs:
+          type: array
+          items: {type: string}
+        options:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [option_id, summary, tradeoffs]
+            properties:
+              option_id: {type: string, minLength: 1}
+              summary: {type: string}
+              tradeoffs:
+                type: array
+                items: {type: string}
+        selected_answer:
+          type: object
+          additionalProperties: false
+          required: [summary, rationale, confidence, delegated_authority_rationale, human_escalation, escalation_reason]
+          properties:
+            summary: {type: string}
+            rationale: {type: string}
+            confidence: {type: string, enum: [high, medium, low]}
+            delegated_authority_rationale: {type: string}
+            human_escalation: {type: boolean}
+            escalation_reason: {type: [string, 'null']}
+        planning_handoff:
+          type: object
+          additionalProperties: false
+          required: [northstar_question_ids, proposed_artifact_updates, issue_recommendations]
+          properties:
+            northstar_question_ids:
+              type: array
+              items: {type: string}
+            proposed_artifact_updates:
+              type: array
+              items: {type: string}
+            issue_recommendations:
+              type: array
+              items: {type: string}
+  remaining_human_questions:
+    type: array
+    items: {type: string}
+  validation:
+    type: object
+    additionalProperties: false
+    required: [commands, evidence_queries, notes]
+    properties:
+      commands:
+        type: array
+        items: {type: string}
+      evidence_queries:
+        type: array
+        items: {type: string}
+      notes:
+        type: array
+        items: {type: string}
