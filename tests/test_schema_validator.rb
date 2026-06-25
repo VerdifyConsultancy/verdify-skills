@@ -416,7 +416,77 @@ class SchemaValidatorTest < Minitest::Test
     assert errors.any? { |e| e.include?("$.verifier: verified release verifier must differ from deployer") }
   end
 
+  def test_compliance_assessor_passes_standardized_repo_and_round_trips_schema
+    Dir.mktmpdir("verdify-compliance-pass") do |dir|
+      repo = build_standardized_repo(dir)
+      assessment = Verdify::ComplianceAssessor.new(repo: repo, strict: true).assess
+
+      schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/compliance-assessment.schema.yaml"))
+      assert_empty validator.validate(assessment, schema), "emitted assessment must validate against its schema"
+      assert_empty Verdify::SemanticValidator.validate(assessment)
+      assert_equal true, assessment["ok"]
+      assert_equal 0, assessment["summary"]["required_failed"]
+      assert assessment["checks"].all? { |check| check["status"] == "pass" }, "all checks should pass for a standardized repo"
+    end
+  end
+
+  def test_compliance_assessor_fails_noncompliant_repo
+    Dir.mktmpdir("verdify-compliance-fail") do |dir|
+      repo = Verdify::GitRepository.new(init_git_repo(dir))
+      File.write(File.join(dir, "AGENTS.md"), "# Agent instructions\n\nNo managed block.\n")
+      File.write(File.join(dir, "leaked.txt"), "aws_key = AKIA#{'IOSFODNN7EXAMPLE'}\n")
+      commit_all(dir)
+
+      assessment = Verdify::ComplianceAssessor.new(repo: repo, strict: true).assess
+      schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/compliance-assessment.schema.yaml"))
+      assert_empty validator.validate(assessment, schema)
+
+      by_id = assessment["checks"].to_h { |check| [check["id"], check] }
+      assert_equal false, assessment["ok"]
+      assert_equal "fail", by_id["agents_markers"]["status"]
+      assert_equal "fail", by_id["northstar_present"]["status"]
+      assert_equal "fail", by_id["vendored_skills"]["status"]
+      assert_equal "fail", by_id["access_project_block"]["status"]
+      assert_equal "fail", by_id["no_committed_secrets"]["status"]
+      assert by_id["no_committed_secrets"]["details"].any? { |line| line.include?("leaked.txt") }
+    end
+  end
+
   private
+
+  def init_git_repo(dir)
+    system("git", "-C", dir, "init", "-q", "-b", "main", out: File::NULL, err: File::NULL)
+    system("git", "-C", dir, "config", "user.name", "Verdify Test")
+    system("git", "-C", dir, "config", "user.email", "verdify-test@example.invalid")
+    dir
+  end
+
+  def commit_all(dir)
+    system("git", "-C", dir, "add", "-A", out: File::NULL, err: File::NULL)
+    system("git", "-C", dir, "commit", "-qm", "fixture", out: File::NULL, err: File::NULL)
+  end
+
+  def build_standardized_repo(dir)
+    init_git_repo(dir)
+    File.write(File.join(dir, "AGENTS.md"),
+               "# Agent instructions\n\n<!-- BEGIN VERDIFY -->\nObey COMMON_OPERATING_CONTRACT.md.\n<!-- END VERDIFY -->\n")
+    example = Verdify::ROOT.join("examples/minimal-project/.agent-workflow")
+    %w[project/product.md project/project-definition.yaml
+       architecture/north-star-architecture.md architecture/architecture.yaml].each do |relative|
+      target = File.join(dir, ".agent-workflow", relative)
+      FileUtils.mkdir_p(File.dirname(target))
+      FileUtils.cp(example.join(relative), target)
+    end
+    vendor = File.join(dir, ".agent-skills/verdify-skills/1.0.0")
+    FileUtils.mkdir_p(File.join(vendor, "bin"))
+    FileUtils.mkdir_p(File.join(vendor, "skills/lane-delivery"))
+    File.write(File.join(vendor, "bin/verdify"), "#!/usr/bin/env ruby\n")
+    FileUtils.mkdir_p(File.join(dir, ".agents/skills"))
+    File.symlink("../../.agent-skills/verdify-skills/1.0.0/skills/lane-delivery",
+                 File.join(dir, ".agents/skills/lane-delivery"))
+    commit_all(dir)
+    Verdify::GitRepository.new(dir)
+  end
 
   def two_wave_sprint_plan
     {

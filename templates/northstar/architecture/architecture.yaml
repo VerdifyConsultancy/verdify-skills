@@ -1,0 +1,28 @@
+# TEMPLATE scaffold — copy to .agent-workflow/architecture/architecture.yaml.
+# Complete and validate via $architecture-contracts until it satisfies
+# schemas/architecture.schema.yaml and approval.status is "approved".
+# The compliance gate checks presence + schema validity + approval state at this
+# canonical authority-matrix path; it does not judge content quality.
+schema_ref: architecture.schema.yaml
+kind: ArchitectureDefinition
+schema_version: "1.0"
+architecture_id: replace-with-repo-slug
+status: draft            # draft | blocked | approved | superseded
+baseline_sha: replace-with-baseline-commit-sha
+requirement_ids: []      # requirements this architecture realizes (>= 1 when approved)
+system_context: Describe the system, its boundary, and the actors it serves.
+components: []            # CMP-### components: {id, name, responsibility, requirement_ids}
+runtime_topology: []      # how the components run (>= 1 when approved)
+data_flows: []            # {from, to, data, transport}
+storage: []
+security_boundaries: []
+integrations: []
+deployment: []            # deployment/runtime model (>= 1 when approved)
+observability: []
+risks: []
+decision_ids: []          # ADR / DEC references
+# Owner-approved gate. Keep "pending" until the owning operator signs off.
+approval:
+  status: pending         # approved | pending | blocked
+  approver: null          # e.g. jvallery | jrvallery | evallery
+  approved_at: null       # ISO-8601 UTC timestamp on approval

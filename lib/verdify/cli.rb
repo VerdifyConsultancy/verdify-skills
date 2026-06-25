@@ -76,6 +76,7 @@ module Verdify
       when "lane" then command_lane
       when "prompt" then command_prompt
       when "github" then command_github
+      when "gate" then command_gate
       else
         raise UsageError, "unknown command #{command.inspect}\n\n#{help}"
       end
@@ -106,6 +107,7 @@ module Verdify
           github bootstrap           Preview/apply standard Verdify labels
           github snapshot            Cache current issues and pull requests locally
           github reconcile           Compare sprint lane contracts with a snapshot
+          gate compliance            Assess fleet-standard-shape conformance of a repo
 
         Run `bin/verdify <command> --help` for command options.
       HELP
@@ -1090,6 +1092,51 @@ module Verdify
       Verdify.atomic_write(out, JSON.pretty_generate(report) + "\n")
       puts JSON.pretty_generate(report)
       errors.empty? ? 0 : 1
+    end
+
+    def command_gate
+      subcommand = @argv.shift
+      raise UsageError, "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--strict] [--no-strict] [--snapshot PATH]" unless subcommand == "compliance"
+
+      command_gate_compliance
+    end
+
+    def command_gate_compliance
+      options = { repo: Dir.pwd, json: false, report: nil, strict: false, report_only: false, snapshot: nil }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--strict] [--no-strict] [--snapshot PATH]"
+        o.on("--repo PATH", "Repository under assessment (default current directory)") { |v| options[:repo] = v }
+        o.on("--json", "Emit the assessment JSON to stdout") { options[:json] = true }
+        o.on("--report PATH", "Write the assessment to PATH (default .agent-workflow/compliance/assessment.json)") { |v| options[:report] = v }
+        o.on("--strict", "Use the rigorous tighten-later tier: also require access_project_block and the canonical project-definition.yaml/architecture.yaml. Default is the relaxed-to-North-Star v1 tier (Jason 2026-06-25).") { options[:strict] = true }
+        o.on("--no-strict", "Report-only: assess without setting a non-zero exit status when a required check fails") { options[:report_only] = true }
+        o.on("--snapshot PATH", "Opt-in GitHub snapshot for the reconcile cross-check") { |v| options[:snapshot] = v }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+
+      repo = GitRepository.new(options[:repo])
+      assessment = ComplianceAssessor.new(repo: repo, strict: options[:strict], snapshot_path: options[:snapshot]).assess
+      validate_hash!(assessment, "compliance-assessment.schema.yaml", "compliance assessment")
+
+      report_path = options[:report] ? resolve_repo_path(repo, options[:report]) : repo.root.join(".agent-workflow/compliance/assessment.json")
+      Verdify.atomic_write(report_path, JSON.pretty_generate(assessment) + "\n")
+
+      if options[:json]
+        puts JSON.pretty_generate(assessment)
+      else
+        assessment["checks"].each do |check|
+          marker = check["status"] == "pass" ? "PASS" : (check["required"] ? "FAIL" : "WARN")
+          puts format("%-4s %-24s %s", marker, check["id"], check["title"])
+          check["details"].each { |detail| puts "       - #{detail}" }
+        end
+        summary = assessment["summary"]
+        puts format("compliance %s (%d/%d checks passed, %d required failed)",
+                    assessment["ok"] ? "OK" : "FAILED", summary["passed"], summary["total"], summary["required_failed"])
+        puts "Report: #{report_path.relative_path_from(repo.root)}"
+      end
+
+      assessment["ok"] || options[:report_only] ? 0 : 1
     end
 
     def build_route_decision(repo)

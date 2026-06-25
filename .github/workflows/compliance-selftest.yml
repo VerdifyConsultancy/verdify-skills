@@ -1,0 +1,17 @@
+name: compliance-selftest
+# Exercises the reusable compliance-gate workflow on every PR/push so the workflow_call
+# contract stays green. The package source tree is not itself a standardized installed
+# repo, so this self-test runs report-only: it proves the reusable workflow executes the
+# assessor end-to-end without requiring the package repo to satisfy the consumer shape.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compliance:
+    uses: ./.github/workflows/compliance-gate.yml
+    with:
+      report_only: true

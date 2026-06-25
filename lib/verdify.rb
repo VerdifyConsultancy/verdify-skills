@@ -55,4 +55,5 @@ end
 require_relative "verdify/schema_validator"
 require_relative "verdify/semantic_validator"
 require_relative "verdify/git_repository"
+require_relative "verdify/compliance_assessor"
 require_relative "verdify/cli"
