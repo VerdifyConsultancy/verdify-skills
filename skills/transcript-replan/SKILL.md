@@ -4,7 +4,7 @@ description: Converts walk transcripts, meeting notes, and spoken planning extra
 compatibility: Requires access to the transcript source, target repositories or supplied snapshots, current .agent-workflow artifacts, and GitHub state when issue recommendations are requested.
 metadata:
   author: Verdify
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Transcript Replan

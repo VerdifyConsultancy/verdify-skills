@@ -4,7 +4,7 @@ description: Reviews approved Verdify project definition, lifecycle readiness, n
 compatibility: Requires repository read access and GitHub issue access or a current snapshot. Writing GitHub updates or gates requires explicit authority from repository policy or the user.
 metadata:
   author: Verdify
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # State Of Union

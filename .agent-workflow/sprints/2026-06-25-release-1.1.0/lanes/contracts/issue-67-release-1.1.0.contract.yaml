@@ -1,0 +1,98 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-06-25-release-1.1.0
+lane_id: issue-67-release-1.1.0
+title: "Release @verdify-cli/cli 1.1.0 — ship the compliance gate"
+status: approved
+issue_ids:
+  - 67
+coupling_justification: null
+objective: "Cut version 1.1.0 so the relaxed compliance gate (PR #66) ships in the published npm package and is consumable via `npx @verdify-cli/cli@1.1.0 gate compliance` and the reusable compliance-gate.yml workflow."
+desired_outcome: "package.json, VERSION, every skill's metadata.version, and the CHANGELOG declare 1.1.0; the published tarball includes the gate assessor, the reusable workflow, and the assessment schema; the install/version-consistency test suite stays green and is no longer hard-pinned to the old version. Unblocks jvallery/agents#2026 enforcement (canary → batch)."
+non_goals:
+  - "Do not change gate behavior — the relaxed-to-North-Star v1 tier shipped in PR #66 is unchanged."
+  - "Do not perform the npm publish here — the credentialed publish is run by the operator (Jason) from main."
+  - "Do not wire consumer-repo enforcement in this lane — that is the downstream jvallery/agents#2026 canary/batch."
+baseline_sha: 447e7f44b428b265f87b1ea0fe5eb7f1473de95e
+branch: lane/release-1.1.0
+module_contracts:
+  - "package.json"
+  - "VERSION"
+  - "CHANGELOG.md"
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+    - "Package version + changelog release of the compliance gate"
+  owned_paths:
+    - "package.json"
+    - "VERSION"
+    - "CHANGELOG.md"
+    - "skills/*/SKILL.md"
+    - ".github/workflows/compliance-gate.yml"
+    - "tests/test_npm_install.sh"
+    - ".agent-workflow/sprints/2026-06-25-release-1.1.0/**"
+  prohibited_paths:
+    - "lib/verdify/compliance_assessor.rb"
+    - "schemas/compliance-assessment.schema.yaml"
+  coordination_required_paths:
+    - "config/**"
+  owned_interfaces:
+    - "The published @verdify-cli/cli package version (semver)"
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: "package.json, VERSION, and all skills/*/SKILL.md metadata.version equal 1.1.0; `validate` passes the version-consistency check."
+    sprint_acceptance_ids:
+      - "ISSUE-67-AC-01"
+    evidence_required:
+      - "File diff"
+      - "make test"
+  - id: LANE-AC-02
+    statement: "CHANGELOG has a 1.1.0 section documenting the compliance gate; `npm pack` produces verdify-cli-cli-1.1.0.tgz including the gate assessor, compliance-gate.yml, and the assessment schema."
+    sprint_acceptance_ids:
+      - "ISSUE-67-AC-02"
+    evidence_required:
+      - "File diff"
+      - "npm pack --dry-run output"
+  - id: LANE-AC-03
+    statement: "test_npm_install.sh derives the vendored-skills version from the VERSION file (no hard-pinned version), so the suite stays green across version bumps."
+    sprint_acceptance_ids:
+      - "ISSUE-67-AC-03"
+    evidence_required:
+      - "File diff"
+      - "make test"
+validation_commands:
+  - id: make-test
+    command: "make test"
+    purpose: "Run validate (incl. version consistency) + the full test suite."
+    required: true
+required_evidence:
+  - "Current-head `make test` output"
+  - "npm pack --dry-run showing the 1.1.0 tarball + gate contents"
+  - "PR linked to issue #67"
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - "The npm publish requires credentials the agent does not hold — handed to the operator."
+definition_of_done:
+  - "Issue #67 is linked from the PR."
+  - "Version is consistently 1.1.0 across package.json/VERSION/skills."
+  - "Repository tests pass locally and in CI."
+  - "The publish step is handed to the operator with the exact command."
+approval:
+  status: approved
+  approver: "user-request"
+  approved_at: "2026-06-25T00:00:00Z"

@@ -4,7 +4,7 @@ description: Gates Gravity implementation by inventorying Gravity product, archi
 compatibility: Requires read access to the Gravity repository, relevant Agent Platform and skills artifacts, GitHub state, and environment/readiness evidence. Jason and James approval is required before pilot execution.
 metadata:
   author: Verdify
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Gravity Readiness

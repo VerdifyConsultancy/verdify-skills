@@ -21,7 +21,7 @@ git -C "$REPO" commit -qm "initial"
 
 npx --yes --package "$ROOT" verdify init --repo "$REPO" > "$TMP/install.log"
 
-INSTALL="$REPO/.agent-skills/verdify-skills/1.0.0"
+INSTALL="$REPO/.agent-skills/verdify-skills/$(cat "$ROOT/VERSION")"
 OLD_WORKFLOW_DIR=".ver""dify"
 [[ -x "$INSTALL/bin/verdify" ]]
 [[ -f "$REPO/.agent-workflow/config.yaml" ]]
@@ -33,7 +33,7 @@ OLD_WORKFLOW_DIR=".ver""dify"
 ruby -e 'abort unless File.realpath(ARGV[0]) == File.realpath(ARGV[1])' \
   "$REPO/.agents/skills/project-router" "$INSTALL/skills/project-router"
 grep -q ".agent-workflow" "$REPO/AGENTS.md"
-grep -q ".agent-skills/verdify-skills/1.0.0" "$REPO/AGENTS.md"
+grep -q ".agent-skills/verdify-skills/$(cat "$ROOT/VERSION")" "$REPO/AGENTS.md"
 
 "$INSTALL/bin/verdify" doctor --repo "$REPO" --json > "$TMP/doctor.json" || true
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["checks"].any? { |c| c["name"] == "agent_workflow_initialized" && c["ok"] }' "$TMP/doctor.json"
