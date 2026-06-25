@@ -4,7 +4,7 @@ description: Implements and closes out one approved lane contract inside one lea
 compatibility: Requires Git, an active Verdify worker lease, repository build tools, and permission to push the lane branch and update its pull request.
 metadata:
   author: Verdify
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Lane Delivery
