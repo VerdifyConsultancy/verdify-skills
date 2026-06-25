@@ -1,0 +1,103 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-06-25-cicd-gates
+lane_id: issue-65-cicd-gates
+title: "Executable compliance gate + reusable CI workflow + North Star template (relaxed-to-North-Star v1)"
+status: approved
+issue_ids:
+  - 65
+coupling_justification: null
+objective: "Make the Verdify CICD gates enforceable: a deterministic, hermetic compliance assessor behind `verdify gate compliance`, a `workflow_call` reusable CI workflow, the compliance assessment schema, and the North Star template. Default to the relaxed-to-North-Star v1 tier the 24 standardized fleet repos already meet; reserve the rigorous tier behind `--strict`."
+desired_outcome: "Any fleet repo can call `.github/workflows/compliance-gate.yml` to assert the standard shape (AGENTS.md managed markers, North Star present, vendored skills + discovery symlinks, no committed secrets). The default tier passes the already-standardized repos; `--strict` adds access_project_block and the canonical project-definition/architecture requirement for the tighten-later phase. This is upstream of agents#2026 enforcement."
+non_goals:
+  - "Do not make the compliance check a required branch-protection status here — enforcement rollout (canary-first, DEC-009) lands in jvallery/agents#2026."
+  - "Do not make independent-critic / release-verification verdicts executable — they stay agent/human gates; only their deterministic shell is scriptable."
+  - "Do not change lifecycle routing semantics beyond adding the gate command and tier flags."
+baseline_sha: d1cde24b3e607f834ea19eed7579ba5e1f386ad9
+branch: lane/cicd-gates-2026
+module_contracts:
+  - "lib/verdify/compliance_assessor.rb"
+  - "schemas/compliance-assessment.schema.yaml"
+  - ".github/workflows/compliance-gate.yml"
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+    - "Executable compliance gate assessor and reusable CI workflow"
+    - "North Star template + compliance assessment schema"
+  owned_paths:
+    - "lib/verdify/compliance_assessor.rb"
+    - "schemas/compliance-assessment.schema.yaml"
+    - ".github/workflows/compliance-gate.yml"
+    - ".github/workflows/compliance-selftest.yml"
+    - "templates/northstar/**"
+    - "tests/test_cli.sh"
+    - ".agent-workflow/sprints/2026-06-25-cicd-gates/**"
+  prohibited_paths:
+    - "skills/**"
+    - "evaluations/**"
+  coordination_required_paths:
+    - "lib/verdify/cli.rb"
+    - "config/**"
+  owned_interfaces:
+    - "`verdify gate compliance` command and its --strict / --no-strict tier flags"
+    - "workflow_call contract of .github/workflows/compliance-gate.yml (strict, report_only inputs)"
+    - "ComplianceAssessment schema (kind: ComplianceAssessment)"
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: "`verdify gate compliance` runs hermetically and emits a schema-valid ComplianceAssessment; default (relaxed) tier requires agents_markers, northstar_present, vendored_skills, no_committed_secrets."
+    sprint_acceptance_ids:
+      - "ISSUE-65-AC-01"
+    evidence_required:
+      - "File diff"
+      - "make test"
+  - id: LANE-AC-02
+    statement: "northstar_present is satisfied in the default tier by a non-empty .agent-workflow/northstar/NORTHSTAR_PRODUCT.md OR the canonical project-definition/architecture artifacts; --strict requires the canonical artifacts and adds access_project_block."
+    sprint_acceptance_ids:
+      - "ISSUE-65-AC-02"
+    evidence_required:
+      - "File diff"
+      - "test_cli.sh North-Star fixture (default PASS, --strict FAIL)"
+  - id: LANE-AC-03
+    statement: "The reusable compliance-gate.yml workflow defaults to the relaxed tier and fails the job on a required-check failure; a report_only input maps to --no-strict; compliance-selftest exercises it report-only."
+    sprint_acceptance_ids:
+      - "ISSUE-65-AC-03"
+    evidence_required:
+      - "File diff"
+      - "Workflow run on the pushed commit"
+validation_commands:
+  - id: make-test
+    command: "make test"
+    purpose: "Run the repository validation and full test suite (validate-repo, schema validator, test_cli.sh, pr-policy, npm-install)."
+    required: true
+required_evidence:
+  - "Current-head `make test` output"
+  - "Diff review showing owned-path scope"
+  - "PR linked to issue #65"
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - "A required public lifecycle interface or schema must change beyond the compliance gate."
+  - "The enforcement rollout requires touching consumer-repo branch protection."
+definition_of_done:
+  - "Issue #65 is linked from the PR."
+  - "The compliance gate is callable as a reusable workflow and via `verdify gate compliance`."
+  - "Repository tests pass locally and in CI."
+  - "Worker closeout records evidence and residual risk."
+approval:
+  status: approved
+  approver: "user-request"
+  approved_at: "2026-06-25T00:00:00Z"
