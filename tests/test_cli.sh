@@ -397,6 +397,53 @@ CRITIC_LEASE="critic-issue-123-api-critic-test"
 [[ ! -e "$WORKTREE" ]]
 [[ ! -e "$REVIEW" ]]
 
+COMPLIANCE_PASS="$TMP/compliance-pass"
+mkdir -p "$COMPLIANCE_PASS"
+git -C "$COMPLIANCE_PASS" init -q -b main
+git -C "$COMPLIANCE_PASS" config user.name "Verdify Test"
+git -C "$COMPLIANCE_PASS" config user.email "verdify-test@example.invalid"
+printf '# Agent instructions\n\n<!-- BEGIN VERDIFY -->\nObey COMMON_OPERATING_CONTRACT.md and config/authority-matrix.yaml.\n<!-- END VERDIFY -->\n' > "$COMPLIANCE_PASS/AGENTS.md"
+mkdir -p "$COMPLIANCE_PASS/.agent-workflow/project" "$COMPLIANCE_PASS/.agent-workflow/architecture"
+cp "$ROOT/examples/minimal-project/.agent-workflow/project/product.md" "$COMPLIANCE_PASS/.agent-workflow/project/product.md"
+cp "$ROOT/examples/minimal-project/.agent-workflow/project/project-definition.yaml" "$COMPLIANCE_PASS/.agent-workflow/project/project-definition.yaml"
+cp "$ROOT/examples/minimal-project/.agent-workflow/architecture/north-star-architecture.md" "$COMPLIANCE_PASS/.agent-workflow/architecture/north-star-architecture.md"
+cp "$ROOT/examples/minimal-project/.agent-workflow/architecture/architecture.yaml" "$COMPLIANCE_PASS/.agent-workflow/architecture/architecture.yaml"
+mkdir -p "$COMPLIANCE_PASS/.agent-skills/verdify-skills/1.0.0/bin" \
+  "$COMPLIANCE_PASS/.agent-skills/verdify-skills/1.0.0/skills/lane-delivery" \
+  "$COMPLIANCE_PASS/.agents/skills"
+printf '#!/usr/bin/env ruby\n' > "$COMPLIANCE_PASS/.agent-skills/verdify-skills/1.0.0/bin/verdify"
+ln -s "../../.agent-skills/verdify-skills/1.0.0/skills/lane-delivery" "$COMPLIANCE_PASS/.agents/skills/lane-delivery"
+git -C "$COMPLIANCE_PASS" add -A
+git -C "$COMPLIANCE_PASS" commit -qm "standardized repo"
+"$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_PASS" --json > "$TMP/compliance-pass.json"
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort "expected ok" unless d["ok"] == true; abort "expected ComplianceAssessment" unless d["kind"] == "ComplianceAssessment"; abort "expected required check ids" unless (%w[agents_markers northstar_present vendored_skills no_committed_secrets access_project_block] - d["checks"].map { |c| c["id"] }).empty?; abort "all required pass" unless d["checks"].all? { |c| c["status"] == "pass" }' "$TMP/compliance-pass.json"
+"$ROOT/bin/verdify" artifact validate --file "$COMPLIANCE_PASS/.agent-workflow/compliance/assessment.json" >/dev/null
+
+COMPLIANCE_FAIL="$TMP/compliance-fail"
+mkdir -p "$COMPLIANCE_FAIL"
+git -C "$COMPLIANCE_FAIL" init -q -b main
+git -C "$COMPLIANCE_FAIL" config user.name "Verdify Test"
+git -C "$COMPLIANCE_FAIL" config user.email "verdify-test@example.invalid"
+printf '# Agent instructions\n\nThis repo has no managed marker block.\n' > "$COMPLIANCE_FAIL/AGENTS.md"
+printf 'aws_key = %s%s\n' "AKIA" "IOSFODNN7EXAMPLE" > "$COMPLIANCE_FAIL/leaked.txt"
+git -C "$COMPLIANCE_FAIL" add -A
+git -C "$COMPLIANCE_FAIL" commit -qm "noncompliant repo"
+if "$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_FAIL" --json > "$TMP/compliance-fail.json"; then
+  echo "expected noncompliant repo gate to exit non-zero" >&2
+  exit 1
+fi
+ruby -rjson -e '
+  d = JSON.parse(File.read(ARGV[0]))
+  abort "expected ok false" unless d["ok"] == false
+  abort "expected required_failed > 0" unless d["summary"]["required_failed"] > 0
+  by_id = d["checks"].to_h { |c| [c["id"], c] }
+  abort "expected agents_markers fail" unless by_id["agents_markers"]["status"] == "fail"
+  abort "expected secret finding" unless by_id["no_committed_secrets"]["status"] == "fail"
+  abort "expected secret detail to name the file" unless by_id["no_committed_secrets"]["details"].any? { |x| x.include?("leaked.txt") }
+' "$TMP/compliance-fail.json"
+"$ROOT/bin/verdify" artifact validate --file "$COMPLIANCE_FAIL/.agent-workflow/compliance/assessment.json" >/dev/null
+"$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_FAIL" --no-strict >/dev/null
+
 bash "$ROOT/tests/test_router_gate_bypass.sh"
 
 echo "CLI lifecycle tests passed."

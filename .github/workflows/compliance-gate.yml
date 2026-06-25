@@ -1,0 +1,80 @@
+name: verdify-compliance
+# Reusable workflow: any fleet repo adds a 6-line caller that pins this by tag/SHA and
+# wires the resulting `verdify-compliance / compliance` check into branch protection.
+#
+#   jobs:
+#     compliance:
+#       uses: VerdifyConsultancy/verdify-skills/.github/workflows/compliance-gate.yml@v1
+#       with:
+#         verdify_version: "1.0.0"
+#
+# The default path is hermetic: no network and no gh token. The optional github
+# reconcile cross-check only runs when .agent-workflow/github/snapshot.json exists.
+on:
+  workflow_call:
+    inputs:
+      verdify_version:
+        description: "Pinned @verdify-cli/cli version to source the assessor via npx. Empty uses the consumer's vendored copy."
+        type: string
+        required: false
+        default: ""
+      repo_path:
+        description: "Path of the repository under assessment relative to the workspace."
+        type: string
+        required: false
+        default: "."
+      strict:
+        description: "Fail the job when any required check fails."
+        type: boolean
+        required: false
+        default: true
+permissions:
+  contents: read
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Run verdify compliance gate
+        env:
+          VERDIFY_VERSION: ${{ inputs.verdify_version }}
+          REPO_PATH: ${{ inputs.repo_path }}
+          STRICT: ${{ inputs.strict }}
+        run: |
+          set -euo pipefail
+
+          if [ "${STRICT}" = "true" ]; then
+            STRICT_FLAG="--strict"
+          else
+            STRICT_FLAG="--no-strict"
+          fi
+
+          SNAPSHOT_FLAG=()
+          if [ -f "${REPO_PATH}/.agent-workflow/github/snapshot.json" ]; then
+            SNAPSHOT_FLAG=(--snapshot "${REPO_PATH}/.agent-workflow/github/snapshot.json")
+          fi
+
+          if [ -n "${VERDIFY_VERSION}" ]; then
+            echo "Sourcing assessor via npx @verdify-cli/cli@${VERDIFY_VERSION}"
+            npx -y "@verdify-cli/cli@${VERDIFY_VERSION}" gate compliance \
+              --repo "${REPO_PATH}" --json "${SNAPSHOT_FLAG[@]}" ${STRICT_FLAG}
+            exit $?
+          fi
+
+          # Hermetic vendored-copy mode: prefer the newest installed package, then a
+          # root-level bin/verdify (exercised by this package's own self-test caller).
+          VENDORED="$(ls -d "${REPO_PATH}"/.agent-skills/verdify-skills/*/bin/verdify 2>/dev/null | sort -V | tail -1 || true)"
+          if [ -n "${VENDORED}" ]; then
+            BIN="${VENDORED}"
+          elif [ -x "${REPO_PATH}/bin/verdify" ]; then
+            BIN="${REPO_PATH}/bin/verdify"
+          else
+            echo "::error::No verdify assessor found. Set verdify_version or vendor the package under .agent-skills/verdify-skills/<version>/." >&2
+            exit 1
+          fi
+
+          echo "Sourcing assessor from ${BIN}"
+          ruby "${BIN}" gate compliance --repo "${REPO_PATH}" --json "${SNAPSHOT_FLAG[@]}" ${STRICT_FLAG}
