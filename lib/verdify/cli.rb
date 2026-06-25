@@ -1096,20 +1096,20 @@ module Verdify
 
     def command_gate
       subcommand = @argv.shift
-      raise UsageError, "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--strict] [--snapshot PATH]" unless subcommand == "compliance"
+      raise UsageError, "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--strict] [--no-strict] [--snapshot PATH]" unless subcommand == "compliance"
 
       command_gate_compliance
     end
 
     def command_gate_compliance
-      options = { repo: Dir.pwd, json: false, report: nil, strict: true, snapshot: nil }
+      options = { repo: Dir.pwd, json: false, report: nil, strict: false, report_only: false, snapshot: nil }
       parser = OptionParser.new do |o|
-        o.banner = "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--no-strict] [--snapshot PATH]"
+        o.banner = "Usage: bin/verdify gate compliance [--repo PATH] [--json] [--report PATH] [--strict] [--no-strict] [--snapshot PATH]"
         o.on("--repo PATH", "Repository under assessment (default current directory)") { |v| options[:repo] = v }
         o.on("--json", "Emit the assessment JSON to stdout") { options[:json] = true }
         o.on("--report PATH", "Write the assessment to PATH (default .agent-workflow/compliance/assessment.json)") { |v| options[:report] = v }
-        o.on("--strict", "Fail the process when any required check fails (default)") { options[:strict] = true }
-        o.on("--no-strict", "Report failures without setting a non-zero exit status") { options[:strict] = false }
+        o.on("--strict", "Use the rigorous tighten-later tier: also require access_project_block and the canonical project-definition.yaml/architecture.yaml. Default is the relaxed-to-North-Star v1 tier (Jason 2026-06-25).") { options[:strict] = true }
+        o.on("--no-strict", "Report-only: assess without setting a non-zero exit status when a required check fails") { options[:report_only] = true }
         o.on("--snapshot PATH", "Opt-in GitHub snapshot for the reconcile cross-check") { |v| options[:snapshot] = v }
         o.on("-h", "--help") { puts o; return 0 }
       end
@@ -1136,7 +1136,7 @@ module Verdify
         puts "Report: #{report_path.relative_path_from(repo.root)}"
       end
 
-      assessment["ok"] || !options[:strict] ? 0 : 1
+      assessment["ok"] || options[:report_only] ? 0 : 1
     end
 
     def build_route_decision(repo)

@@ -10,10 +10,32 @@ module Verdify
   # It produces a schema-valid ComplianceAssessment (schemas/compliance-assessment.schema.yaml)
   # and is the single scriptable shell behind the `verdify gate compliance` command
   # and the reusable .github/workflows/compliance-gate.yml CI job.
+  #
+  # Two tiers (Jason 2026-06-25, "relax to North Star now, tighten later"):
+  #
+  #   v1 default (relaxed, strict: false) — the bar the 24 already-standardized fleet
+  #   repos actually meet. Required checks:
+  #     * agents_markers        — AGENTS.md BEGIN/END VERDIFY managed block
+  #     * northstar_present      — a non-empty .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  #                                (created by the standardize lanes) OR the canonical
+  #                                project-definition/architecture artifacts (either satisfies it)
+  #     * vendored_skills        — .agent-skills/verdify-skills/<version>/ + discovery symlinks
+  #     * no_committed_secrets   — working-tree secret scan
+  #   access_project_block is NOT required in this tier (standardized repos lack the
+  #   canonical project-definition.yaml it demands).
+  #
+  #   strict tier (--strict, strict: true) — the tighten-later bar. Adds the
+  #   access_project_block check AND requires northstar_present to be satisfied by the
+  #   canonical project-definition.yaml/architecture.yaml artifacts (NORTHSTAR_PRODUCT.md
+  #   alone is not enough).
   class ComplianceAssessor
-    # Canonical North Star layout owned by config/authority-matrix.yaml.
-    # NOT the hypothesized .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, which does
-    # not exist in standardized repos and would false-fail every conforming repo.
+    # Relaxed v1 North Star artifact authored by the standardize lanes. In the default
+    # (relaxed) tier, a non-empty file here satisfies northstar_present; the canonical
+    # project-definition/architecture artifacts below are also accepted (either suffices).
+    NORTHSTAR_PRODUCT_DOC = ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+
+    # Canonical North Star layout owned by config/authority-matrix.yaml. Required by the
+    # strict tier; accepted (but not demanded on its own) by the relaxed default tier.
     NORTHSTAR_DOC_FILES = [
       ".agent-workflow/project/product.md",
       ".agent-workflow/architecture/north-star-architecture.md"
@@ -47,7 +69,9 @@ module Verdify
     ].freeze
     SECRET_SCAN_MAX_BYTES = 1_048_576
 
-    def initialize(repo:, strict: true, snapshot_path: nil)
+    # strict: false (default) runs the relaxed-to-North-Star v1 tier; strict: true runs
+    # the rigorous tighten-later tier. See the class comment for the per-tier check set.
+    def initialize(repo:, strict: false, snapshot_path: nil)
       @repo = repo
       @strict = strict
       @snapshot_path = snapshot_path
@@ -59,9 +83,11 @@ module Verdify
         check_agents_markers,
         check_northstar_present,
         check_vendored_skills,
-        check_no_committed_secrets,
-        check_access_project_block
+        check_no_committed_secrets
       ]
+      # access_project_block lives in the strict tier: standardized repos do not ship the
+      # canonical project-definition.yaml it requires, so it is not a default-required check.
+      checks << check_access_project_block if @strict
       checks << check_github_reconcile if @snapshot_path
 
       required_failed = checks.count { |c| c["required"] && c["status"] == "fail" }
@@ -129,7 +155,37 @@ module Verdify
       check_record("agents_markers", "AGENTS.md managed marker block", details.empty?, true, details, ["AGENTS.md"])
     end
 
+    def northstar_title
+      if @strict
+        "North Star present at authority-matrix canonical paths (strict)"
+      else
+        "North Star present (NORTHSTAR_PRODUCT.md or canonical artifacts)"
+      end
+    end
+
+    # Relaxed v1 tier: a non-empty NORTHSTAR_PRODUCT.md satisfies the North Star, and the
+    # canonical project-definition/architecture artifacts are still accepted (either path
+    # passes). Strict tier requires the canonical artifacts.
     def check_northstar_present
+      return check_northstar_canonical if @strict
+
+      product = repo_path(NORTHSTAR_PRODUCT_DOC)
+      if product.file? && !product.read.strip.empty?
+        return check_record("northstar_present", northstar_title, true, true, [], [NORTHSTAR_PRODUCT_DOC])
+      end
+
+      canonical = check_northstar_canonical
+      return canonical if canonical["status"] == "pass"
+
+      details = ["missing non-empty #{NORTHSTAR_PRODUCT_DOC} (North Star created by the standardize lanes)"]
+      details.concat(canonical["details"])
+      check_record("northstar_present", northstar_title, false, true, details, canonical["evidence"])
+    rescue Verdify::Error => e
+      check_record("northstar_present", northstar_title, false, true,
+                   ["North Star artifact could not be read: #{e.message}"])
+    end
+
+    def check_northstar_canonical
       details = []
       evidence = []
       NORTHSTAR_DOC_FILES.each do |relative|
@@ -162,11 +218,10 @@ module Verdify
         end
       end
 
-      check_record("northstar_present", "North Star present at authority-matrix canonical paths",
-                   details.empty?, true, details, evidence)
+      check_record("northstar_present", northstar_title, details.empty?, true, details, evidence)
     rescue Verdify::Error => e
-      check_record("northstar_present", "North Star present at authority-matrix canonical paths",
-                   false, true, ["North Star artifact could not be parsed: #{e.message}"])
+      check_record("northstar_present", northstar_title, false, true,
+                   ["North Star artifact could not be parsed: #{e.message}"])
     end
 
     def check_vendored_skills

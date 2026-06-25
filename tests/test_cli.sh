@@ -416,8 +416,30 @@ ln -s "../../.agent-skills/verdify-skills/1.0.0/skills/lane-delivery" "$COMPLIAN
 git -C "$COMPLIANCE_PASS" add -A
 git -C "$COMPLIANCE_PASS" commit -qm "standardized repo"
 "$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_PASS" --json > "$TMP/compliance-pass.json"
-ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort "expected ok" unless d["ok"] == true; abort "expected ComplianceAssessment" unless d["kind"] == "ComplianceAssessment"; abort "expected required check ids" unless (%w[agents_markers northstar_present vendored_skills no_committed_secrets access_project_block] - d["checks"].map { |c| c["id"] }).empty?; abort "all required pass" unless d["checks"].all? { |c| c["status"] == "pass" }' "$TMP/compliance-pass.json"
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort "expected ok" unless d["ok"] == true; abort "expected ComplianceAssessment" unless d["kind"] == "ComplianceAssessment"; abort "expected required check ids" unless (%w[agents_markers northstar_present vendored_skills no_committed_secrets] - d["checks"].map { |c| c["id"] }).empty?; abort "all required pass" unless d["checks"].all? { |c| c["status"] == "pass" }' "$TMP/compliance-pass.json"
 "$ROOT/bin/verdify" artifact validate --file "$COMPLIANCE_PASS/.agent-workflow/compliance/assessment.json" >/dev/null
+
+# Relaxed North-Star tier (Jason 2026-06-25): a NORTHSTAR_PRODUCT.md-only repo (no canonical
+# project-definition/architecture artifacts) PASSES the default gate but FAILS --strict.
+COMPLIANCE_NS="$TMP/compliance-northstar"
+mkdir -p "$COMPLIANCE_NS"
+git -C "$COMPLIANCE_NS" init -q -b main
+git -C "$COMPLIANCE_NS" config user.name "Verdify Test"
+git -C "$COMPLIANCE_NS" config user.email "verdify-test@example.invalid"
+printf '# Agent instructions\n\n<!-- BEGIN VERDIFY -->\nObey COMMON_OPERATING_CONTRACT.md and config/authority-matrix.yaml.\n<!-- END VERDIFY -->\n' > "$COMPLIANCE_NS/AGENTS.md"
+mkdir -p "$COMPLIANCE_NS/.agent-workflow/northstar"
+printf '# North Star\n\nMission, scope, and non-goals (standardize-lane North Star).\n' > "$COMPLIANCE_NS/.agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+mkdir -p "$COMPLIANCE_NS/.agent-skills/verdify-skills/1.0.0/bin" "$COMPLIANCE_NS/.agent-skills/verdify-skills/1.0.0/skills/lane-delivery" "$COMPLIANCE_NS/.agents/skills"
+printf '#!/usr/bin/env ruby\n' > "$COMPLIANCE_NS/.agent-skills/verdify-skills/1.0.0/bin/verdify"
+ln -s "../../.agent-skills/verdify-skills/1.0.0/skills/lane-delivery" "$COMPLIANCE_NS/.agents/skills/lane-delivery"
+git -C "$COMPLIANCE_NS" add -A
+git -C "$COMPLIANCE_NS" commit -qm "northstar-only standardized repo"
+"$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_NS" --json > "$TMP/compliance-ns.json"
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort "expected northstar-only repo to PASS default gate" unless d["ok"] == true; abort "expected northstar_present pass" unless d["checks"].any? { |c| c["id"] == "northstar_present" && c["status"] == "pass" }' "$TMP/compliance-ns.json"
+if "$ROOT/bin/verdify" gate compliance --repo "$COMPLIANCE_NS" --strict --json > "$TMP/compliance-ns-strict.json"; then
+  echo "expected --strict to FAIL the northstar-only repo (no canonical artifacts)" >&2
+  exit 1
+fi
 
 COMPLIANCE_FAIL="$TMP/compliance-fail"
 mkdir -p "$COMPLIANCE_FAIL"
