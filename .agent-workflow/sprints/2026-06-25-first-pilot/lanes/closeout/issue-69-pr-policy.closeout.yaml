@@ -1,0 +1,44 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+lane_id: issue-69-pr-policy
+status: ready_for_critic
+issue_ids: [69]
+pull_request: 78
+baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
+head_sha: "e9be05536ad59dd1e2242e6914d5bf549206ecc7"
+contract_hash: "cc901993944e2a2dd7a959c1f7a5695841962a67115de5748ae232f14071db27"
+changed_paths:
+  - scripts/pr-policy.rb
+  - tests/test_pr_policy.sh
+  - config/github-primitives.yaml
+  - .github/PULL_REQUEST_TEMPLATE/lightweight.md
+validation_results:
+  - id: pr-policy-test
+    command: bash tests/test_pr_policy.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-25T19:05:00Z"
+    artifact: https://github.com/VerdifyConsultancy/verdify-skills/pull/78/checks
+  - id: make-test
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-25T19:06:00Z"
+    artifact: https://github.com/VerdifyConsultancy/verdify-skills/pull/78/checks
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [pr-policy-test]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [pr-policy-test]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - The lane contract had to point module_contracts at COMMON_OPERATING_CONTRACT.md because no module contract applies to a CI-policy change — an instance of the audit's lane-contract friction (issue #70/#76).
+worktree_clean: true
+worker_session_id: claude-20260625-pilot-worker
+completed_at: "2026-06-25T19:07:00Z"
+limitations:
+  - Fresh independent-critic review is the next step and must run in a separate session against head e9be0553.
