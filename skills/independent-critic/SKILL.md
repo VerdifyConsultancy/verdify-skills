@@ -4,7 +4,7 @@ description: Performs fresh-context, evidence-based review of a completed Verdif
 compatibility: Requires read access to the repository, pull request, checks, contracts, and evidence. A separate detached worktree or clean clone is required.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Independent Critic

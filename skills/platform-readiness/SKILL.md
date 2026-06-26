@@ -4,7 +4,7 @@ description: Inventories and gates Agent Platform readiness across Kubernetes na
 compatibility: Requires authorized read access to platform repositories, Kubernetes/GitOps state or supplied snapshots, credential location inventory, and CI/CD state. Production changes require a separate approved operator.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Platform Readiness

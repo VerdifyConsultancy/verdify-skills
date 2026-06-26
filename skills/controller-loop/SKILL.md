@@ -4,7 +4,7 @@ description: Specifies or operates the long-lived Verdify outer loop that persis
 compatibility: Requires approved lifecycle prerequisites, repository artifacts, access to session/runtime records, and Agent Platform API or MCP details when child sessions are actually launched.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Controller Loop

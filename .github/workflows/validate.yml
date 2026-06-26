@@ -2,7 +2,7 @@ name: validate
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,8 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
+      - uses: actions/setup-node@v4
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
       - name: Validate package
         run: make test
+      - name: Check release version
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: ruby scripts/release-preflight.rb --require-version-bump "origin/${{ github.base_ref }}" --require-unpublished

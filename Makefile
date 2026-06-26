@@ -8,6 +8,7 @@ test: validate
 	ruby tests/test_schema_validator.rb
 	bash tests/test_cli.sh
 	bash tests/test_pr_policy.sh
+	bash tests/test_release_preflight.sh
 	bash tests/test_npm_install.sh
 
 links:

@@ -4,7 +4,7 @@ description: Creates an approved north-star architecture and converts it into bl
 compatibility: Requires an approved project definition and repository access. Material security, migration, public-interface, or deployment decisions may require human approval.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Architecture and Module Contracts

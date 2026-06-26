@@ -6,7 +6,7 @@ name: verdify-compliance
 #     compliance:
 #       uses: VerdifyConsultancy/verdify-skills/.github/workflows/compliance-gate.yml@v1
 #       with:
-#         verdify_version: "1.1.0"
+#         verdify_version: "1.1.1"
 #
 # The default path is hermetic: no network and no gh token. It runs the relaxed v1
 # "relaxed-to-North-Star" tier (Jason 2026-06-25) and fails the job when a required

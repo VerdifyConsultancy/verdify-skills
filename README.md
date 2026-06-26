@@ -135,6 +135,50 @@ Release archives include `MANIFEST.sha256`. Verify an archive after download wit
 bash scripts/verify-package.sh /path/to/verdify-lifecycle-skills-v1.0.0.zip
 ```
 
+## Branch and release flow
+
+`dev` is the long-running development integration branch. Implementation and
+lane pull requests target `dev`. `main` is the protected release branch; it
+should only receive release pull requests from `dev`.
+
+Every push to `dev` runs validation and `.github/workflows/release-pr.yml`,
+which opens or updates a `dev -> main` release PR for the current package
+version. The workflow also creates a matching GitHub Issue for that release
+version and links it from the PR body, keeping GitHub Issues as the backlog
+source of truth.
+
+Merging the release PR into `main` publishes that exact version to npm as
+`@verdify-cli/cli@latest`, creates tag `vX.Y.Z`, and creates the GitHub release.
+Direct pushes to `main` are a policy violation once branch protection/rulesets
+are configured.
+
+## Release this package
+
+Before pushing the release candidate to `dev`, update:
+
+- `package.json`
+- `VERSION`
+- each `skills/*/SKILL.md` `metadata.version`
+- `CHANGELOG.md`
+
+Then run:
+
+```bash
+make test
+ruby scripts/release-preflight.rb --require-unpublished
+```
+
+The `validate` workflow runs the same release preflight for PRs targeting
+`main`, including the check that the proposed npm version is not already
+published. After the `dev -> main` release PR is merged,
+`.github/workflows/publish-npm.yml` builds and verifies the release archive,
+publishes to npm using Trusted Publishing/OIDC, tags the commit as `vX.Y.Z`, and
+creates a GitHub release with the zip and checksum.
+
+Configure npm Trusted Publishing for the `publish-npm.yml` workflow and the
+`npm` GitHub environment before relying on the release workflow. Do not add a
+long-lived `NPM_TOKEN` unless Trusted Publishing is unavailable.
+
 ## Install in a target repository
 
 Run one command from the target repository root:
@@ -167,6 +211,20 @@ AGENTS.md
 ```
 
 `.agent-skills` contains the installed Verdify skills package. `.agent-workflow` contains durable project workflow artifacts such as route decisions, definitions, contracts, sprint records, status, and evidence. `.agents/skills` contains host discovery symlinks into the installed package.
+
+Update an installed target repository to the latest published skills package by
+rerunning the installer from that repository root:
+
+```bash
+npx -y @verdify-cli/cli@latest init
+```
+
+Use `--force` only when reinstalling the same version or intentionally replacing
+Verdify-owned starter files:
+
+```bash
+npx -y @verdify-cli/cli@latest init --force
+```
 
 Use the Ruby CLI directly when developing against a local checkout:
 
@@ -275,7 +333,7 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 ## Repository-specific setup still required
 
-Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should also configure a ruleset or protected branch with required checks, at least one approving review, conversation resolution, and—on busy repositories—a merge queue. Deployment environments and their approvers remain project-specific.
+Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should also configure a ruleset or protected branch for `main` with required checks (`validate / validate`, `policy / pull-request-policy`, and `compliance-selftest / compliance`), at least one approving review, conversation resolution, no direct pushes, and no force pushes or branch deletion. On busy repositories, add a merge queue. Deployment environments and their approvers remain project-specific.
 
 ## Design documentation
 
