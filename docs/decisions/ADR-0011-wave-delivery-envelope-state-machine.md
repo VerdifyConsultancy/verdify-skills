@@ -16,14 +16,15 @@ control flow.
 ## Decision
 
 A wave is **not** a loop. A wave is a versioned, bounded **delivery envelope** — a set
-of user stories, committed tasks, dependencies, risk limits, and exit evidence — that
-moves through one durable state machine:
+of user stories, committed tasks, dependencies, risk limits, and exit evidence — that is
+one turn of the controller's loop:
 
-`Observe -> DraftWave -> Approve -> Execute -> Verify -> Integrate -> DeployPreview -> Review -> Accept`,
+`PLAN -> EXECUTE -> VERIFY -> REVIEW`, cycling on review feedback.
 
-with `Replan` and `Escalate` as explicit transitions. Planning and implementation are
-**phases of this single lifecycle**, not separate loops. The wave is the unit presented
-for human/Orbit review.
+PLAN folds in observe/draft/approve; VERIFY folds in integrate and preview/deploy;
+REVIEW returns the landed wave to a human/Orbit and restarts PLAN. Planning and
+implementation are **beats of one loop**, not separate loops. The wave is the unit
+presented for human/Orbit review.
 
 Once approved, the wave is versioned. Material scope change requires a wave amendment
 with an audit record, a task decommit, or a replanned successor wave — never silent

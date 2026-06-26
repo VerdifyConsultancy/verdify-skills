@@ -1,96 +1,56 @@
-# Delivery loop model, decision rights, and glossary
+# The delivery loop
 
-Canonical description of how the Verdify lifecycle skills compose into runtime
-loops. Decisions recorded in ADR-0011 through ADR-0018.
+One loop, run by the controller. Decisions: ADR-0011 through ADR-0018.
 
-## The wave is an envelope, not a loop
-
-A **wave** is a versioned, bounded delivery envelope (stories, committed tasks,
-dependencies, risk limits, exit evidence) that moves through one durable state
-machine owned by the deterministic controller:
+## The loop
 
 ```text
-Observe -> DraftWave -> Approve -> Execute -> Verify -> Integrate
-        -> DeployPreview -> Review -> Accept
+PLAN -> EXECUTE -> VERIFY -> REVIEW -> (feedback) -> PLAN
 ```
 
-`Replan` (dependency or scope invalidated) and `Escalate` (risk, retry, cost, or
-stagnation limit) are explicit transitions, not informal jumps. Planning and
-implementation are phases of this one lifecycle. Once approved, the wave is
-versioned; material scope change needs a wave amendment (audit record), a task
-decommit, or a replanned successor wave.
+- **PLAN** — snapshot state and feedback into one bounded wave: stories, tasks, exit
+  gates. Rolling-wave: decompose only the next wave or two (ADR-0014).
+- **EXECUTE** — the controller schedules ready tasks into single-writer lanes and runs
+  one worker per lane; workers propose candidates (ADR-0012, ADR-0016).
+- **VERIFY** — deterministic checks plus a fresh critic per task; a cumulative
+  security/intent review plus CI green for the whole wave (ADR-0015).
+- **REVIEW** — a human (or Orbit) reviews the landed wave; their feedback restarts PLAN.
 
-## Nested loops
+A wave is one turn of this loop — a versioned delivery envelope, not a loop of its own
+(ADR-0011). `wave-contract.status` is exactly these beats: `planning -> executing ->
+verifying -> review`, ending `accepted` or `blocked`.
 
-- **L0 North Star loop** (per repo / major reset): research + human conversation
-  until an approved PR locks `NORTHSTAR_PRODUCT.md` / `NORTHSTAR_ARCHITECTURE.md`
-  as plan of record. Skills: `northstar-research-ingest`, `northstar-planning`,
-  `northstar-interview`, `northstar-question-resolution`.
-- **L1 Wave lifecycle** (outermost runtime): the human/Orbit review cadence; the
-  state machine above. Skills: `controller-loop` (+ `state-of-union`).
-- **L2 Planning phase**: rolling-wave planning pass (see
-  `../../sprint-planning/references/rolling-wave-planning.md`). Skills:
-  `state-of-union` -> `sprint-planning` (+ `issue-triage`).
-- **L3 Execution phase**: the reconciler schedules ready tasks into lanes, runs
-  workers, verifies, integrates onto the wave branch. Skills:
-  `sprint-orchestrator` + `controller-loop`, gated by `independent-critic` and
-  `release-verification`.
-- **L4 Lane/task loop** (innermost): one worker against one task contract:
-  Orient -> LocalPlan -> ReproduceOrTest -> Implement -> LocalChecks ->
-  SelfReview -> CommitCandidate -> IndependentReview. Worker output is a
-  candidate; it never self-certifies. Skill: `lane-delivery`.
+## It recurses
 
-## Controller is a reconciler
+A task is the same four beats one altitude down: plan locally -> implement -> check ->
+independent review -> candidate. Above the loop sits one thing: the North Star, the
+target the loop aims at, locked by an approved PR (ADR-0014).
 
-On each normalized worker event the controller: loads durable state; validates
-the event against state and policy; applies an idempotent transition; schedules
-newly-ready tasks; enforces retry/cost/risk/time budgets; persists the decision
-and evidence. Models propose; the control plane authorizes transitions. Polling
-detects lost workers only.
+## Three rules keep it tight
 
-## Sources of truth
-
-- **Git** — approved intent: plans, ADRs, code, skills, acceptance specs.
-- **GitHub** — backlog and delivery collaboration: issues, PRs, reviews,
-  deployments.
-- **Runtime state store** — execution state: claims, leases, attempts, events,
-  costs, heartbeats, normalized provider state. (Agent Platform owned.)
-- **CI and policy** — gate authority.
-
-## Decision rights
-
-| Decision | Authority |
-| --- | --- |
-| Product priority / North Star change | Human or delegated Orbit policy |
-| Proposed wave objective and stories | Wave-planning agent (`sprint-planning`) |
-| Approval of wave scope | Human initially; risk policy may auto-approve low-risk waves |
-| Task decomposition and dependency DAG | Planning agent + deterministic validation |
-| Assignment to lanes | Scheduler: readiness, path conflicts, risk, availability |
-| Local implementation steps | Lane worker |
-| Expansion/alteration of task scope | Controller via versioned change request; never silently by the worker |
-| Whether a task is a completion candidate | Worker may report `candidate_done` |
-| Whether a task is actually complete | Deterministic checks + independent verifier |
-| Whether a wave is technically releasable | Integration CI, security, acceptance gates |
-| Whether a wave meets product intent | Human or authorized Orbit reviewer |
-| Production deployment | Risk policy; high-risk requires explicit human approval |
+1. **Workers propose; the controller authorizes.** A worker emits one of
+   `candidate_done | blocked | scope_change_requested | human_decision_required |
+   retry_recommended`; the deterministic controller validates it against state and
+   policy and commits the transition. Polling only detects lost workers. Nothing
+   self-certifies (ADR-0012, ADR-0015).
+2. **One writer per lane.** A lane is a per-wave partition of non-conflicting tasks,
+   derived from the dependency and write-conflict graph (ADR-0013); ADR-0003 isolation
+   retained.
+3. **Three sources of truth.** Git = approved intent; GitHub = backlog/delivery; the
+   runtime state store = execution state. CI and policy are the gates. The runtime is
+   Agent Platform's; this repo owns the contracts (ADR-0018).
 
 ## Glossary
 
-- **Milestone** — observable capability/outcome that can be demonstrated and
-  accepted. Never a branch or worktree.
-- **Wave** — approved bounded delivery envelope and review cadence; owns scope.
-- **User story** — integrated user-observable behavior with acceptance scenarios;
-  generally vertical even when it crosses lanes.
-- **Task / issue** — smallest independently implementable, reviewable, mergeable
-  unit; need not equal one method or file.
-- **Lane** — temporary per-wave write-conflict partition one worker can own
-  without colliding with other active writers (ADR-0013).
-- **Attempt** — one worker run against a task contract; a failed attempt does not
-  change the task's committed objective.
-- **Evidence** — test outputs, builds, screenshots, security findings, review
-  results, deployment identifiers proving acceptance.
+milestone = a demonstrable outcome (never a branch/worktree) · wave = one loop turn and
+review cadence · story = vertical user behavior · task = smallest committed unit (one
+issue, one PR, one fresh critic) · lane = per-wave writer partition · attempt = one
+worker run. "Sprint" survives only as a skill/directory name (ADR-0017).
 
-"Sprint" is retained as a skill/directory name (`sprint-planning`,
-`sprint-orchestrator`, `.agent-workflow/sprints/`) but is retired as a
-scope-owning concept; a "sprint" artifact is the durable record of one wave's
-execution (ADR-0017).
+## Decision rights
+
+Plan and sequence -> planner. Approve the wave -> human (risk policy may auto-approve
+low-risk). Assign lanes -> scheduler. Implement -> worker. Authorize a scope change ->
+controller. Task done -> checks plus fresh critic. Wave releasable -> CI, security,
+acceptance. Accept the wave -> human/Orbit. Production -> risk policy, human for high
+risk.

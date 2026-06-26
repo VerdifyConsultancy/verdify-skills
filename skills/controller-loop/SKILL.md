@@ -23,10 +23,9 @@ event against current state and policy, applies an idempotent transition,
 schedules newly-ready tasks, enforces retry/cost/risk/time budgets, and persists
 the decision with evidence. A worker never moves authoritative state to `done`.
 
-A **wave** is a versioned delivery envelope, not a loop: it advances through one
-state machine (`Observe -> DraftWave -> Approve -> Execute -> Verify -> Integrate
--> DeployPreview -> Review -> Accept`, with `Replan` and `Escalate` as explicit
-transitions; ADR-0011). Periodic polling exists only to detect lost workers
+A **wave** is one turn of the controller's loop — a versioned delivery envelope,
+not a loop of its own: `PLAN -> EXECUTE -> VERIFY -> REVIEW`, cycling on review
+feedback (ADR-0011). Periodic polling exists only to detect lost workers
 (expired leases, missing heartbeats, undelivered CI events, GitHub/controller
 drift) — never to infer progress from terminal text.
 
