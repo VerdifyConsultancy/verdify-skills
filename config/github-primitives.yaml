@@ -49,9 +49,9 @@ required_release_pull_request_sections:
   - Risk and rollback
 recommended_default_branch_rules:
   required_checks:
-    - "validate / validate"
-    - "policy / pull-request-policy"
-    - "compliance-selftest / compliance"
+    - "validate"
+    - "pull-request-policy"
+    - "compliance / compliance"
   approving_reviews: 1
   dismiss_stale_reviews: true
   require_code_owner_review: true

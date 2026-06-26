@@ -338,7 +338,7 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 ## Repository-specific setup still required
 
-Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should also configure a ruleset or protected branch for `main` with required checks (`validate / validate`, `policy / pull-request-policy`, and `compliance-selftest / compliance`), at least one approving review, conversation resolution, no direct pushes, and no force pushes or branch deletion. On busy repositories, add a merge queue. Deployment environments and their approvers remain project-specific.
+Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should also configure a ruleset or protected branch for `main` with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), at least one approving review, conversation resolution, no direct pushes, and no force pushes or branch deletion. On busy repositories, add a merge queue. Deployment environments and their approvers remain project-specific.
 
 ## Design documentation
 

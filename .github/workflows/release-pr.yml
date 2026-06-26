@@ -75,9 +75,9 @@ jobs:
 
           Required checks must pass on this PR before merge:
 
-          - \`validate / validate\`
-          - \`policy / pull-request-policy\`
-          - \`compliance-selftest / compliance\`
+          - \`validate\`
+          - \`pull-request-policy\`
+          - \`compliance / compliance\`
 
           Current head SHA: \`${HEAD_SHA}\`
 
