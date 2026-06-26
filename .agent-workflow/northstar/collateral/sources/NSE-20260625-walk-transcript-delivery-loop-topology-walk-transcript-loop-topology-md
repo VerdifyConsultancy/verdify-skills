@@ -1,0 +1,142 @@
+# Walk transcript — wave/loop/lane SDLC topology design
+
+Participants: Jason Vallery, James Vallery. Whiteboard session defining how the
+Verdify lifecycle skills compose into runtime loops, waves, milestones, and lanes.
+Reported transcript extraction (auto-transcribed; minor transcription errors likely).
+
+---
+
+James: We input our daily updates / the project North Star. You can do this
+multiple times. OpenClaw/Orbit manages multiple projects — the repo is the box
+the project lives in ("orbit"). Another repo over here has the same inner
+looping. There are two loops. The first: the controller agent is the "god of the
+repo." It reviews the goals/milestones that Orbit sets and creates lanes/worktrees
+for the milestones and goals. Right now I say it's one root worktree per
+milestone/goal (one-to-one), but maybe multiple milestones per worktree. The lane
+agent gets the goal, its worktree, and maybe some documentation. I think the lane
+agent (the one implementing code) should split into sprints. Then the lane agent
+does a coding cycle — I think it does this WITHOUT adversarial audit, one straight
+shot through the sprint. Then implementation result goes back to the controller
+agent, which decides: was the goal done? Updated? Reworked? Then it updates the
+lanes/worktrees and repeats until we have our product.
+
+Jason: Where I'm at is a little different and has more steps, because there are
+more places to insert ourselves and give it opportunities to self-correct. There's
+a North Star planning document per repo, with a planning skill: research, have
+conversations with us, loop until the milestone of an APPROVED PULL REQUEST for the
+North Star plan. When that PR is approved it becomes plan of record referenced by
+all agents. The North Star must have traceability all the way down to the most
+granular unit: a GitHub issue (a specific unit of work — "add this method to this
+API", "create this button"). Traditional product-management hierarchy: North Star
+vision → milestones → waves → user stories → issues, with full end-to-end
+interdependency tracing. A lane/worktree is really a functional area of the
+codebase — API, frontend, database, backend. Each lane may have work spanning a
+user story. The user story at a milestone is "As a user I must be able to do X,"
+tied back to the North Star vision and to waves of planning. Issues nested into a
+wave for lane A, B, C, D all accrue to a common set of user stories → common epic
+milestones → a phased delivery plan from where we are to the end of the North Star.
+Every issue must be interdependency-traced. The plan has to be airtight — every
+button/API/surface planned through its lifecycle, then you just loop on issues by
+lane. A wave accrues to a set of user stories, and the wave is the moment the inner
+loop asks the human's outer loop for review. The loop's exit criteria is CI/CD
+green deployed to the dev environment plus the user stories hit, ready for the
+outer-loop human to view and give feedback. So you've got planning, validation,
+lane execution — distinct skills on this loop that must be done the same way each
+time. I won't personally run the planning skill, the lane execution skill, the
+replan-the-worktree skill, the deliver-the-wave skill, or the CI/CD deployment
+skill — but those are distinct skills on the loop.
+
+James: A wave is the outermost loop for the repo?
+
+Jason: The wave is every time the human comes back for feedback. The outer-loop
+agent says "we delivered this set of user stories, ready for your review." Human
+gives feedback, which triggers a full replan based on the feedback, what got done,
+what issues are still open, and what still needs delivering. Then it plans the
+next wave, the human approves the next wave, and it builds it: I've got the plan →
+carve by lanes → run the lanes → reach success criteria → test CI/CD green → back
+to the human.
+
+James: So from the wave you get two options — the planning cycle or the
+implementation cycle. Input to the wave is feedback (human or Orbit). Depending on
+feedback you go left (planning) or right (implementation). The planning side is its
+own isolated environment; so is implementation. What's the first step in planning?
+
+Jason: There's a first-time "plan" (ideally the North Star plan) and a "replan."
+The North Star planning loop differs from the in-the-loop iterative planning loop.
+Call the iterative one the simple planning loop. It asks: what happened during the
+last execution wave (git history)? what issues are still open in the backlog? what
+are my health metrics? what do I focus on next based on the North Star priorities?
+It then resets the deliverables for the next wave and submits that as a plan for
+sign-off.
+
+James: Where's the loop in that?
+
+Jason: It's a step in the loop. It looks at git history, issues, commit logs, then
+— open question whether it needs sign-off. If it needs sign-off it goes to a PR for
+us to say yes. It's planning the next wave, then handing to agent execution of the
+wave (another skill) which grabs all the lanes.
+
+James: So the planning side: get full context of everything, then CRUD issues.
+
+Jason: Reprioritizes the issues, sequences them, carves them out by lane. The
+planning loop includes recreating any new issues, re-sequencing priorities,
+relinking dependency trees, validating the dependency tree, carving up and
+prioritizing.
+
+James: Actually the first step is define your goals/model.
+
+Jason: It happens in the same pass: there's a bunch of things already on the issue
+list, things broken from the last wave, new human feedback, North Star priorities,
+maybe adjusted priorities. Weigh all that to determine the right scope for the next
+wave, then reprioritize all the issues.
+
+James: First get all the issues, then create the goals based on those issues,
+assign issues to the goals. Then we have all issues assigned to lanes; go back up.
+
+Jason: Then there's an agentic execution. Question: do you need a sign-off to start
+the wave? I think you have to need a sign-off — depends how autonomous you want to
+get.
+
+James: Even if autonomous you'd want an Orbit-level sign-off — feedback in general
+(us or Orbit acting as us).
+
+Jason: The implementation side is straightforward: spin up an agent by lane and
+"whip it every five minutes." The controller agent checks in with each sub-agent
+every (configurable) period: what progress? what's it stuck on? what issues? what
+decisions does it need me to make? It's responsible for conflict resolution,
+escalating decisions to me based on criteria, and pushing all lane agents to
+converge and merge on a specific branch, then deploying that branch.
+
+James: Who makes decisions in each lane — does the lane agent define the sprints or
+the controller?
+
+Jason: The controller says: you're the narrowly-scoped lane agent responsible for
+this set of files; here are seven issues to complete this wave; do them in
+sequence; tell me when done. Issues are granularly scoped and clear — "this file
+needs this code."
+
+James: Who decides what's done? Does the lane agent report after every issue or
+once done?
+
+Jason: Variance between Claude and Codex. Claude Code spins up its own lane agents
+and manages them in its own session — fan-out works really well; Codex has nothing
+like it (at the time). I tried to create sub-worktrees in the agents platform so
+you could have agents per worktree, but if you're using Claude you don't need that
+— Claude spins up its own lane agents inside its process and manages them, with
+eventing (when lane agent X finishes, the controller outer-loop agent is notified).
+With separate tmux/SSH sessions the outer agent has to poll them. Sub-worktrees are
+too complicated; letting Claude do it is the better solution because it evolves
+with Claude. The agents-platform sub-worktree machinery effectively becomes
+pointless once you have Claude fan-out. As it stands you need one Claude Code
+session and can run all the layers of the loop within it.
+
+Jason: Check-in cadence — I told the running one to check every five minutes in a
+loop. Arbitrary. There are multiple phases: the outer controller loop, the inner
+controller loop, and the lane agent. Write the loops more explicitly as points on
+the loop — outer loop and inner loop. Plus a milestone of sprint review / wave
+review. The plan during the planning cycle defines the scope for a given wave.
+Every time the implementation loop finishes it's gated on the outer loop hitting
+CI/CD green; when CI/CD is green and all lanes are closed and signed off, it's
+built, tested, passed its own test cases, and ready for human feedback. There are
+two loops here, plus gates and interdependencies — there's a flow diagram in there.
+Maybe I'll hand my transcript over and build a mermaid diagram of the loop.

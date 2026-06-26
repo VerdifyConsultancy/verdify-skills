@@ -1,0 +1,43 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260625-recommended-event-driven-sdlc-control-plane
+reference: northstar://evidence/NSE-20260625-recommended-event-driven-sdlc-control-plane
+title: Recommended event-driven SDLC control-plane model and loop-architecture critique
+evidence_type: adversarial_review
+evidence_status: reported
+ingested_at: '2026-06-26T01:28:09Z'
+source:
+  uri:
+  original_path: "/private/tmp/claude-501/-Users-jason-repos-verdify-skills/39aead7e-7347-4580-8fdd-3fe13a68d2ef/scratchpad/recommended-model-critique.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260625-recommended-event-driven-sdlc-control-plane-recommended-model-critique-md"
+  sha256: 5d7f2802de90d26f1418b1612595ebc54dd5a620f722453c34764413a2232387
+summary: 'External adversarial reconciliation of James''s topology and Jason''s operating
+  contract: wave as a versioned delivery envelope on a deterministic state machine,
+  controller as reconciler, dynamic lanes, vendor-neutral worker adapter, rolling-wave
+  planning, two-tier verification, and an M0-M8 build order.'
+tags:
+- control-plane
+- delivery-loop
+- rolling-wave
+- state-machine
+- verification
+- worker-adapter
+claims:
+- A wave is a versioned delivery envelope moving through a durable state machine;
+  planning and implementation are phases of one wave lifecycle, not two loops.
+- The controller must be a deterministic reconciler over a durable event log; models
+  propose events (candidate_done, blocked, scope_change_requested, human_decision_required,
+  retry_recommended) and the control plane authorizes transitions.
+- Lanes are temporary write-conflict partitions derived per wave from the dependency
+  and file-conflict graph, not permanent codebase silos.
+- Orchestration should be event-driven via a vendor-neutral worker adapter (Codex
+  exec --json / Claude Agent SDK); polling/heartbeats only detect lost workers.
+planning_relevance:
+- Basis for the controller-reconciler, dynamic-lane, worker-adapter, rolling-wave,
+  and M0-M8 decisions; reinforces ARCH-013 layer boundary and resolves NSQ-002/NSQ-011.
+limitations:
+- Several capability claims (Codex subagents, Claude agent teams) and the MOSAIC-Bench
+  arXiv:2605.03952 citation are post-cutoff and unverified; verify before treating
+  as load-bearing.

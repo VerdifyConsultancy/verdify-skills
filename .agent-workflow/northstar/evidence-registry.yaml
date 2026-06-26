@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-06-24T17:03:10Z'
+updated_at: '2026-06-26T01:28:09Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1484,3 +1484,69 @@ evidence:
   - 'Supports the northstar-question-resolution skill and issue #4.'
   - Supports using a resolution register plus North Star evidence ingestion before
     northstar-planning updates artifacts.
+- id: NSE-20260625-recommended-event-driven-sdlc-control-plane
+  reference: northstar://evidence/NSE-20260625-recommended-event-driven-sdlc-control-plane
+  title: Recommended event-driven SDLC control-plane model and loop-architecture critique
+  evidence_type: adversarial_review
+  evidence_status: reported
+  ingested_at: '2026-06-26T01:28:09Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260625-recommended-event-driven-sdlc-control-plane.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260625-recommended-event-driven-sdlc-control-plane-recommended-model-critique-md"
+  source_uri:
+  source_sha256: 5d7f2802de90d26f1418b1612595ebc54dd5a620f722453c34764413a2232387
+  summary: 'External adversarial reconciliation of James''s topology and Jason''s
+    operating contract: wave as a versioned delivery envelope on a deterministic state
+    machine, controller as reconciler, dynamic lanes, vendor-neutral worker adapter,
+    rolling-wave planning, two-tier verification, and an M0-M8 build order.'
+  tags:
+  - control-plane
+  - delivery-loop
+  - rolling-wave
+  - state-machine
+  - verification
+  - worker-adapter
+  claims:
+  - A wave is a versioned delivery envelope moving through a durable state machine;
+    planning and implementation are phases of one wave lifecycle, not two loops.
+  - The controller must be a deterministic reconciler over a durable event log; models
+    propose events (candidate_done, blocked, scope_change_requested, human_decision_required,
+    retry_recommended) and the control plane authorizes transitions.
+  - Lanes are temporary write-conflict partitions derived per wave from the dependency
+    and file-conflict graph, not permanent codebase silos.
+  - Orchestration should be event-driven via a vendor-neutral worker adapter (Codex
+    exec --json / Claude Agent SDK); polling/heartbeats only detect lost workers.
+  planning_relevance:
+  - Basis for the controller-reconciler, dynamic-lane, worker-adapter, rolling-wave,
+    and M0-M8 decisions; reinforces ARCH-013 layer boundary and resolves NSQ-002/NSQ-011.
+- id: NSE-20260625-walk-transcript-delivery-loop-topology
+  reference: northstar://evidence/NSE-20260625-walk-transcript-delivery-loop-topology
+  title: 'Walk transcript: wave/loop/lane SDLC topology design (Jason + James)'
+  evidence_type: transcript
+  evidence_status: reported
+  ingested_at: '2026-06-26T01:28:09Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260625-walk-transcript-delivery-loop-topology.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260625-walk-transcript-delivery-loop-topology-walk-transcript-loop-topology-md"
+  source_uri:
+  source_sha256: 24fc5f198fe2d5f22dfbd8d4558df6d834791b78ca2289e0d0266cd55bb9784f
+  summary: Principal design conversation defining how Verdify lifecycle skills compose
+    into runtime loops, waves, milestones, and lanes; source for the delivery-loop-architecture
+    decisions.
+  tags:
+  - controller-loop
+  - delivery-loop
+  - lane-model
+  - traceability
+  - wave
+  claims:
+  - A wave accrues to a set of user stories and is the moment the inner loop asks
+    the human/Orbit outer loop for review; wave exit is CI/CD green deployed to dev
+    plus the targeted user stories.
+  - Traceability must run North Star vision -> milestone/epic -> wave -> user story
+    -> GitHub issue (the granular unit), with full interdependency tracing.
+  - The controller checks in with lane agents on a configurable cadence, resolves
+    conflicts, escalates decisions, and drives lanes to converge/merge on a branch
+    then deploys it.
+  planning_relevance:
+  - Primary source for ADR-0011..0018 (wave state machine, controller reconciler,
+    dynamic lanes, rolling-wave, two-tier verification, event-driven adapter, vocabulary,
+    build order).

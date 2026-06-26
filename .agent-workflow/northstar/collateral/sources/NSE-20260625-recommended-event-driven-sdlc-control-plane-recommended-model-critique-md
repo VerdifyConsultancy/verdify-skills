@@ -1,0 +1,347 @@
+# Recommended model — event-driven SDLC control plane and loop architecture critique
+
+External adversarial analysis of the Verdify wave/loop/lane design (walk transcript
+SRC: loop-topology). Reconciles James's topology layer with Jason's operating
+contract. Reported analysis; several capability claims and citations are post-cutoff
+and MUST be independently verified before being treated as load-bearing.
+
+## Core reconciliation
+
+James describes the TOPOLOGY (planning loop, implementation loop, controller, lanes).
+Jason describes the OPERATING CONTRACT (North Star, traceability, approvals,
+acceptance criteria, CI/CD gates, human feedback). Reconciliation:
+
+> A wave is NOT itself a loop. A wave is a versioned delivery envelope that moves
+> through a durable state machine. Inside that wave, task-level implementation and
+> repair loops execute concurrently.
+
+The architecture should be a vendor-neutral, event-driven SDLC control plane. Claude
+Code and Codex are replaceable execution engines, not the durable controller or
+source of truth.
+
+## Most important critiques (current thinking -> recommended change)
+
+- Controller as "god of the repo" -> too much authority/hidden state in one model
+  context. Make the controller a DETERMINISTIC STATE MACHINE backed by a durable
+  event log. Models propose plans/actions; the control plane authorizes transitions.
+- North Star traces to every future button/API/issue -> exhaustive future
+  decomposition goes stale. Use ROLLING-WAVE PLANNING: complete outcome-level
+  traceability for the roadmap, but decompose only the next one or two waves to
+  issue-level contracts.
+- Milestone maps 1:1 to a worktree -> different kinds of objects. A milestone is a
+  product outcome; a worktree is temporary execution isolation. Use one worktree per
+  active write task or conflict domain, not per milestone.
+- Lanes are frontend/API/database/backend -> useful seed, too static. Derive lanes
+  per wave from the dependency graph and file-conflict graph. A lane is a temporary
+  scheduling partition, not a permanent codebase silo.
+- Lane agent decides its sprint -> lets execution agents redefine committed scope.
+  The wave planner owns committed scope and issue sequencing; a lane agent may make a
+  local implementation plan, but scope changes are explicit change requests.
+- Controller polls terminals every five minutes -> brittle as primary protocol.
+  Consume structured worker events and webhooks; use heartbeats and lease expiry only
+  to detect lost workers, not to scrape terminal output.
+- First coding pass may run without adversarial audit -> too weak. Every candidate
+  gets deterministic checks plus fresh-context review before integration; the
+  cumulative wave diff also needs review.
+- CI green means the wave is ready -> necessary, not sufficient. Also require story
+  acceptance evidence, security policy, migration validation, observability checks,
+  and cumulative integration review.
+- "Claude has subagents; Codex has nothing" -> no longer current (as of mid-2026).
+  Codex now supports explicit parallel subagent workflows (recommended for bounded
+  exploration/testing/triage/read-heavy work; parallel writers increase conflict
+  cost). Claude still has richer in-session team semantics (shared tasks, teammate
+  messaging, idle notifications) but agent teams remain experimental with resumption/
+  stale-state/shutdown limits -> Claude internal team state must NOT become Orbit's
+  durable program state.
+
+## Definitions that resolve the debate
+
+- North Star: versioned product outcomes, user groups, architectural principles,
+  NFRs, constraints, non-goals, product-level success measures.
+- Milestone: an observable capability/outcome that can be demonstrated and accepted.
+  Never a branch or worktree.
+- Wave: an approved, bounded delivery envelope of user stories, tasks, dependencies,
+  risk limits, and exit evidence. The unit presented for human/Orbit review.
+- User story: integrated user-observable behavior with acceptance scenarios.
+  Generally vertical even when implementation crosses lanes.
+- Task / issue: the smallest independently implementable, reviewable, mergeable work
+  contract. Need not equal exactly one method or file.
+- Lane: a temporary execution partition of tasks one worker can own without colliding
+  with other active writers.
+- Attempt: one worker run against a task contract. A failed attempt does not alter
+  the task's committed objective.
+- Evidence: test outputs, build results, screenshots, security findings, review
+  results, deployment identifiers, and other artifacts proving acceptance.
+
+Remove "sprint" from the agent vocabulary. Wave = human/Orbit review cadence; Task =
+committed implementation unit; Attempt plan = lane worker's private step sequence.
+
+## Decision rights (answers "who decides?")
+
+- Product priority / North Star change: human or delegated Orbit policy.
+- Proposed wave objective and stories: wave-planning agent.
+- Approval of wave scope: human initially; risk policy may later auto-approve
+  low-risk waves.
+- Task decomposition and dependency DAG: planning agent + deterministic schema and
+  dependency validation.
+- Assignment to lanes: scheduler, based on readiness, path conflicts, risk, worker
+  availability.
+- Local implementation steps: lane worker.
+- Expansion/alteration of task scope: controller via a versioned change request;
+  never silently by the worker.
+- Whether a task is a CANDIDATE for completion: worker may report candidate_done.
+- Whether a task is ACTUALLY complete: deterministic checks + independent verifier.
+- Whether a wave is technically releasable: integration CI, security, acceptance.
+- Whether a wave meets product intent: human or authorized Orbit reviewer.
+- Production deployment: risk policy; high-risk requires explicit human approval.
+
+## Control-plane boundaries
+
+- Git is the durable source of truth for approved plans, code, ADRs, instructions,
+  skills, acceptance specs.
+- GitHub is the human collaboration surface for issues, PRs, comments, reviews,
+  approvals.
+- The runtime state store is the EXECUTION source of truth for claims, leases,
+  attempt numbers, events, costs, heartbeats, blockers, normalized provider state.
+- CI and policy are the gate authority.
+- The model is a worker/proposer; it does not directly mutate authoritative state
+  from running to done. A model emits events: candidate_done, blocked,
+  scope_change_requested, human_decision_required, retry_recommended. The controller
+  validates the event, checks policy, and commits the transition.
+
+## Normalized worker adapter
+
+Both vendors implement one interface: start(task, workspace, policy)->RunId;
+events(runId)->AsyncIterable<RunEvent>; send(runId, message); cancel(runId, reason);
+collect(runId)->ResultPacket.
+
+Normalized RunEvent kinds: run.started, task.oriented, plan.created,
+command.started, file.changed, test.completed, progress.reported, decision.requested,
+task.blocked, candidate.completed, run.failed, run.stopped.
+
+Codex noninteractive mode emits a JSONL stream (lifecycle/command/file-change/plan/
+completion) and the Codex SDK can create/resume threads. Claude Agent SDK provides
+programmatic access to the same loop/tool capabilities. These beat SSHing into tmux
+and reading terminal text.
+
+## Outer repo/wave loop (state machine)
+
+States/transitions: Observe -> DraftWave (snapshot North Star, backlog, repo, CI,
+telemetry, feedback) -> Approve (changes requested loops to DraftWave; human/policy
+approval -> Execute) -> Verify (bounded repair -> Execute; dependency/scope
+invalidated -> Replan; task evidence passes -> Integrate) -> Integrate (merge/
+integration failure -> Execute; all wave gates pass -> DeployPreview) -> Review
+(stories accepted -> Accept; defects/new feedback -> Replan) -> Accept -> Observe;
+Replan -> DraftWave. Escalate transitions out of Execute/Verify on risk, retry, cost,
+or stagnation limits -> human/Orbit decision -> DraftWave. Planning and implementation
+are PHASES of one wave lifecycle, not two separate loops; replan is an explicit
+transition.
+
+## Correct planning-pass order
+
+1. Snapshot facts (merged code, open PRs, CI, telemetry, feedback, backlog,
+   unresolved decisions, current North Star).
+2. Select next outcome; define wave objective.
+3. Define user stories + acceptance evidence.
+4. Discover implementation delta.
+5. Derive/update tasks and dependencies.
+6. Calculate write conflicts, sequencing, risk, capacity.
+7. Materialize/update GitHub issues.
+8. Produce an immutable proposed WavePlan.
+9. Approve it. 10. Execute it.
+
+Issues are an OUTPUT of planning, not the raw plan. Once approved the wave is
+versioned; material scope changes require a wave amendment (audit record),
+decommitting a task, or ending the wave and creating a replanned successor. No agent
+silently adds "while I'm here" work.
+
+## Inner execution-controller loop (reconciler)
+
+Approved WavePlan -> ready task? -> claim with lease -> isolated branch+worktree ->
+run provider worker -> worker events: progress (persist, refresh lease); blocked
+(classify: dependency-not-ready -> schedule others; task-contract-wrong -> request
+replan; decision-required -> escalate); candidate_done -> independent verification
+(failed+budget -> repair attempt with focused validation delta; passed -> queue merge
+to wave branch -> integration CI (failed -> classify; passed+work remains -> next
+ready; passed+stories complete -> wave evidence bundle)).
+
+The controller is a RECONCILER, not a chat session that wakes and asks everyone what
+happened. On every event: load durable state; validate event vs state+policy; apply
+idempotent transition; schedule newly ready tasks; enforce retry/cost/risk/time
+budgets; persist decision + evidence. A periodic process detects expired leases,
+missing heartbeats, lost jobs, stale PRs, undelivered CI events, and GitHub/controller
+state mismatches; it does not infer progress from terminal text.
+
+## Lane/task execution loop
+
+Orient -> LocalPlan -> ReproduceOrTest -> Implement -> LocalChecks (actionable
+failure loops to Implement) -> SelfReview -> CommitCandidate -> IndependentReview
+(fix requested + budget -> Implement; accepted -> CandidateDone). Escalate from
+LocalChecks (no progress/retry limit) or IndependentReview (ambiguous/high risk).
+Trivial changes may have a one/two-step LocalPlan. Explicit stops: validation passes,
+attempt limit reached, remaining delta stops changing, or next decision needs human
+review. Keep findings/changes/validation-result/remaining-delta as an audit record
+per pass.
+
+No self-certification: the implementer can only say "I believe this is a candidate;
+here is the evidence." A fresh-context verifier determines whether the task contract
+was satisfied (review in a fresh subagent context that sees diff+requirements, not the
+implementer's reasoning). Evidence strength order: (1) deterministic tests/schemas/
+static analysis/builds/policy; (2) behavior-level test or browser evidence; (3)
+fresh-context review vs task contract; (4) LLM semantic judgment for not-yet-testable
+requirements; (5) human review for ambiguity/high risk.
+
+## Traceability model
+
+North Star (outcomes, constraints, NFRs) -> Milestone (observable capability) -> Wave
+(approved delivery envelope) -> User story (behavior + acceptance) -> Task/GitHub
+issue (implementation contract) -> Run attempt (provider, prompt, tools, cost) ->
+Commit + task PR -> Evidence (tests, review, security, screenshots) -> Preview/release
+-> Feedback/telemetry -> Wave. Traceability is COMPLETE for what is currently
+committed, not falsely detailed for every hypothetical feature. Each object supports
+both directions ("why are we changing this file?" and "what proves this story
+works?").
+
+Product-level vs issue-level security: review the cumulative wave diff and intended
+end state, not only isolated task PRs. (A mid-2026 preprint reportedly found
+individually routine tickets compose into vulnerable outcomes that are less visible
+when reviewed independently — early research, supports a wave-integration threat/intent
+review.)
+
+## Typed task and wave contracts
+
+Task contract fields: task_id, wave_id, story_ids, goal, non_goals, dependencies,
+write_scope (expected_paths + additional_paths_require_change_request), acceptance
+(deterministic commands + behavior scenarios), required_evidence, risk (class +
+reasons), budgets (max_attempts, max_no_progress_attempts), escalate_when.
+
+Wave contract adds: wave_id, north_star_version, objective, stories (id + acceptance),
+committed_tasks, exit_gates (all_committed_tasks_terminal, integration_ci_green,
+cumulative_security_review_passed, acceptance_scenarios_passed,
+preview_deployment_healthy, evidence_bundle_complete), approval (mode + approved_version).
+
+## Codex vs Claude implementation
+
+Codex: use the Codex SDK for durable threads or `codex exec --json` for a process
+adapter with structured events; subagents must be requested explicitly; use for
+exploration/test/log/review read tasks; separate worktrees for concurrent writers;
+avoid overlapping write scopes. Codex hooks have limits (no async handlers, only
+command handlers, some pre-tool stop fields unsupported) -> keep cross-vendor
+invariants in the controller/sandbox/CI.
+
+Claude: use the Claude Agent SDK for production orchestration; custom subagent for
+exploration/test/verification; agent teams only when peer communication helps;
+worktrees for concurrent writers; dynamic workflows for codified stage-local fan-outs
+(audits/migrations). Teams work best for independent tasks, not sequential/same-file/
+dependency-heavy work; begin with research/review, assign distinct file ownership,
+keep teams small. Dynamic workflows do not accept ordinary mid-run user input and
+resume only within the same session -> treat one workflow as a bounded execution
+stage, not the outer controller.
+
+Common policy: one active writer per worktree and branch; parallelize only tasks whose
+dependencies are satisfied and whose expected write sets do not conflict.
+
+## Platform build milestones (prove correctness before parallelism)
+
+- M0 Contracts and state machine: versioned schemas for North Star, wave, story, task,
+  attempt, event, evidence, approval, deployment. Invalid transitions rejected; every
+  transition auditable + idempotent. No coding agents yet.
+- M1 Single-task closed loop: one approved task -> branch/worktree -> one provider ->
+  local checks -> candidate PR. Task can finish/block/fail/escalate without manual
+  state repair.
+- M2 Independent verification: fresh-context verifier, deterministic evidence packet,
+  bounded repair attempts, stagnation detection. Worker cannot mark itself done.
+- M3 Sequential wave: North Star snapshot -> approved WavePlan -> several sequential
+  tasks -> wave branch -> preview deployment -> review packet.
+- M4 Parallel lanes: task DAG, leases, conflict map, isolated worktrees, integration
+  queue, event-driven monitoring. 2-4 independent writers without duplicate work,
+  overwritten files, or uncontrolled scope drift.
+- M5 Provider parity: Codex and Claude adapters produce the same normalized events and
+  result packet; same benchmark task set runs through either provider.
+- M6 Risk-based autonomy: policy classes, sandbox profiles, permission scopes, approval
+  gates, separate deployment identities. Low-risk auto-integrates; high-risk pauses.
+- M7 Learning and eval loop: run traces, human feedback, regression cases, skill
+  versions, controlled harness-change PRs. A repeated failure becomes a reproducible
+  eval before instructions/skills change.
+- M8 Orbit multi-repo loop: cross-repo priorities, dependency graph, release
+  coordination, shared policy, portfolio feedback. Parallelism does not make an
+  unreliable single-agent loop reliable; it makes failures concurrent.
+
+## Recommended skills (small catalog)
+
+Controller owns state/transitions; a skill defines a reusable method; an agent
+definition defines role/model/tools/permissions; a hook/policy enforces an invariant;
+CI decides whether objective checks passed. Catalog: repo-discovery,
+north-star-maintainer, wave-plan, issue-contract, implement-issue, verify-issue,
+ci-repair, integrate-wave, wave-review-package, run-retrospective. Each skill:
+purpose/trigger, required inputs, preconditions, allowed tools, write scope, procedure,
+output schema, validation procedure, stop/escalation, examples, version. Do not build
+one giant run-the-project skill. Keep AGENTS.md/CLAUDE.md thin; move task-specific
+workflows into on-demand skills. Maintain one canonical skill/policy source, generate
+vendor packaging.
+
+## Risk and approval policy
+
+- Low (docs, isolated tests, formatting, generated files): auto-execute + auto-integrate
+  after deterministic checks.
+- Medium (ordinary app behavior, bounded interfaces): approved wave required;
+  independent verification before integration.
+- High (auth, authz, dependency upgrades, public API contracts, schema changes, data
+  migration): human plan/change approval; security review; controlled integration.
+- Critical (production infra, secrets, destructive data ops, billing/identity): human
+  approval before execution, merge, and deployment.
+
+Worker agents do not hold production credentials or broad repo-admin rights. Keep code
+generation in a sandboxed identity; perform PR publication, merging, and deployment
+through separate controlled services. Provider hooks supplement, not replace,
+vendor-neutral policy and CI gates. Integrate secure practices into the SDLC (NIST
+SSDF), not as a final phase.
+
+## Learning loop (orthogonal)
+
+Run traces + human/Orbit feedback -> classify recurring failures -> create/update
+regression eval -> propose smallest skill/instruction/tool/policy change -> run
+benchmark + canary (regression loops back) -> reviewed harness-change PR -> runs. Do
+not let an agent rewrite its own permanent instructions because one run went poorly.
+Classify the failure (missing context, bad instruction adherence, tool failure, model
+failure, validation weakness, incorrect task contract) -> replayable eval -> smallest
+change -> old-vs-new gate -> PR review -> canary.
+
+## What to measure (outcomes, not activity)
+
+Wave stories accepted without requirement reinterpretation; first-pass verifier success
+rate; attempts per accepted task + % stopped for stagnation; tasks added/removed/changed
+after wave approval; merge-conflict rate + blocked time from dependency mistakes;
+escaped defects + rollback rate per accepted wave; % tasks/stories with complete
+evidence packets; human decisions + review minutes per accepted wave; cost + elapsed
+time per accepted story by provider/task class; recurring failure rate after the
+associated eval/skill change shipped. Do NOT optimize for lines changed, agent turns,
+subagents spawned, or issues closed.
+
+## Resulting architecture (target)
+
+Orbit prioritizes outcomes across repositories. Each repository controller snapshots
+reality, proposes a bounded wave, and obtains policy/human approval. A deterministic
+scheduler converts the approved task DAG into leased, isolated worker runs. Codex or
+Claude workers implement tasks and return structured candidates. Fresh-context
+verifiers and deterministic checks decide task completion. An integration queue
+constructs the cumulative wave, CI and security gates validate it, a preview is
+deployed, and human/Orbit review generates the next planning input. Every run is
+traced, bounded, and replayable. The controller is the accountable state machine, not
+"god of the repo"; models are powerful workers inside explicit contracts; parallelism
+is an optimization added after correctness.
+
+## Citations (POST-CUTOFF — verify before treating as load-bearing)
+
+- Codex subagents: developers.openai.com/codex/concepts/subagents
+- Claude agent teams: code.claude.com/docs/en/agent-teams
+- Codex non-interactive mode: developers.openai.com/codex/noninteractive
+- Codex best practices: developers.openai.com/codex/learn/best-practices
+- Codex iterative repair loops: developers.openai.com/cookbook/examples/codex/build_iterative_repair_loops_with_codex
+- Claude best practices: code.claude.com/docs/en/best-practices
+- MOSAIC-Bench (compositional vulnerability induction): arXiv:2605.03952 (unverified;
+  ID format and existence not confirmed)
+- Codex hooks: developers.openai.com/codex/hooks
+- Claude dynamic workflows: code.claude.com/docs/en/workflows
+- Claude hooks: code.claude.com/docs/en/hooks
+- Codex agent improvement loop: developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop
