@@ -47,12 +47,30 @@ package = read_package(root)
 package_name = package.fetch("name").to_s
 package_version = package.fetch("version").to_s
 file_version = read_version(root)
+npm_status = nil
+npm_detail = nil
 
 errors << "package.json name is missing" if package_name.empty?
 errors << "package.json version is missing" if package_version.empty?
 errors << "VERSION is missing" if file_version.empty?
 errors << "package.json version #{package_version.inspect} does not match VERSION #{file_version.inspect}" unless package_version == file_version
 errors << "version #{package_version.inspect} is not a SemVer release version" unless package_version.match?(/\A\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\z/)
+
+if (options[:require_unpublished] || options[:require_version_bump]) && !options[:skip_registry] && errors.empty?
+  target = "#{package_name}@#{package_version}"
+  stdout, stderr, status = Open3.capture3("npm", "view", target, "version", "--json", chdir: root.to_s)
+  registry_output = [stdout, stderr].join("\n")
+
+  if status.success?
+    npm_status = :published
+    npm_detail = stdout.strip.delete_prefix('"').delete_suffix('"')
+  elsif registry_output.match?(/(?:E404|404 Not Found|is not in this registry)/i)
+    npm_status = :unpublished
+  else
+    npm_status = :unknown
+    npm_detail = registry_output.strip
+  end
+end
 
 if options[:require_version_bump]
   base_ref = options.fetch(:require_version_bump)
@@ -61,22 +79,23 @@ if options[:require_version_bump]
   base_file_version = git_show(root, base_ref, "VERSION").strip
 
   errors << "base package.json version #{base_package_version.inspect} does not match base VERSION #{base_file_version.inspect}" unless base_package_version == base_file_version
-  errors << "package.json version must be bumped from #{base_package_version}" if base_package_version == package_version
-  errors << "VERSION must be bumped from #{base_file_version}" if base_file_version == file_version
+  if base_package_version == package_version && npm_status != :unpublished
+    errors << "package.json version must be bumped from #{base_package_version}"
+  end
+  if base_file_version == file_version && npm_status != :unpublished
+    errors << "VERSION must be bumped from #{base_file_version}"
+  end
 end
 
 if options[:require_unpublished] && !options[:skip_registry] && errors.empty?
   target = "#{package_name}@#{package_version}"
-  stdout, stderr, status = Open3.capture3("npm", "view", target, "version", "--json", chdir: root.to_s)
-  registry_output = [stdout, stderr].join("\n")
-
-  if status.success?
-    published_version = stdout.strip.delete_prefix('"').delete_suffix('"')
-    errors << "#{target} is already published#{published_version.empty? ? '' : " as #{published_version}"}"
-  elsif registry_output.match?(/(?:E404|404 Not Found|is not in this registry)/i)
+  case npm_status
+  when :published
+    errors << "#{target} is already published#{npm_detail.to_s.empty? ? '' : " as #{npm_detail}"}"
+  when :unpublished
     # Expected when the release version has not been published yet.
   else
-    errors << "could not determine whether #{target} is published: #{registry_output.strip}"
+    errors << "could not determine whether #{target} is published: #{npm_detail}"
   end
 end
 

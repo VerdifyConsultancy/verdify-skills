@@ -48,11 +48,19 @@ if ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --require-version-bu
   exit 1
 fi
 
+FAKE_BIN="$TMP/bin"
+mkdir -p "$FAKE_BIN"
+cat > "$FAKE_BIN/npm" <<'SH'
+#!/usr/bin/env bash
+echo "npm ERR! code E404" >&2
+exit 1
+SH
+chmod +x "$FAKE_BIN/npm"
+PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --require-version-bump "$BASE" --require-unpublished
+
 ruby -rjson -e 'path=ARGV.fetch(0); data=JSON.parse(File.read(path)); data["version"]="1.1.1"; File.write(path, JSON.pretty_generate(data) + "\n")' "$REPO/package.json"
 printf '1.1.1\n' > "$REPO/VERSION"
 
-FAKE_BIN="$TMP/bin"
-mkdir -p "$FAKE_BIN"
 cat > "$FAKE_BIN/npm" <<'SH'
 #!/usr/bin/env bash
 printf '"1.1.1"\n'
