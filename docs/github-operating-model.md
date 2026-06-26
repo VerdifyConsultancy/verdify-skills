@@ -24,11 +24,14 @@ Every implementation PR links its issue with a supported closing keyword, names 
 
 This repository uses two long-running branches:
 
-- `dev` is the development integration branch. Implementation/lane PRs target
-  `dev` and keep the normal one issue -> one lane contract -> one branch -> one
-  worktree -> one worker session -> one PR policy.
+- `dev` is the development integration branch and the working branch for current
+  repository changes. Humans and agents make normal changes on `dev`, or on
+  short-lived lane branches based on `dev` with PRs back to `dev`. The normal
+  one issue -> one lane contract -> one branch -> one worktree -> one worker
+  session -> one PR policy still applies to implementation lanes.
 - `main` is the protected release branch. It should only receive generated
-  release PRs from `dev`.
+  release PRs from `dev`, and it should match the package version published to
+  npm and the corresponding GitHub release.
 
 Pushing to `dev` runs validation and `.github/workflows/release-pr.yml`. That
 workflow opens or updates one release PR from `dev` to `main`, creates or reuses
@@ -48,14 +51,17 @@ blocked by branch protection or a repository ruleset.
 
 ## Required controls
 
-Configure a repository ruleset or protected branch to require:
+Configure a repository ruleset or protected branch for `main` to require:
 
 - validation, policy, and compliance self-test checks;
-- at least one approving review;
-- code-owner review after CODEOWNERS is configured;
+- strict up-to-date checks;
 - resolved conversations;
+- no direct pushes;
 - no force pushes or branch deletion;
-- a merge queue when concurrent lanes make stale integration likely.
+
+The current release flow does not require approving reviews. Add review gates,
+code-owner gates after CODEOWNERS is configured, or a merge queue only through
+an explicit governance decision.
 
 ## Deployments
 

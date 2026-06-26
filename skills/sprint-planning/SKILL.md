@@ -4,7 +4,7 @@ description: Selects approved GitHub Issues for a bounded sprint and atomically 
 compatibility: Requires Git, approved project/module artifacts, and GitHub issue access or a current snapshot. No worktree is created until the complete plan transaction is approved.
 metadata:
   author: Verdify
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Sprint Planning

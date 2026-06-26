@@ -4,7 +4,7 @@ description: Converts raw project knowledge into an approved end-to-end project 
 compatibility: Requires access to supplied project sources and permission to write .agent-workflow project artifacts. Human input may be required for material ambiguity.
 metadata:
   author: Verdify
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Project Definition
