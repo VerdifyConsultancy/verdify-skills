@@ -179,6 +179,11 @@ Configure npm Trusted Publishing for the `publish-npm.yml` workflow and the
 `npm` GitHub environment before relying on the release workflow. Do not add a
 long-lived `NPM_TOKEN` unless Trusted Publishing is unavailable.
 
+For automatic release PR creation, either enable the repository setting that
+allows GitHub Actions to create pull requests, or add a fine-scoped
+`VERDIFY_RELEASE_PR_TOKEN` repository secret with permission to create issues and
+pull requests in this repository.
+
 ## Install in a target repository
 
 Run one command from the target repository root:

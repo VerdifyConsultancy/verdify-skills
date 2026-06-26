@@ -24,7 +24,7 @@ jobs:
 
       - name: Open or update release PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.VERDIFY_RELEASE_PR_TOKEN || github.token }}
           HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
