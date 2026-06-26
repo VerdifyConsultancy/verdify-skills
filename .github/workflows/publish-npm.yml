@@ -1,0 +1,77 @@
+name: publish npm
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Use current npm
+        run: npm install -g npm@latest
+
+      - name: Check release version
+        run: ruby scripts/release-preflight.rb --require-unpublished
+
+      - name: Check release tag
+        run: |
+          set -euo pipefail
+          VERSION="$(cat VERSION)"
+          TAG="v${VERSION}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Release tag ${TAG} already exists"
+            exit 1
+          fi
+
+      - name: Build release archive
+        id: package
+        run: |
+          set -euo pipefail
+          ARCHIVE="$(bash scripts/package.sh dist)"
+          bash scripts/verify-package.sh "${ARCHIVE}"
+          echo "archive=${ARCHIVE}" >> "${GITHUB_OUTPUT}"
+          echo "checksum=${ARCHIVE}.sha256" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+
+      - name: Tag and create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="$(cat VERSION)"
+          TAG="v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Verdify skills ${VERSION}"
+          git push origin "${TAG}"
+          gh release create "${TAG}" \
+            "${{ steps.package.outputs.archive }}" \
+            "${{ steps.package.outputs.checksum }}" \
+            --title "Verdify skills ${VERSION}" \
+            --notes "Published @verdify-cli/cli@${VERSION} to npm."

@@ -49,4 +49,42 @@ if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/invalid.md" --base "$BASE" --h
   exit 1
 fi
 
+VERSION="$(cat "$ROOT/VERSION")"
+PACKAGE="$(ruby -rjson -e 'data=JSON.parse(File.read(ARGV.fetch(0))); puts "#{data.fetch("name")}@#{data.fetch("version")}"' "$ROOT/package.json")"
+cat > "$TMP/release.md" <<EOF
+## Backlog issue
+
+Closes #456
+
+## Release candidate
+
+Promote \`dev\` to \`main\`.
+
+## Version
+
+- VERSION: \`$VERSION\`
+- Package: \`$PACKAGE\`
+- Source branch: \`dev\`
+- Target branch: \`main\`
+
+## Evidence
+
+Required checks must pass before merge.
+
+Current head SHA: \`$HEAD\`
+
+## Risk and rollback
+
+npm versions are immutable; rollback requires a newer version.
+EOF
+
+ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release.md" --base "$BASE" --head "$HEAD" --base-ref main --head-ref dev
+
+cp "$TMP/release.md" "$TMP/release-invalid.md"
+ruby -0pi -e 'gsub(/- VERSION: `[^`]+`/, "- VERSION: `0.0.0`")' "$TMP/release-invalid.md"
+if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release-invalid.md" --base "$BASE" --head "$HEAD" --base-ref main --head-ref dev >/dev/null 2>&1; then
+  echo "expected PR policy to reject a release PR with the wrong version" >&2
+  exit 1
+fi
+
 echo "PR policy tests passed."

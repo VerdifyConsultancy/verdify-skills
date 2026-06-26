@@ -4,7 +4,7 @@ description: Performs Wave 0 repository hygiene before feature execution by asse
 compatibility: Requires repository read access, Git, Verdify CLI, and GitHub CLI or a current snapshot when GitHub state is material.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Repo Hygiene

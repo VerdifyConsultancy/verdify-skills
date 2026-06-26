@@ -1,0 +1,104 @@
+name: release PR
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: false
+
+jobs:
+  release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Open or update release PR
+        env:
+          GH_TOKEN: ${{ secrets.VERDIFY_RELEASE_PR_TOKEN }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::warning::VERDIFY_RELEASE_PR_TOKEN is not configured; skipping automatic release PR creation."
+            exit 0
+          fi
+
+          VERSION="$(cat VERSION)"
+          TITLE="Release @verdify-cli/cli@${VERSION}"
+          ISSUE="$(
+            gh issue list \
+              --state open \
+              --limit 100 \
+              --json number,title \
+              --jq ".[] | select(.title == \"${TITLE}\") | .number" \
+              | head -n 1 || true
+          )"
+
+          if [ -z "${ISSUE}" ]; then
+            ISSUE="$(
+              gh issue create \
+                --title "${TITLE}" \
+                --body "Tracks the release candidate promoted from dev to main for @verdify-cli/cli@${VERSION}."
+            )"
+            ISSUE="${ISSUE##*/}"
+          fi
+
+          BODY="$(mktemp)"
+          cat > "${BODY}" <<EOF
+          ## Backlog issue
+
+          Closes #${ISSUE}
+
+          ## Release candidate
+
+          Promote \`dev\` to \`main\` for \`@verdify-cli/cli@${VERSION}\`. Merging this PR publishes the package to npm, creates tag \`v${VERSION}\`, and creates the GitHub release.
+
+          ## Version
+
+          - VERSION: \`${VERSION}\`
+          - Package: \`@verdify-cli/cli@${VERSION}\`
+          - Source branch: \`dev\`
+          - Target branch: \`main\`
+
+          ## Evidence
+
+          Required checks must pass on this PR before merge:
+
+          - \`validate\`
+          - \`pull-request-policy\`
+          - \`compliance / compliance\`
+
+          Current head SHA: \`${HEAD_SHA}\`
+
+          ## Risk and rollback
+
+          - npm versions are immutable; rollback requires publishing a newer version.
+          - The release workflow must publish with npm Trusted Publishing/OIDC.
+          - Runtime deployment is not performed by this package release.
+          EOF
+
+          PR="$(
+            gh pr list \
+              --base main \
+              --head dev \
+              --state open \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [ -n "${PR}" ]; then
+            gh pr edit "${PR}" --title "${TITLE}" --body-file "${BODY}"
+          else
+            gh pr create --base main --head dev --title "${TITLE}" --body-file "${BODY}"
+          fi

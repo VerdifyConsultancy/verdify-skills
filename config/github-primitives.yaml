@@ -35,8 +35,23 @@ required_pull_request_sections:
   - Scope proof
   - Evidence
   - Risk and deployment impact
+release_branch_flow:
+  development_branch: dev
+  release_branch: main
+  release_trigger: merge_release_pr_to_main
+  release_pr_source: ".github/workflows/release-pr.yml"
+  publish_workflow: ".github/workflows/publish-npm.yml"
+required_release_pull_request_sections:
+  - Backlog issue
+  - Release candidate
+  - Version
+  - Evidence
+  - Risk and rollback
 recommended_default_branch_rules:
-  required_checks: [validate, policy]
+  required_checks:
+    - "validate"
+    - "pull-request-policy"
+    - "compliance / compliance"
   approving_reviews: 1
   dismiss_stale_reviews: true
   require_code_owner_review: true

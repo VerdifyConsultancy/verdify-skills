@@ -1,6 +1,8 @@
 # Contributing
 
-Changes should begin with a GitHub issue that states the problem and desired outcome. Pull requests must link that issue with a supported closing keyword; discovered maintenance work belongs in the backlog rather than an undocumented exception.
+Changes should begin with a GitHub issue that states the problem and desired outcome. Implementation pull requests target `dev` and must link that issue with a supported closing keyword; discovered maintenance work belongs in the backlog rather than an undocumented exception.
+
+`dev` is the long-running development integration branch. `main` is the protected release branch and should only be updated by the generated `dev -> main` release PR. Every push to `dev` opens or updates that release PR; merging it to `main` triggers the npm publish workflow.
 
 Before opening a pull request:
 

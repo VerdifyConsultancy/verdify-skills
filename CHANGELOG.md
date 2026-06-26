@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.1.1 - 2026-06-26
+
+- Added npm release automation: PR release preflight checks, a `main` publish workflow using Trusted Publishing/OIDC, GitHub release artifact creation, and documentation for updating installed target repositories.
+- Added the `dev -> main` release branch model, auto-generated release PR workflow, release-specific PR policy validation, and documentation for protecting `main` from direct pushes.
+
 ## 1.1.0 - 2026-06-25
 
 - Added the executable compliance gate: `verdify gate compliance` (`Verdify::ComplianceAssessor`) — a deterministic, hermetic, gem-free assessor of the fleet-standard repo shape (AGENTS.md managed markers, North Star present, vendored skills + discovery symlinks, no committed secrets), emitting a schema-valid `ComplianceAssessment`.
