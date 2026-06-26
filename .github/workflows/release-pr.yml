@@ -24,10 +24,15 @@ jobs:
 
       - name: Open or update release PR
         env:
-          GH_TOKEN: ${{ secrets.VERDIFY_RELEASE_PR_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.VERDIFY_RELEASE_PR_TOKEN }}
           HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::warning::VERDIFY_RELEASE_PR_TOKEN is not configured; skipping automatic release PR creation."
+            exit 0
+          fi
 
           VERSION="$(cat VERSION)"
           TITLE="Release @verdify-cli/cli@${VERSION}"

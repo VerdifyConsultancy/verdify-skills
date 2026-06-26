@@ -37,9 +37,10 @@ The PR policy treats this as a release gate rather than a worker lane, but still
 requires a closing GitHub Issue, exact package version evidence, current head
 SHA, and rollback notes.
 
-Automatic release PR creation requires either the repository setting that allows
-GitHub Actions to create pull requests, or a `VERDIFY_RELEASE_PR_TOKEN`
-repository secret with issue and pull-request write access.
+Automatic release PR creation requires a `VERDIFY_RELEASE_PR_TOKEN` repository
+secret with issue and pull-request write access. The VerdifyConsultancy
+organization currently blocks the repository setting that would let the built-in
+`GITHUB_TOKEN` create pull requests.
 
 Merging the release PR into `main` triggers `.github/workflows/publish-npm.yml`.
 Direct pushes to `main` are not part of the operating model and should be
