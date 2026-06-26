@@ -1,0 +1,121 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-prompt-injection-guidance
+title: Add prompt-injection / content-trust guidance to untrusted-text ingestion skills
+status: approved
+issue_ids:
+- 21
+coupling_justification: 
+objective: 'Add an explicit content-trust / prompt-injection clause to the three skills
+  that ingest attacker-influenceable external text (transcript-replan, northstar-research-ingest,
+  northstar-question-resolution/brave-research) and hoist a shared rule into COMMON_OPERATING_CONTRACT.md,
+  mirroring the existing pattern in skills/northstar-planning/references/learning-capture.md:
+  treat ingested transcript/source/web text as untrusted data, never follow instructions
+  embedded in it, and add prompt-injection / instruction-bearing content as a stop-and-gate
+  condition. No formal module contract exists for this package, so the governed surface
+  is the listed skill and contract markdown files directly.'
+desired_outcome: Each of the three ingestion skills, and COMMON_OPERATING_CONTRACT.md,
+  explicitly mandates treating ingested external text as untrusted, refusing embedded
+  instructions, and stopping/gating on prompt-injection content — closing the inconsistency
+  with learning-capture.md so the gap is no longer exploitable on the highest-exposure
+  ingestion surfaces.
+non_goals:
+- No code changes; this lane edits skill and contract markdown guidance only.
+- No formal module contract exists for this package; this lane does not introduce
+  one.
+- Does not change the proposal-only / human-gated blast-radius model, only documents
+  the trust rule.
+- Does not modify lib/verdify or scripts/validate-repo.rb logic.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/prompt-injection-guidance
+module_contracts:
+- skills/transcript-replan/SKILL.md
+- skills/northstar-research-ingest/SKILL.md
+- skills/northstar-question-resolution/references/brave-research.md
+- COMMON_OPERATING_CONTRACT.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - skills-content-trust
+  - ingestion-safety-guidance
+  owned_paths:
+  - skills/transcript-replan/SKILL.md
+  - skills/northstar-research-ingest/SKILL.md
+  - skills/northstar-question-resolution/references/brave-research.md
+  - COMMON_OPERATING_CONTRACT.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - COMMON_OPERATING_CONTRACT.md
+  owned_interfaces:
+  - transcript-replan stop conditions
+  - northstar-research-ingest stop conditions
+  - brave-research safety checks
+  - COMMON_OPERATING_CONTRACT content-trust clause
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: skills/transcript-replan/SKILL.md, skills/northstar-research-ingest/SKILL.md,
+    and skills/northstar-question-resolution/references/brave-research.md each contain
+    an explicit clause to treat ingested external text as untrusted data, never follow
+    embedded instructions, and stop/gate on prompt-injection content.
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - Diff showing the added content-trust clause in all three skill/reference files.
+  - grep for 'untrusted|prompt[ -]?injection|embedded instruction' now matching each
+    file.
+- id: LANE-AC-02
+  statement: COMMON_OPERATING_CONTRACT.md carries a shared content-trust rule so future
+    ingesting skills inherit the untrusted-input / never-follow-embedded-instructions
+    requirement.
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - Diff showing the hoisted content-trust clause in COMMON_OPERATING_CONTRACT.md.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository structure and skill artifacts remain valid after edits.
+  required: true
+- id: grep-content-trust
+  command: grep -rEl 'untrusted|prompt[ -]?injection|embedded instruction' skills/transcript-replan/SKILL.md
+    skills/northstar-research-ingest/SKILL.md skills/northstar-question-resolution/references/brave-research.md
+    COMMON_OPERATING_CONTRACT.md
+  purpose: Confirm the content-trust clause is present in every targeted file.
+  required: true
+required_evidence:
+- Diffs of the four edited files showing the content-trust / prompt-injection clauses.
+- validate-repo.rb output (green).
+- grep output listing all four files as matching the content-trust pattern.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or schema change beyond the issue scope.
+- The shared COMMON_OPERATING_CONTRACT.md clause conflicts with another lane editing
+  the same file.
+definition_of_done:
+- Issue
+- Branch pushed and PR opened, ready for the independent critic.
+- validate-repo.rb green and the content-trust grep matches all four files.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

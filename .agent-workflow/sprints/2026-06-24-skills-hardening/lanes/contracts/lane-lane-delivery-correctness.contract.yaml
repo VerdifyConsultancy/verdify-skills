@@ -1,0 +1,146 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-lane-delivery-correctness
+title: Fix lane-delivery READY_FOR_CRITIC instruction, fix-forward worktree lifecycle,
+  and forbidden-status closeout eval
+status: approved
+issue_ids:
+- 26
+coupling_justification: 
+objective: 'Reground the lane-delivery worker closeout/handoff contract by replacing
+  the ungrounded uppercase READY_FOR_CRITIC instruction in skills/lane-delivery/SKILL.md
+  step 7 with the concrete lowercase closeout-status mechanism (status: ready_for_critic,
+  readiness derived from closeout presence with no critic file), specifying the fix-forward
+  worktree/lease lifecycle so workers do not improvise around the one-active-worker-lease
+  constraint, and rewriting the evaluations/lane-delivery/evals.json closeout eval
+  so it stops endorsing the schema-forbidden "complete-with-risks" status. No formal
+  black-box module contract exists for the lane-delivery skill package; skills/lane-delivery/SKILL.md
+  is the primary governed artifact.'
+desired_outcome: 'A worker following lane-delivery step 7 has an unambiguous, schema-grounded
+  mechanism to signal criticism readiness (writing the closeout with status: ready_for_critic),
+  the fix-forward path names a single canonical worktree/lease procedure that respects
+  the one-coding-session-per-worktree ban, and the closeout eval grades only against
+  the actual lane-closeout enum (ready_for_critic | blocked | failed | decision_required).'
+non_goals:
+- No changes to lib/verdify/cli.rb route logic or lease handling; the route engine
+  already keys on closeout-file presence and is the grounding truth, not a target
+  of this lane.
+- No changes to schemas/lane-closeout.schema.yaml; its status enum is the authority
+  this lane conforms instructions and evals to.
+- No changes to COMMON_OPERATING_CONTRACT.md lifecycle-state definitions.
+- No new bin/verdify command to write lifecycle status.
+- No formal module contract is created; this lane edits skill documentation and an
+  eval suite only.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/lane-delivery-correctness
+module_contracts:
+- skills/lane-delivery/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - lane-delivery-skill
+  - lane-delivery-evals
+  owned_paths:
+  - skills/lane-delivery/
+  - evaluations/lane-delivery/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - schemas/lane-closeout.schema.yaml
+  - scripts/validate-repo.rb
+  - config/lifecycle.yaml
+  - COMMON_OPERATING_CONTRACT.md
+  coordination_required_paths: []
+  owned_interfaces:
+  - lane-delivery worker closeout/handoff instruction (SKILL.md step 7 + fix-forward
+    mode)
+  - lane-delivery eval suite expected_output for evidence-backed-closeout
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'skills/lane-delivery/SKILL.md step 7 replaces the uppercase READY_FOR_CRITIC
+    lifecycle-state reference with the concrete mechanism: write the closeout file
+    with status: ready_for_critic, whose presence (with no critic file) the route
+    engine treats as readiness for criticism, and forbids writing any integrated/complete
+    status.'
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - 'Diff of skills/lane-delivery/SKILL.md showing step 7 reworded with status: ready_for_critic
+    and no uppercase READY_FOR_CRITIC instruction.'
+- id: LANE-AC-02
+  statement: skills/lane-delivery/SKILL.md fix-forward mode names a single canonical
+    worktree/lease procedure (reuse the same worktree under a re-authorized sequential
+    lease, or release with --keep-worktree then create with a new --session-id) that
+    does not violate the one-coding-session-per-worktree / one-active-worker-lease
+    constraint.
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff of skills/lane-delivery/SKILL.md fix-forward section showing an explicit
+    canonical worktree/lease lifecycle.
+- id: LANE-AC-03
+  statement: evaluations/lane-delivery/evals.json evidence-backed-closeout expected_output
+    no longer references the schema-forbidden complete-with-risks value and references
+    only the actual lane-closeout enum (ready_for_critic | blocked | failed | decision_required).
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff of evaluations/lane-delivery/evals.json showing complete-with-risks removed
+    and the real enum referenced.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Repository-wide structural/schema validation passes after the edits.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Full test/eval suite green, including the lane-delivery eval suite.
+  required: true
+- id: closeout-enum-grep
+  command: "! grep -q 'complete-with-risks' evaluations/lane-delivery/evals.json"
+  purpose: Confirm the forbidden complete-with-risks status no longer appears in the
+    eval.
+  required: true
+- id: status-grounding-grep
+  command: grep -q 'ready_for_critic' skills/lane-delivery/SKILL.md
+  purpose: Confirm SKILL.md step 7 now uses the lowercase closeout status mechanism.
+  required: true
+required_evidence:
+- ruby scripts/validate-repo.rb output showing pass.
+- make test output showing pass.
+- Diffs of skills/lane-delivery/SKILL.md and evaluations/lane-delivery/evals.json
+  against baseline fa8fb8a.
+- Current-head CI run reference for the lane PR.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Grounding the worker closeout status would require a new bin/verdify command, a
+  lib/verdify/cli.rb route change, or a schemas/lane-closeout.schema.yaml enum change
+  beyond this lane's documentation/eval scope.
+- The canonical fix-forward worktree/lease procedure cannot be expressed without changing
+  the one-active-worker-lease behavior in lib/verdify/cli.rb.
+definition_of_done:
+- 'Issue #26 acceptance satisfied with evidence: SKILL.md step 7 and fix-forward regrounded,
+  eval no longer endorses a forbidden status.'
+- Branch lane/lane-delivery-correctness pushed and PR ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green at the PR head SHA.
+- 'Closeout file written with status: ready_for_critic and validated against schemas/lane-closeout.schema.yaml.'
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

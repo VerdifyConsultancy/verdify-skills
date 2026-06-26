@@ -1,0 +1,142 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-consensus-audit-workflow
+title: Adversarial skill-audit + consensus-review workflow (#3)
+status: approved
+issue_ids:
+- 3
+coupling_justification: 
+objective: Deliver a documented adversarial skill-architecture-audit and consensus-review
+  workflow for the verdify-skills package as a new lifecycle skill, reconciled with
+  the platform's consensus-review boundary established by the lane-dec-platform-reconciliation
+  ADR. The workflow must review the skill set against registered evidence and external
+  research, score evidence and record why skill boundaries exist, check tag/schema/internal
+  consistency, run Codex and Claude adversarial reviews until both return no required
+  changes, allow lane owners and stakeholder lenses (product, manager, finance, infrastructure,
+  SRE, security) to vote on plan artifacts, and persist objections, decisions, votes,
+  and final unresolved issues. No formal black-box module contract exists for this
+  package; the primary governed surface is the new skill directory under skills/ plus
+  its decision/evidence docs.
+desired_outcome: A durable review-packet format exists for skill-architecture audits;
+  evidence references are registered in the North Star evidence registry (or a linked
+  collateral registry); the workflow distinguishes accepted decisions, proposed changes,
+  conflicts, and rejected suggestions; it supports the six stakeholder lenses; it
+  records machine reviewers separately from human/lane-owner votes; and it never marks
+  protected North Star or skill decisions approved without explicit human approval.
+  The new skill and any new schemas/templates validate under validate-repo.rb.
+non_goals:
+- No code changes to lib/verdify/* or scripts/validate-repo.rb in this lane (other
+  lanes own the engine).
+- No changes to GitHub as the backlog/control plane.
+- No locking of the product North Star or project-definition (separate product-direction
+  track).
+- No formal module contract authored or modified; this package has no black-box module
+  contracts.
+- 'No implementation of the platform-side consensus-review skill; this lane consumes
+  its boundary via the #36/platform-reconciliation ADR.'
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/consensus-audit-workflow
+module_contracts:
+- skills/consensus-audit-workflow/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - skill-architecture audit and consensus-review workflow
+  - skill authoring and lifecycle skill documentation
+  owned_paths:
+  - skills/consensus-audit-workflow/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  - config/lifecycle.yaml
+  coordination_required_paths:
+  - ".agent-workflow/northstar/evidence-registry.yaml"
+  - schemas/
+  - skills/independent-critic/SKILL.md
+  - docs/decisions/
+  owned_interfaces:
+  - consensus-audit-workflow SKILL contract and its review-packet / vote / objection
+    record formats
+dependencies:
+  hard:
+  - lane_id: lane-dec-platform-reconciliation
+    required_output: platform-reconciliation ADR (consensus-review boundary)
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: A durable skill-architecture-audit + consensus-review workflow skill
+    exists that distinguishes accepted decisions, proposed changes, conflicts, and
+    rejected suggestions; supports product/manager/finance/ infrastructure/SRE/security
+    lenses; records machine (Codex/Claude) reviewers separately from human/ lane-owner
+    votes; loops adversarial review until both reviewers return no required changes;
+    and never marks protected North Star/skill decisions approved without human approval.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - skills/consensus-audit-workflow/SKILL.md (and references/assets) present and validating
+  - review-packet/vote/objection format documented with the four decision categories
+    and six lenses
+  - validate-repo.rb output showing the new skill validates
+- id: LANE-AC-02
+  statement: 'Evidence references are registered in the North Star evidence registry
+    or a linked collateral registry, and the workflow is reconciled with the platform
+    consensus-review boundary per the lane-dec-platform-reconciliation ADR (referenced
+    by docs and the #3 issue).'
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - evidence registration entry referenced by the skill (NSE-20260623-repo-controller-bootstrap-self-discovery
+    or linked collateral)
+  - skill/docs reference to the platform-reconciliation ADR for the consensus-review
+    boundary
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the new skill, frontmatter, references, and any new schemas/artifacts
+    validate repo-wide.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Confirm no regressions in the validation/CLI engine after adding the skill
+    and any assets.
+  required: true
+required_evidence:
+- ruby scripts/validate-repo.rb output (green)
+- make test output (green)
+- skills/consensus-audit-workflow/SKILL.md and supporting reference/asset files
+- reference to the lane-dec-platform-reconciliation ADR and the registered evidence
+  entry
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The platform-reconciliation ADR has not landed or its consensus-review boundary
+  contradicts the skill design.
+- The fix requires a public interface or schema change beyond the issue scope (e.g.
+  a new shared schema other lanes consume).
+- Delivering the workflow requires editing a prohibited shared hot file (lib/verdify/*,
+  scripts/validate-repo.rb, config/lifecycle.yaml).
+definition_of_done:
+- 'Issue #3 acceptance criteria are satisfied with the evidence listed above.'
+- Branch lane/consensus-audit-workflow is pushed and a PR is open and ready for the
+  independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- The new skill references the lane-dec-platform-reconciliation ADR and the registered
+  evidence entry.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

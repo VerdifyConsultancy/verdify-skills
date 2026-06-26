@@ -1,0 +1,146 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-readiness-grounding
+title: Reground readiness skills to the real edge stack and define platform-readiness
+  modes
+status: approved
+issue_ids:
+- 27
+coupling_justification: 
+objective: 'Reground the platform-readiness and gravity-readiness skills to the real
+  control plane: replace the hardcoded "Cloudflare health" edge item in skills/platform-readiness/references/readiness-domains.md
+  with a provider-neutral / real edge+SSO item (k3s Traefik ingress + Authentik),
+  document each platform-readiness mode (inventory, target-contract, readiness-gate,
+  pilot-plan) as an explicit SKILL.md section following the release-verification pattern,
+  and in gravity-readiness state the precondition that platform-readiness must be
+  approved before marking platform-dependent areas and name a concrete evidence source
+  per area.'
+desired_outcome: Readiness assessments gate against the actual edge/SSO stack, the
+  four declared platform-readiness modes have distinct documented behavior, and gravity-readiness
+  platform-dependent items each cite a concrete evidence source with an explicit platform-readiness-approved
+  precondition, eliminating false gaps and fabricated passes.
+non_goals:
+- No code changes in this lane; the work edits skill prose and reference docs only.
+- No edits to config/lifecycle.yaml; if a declared mode must be removed instead of
+  documented, that decision is coordinated with lane-canonical-lifecycle which owns
+  config/lifecycle.yaml.
+- No new readiness schemas or validation engine changes.
+- No formal module contract exists for the readiness skills package; the governed
+  surface is the skill markdown and reference files listed in module_contracts.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/readiness-grounding
+module_contracts:
+- skills/platform-readiness/SKILL.md
+- skills/platform-readiness/references/readiness-domains.md
+- skills/gravity-readiness/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - platform-readiness skill
+  - gravity-readiness skill
+  owned_paths:
+  - skills/platform-readiness/
+  - skills/gravity-readiness/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - lib/verdify/schema_validator.rb
+  - schemas/
+  coordination_required_paths:
+  - config/lifecycle.yaml
+  owned_interfaces:
+  - platform-readiness mode contract (inventory, target-contract, readiness-gate,
+    pilot-plan)
+  - gravity-readiness platform-dependency evidence-source contract
+dependencies:
+  hard:
+  - lane_id: lane-dec-readiness-boundary
+    required_output: readiness boundary ADR
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The "Cloudflare health" edge item in skills/platform-readiness/references/readiness-domains.md
+    is replaced with a provider-neutral or real-stack edge/DNS/TLS item, and the Authentik
+    SSO boundary is named as an explicit domain; "Cloudflare" no longer appears in
+    skills/.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - grep showing no remaining "Cloudflare" occurrence under skills/
+  - diff of readiness-domains.md showing the regrounded edge/SSO item
+- id: LANE-AC-02
+  statement: Each platform-readiness mode declared in config/lifecycle.yaml (inventory,
+    target-contract, readiness-gate, pilot-plan) is documented in skills/platform-readiness/SKILL.md
+    as an explicit section with purpose, inputs, outputs, and exit condition, following
+    the release-verification SKILL.md mode pattern.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - diff of platform-readiness/SKILL.md showing four explicit mode sections
+  - grep of SKILL.md confirming each lifecycle-declared mode name is present
+- id: LANE-AC-03
+  statement: gravity-readiness/SKILL.md states the precondition that platform-readiness
+    must be approved/pass before marking platform-dependent areas, and names a concrete
+    evidence source (artifact field / command / MCP contract) for each platform-dependent
+    area.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - diff of gravity-readiness/SKILL.md showing the precondition and per-area evidence
+    sources
+  - alignment note referencing the lane-dec-readiness-boundary ADR for the readiness
+    boundary
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Repository-wide structural and schema validation stays green after the
+    skill edits.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Full test suite passes with the regrounded readiness skills.
+  required: true
+- id: no-cloudflare
+  command: "! grep -ri cloudflare skills/"
+  purpose: Confirm the Cloudflare edge reference is fully removed from skills/.
+  required: true
+required_evidence:
+- grep output proving "Cloudflare" no longer appears under skills/
+- diffs of the three governed files showing regrounded edge/SSO item, four mode sections,
+  and per-area evidence sources
+- ruby scripts/validate-repo.rb output showing success
+- make test output showing success
+- reference to the lane-dec-readiness-boundary ADR confirming the readiness boundary
+  used
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires removing a mode from config/lifecycle.yaml rather than documenting
+  it, which touches a path owned by lane-canonical-lifecycle and must be coordinated.
+- The lane-dec-readiness-boundary ADR has not landed or contradicts the regrounding
+  direction, so the platform-readiness vs gravity-readiness boundary is unresolved.
+- The fix requires a public interface or schema change beyond the issue scope.
+definition_of_done:
+- Issue
+- Branch lane/readiness-grounding is pushed and a PR is open and ready for the independent
+  critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- The lane-dec-readiness-boundary ADR is referenced as the basis for the readiness
+  boundary.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

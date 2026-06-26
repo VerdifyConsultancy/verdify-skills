@@ -1,0 +1,177 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-canonical-lifecycle
+title: 'Single-source canonical lifecycle: skills/modes/order across router, workflow,
+  config, docs, validator'
+status: approved
+issue_ids:
+- 7
+- 20
+- 30
+coupling_justification: 'Issues #7, #20, and #30 all converge on making config/lifecycle.yaml
+  the single canonical source of truth for lifecycle skills, modes, and ordering,
+  and enforcing that source in the router (lib/verdify/cli.rb, skills/project-router/SKILL.md),
+  verdify.workflow.yaml, SKILL.md frontmatter, and the validator (scripts/validate-repo.rb).
+  They edit the same canonical config and the same validator enforcement path, so
+  splitting them would create conflicting edits to config/lifecycle.yaml and scripts/validate-repo.rb
+  and risk re-introducing the very drift being fixed.'
+objective: Establish config/lifecycle.yaml as the explicitly-named canonical source
+  for lifecycle skills, states, modes, and order; reconcile router routing order (#7),
+  gate/orchestration next_mode emissions (#20), and SKILL.md frontmatter lifecycle-order
+  (#30) against that canonical source; and add validator enforcement in scripts/validate-repo.rb
+  so the canonical model and its derived views (router, workflow, docs, config, SKILL
+  frontmatter) cannot silently drift. No formal black-box module contract exists for
+  this package; the primary governed surface is config/lifecycle.yaml plus its derived
+  views and the validator that enforces them.
+desired_outcome: The repository has one explicit canonical lifecycle model. project-router
+  can route to every directly-routable lifecycle skill (or docs explain why a skill
+  is only reachable through another). release-verification modes (including review-inbox
+  and observability-diagnostics) are consistent across SKILL.md, config/lifecycle.yaml,
+  verdify.workflow.yaml, and docs. Every router/gate next_mode and every workflow
+  state mode is a member of the target skill's declared mode set. SKILL.md frontmatter
+  lifecycle-order is reconciled (de-duplicated, made consistent with config order,
+  or removed) with explicit treatment of standalone issue-triage. scripts/validate-repo.rb
+  fails on meaningful drift, and a validation command demonstrates the reconciled
+  state.
+non_goals:
+- Do not redesign the lifecycle itself (no new/removed/merged skills) (#7 non-goal).
+- 'Do not change issue-triage runtime behavior; only decide how it is represented
+  in the canonical/order model (#7, #30).'
+- Do not merge or remove skills unless a separate approved architecture decision requires
+  it.
+- 'Do not author the route-decision next_skill enum fix (owned by lane-route-decision-enum,
+  #13).'
+- No formal black-box module contract exists for this package; do not invent one.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/canonical-lifecycle
+module_contracts:
+- config/lifecycle.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Canonical lifecycle model (skills, states, modes, order)
+  - Lifecycle router routing order and gate/orchestration mode emission
+  - Lifecycle documentation and SKILL frontmatter ordering metadata
+  owned_paths:
+  - config/lifecycle.yaml
+  - verdify.workflow.yaml
+  - skills/project-router/SKILL.md
+  - docs/lifecycle.md
+  - README.md
+  prohibited_paths:
+  - schemas/lane-contract.schema.yaml
+  - config/authority-matrix.yaml
+  coordination_required_paths:
+  - scripts/validate-repo.rb
+  - schemas/route-decision.schema.yaml
+  - skills/release-verification/SKILL.md
+  - skills/sprint-orchestrator/SKILL.md
+  - lib/verdify/cli.rb
+  owned_interfaces:
+  - config/lifecycle.yaml lifecycle skill/mode/order schema (canonical source)
+  - bin/verdify route gate/orchestration next_mode emission (route_for_gate, route_hash)
+  - SKILL.md frontmatter lifecycle-order field
+dependencies:
+  hard:
+  - lane_id: lane-validator-engine
+    required_output: validator changes merged (shared validate-repo.rb)
+  - lane_id: lane-dec-authority-boundaries
+    required_output: authority-boundary ADR
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: config/lifecycle.yaml is explicitly named as the canonical lifecycle
+    source; project-router routes to every directly-routable lifecycle skill (or docs
+    explain skills reachable only via another skill); release-verification modes including
+    review-inbox and observability-diagnostics are consistent across SKILL.md, config/lifecycle.yaml,
+    verdify.workflow.yaml, and docs; outline_stages is reconciled or explicitly documented
+    as legacy compatibility (#7).
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff showing the canonical source named and router/docs/config/workflow reconciled.
+  - ruby scripts/validate-repo.rb output showing pass with the reconciled lifecycle
+    model.
+- id: LANE-AC-02
+  statement: Every route_for_gate / route_hash next_mode and every verdify.workflow.yaml
+    state mode is a member of the target skill's declared mode set in config/lifecycle.yaml
+    (or the mode is formally added to that skill), and the validator asserts mode
+    membership so future drift is detected (#20).
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff of lib/verdify/cli.rb and config/lifecycle.yaml showing canonical mode names.
+  - Validator failure demonstration on an injected non-canonical mode, then pass after
+    revert.
+- id: LANE-AC-03
+  statement: SKILL.md frontmatter lifecycle-order is reconciled with config/lifecycle.yaml
+    order (de-duplicated, made consistent, or removed), with explicit treatment of
+    standalone issue-triage, and the validator enforces the chosen rule so the two
+    orderings can never drift again (#30).
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff of SKILL.md frontmatter and/or scripts/validate-repo.rb showing the reconciliation
+    and enforcement.
+  - ruby scripts/validate-repo.rb output showing the lifecycle-order check passing.
+validation_commands:
+- id: vc-validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the reconciled lifecycle model and new drift checks pass repo-wide
+    validation.
+  required: true
+- id: vc-make-test
+  command: make test
+  purpose: Run the repository test/validate target (test -> validate) green.
+  required: true
+- id: vc-route-modes
+  command: ruby bin/verdify route --write && ruby bin/verdify artifact validate --file
+    .agent-workflow/router/route-decision.yaml
+  purpose: Demonstrate that emitted route next_mode is canonical and the route-decision
+    artifact validates.
+  required: true
+required_evidence:
+- ruby scripts/validate-repo.rb output (before failing on injected drift, after passing
+  on reconciled state).
+- make test output showing green.
+- Diff confirming config/lifecycle.yaml named canonical and router/workflow/docs/frontmatter
+  reconciled.
+- Coordination record with lane-validator-engine for shared scripts/validate-repo.rb
+  edits.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reconciliation requires a public interface/schema change (e.g. route-decision next_mode
+  enum, or new canonical modes on a skill) beyond the issue scope.
+- The authority-boundary ADR (lane-dec-authority-boundaries) is not yet merged, blocking
+  the canonical decision on skill routability.
+- Conflicting edits to shared scripts/validate-repo.rb cannot be coordinated with
+  lane-validator-engine.
+- Reconciling outline_stages would break an external consumer that requires the original
+  17-stage list.
+definition_of_done:
+- 'Acceptance criteria for #7, #20, and #30 satisfied with linked evidence.'
+- config/lifecycle.yaml is explicitly named canonical; router/workflow/docs/frontmatter
+  reconciled and validator-enforced.
+- Branch pushed and PR opened, ready for independent-critic review.
+- ruby scripts/validate-repo.rb and make test green on the branch with GitHub checks
+  passing.
+- Shared validate-repo.rb / route-decision.schema.yaml edits coordinated with lane-validator-engine
+  and lane-route-decision-enum.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

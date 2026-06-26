@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-06-24T14:52:36Z'
+updated_at: '2026-06-24T17:03:10Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1343,6 +1343,86 @@ evidence:
     OpenClaw workflow stage.
   - Supports keeping `wave-release-planning` as a sprint-planning mode before adding
     a top-level canonical skill.
+- id: NSE-20260624-agentic-loop-audit-closeout
+  reference: northstar://evidence/NSE-20260624-agentic-loop-audit-closeout
+  title: Agentic loop audit closeout summary
+  evidence_type: observation
+  evidence_status: reported
+  ingested_at: '2026-06-24T17:03:10Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-audit-closeout.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-audit-closeout-pasted-text-1-txt"
+  source_uri: codex-attachment://0f39cc5c-8e0e-4417-9252-8d73d986d756/pasted-text-1.txt
+  source_sha256: 72d145fdbdec193afd79a4ea42968cf049f44a00d7db7307eaee31dcb7d85e7f
+  summary: 'Session closeout summary reporting that the agentic-loop audit was ingested,
+    North Star drafts were updated, platform issues #1995-#2000 were created, validations
+    passed, and the route remains in northstar-planning artifact-loop pending signoff.'
+  tags:
+  - agentic-loop
+  - audit
+  - governance
+  - platform
+  - skills
+  - validation
+  claims:
+  - The prior audit work registered the agentic-loop best-practices report as NSE-20260624-agentic-loop-sdlc-best-practices.
+  - The prior audit produced AGENTIC_LOOP_SKILL_AUDIT.md covering 19 skills, SDLC
+    chaining, compliance, drift, missing capabilities, existing decisions, and the
+    agents.vallery.net baseline.
+  - 'The prior audit created jvallery/agents issues #1995 through #2000 for missing
+    runtime/MCP/platform controls.'
+  - The prior audit left the route at NORTHSTAR_ARTIFACTS_INCOMPLETE with next skill
+    northstar-planning and mode artifact-loop pending North Star signoff.
+  planning_relevance:
+  - Supports this North Star planning turn by capturing the previous audit closeout,
+    validation claims, and remaining signoff state as registered evidence.
+  - Highlights that platform issues were created while skills-repo adjustment issues
+    should be reconciled against the existing Verdify skills backlog.
+- id: NSE-20260624-agentic-loop-sdlc-best-practices
+  reference: northstar://evidence/NSE-20260624-agentic-loop-sdlc-best-practices
+  title: Agentic loop execution and SDLC best practices
+  evidence_type: research_report
+  evidence_status: reported
+  ingested_at: '2026-06-24T16:42:05Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-sdlc-best-practices.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-sdlc-best-practices-pasted-text-1-txt"
+  source_uri: codex-attachment://33a637a2-c48a-4aa3-b7d7-f3d1e4ef30df/pasted-text-1.txt
+  source_sha256: 809ebfc0a2726ee12eaf176c5851d275d908109db045c765523593b4655d27a1
+  summary: Attached research report establishing planner-executor-validator loops,
+    bounded autonomy, evidence-backed stop rules, evals, adversarial testing, telemetry,
+    incident response, reproducibility, and governance requirements for Codex/Claude-style
+    software delivery agents.
+  tags:
+  - agentic-loop
+  - evals
+  - governance
+  - observability
+  - platform
+  - sdlc
+  - security
+  - skills
+  claims:
+  - Software-engineering agents should use bounded autonomy with explicit evidence,
+    least-privilege permissions, validation, and stop conditions rather than unbounded
+    autonomy.
+  - The safest default SDLC architecture is a planner-executor-validator loop with
+    separate planning, tool execution, validation, repair, and human-review paths.
+  - Agent harnesses should be treated as versioned product code, including prompts,
+    tool contracts, validators, approval policies, memory or compaction policy, and
+    telemetry.
+  - Testing should include unit, integration, task-eval, adversarial/red-team, and
+    chaos layers covering prompt injection, permission boundaries, retry exhaustion,
+    stale caches, and partial failures.
+  - Production agent operations need tracing, audit logs, spend and rate controls,
+    incident response, rollback triggers, reproducible model/prompt/tool bundles,
+    and supply-chain provenance.
+  planning_relevance:
+  - Baseline for adversarial audit of every Verdify lifecycle skill against agentic-loop
+    and SDLC best practices.
+  - Supports North Star updates for end-to-end requirements, architecture, planning,
+    implementation, QA, deployment, observability, incident response, and learning
+    loops.
+  - Supports backlog and platform capability issues for agents.vallery.net MCP/runtime
+    gaps.
 - id: NSE-20260624-comprehensive-planning-and-review-loop-b
   reference: northstar://evidence/NSE-20260624-comprehensive-planning-and-review-loop-b
   title: Comprehensive planning and review loop Brave research

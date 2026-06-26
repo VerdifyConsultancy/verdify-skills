@@ -1,0 +1,127 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-controller-recovery
+title: Controller-loop telemetry, context reset, and recovery contract
+status: approved
+issue_ids:
+- 2
+coupling_justification: 
+objective: 'Extend the controller-loop skill contract to specify the long-running
+  repo controller operating model: outer/inner/cron loops, durable state checkpoints
+  before context reset, context-window reset thresholds and resume prompts, mandatory
+  loop KPIs/metrics, prompt-injection-safe alert/resume handling, and failure reporting
+  plus handoff to Agent Fleet observability.'
+desired_outcome: controller-loop documents outer-loop, inner-loop, cron, context-reset,
+  and resume semantics; loop records carry status, owner, repo, issue/PR refs, checkpoint
+  path, current objective, last action, last error, and next prompt; plans must declare
+  KPIs and the minimum scrape/receive metrics (loop starts, completions, failures,
+  context resets, active child sessions, alert count, last successful checkpoint);
+  prompt-injection-safe alert/resume prompt handling is defined at the contract level;
+  and examples cover an interrupted loop, a context reset, and a failed outer loop
+  that produces a recoverable status event.
+non_goals:
+- No runtime Agent Fleet controller observability implementation; that is the runtime
+  counterpart issue, not this skills-repo contract.
+- No code changes outside the controller-loop skill package.
+- No formal black-box module contract exists for this package; this lane governs the
+  controller-loop skill's primary files rather than a module-contract artifact.
+- No changes to lib/verdify or scripts/validate-repo.rb tooling.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/controller-recovery
+module_contracts:
+- skills/controller-loop/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - controller-loop skill contract
+  - controller telemetry and recovery semantics
+  owned_paths:
+  - skills/controller-loop/SKILL.md
+  - skills/controller-loop/references/
+  - skills/controller-loop/assets/
+  - skills/controller-loop/agents/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - lib/verdify/semantic_validator.rb
+  coordination_required_paths:
+  - schemas/controller-state.schema.yaml
+  - schemas/session-ledger.schema.yaml
+  owned_interfaces:
+  - controller-loop skill loop-record and metrics contract
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: controller-loop documents outer-loop, inner-loop, cron, context-reset,
+    and resume semantics, and loop records include status, owner, repo, issue/PR references,
+    checkpoint path, current objective, last action, last error, and next prompt.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - Diff of skills/controller-loop/SKILL.md and references showing the documented
+    loop and record semantics.
+- id: LANE-AC-02
+  statement: The skill defines mandatory plan KPIs and the minimum metrics Agent Fleet
+    must scrape or receive (loop starts, completions, failures, context resets, active
+    child sessions, alert count, last successful checkpoint), defines prompt-injection-safe
+    alert/resume prompt handling, and includes examples covering an interrupted loop,
+    a context reset, and a recoverable failed outer loop.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - Diff showing required metrics and KPI declaration in the skill contract.
+  - Example/template assets demonstrating interrupt, context reset, and recoverable-failure
+    status events.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Repository-wide structural and schema validation passes.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Full test suite passes.
+  required: true
+- id: validate-controller-state-template
+  command: ruby bin/verdify artifact validate --file skills/controller-loop/assets/controller-state.template.yaml
+  purpose: Controller-state template still validates after recovery-field edits.
+  required: true
+required_evidence:
+- Diff of skills/controller-loop/SKILL.md, references, and assets.
+- validate-repo.rb output showing success.
+- make test output showing success.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public controller-state or session-ledger schema change beyond
+  the issue scope and not yet aligned with lane-controller-state-fields.
+- The controller-ownership boundary from lane-dec-controller-ownership conflicts with
+  the documented loop semantics.
+definition_of_done:
+- Issue
+- Branch lane/controller-recovery pushed and PR ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- Coordination on shared controller-loop schemas with lane-controller-state-fields
+  resolved before any schema edit.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'
+dependencies:
+  hard:
+  - lane_id: lane-dec-controller-ownership
+    required_output: controller ownership ADR
+  soft:
+  - lane_id: lane-controller-state-fields
+    coordination: shares controller-loop schema/skill

@@ -1,0 +1,152 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-qr-schemarefs
+title: Fix northstar-question-resolution bogus .v1 schema_refs so its artifacts validate
+status: approved
+issue_ids:
+- 14
+coupling_justification: 
+objective: Replace the three bogus `.v1` schema_ref values emitted by the northstar-question-resolution
+  skill with real `<name>.schema.yaml` filenames, author the matching schema files,
+  and register them so that `bin/verdify artifact validate` succeeds for the skill's
+  inventory, cluster map, and resolution register outputs. No formal module contract
+  exists for this package; the skill's governed source files and the schemas/ directory
+  are the contract surface for this lane.
+desired_outcome: 'The resolution-register template, question_inventory.rb, and cluster_questions.rb
+  emit `schema_ref` values matching real `schemas/northstar-question-inventory.schema.yaml`,
+  `schemas/northstar-question-cluster-map.schema.yaml`, and `schemas/northstar-question-resolution-register.schema.yaml`
+  files (each with `additionalProperties: false`, required fields, a `kind` const,
+  and a `schema_ref` const equal to its own filename per the scripts/validate-repo.rb:114
+  convention); the three new schemas are added to MANIFEST.sha256; SemanticValidator
+  has cases for the three new kinds; and `bin/verdify artifact validate` passes on
+  each produced artifact.'
+non_goals:
+- No formal module contract exists for this package; this lane does not create one.
+- Do not change the public CLI behavior or the schema-resolution logic in lib/verdify/cli.rb
+  (read for evidence only; owned by other lanes).
+- Do not extend scripts/validate-repo.rb's example-only schema_ref existence check
+  to skill assets (that CI-hardening change is owned by lane-validator-engine / lane-canonical-lifecycle);
+  coordinate rather than edit.
+- Do not alter the question-resolution skill's runtime logic or guidance beyond the
+  schema_ref values.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/qr-schemarefs
+module_contracts:
+- skills/northstar-question-resolution/
+- schemas/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - northstar-question-resolution skill artifacts and their schemas
+  owned_paths:
+  - skills/northstar-question-resolution/assets/resolution-register.template.yaml
+  - skills/northstar-question-resolution/scripts/question_inventory.rb
+  - skills/northstar-question-resolution/scripts/cluster_questions.rb
+  - schemas/northstar-question-inventory.schema.yaml
+  - schemas/northstar-question-cluster-map.schema.yaml
+  - schemas/northstar-question-resolution-register.schema.yaml
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - lib/verdify/semantic_validator.rb
+  - schemas/
+  - skills/northstar-question-resolution/
+  - MANIFEST.sha256
+  owned_interfaces:
+  - schema_ref contract for northstar-question-resolution inventory/cluster-map/resolution-register
+    artifacts
+dependencies:
+  hard: []
+  soft:
+  - lane_id: lane-platform-control-regrounding
+    coordination: Both lanes edit lib/verdify/semantic_validator.rb; coordinate the
+      added `when` cases for the three new NorthStarQuestion* kinds to avoid merge
+      conflicts.
+  - lane_id: lane-schema-contradictions
+    coordination: Both lanes add/modify files under schemas/; coordinate new schema
+      files to avoid overlapping edits.
+  - lane_id: lane-orphan-artifacts
+    coordination: Both lanes touch schemas/ and skills/; coordinate so the new schemas
+      are not flagged as orphaned and skill edits do not collide.
+  - lane_id: lane-prompt-injection-guidance
+    coordination: Both lanes edit files under skills/northstar-question-resolution/;
+      coordinate edits to avoid collisions.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The resolution-register template and both scripts emit `schema_ref` values
+    that are real `schemas/*.schema.yaml` filenames, and matching schema files exist
+    with additionalProperties:false, required fields, a kind const, and a schema_ref
+    const equal to their own filename.
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - diff of resolution-register.template.yaml, question_inventory.rb, cluster_questions.rb
+    showing updated schema_ref values
+  - the three new schemas/northstar-question-*.schema.yaml files
+- id: LANE-AC-02
+  statement: "`bin/verdify artifact validate` succeeds for each of the three produced
+    northstar-question-resolution artifacts, and SemanticValidator has cases for the
+    three new kinds."
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - captured `bin/verdify artifact validate` output printing `valid` for each artifact
+  - diff of lib/verdify/semantic_validator.rb adding the three new kind cases
+  - MANIFEST.sha256 entries for the three new schemas
+validation_commands:
+- id: vc-validate-template
+  command: ruby bin/verdify artifact validate --file skills/northstar-question-resolution/assets/resolution-register.template.yaml
+  purpose: Confirm the resolution-register template now resolves to a real schema
+    and validates.
+  required: true
+- id: vc-validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the schema_ref-const-equals-filename convention and repo invariants
+    hold for the new schemas.
+  required: true
+- id: vc-make-test
+  command: make test
+  purpose: Confirm the test suite passes after the schema_ref and semantic-validator
+    changes.
+  required: true
+required_evidence:
+- "`bin/verdify artifact validate` output printing `valid` for the inventory, cluster-map,
+  and resolution-register artifacts"
+- "`ruby scripts/validate-repo.rb` passing output"
+- "`make test` passing output"
+- diff showing updated schema_ref values, the three new schemas, MANIFEST.sha256 entries,
+  and SemanticValidator cases
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or schema-resolution change in lib/verdify/cli.rb
+  beyond the issue scope.
+- Catching this defect class in CI requires editing scripts/validate-repo.rb, which
+  is owned by another lane and must be coordinated rather than done here.
+- The required schema shape conflicts with the actual artifact fields the scripts
+  emit and cannot be reconciled within issue scope.
+definition_of_done:
+- Issue
+- Branch lane/qr-schemarefs pushed and a pull request opened, ready for the independent
+  critic.
+- "`ruby scripts/validate-repo.rb` and `make test` are green."
+- SemanticValidator cases added for the three new kinds and the new schemas registered
+  in MANIFEST.sha256.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

@@ -1,0 +1,112 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-eval-strategy
+title: Decide whether/how to add an executable eval runner for evaluations/*
+status: approved
+issue_ids:
+- 25
+coupling_justification: 
+objective: 'Produce an Architecture Decision Record (ADR) resolving issue #25: whether
+  to (a) build an executable eval runner (LLM-judge or assertion-DSL) with a fixture-backed
+  format and machine-checkable assertions wired into CI, or (b) re-scope the evaluations/*
+  packs as behavioral spec examples and document/rename them so they are not mistaken
+  for a quality gate. This is a decision lane; the only deliverable is the ADR. No
+  formal module contract exists for this package, so the lane is governed by its primary
+  cited file scripts/validate-repo.rb.'
+desired_outcome: 'A merged ADR under docs/decisions/ that states the chosen option,
+  its rationale, the implications for evaluations/* (19 packs, 46 entries), scripts/validate-repo.rb
+  validate_evaluations, and CI (make test / .github/workflows/validate.yml), and that
+  issue #25 references the ADR. No code or eval-pack changes are made in this lane.'
+non_goals:
+- No code changes in this lane (no runner/harness implementation, no edits to scripts/validate-repo.rb).
+- No edits to evaluations/* eval packs (no populating files[], no assertion rewrites).
+- No CI/workflow changes (.github/workflows/validate.yml, Makefile).
+- No formal module contract exists for this package; this lane does not author one.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-eval-strategy
+module_contracts:
+- scripts/validate-repo.rb
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Evaluation strategy / quality-gate decision
+  owned_paths:
+  - docs/decisions/ADR-0015-eval-runner-strategy.md
+  prohibited_paths:
+  - scripts/validate-repo.rb
+  - lib/verdify/cli.rb
+  - Makefile
+  - ".github/workflows/validate.yml"
+  coordination_required_paths:
+  - evaluations/
+  owned_interfaces: []
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: An ADR file docs/decisions/ADR-0011-*.md exists that chooses between
+    building an executable eval runner and re-scoping evaluations/* as behavioral
+    specs, with rationale and implications for scripts/validate-repo.rb, evaluations/*,
+    and CI.
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the merged ADR file under docs/decisions/.
+  - ADR text showing the chosen option, rationale, and affected-surfaces section.
+- id: LANE-AC-02
+  statement: 'Issue #25 references the ADR (and the ADR references issue #25), establishing
+    bidirectional traceability for the decision.'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - 'Issue #25 comment/body link to the ADR.'
+  - 'ADR body line referencing issue #25.'
+validation_commands:
+- id: adr-exists
+  command: ls docs/decisions/ADR-0011-*.md
+  purpose: Confirm the ADR deliverable file was created.
+  required: true
+- id: adr-references-issue
+  command: grep -l '#25' docs/decisions/ADR-0011-*.md
+  purpose: 'Confirm the ADR references issue #25 for traceability.'
+  required: true
+- id: repo-validate
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the repository structural validator still passes after adding the
+    ADR.
+  required: true
+required_evidence:
+- Absolute path to the new ADR file under docs/decisions/.
+- Output of ruby scripts/validate-repo.rb showing a green run.
+- 'Link/reference proving issue #25 and the ADR cross-reference each other.'
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on the chosen option (build runner vs. re-scope) and the
+  decision needs a human gate.
+- The decision would require code/schema/CI changes beyond an ADR, exceeding this
+  decision lane's scope.
+definition_of_done:
+- 'ADR-0011 merged under docs/decisions/ resolving issue #25 with the chosen option
+  and rationale.'
+- 'Issue #25 references the ADR and the ADR references issue #25.'
+- Branch lane/dec-eval-strategy pushed and PR opened, ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

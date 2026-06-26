@@ -1,0 +1,154 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-repo-bootstrap-skill
+title: Repo-bootstrap lifecycle skill (self-discovery packet, AGENTS update, gap PR
+  loop)
+status: approved
+issue_ids:
+- 1
+coupling_justification: 
+objective: Build a reusable repo-bootstrap lifecycle skill in verdify-skills as a
+  facade over the existing lifecycle skills (project-router, repo-hygiene, platform-readiness,
+  northstar-planning, controller-loop). The skill drives repo + runtime self-discovery,
+  proposes an AGENTS.md delta, emits a durable bootstrap packet (repo inventory, runtime
+  inventory, credential-reference inventory, KPI proposal, gap backlog, route recommendation),
+  records named open questions, and opens a gap backlog/PR via the GitHub control
+  plane. A new output schema backs the packet and a validation fixture proves output
+  without live cluster or secret access.
+desired_outcome: A skills/repo-bootstrap/ skill (SKILL.md + references + assets/fixture),
+  a repo-bootstrap output schema under schemas/, and lifecycle wiring in config/lifecycle.yaml
+  so the bootstrap route is discoverable. validate-repo.rb and make test pass; the
+  fixture validates against the new schema; secret handling reports only location/auth-mode/validation-status
+  and never raw values.
+non_goals:
+- No formal module contract exists for this package; this lane treats skills/repo-bootstrap/
+  and the new schema as the primary governed surface and does not introduce a module-contract
+  artifact.
+- Do not duplicate or fork the existing lifecycle skills; compose them as a facade.
+- Do not implement runtime data collection or controller pod APIs (those live in jvallery/agents).
+- Do not print, commit, or log raw secret values; only credential references are in
+  scope.
+- Do not edit other lanes' hot files (lib/verdify/cli.rb, scripts/validate-repo.rb,
+  lib/verdify/semantic_validator.rb, route-decision artifacts).
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/repo-bootstrap-skill
+module_contracts:
+- skills/repo-bootstrap/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - lifecycle-skills
+  - repo-bootstrap
+  owned_paths:
+  - skills/repo-bootstrap/
+  - schemas/repo-bootstrap.schema.yaml
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - lib/verdify/semantic_validator.rb
+  - ".agent-workflow/router/route-decision.yaml"
+  coordination_required_paths:
+  - AGENTS.md
+  - MANIFEST.sha256
+  - schemas/route-decision.schema.yaml
+  - config/lifecycle.yaml
+  owned_interfaces:
+  - repo-bootstrap output packet schema (schemas/repo-bootstrap.schema.yaml)
+  - repo-bootstrap lifecycle route entry in config/lifecycle.yaml
+dependencies:
+  hard:
+  - lane_id: lane-dec-platform-reconciliation
+    required_output: platform-reconciliation ADR
+  - lane_id: lane-dec-authority-boundaries
+    required_output: authority-boundary ADR
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: A repo-bootstrap skill exists and explicitly composes project-router,
+    repo-hygiene, platform-readiness, northstar-planning, and controller-loop as a
+    facade rather than a parallel methodology.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - skills/repo-bootstrap/SKILL.md naming each composed skill
+  - validate-repo.rb output showing the new skill validates
+- id: LANE-AC-02
+  statement: A repo-bootstrap output schema captures repo inventory, runtime inventory,
+    credential-reference inventory, AGENTS.md delta, KPI proposal, gap backlog, and
+    route recommendation; secret handling reports only location/auth-mode/validation-status,
+    never raw values.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - schemas/repo-bootstrap.schema.yaml
+  - validation run of the fixture against the schema
+- id: LANE-AC-03
+  statement: A durable bootstrap packet template plus a validation fixture demonstrate
+    bootstrap output without live cluster or secret access, and the skill records
+    open questions for namespace naming, domain-agent authority, route/DNS ownership,
+    storage mounts, and runtime-image packages.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - skills/repo-bootstrap/assets fixture file
+  - artifact validate output showing the fixture is valid
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the new skill, schema, and lifecycle wiring satisfy repo-wide structural
+    and reference checks.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the full schema-validator, CLI, PR-policy, and npm-install test suites
+    to confirm no regressions.
+  required: true
+- id: validate-fixture
+  command: ruby bin/verdify artifact validate --file skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml
+    --schema schemas/repo-bootstrap.schema.yaml
+  purpose: Prove the bootstrap output fixture validates against the new repo-bootstrap
+    schema without live cluster or secret access.
+  required: true
+required_evidence:
+- skills/repo-bootstrap/SKILL.md composing the five named lifecycle skills as a facade
+- schemas/repo-bootstrap.schema.yaml covering the required inventory/delta/KPI/gap/route
+  sections
+- A repo-bootstrap fixture under skills/repo-bootstrap/assets that validates against
+  the schema
+- validate-repo.rb and make test passing on the lane branch
+- Open-questions section enumerating namespace naming, domain-agent authority, route/DNS
+  ownership, storage mounts, runtime-image packages
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- 'The fix requires a public interface or schema change beyond issue #1 scope (e.g.
+  altering shared schemas or route-decision contracts owned by other lanes).'
+- The hard-dependency ADRs (platform-reconciliation, authority-boundary) land with
+  a controller ownership or authority boundary that contradicts the bootstrap facade
+  composition.
+- Implementing the runtime inventory requires touching jvallery/agents runtime contracts
+  not present in this package.
+definition_of_done:
+- 'Issue #1 acceptance criteria satisfied with cited evidence in the closeout.'
+- Hard-dependency ADRs from lane-dec-platform-reconciliation and lane-dec-authority-boundaries
+  are available and the facade composition is consistent with them.
+- Lane branch pushed and a pull request is ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green, and the fixture validates
+  against the new schema.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

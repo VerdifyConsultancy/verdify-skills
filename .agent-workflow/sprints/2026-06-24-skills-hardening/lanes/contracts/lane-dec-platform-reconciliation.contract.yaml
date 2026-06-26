@@ -1,0 +1,114 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-platform-reconciliation
+title: 'ADR: package<->platform skill-system reconciliation (loop-state/consensus-review/control
+  dispatch)'
+status: approved
+issue_ids:
+- 36
+coupling_justification: 
+objective: 'Produce an Architecture Decision Record that defines the ownership and
+  integration boundary between verdify-skills and the jvallery/agents platform Skills
+  Fleet (epic #1836), resolving how durable controller state (session-ledger vs loop-state),
+  review (review-inbox-packet vs consensus-review/PR-native), and control dispatch
+  (agent-platform-control-request vs dashboard/MCP add_worktree_agent) are owned and
+  reconciled, and resolving NSQ-007. No formal module contract exists for this package;
+  the ADR governs files under docs/decisions/ only.'
+desired_outcome: 'A merged ADR under docs/decisions/ that documents the package<->platform
+  skill-system boundary, states which system is authoritative for loop-state/consensus-review/control
+  dispatch, prescribes the mapping or planning-layer scoping for each divergent artifact,
+  resolves NSQ-007, and is referenced from issue #36.'
+non_goals:
+- No code changes in this lane; the deliverable is an ADR document, not implementation.
+- Does not edit skills/controller-loop, skills/release-verification, sprint-orchestrator,
+  or any schema.
+- Does not implement the session-ledger->loop-state or review-inbox->consensus-report
+  mappings; it only decides and documents the boundary.
+- No formal module contract exists for this package; this lane introduces none.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-platform-reconciliation
+module_contracts:
+- docs/decisions/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - decision-records
+  - package-platform-boundary
+  owned_paths:
+  - docs/decisions/ADR-0016-package-platform-skill-reconciliation.md
+  prohibited_paths:
+  - skills/controller-loop/SKILL.md
+  - skills/release-verification/SKILL.md
+  - schemas/session-ledger.schema.yaml
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+  owned_interfaces:
+  - docs/decisions/ADR-00NN-platform-reconciliation.md
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'A new ADR exists under docs/decisions/ that documents the verdify-skills<->platform
+    Skills Fleet ownership boundary (loop-state vs session-ledger, consensus-review/PR
+    vs review-inbox-packet, MCP add_worktree_agent vs agent-platform-control-request),
+    resolves NSQ-007, and is referenced from issue #36.'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the new docs/decisions/ADR-00NN-*.md file
+  - 'Link or comment showing issue #36 references the ADR'
+  - Quoted ADR section stating the authoritative system for each divergent artifact
+    and the NSQ-007 resolution
+validation_commands:
+- id: VC-01
+  command: ls docs/decisions/ADR-00*-platform-reconciliation.md
+  purpose: Confirm the decision deliverable ADR file exists under docs/decisions/.
+  required: true
+- id: VC-02
+  command: grep -l 'NSQ-007' docs/decisions/ADR-00*-platform-reconciliation.md
+  purpose: Confirm the ADR resolves NSQ-007 and names the platform contracts (loop-state/consensus-review).
+  required: true
+- id: VC-03
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the repository still validates after adding the ADR.
+  required: true
+required_evidence:
+- Path to the new docs/decisions/ADR-00NN-platform-reconciliation.md
+- Output of ls/grep validation commands showing the ADR exists and resolves NSQ-007
+- 'Evidence that issue #36 references the merged ADR'
+- ruby scripts/validate-repo.rb output showing the repo still validates
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on which system is authoritative for loop-state, consensus-review,
+  or control dispatch.
+- Resolving the boundary requires a code/schema change beyond a documentation decision
+  (escalate to a follow-up code lane/issue).
+- NSQ-007 cannot be resolved at the skills-repo layer and requires a North Star planning
+  decision by a human reviewer.
+definition_of_done:
+- 'Issue #36 acceptance is satisfied with evidence: the ownership boundary is decided
+  and documented in an ADR.'
+- 'The ADR is merged under docs/decisions/ and issue #36 references it.'
+- Branch pushed and PR ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

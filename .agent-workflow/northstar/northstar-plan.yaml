@@ -4,7 +4,7 @@ kind: NorthStarPlan
 schema_version: '1.0'
 project_id: verdify-skills
 status: proposed
-generated_at: '2026-06-23T19:30:23Z'
+generated_at: '2026-06-24T17:04:58Z'
 sources:
 - id: SRC-001
   type: repository_doc
@@ -186,6 +186,21 @@ sources:
   location: current planning feedback 2026-06-23
   summary: Jason requested that the North Star include a scope and responsibilities model for each repo-associated agent, tied to exploration/discovery and represented by a reusable template.
   evidence_status: reported
+- id: SRC-037
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-sdlc-best-practices.yaml
+  summary: Reported agentic-loop and SDLC best-practices evidence supporting bounded planner-executor-validator loops, validation, repair, stop conditions, budget/rate controls, tool-call telemetry, reproducible runtime bundles, incident response, content trust, and provenance.
+  evidence_status: reported
+- id: SRC-038
+  type: northstar_design_artifact
+  location: .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md
+  summary: Observed adversarial audit of all 19 lifecycle skills against the agentic-loop baseline, including compliant controls, drift, missing capabilities, SDLC chaining, platform baseline, and issue map.
+  evidence_status: observed
+- id: SRC-039
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-audit-closeout.yaml
+  summary: Reported closeout evidence that the prior audit updated North Star drafts, created platform issues #1995-#2000, passed validation, and left the route in northstar-planning artifact-loop pending signoff.
+  evidence_status: reported
 goals:
 - id: NSG-001
   statement: Turn registered research, ideation, transcript input, feedback, and requirements into durable North Star planning artifacts before implementation planning.
@@ -348,6 +363,13 @@ goals:
   success_signals:
   - '`schemas/repo-agent-scope.schema.yaml` validates the repo-agent scope contract.'
   - Repo hygiene/bootstrap can create `.agent-workflow/hygiene/repo-agent-scope.yaml` from a reusable template before a controller claims operational ownership.
+- id: NSG-024
+  statement: Make every applicable lifecycle skill consume a shared bounded agentic-loop control contract before broad autonomous use.
+  priority: must
+  source_ids: [SRC-037, SRC-038, SRC-039]
+  success_signals:
+  - '`VerdifyConsultancy/verdify-skills#43` tracks package-wide skill adoption of the loop contract.'
+  - Every applicable skill records objective/scope, evidence, plan, permissions, execution, observation, validation, repair, stop/budget, telemetry, content trust, provenance, and handoff.
 requirements:
 - id: NSR-005
   kind: functional
@@ -552,6 +574,15 @@ requirements:
   - '`schemas/repo-agent-scope.schema.yaml` defines repository identity, scope, ownership, responsibilities, authority boundaries, discovery inputs, runtime context, escalation paths, review, handoff, and approval.'
   - '`skills/repo-hygiene/assets/repo-agent-scope.template.yaml` provides a starter artifact for target repositories.'
   - '`skills/repo-hygiene/references/repo-agent-scope.md` defines completion and safety rules.'
+- id: NSR-028
+  kind: non_functional
+  statement: Every applicable Verdify lifecycle skill must include or reference a shared bounded agentic-loop control contract.
+  source_ids: [SRC-037, SRC-038, SRC-039]
+  acceptance_signals:
+  - '`VerdifyConsultancy/verdify-skills#43` remains the GitHub backlog anchor for package-wide skill adoption.'
+  - All 19 current `skills/*/SKILL.md` files are audited against the shared contract and either consume it or record a justified no-op.
+  - The contract covers objective/scope, evidence, plan, authority and permissions, execution, observation, validation, repair, stop/budget, telemetry, reproducibility/runtime bundle dependency, content trust, provenance, and handoff.
+  - Platform-dependent controls link to `jvallery/agents#1995`-`#2000` rather than being silently assumed.
 user_stories:
 - id: NSS-001
   actor: Jason
@@ -691,6 +722,12 @@ user_stories:
   acceptance_signal: '`repo-agent-scope.yaml` validates and links the agent charter to discovery evidence, GitHub authority, AGENTS.md, platform boundaries, review, and handoff.'
   requirement_ids: [NSR-027, NSR-022, NSR-024]
   source_ids: [SRC-034, SRC-036]
+- id: NSS-024
+  actor: Lifecycle skill author
+  story: As a skill author or maintainer, I can apply one shared bounded-loop contract to a skill instead of rediscovering objective, evidence, validation, repair, stop, telemetry, and handoff rules per skill.
+  acceptance_signal: Each applicable skill either references the shared contract or records a reviewed no-op, and package validation still passes.
+  requirement_ids: [NSR-028]
+  source_ids: [SRC-037, SRC-038, SRC-039]
 architecture_principles:
 - id: NSP-001
   statement: North Star planning artifacts are durable `.agent-workflow` records, not hidden chat state.
@@ -836,6 +873,12 @@ architecture_principles:
   linked_goal_ids: [NSG-023, NSG-019]
   linked_requirement_ids: [NSR-027, NSR-022, NSR-024]
   source_ids: [SRC-034, SRC-036]
+- id: NSP-025
+  statement: Lifecycle skills share one bounded agentic-loop contract, with platform-dependent controls linked to platform backlog rather than assumed.
+  purpose: Prevents each skill from inventing different stop, validation, repair, telemetry, content-trust, budget, and handoff rules while preserving clear dependency boundaries with Agent Platform.
+  linked_goal_ids: [NSG-024]
+  linked_requirement_ids: [NSR-028]
+  source_ids: [SRC-037, SRC-038, SRC-039]
 milestones:
 - id: NSM-001
   name: North Star planning loop implemented
@@ -970,6 +1013,11 @@ risks:
   impact: A controller might mutate paths, credentials, namespaces, storage, routes, or GitHub state outside its intended authority.
   mitigation: Require a validated `repo-agent-scope.yaml` before operational ownership; route missing or overbroad authority through platform/security or repo-owner review.
   source_ids: [SRC-034, SRC-036]
+- id: NSK-016
+  statement: Lifecycle skills could drift from the agentic-loop baseline if each skill encodes loop controls independently.
+  impact: Workers, critics, readiness checks, and release verifiers could disagree on validation, repair, stop, telemetry, content-trust, budget, or handoff behavior.
+  mitigation: Use `VerdifyConsultancy/verdify-skills#43` to add or reference one shared bounded-loop contract across all applicable skills, with platform-dependent controls linked to platform issues.
+  source_ids: [SRC-037, SRC-038, SRC-039]
 adversarial_findings:
 - id: ADV-001
   perspective: architect
@@ -1026,6 +1074,11 @@ adversarial_findings:
   finding: A daily Orbit brief is valuable as a cross-repo operating surface, but it must remain a summary over authoritative records rather than an approval channel.
   disposition: accepted
   owner: Orbit/platform owner
+- id: ADV-012
+  perspective: maintainer
+  finding: Filing platform runtime issues is not enough; the skills package also needs its own shared loop-control contract so lifecycle skills do not silently assume platform controls or diverge from each other.
+  disposition: accepted
+  owner: Skills maintainer
 open_questions:
 - id: NSQ-001
   question: 'What approval rule applies to protected North Star changes? Resolved for this loop: final lock approval to proceed to the next milestone is the only North Star planning gate.'
@@ -1407,6 +1460,24 @@ traceability:
 - from: NSR-027
   to: NSM-007
   relationship: adds repo-agent scope to fleet bootstrap readiness
+- from: SRC-037
+  to: NSR-028
+  relationship: supports the shared bounded agentic-loop contract requirement
+- from: SRC-038
+  to: NSR-028
+  relationship: records the per-skill audit that identified shared loop-control drift and missing controls
+- from: SRC-039
+  to: NSR-028
+  relationship: records closeout evidence and backlog reconciliation need for skill adjustments
+- from: NSG-024
+  to: NSP-025
+  relationship: drives the shared lifecycle-skill loop-control principle
+- from: NSR-028
+  to: NSS-024
+  relationship: supports the lifecycle skill author adoption story
+- from: NSR-028
+  to: VerdifyConsultancy/verdify-skills#43
+  relationship: is tracked by the created package-wide skill adjustment issue
 proposed_artifact_changes:
 - path: skills/northstar-research-ingest
   change_type: create
@@ -1538,7 +1609,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/release-verification/SKILL.md
   change_type: update
-  summary: Add review inbox packet mode to release-verification without changing the 17-skill kernel.
+  summary: Add review inbox packet mode to release-verification without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: .agent-workflow/northstar/SDLC_SKILL_DESIGN.md
   change_type: update
@@ -1562,7 +1633,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/sprint-planning/SKILL.md
   change_type: update
-  summary: Add wave release planning to the sprint-planning transaction without changing the 17-skill kernel.
+  summary: Add wave release planning to the sprint-planning transaction without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: schemas/observability-diagnostic-packet.schema.yaml
   change_type: create
@@ -1602,7 +1673,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/controller-loop/SKILL.md
   change_type: update
-  summary: Add validated session-ledger ownership to the controller-loop procedure without changing the 17-skill kernel.
+  summary: Add validated session-ledger ownership to the controller-loop procedure without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: schemas/agent-platform-control-request.schema.yaml
   change_type: create
@@ -1622,7 +1693,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/platform-readiness/SKILL.md
   change_type: update
-  summary: Add optional Agent Platform control request validation to platform-readiness without changing the 17-skill kernel.
+  summary: Add optional Agent Platform control request validation to platform-readiness without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: schemas/github-backlog-sync.schema.yaml
   change_type: create
@@ -1642,7 +1713,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/state-of-union/SKILL.md
   change_type: update
-  summary: Add optional GitHub backlog sync validation to state-of-union without changing the 17-skill kernel.
+  summary: Add optional GitHub backlog sync validation to state-of-union without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: schemas/environment-gitops-reconciliation.schema.yaml
   change_type: create
@@ -1662,7 +1733,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/platform-readiness/SKILL.md
   change_type: update
-  summary: Add optional environment GitOps reconciliation validation to platform-readiness without changing the 17-skill kernel.
+  summary: Add optional environment GitOps reconciliation validation to platform-readiness without expanding the 18-lifecycle-skill kernel.
   approval_required: false
 - path: schemas/gravity-core-extraction-plan.schema.yaml
   change_type: create
@@ -1682,7 +1753,7 @@ proposed_artifact_changes:
   approval_required: false
 - path: skills/gravity-readiness/SKILL.md
   change_type: update
-  summary: Add optional Gravity core extraction plan validation to gravity-readiness without changing the 17-skill kernel or authorizing implementation.
+  summary: Add optional Gravity core extraction plan validation to gravity-readiness without expanding the 18-lifecycle-skill kernel or authorizing implementation.
   approval_required: false
 - path: .agent-workflow/northstar/collateral/NSE-20260623-repo-controller-bootstrap-self-discovery.yaml
   change_type: create
@@ -1724,7 +1795,31 @@ proposed_artifact_changes:
   change_type: update
   summary: Tie repo hygiene/bootstrap to the repo-agent scope contract when a controller or long-lived agent is assigned.
   approval_required: false
+- path: .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-audit-closeout.yaml
+  change_type: create
+  summary: Register the audit closeout and validation summary as North Star evidence for this planning turn.
+  approval_required: false
+- path: .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md
+  change_type: update
+  summary: Link the audit to `VerdifyConsultancy/verdify-skills#43` as the skills-side backlog anchor for the shared bounded loop contract.
+  approval_required: false
+- path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  change_type: update
+  summary: Add the shared skill loop-control surface and link PRQ-030 to `VerdifyConsultancy/verdify-skills#43`.
+  approval_required: true
+- path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  change_type: update
+  summary: Add ARQ-029 and IFACE-021 for the shared lifecycle-skill loop-control contract.
+  approval_required: true
+- path: .agent-workflow/northstar/northstar-artifacts.yaml
+  change_type: update
+  summary: Increment the loop iteration, request human review, reconcile the 18-lifecycle-plus-one-standalone skill count, and cross-link the closeout evidence, PRQ-030, ARQ-029, IFACE-021, and issue #43.
+  approval_required: true
 issue_recommendations:
+- title: Apply shared bounded agentic-loop control contract across Verdify lifecycle skills
+  repository: VerdifyConsultancy/verdify-skills
+  body_summary: Created as VerdifyConsultancy/verdify-skills#43. Audit all 19 lifecycle skills against the shared loop-control contract and make each applicable skill include or reference objective/scope, evidence, plan, permissions, execution, observation, validation, repair, stop/budget, telemetry, reproducibility/runtime bundle dependency, content trust, provenance, and handoff controls.
+  labels: ["type:problem", "risk:high"]
 - title: Approve North Star planning loop authority and handoff
   repository: VerdifyConsultancy/verdify-skills
   body_summary: Record the final lock approval or changes-requested feedback for the review-ready product and architecture North Star.
@@ -1780,7 +1875,7 @@ issue_recommendations:
 gate_recommendations:
 - type: northstar
   owner: Jason and James
-  reason: Final lock approval remains required before downstream lifecycle skills treat the North Star as authority; the current iteration is back in artifact-loop after the June 23 Brave, live-state, and contract-hardening research passes.
+  reason: Final lock approval remains required before downstream lifecycle skills treat the North Star as authority; the current iteration is review-requested after the June 24 agentic-loop audit, platform issue map, and skill-count reconciliation pass.
   blocking: true
 - type: gravity_readiness
   owner: Jason and James
@@ -1796,8 +1891,8 @@ gate_recommendations:
   blocking: true
 handoff:
   next_skill: northstar-planning
-  next_mode: artifact-loop
-  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, first repo-agent scope contract, and repo-controller bootstrap walk evidence have been synthesized into product, architecture, SDLC design, schemas, examples, and structured plan artifacts; continue artifact-loop review before requesting final lock approval.
+  next_mode: human-review
+  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, first repo-agent scope contract, repo-controller bootstrap walk evidence, agentic-loop audit, platform issue map, and skills-side loop-contract issue #43 have been synthesized into product, architecture, SDLC design, schemas, examples, and structured plan artifacts; the North Star packet is ready for Jason and James to approve, request changes, or reject before final lock.
 approval:
   status: pending
   approver: null

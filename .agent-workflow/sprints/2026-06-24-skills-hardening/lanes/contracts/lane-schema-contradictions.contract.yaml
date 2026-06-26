@@ -1,0 +1,138 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-schema-contradictions
+title: Resolve schema/contract contradictions that force schema-invalid happy-path
+  artifacts
+status: approved
+issue_ids:
+- 28
+coupling_justification: 
+objective: 'Reconcile each reference-doc/template-vs-schema contradiction in issue
+  #28 to a single canonical value so an agent following the authoritative reference
+  or shipped template produces YAML that passes the validation the skill mandates:
+  (1) planning-contract disposition final_lock_required -> gate_required and surface
+  gate_required semantics; (2) transcript-replan affected_skill_or_lane field reconciled
+  (add optional schema property or drop from routing-contract.md); (3) critic-report
+  acceptance_assessment template/scaffold made schema-valid (relax minItems to 0 with
+  sanctioned no-criteria path, or ship a valid placeholder item); (4) project-definition
+  SKILL.md ID prefix list extended with ASM/CON/CST/MET/SURF. No formal module contract
+  exists for these schema/skill assets; the schema files and their governing reference
+  docs/templates are the governed surface.'
+desired_outcome: Every cited reference doc, SKILL.md ID list, and shipped *.template.yaml
+  asset is mutually consistent with its governing schema, and a new scripts/validate-repo.rb
+  check fails on any future enum/ID-prefix drift and on any shipped template that
+  does not validate against its own schema.
+non_goals:
+- No formal module contract exists for these schema/skill assets; this lane defines
+  none.
+- 'No changes to unrelated schemas, skills, or templates not named in issue #28.'
+- No semantic redesign of the disposition lifecycle, traceability model, or critic
+  workflow beyond reconciling the four named contradictions.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/schema-contradictions
+module_contracts:
+- schemas/northstar-plan.schema.yaml
+- schemas/transcript-replan.schema.yaml
+- schemas/critic-report.schema.yaml
+- schemas/project-definition.schema.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Lifecycle artifact schemas
+  - Skill reference contracts and shipped templates
+  owned_paths:
+  - schemas/northstar-plan.schema.yaml
+  - schemas/transcript-replan.schema.yaml
+  - schemas/critic-report.schema.yaml
+  - schemas/project-definition.schema.yaml
+  - skills/northstar-planning/references/planning-contract.md
+  - skills/transcript-replan/references/routing-contract.md
+  - skills/independent-critic/assets/critic-report.template.yaml
+  - skills/project-definition/SKILL.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  coordination_required_paths:
+  - scripts/validate-repo.rb
+  owned_interfaces:
+  - northstar-plan disposition enum
+  - transcript-replan item schema
+  - critic-report acceptance_assessment contract and template default
+  - project-definition canonical ID prefixes
+dependencies:
+  hard: []
+  soft:
+  - lane_id: lane-orphan-artifacts
+    coordination: Both lanes touch schemas/ and scripts/validate-repo.rb; coordinate
+      schema edits and any new validate-repo.rb checks so the two lanes' additions
+      to the validator and schema set do not conflict at integration.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'Each of the four contradictions in issue #28 is reconciled so the documented
+    happy-path value (disposition, transcript-replan item field, critic-report acceptance_assessment,
+    project-definition ID prefixes) validates against its governing schema, and the
+    critic-report template ships a schema-valid default.'
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - Diff showing each reconciled reference doc / SKILL.md / template / schema pair.
+  - Validation output showing the shipped critic-report template validates against
+    critic-report.schema.yaml.
+- id: LANE-AC-02
+  statement: scripts/validate-repo.rb gains a check that every enum/disposition value
+    and required ID prefix referenced in a reference doc or shipped template exists
+    in the corresponding schema, and that shipped *.template.yaml assets validate
+    against their own schema; the check passes on the fixed tree.
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - ruby scripts/validate-repo.rb output showing the new check present and passing.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repo-wide schema/reference/template consistency including the new
+    drift check.
+  required: true
+- id: tests
+  command: make test
+  purpose: Confirm the test suite passes after schema and validator changes.
+  required: true
+- id: critic-template-validates
+  command: ruby bin/verdify artifact validate --file skills/independent-critic/assets/critic-report.template.yaml
+  purpose: Confirm the shipped critic-report template validates against its schema.
+  required: true
+required_evidence:
+- Diffs for each reconciled doc/template/schema pair.
+- ruby scripts/validate-repo.rb passing output.
+- make test passing output.
+- Validation output for the critic-report template against critic-report.schema.yaml.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- 'The fix requires a public interface or schema change beyond the scope of issue
+  #28 (e.g. broad redesign of the disposition lifecycle or traceability ID model).'
+- Reconciling a pair would force a breaking change to artifacts already produced by
+  other lanes.
+definition_of_done:
+- 'Issue #28 acceptance satisfied with evidence for all four contradictions plus the
+  validate-repo.rb check.'
+- Branch pushed and a pull request opened and ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- The shipped critic-report template validates against critic-report.schema.yaml.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

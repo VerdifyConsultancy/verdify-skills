@@ -1,0 +1,26 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: local-dispatch-fallback-2026-06-24-skills-hardening
+sprint_id: 2026-06-24-skills-hardening
+lane_id: null
+type: policy_exception
+status: approved
+question: >-
+  Authorize the sprint-orchestrator to dispatch lane workers via LOCAL git worktrees + tmux + codex sessions
+  (surfaced in iTerm2 for follow-along) instead of the default Agent Platform MCP/API path, for this sprint?
+owner: skills-maintainer
+evidence_required:
+  - "Agent Platform MCP create-session path is unreachable from this operator machine (see issue #12: the runbook targets agent_platform.session.* tools that do not exist; real platform create path is in-pod only)."
+  - "Operator directive on 2026-06-24 to kick off worktree lanes + tmux sessions in iTerm2."
+  - "Lane isolation preserved: one leased worktree + one codex session per lane via bin/verdify lane create."
+allowed_decisions: [approve, reject]
+decision: approve
+rationale: >-
+  The approved execution path (Agent Platform MCP) cannot create sessions from this laptop, and the operator
+  explicitly directed local worktree/tmux/iTerm2 dispatch for follow-along. Local dispatch keeps the lane lease,
+  one-session-per-worktree, branch, and PR discipline intact; workers still deliver through PRs and a fresh critic.
+  Scoped to sprint 2026-06-24-skills-hardening only.
+opened_at: "2026-06-24T17:00:00Z"
+resolved_at: "2026-06-24T17:00:00Z"
+resume_state: ORCHESTRATE

@@ -1,0 +1,159 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-skill-count-drift
+title: Reconcile skill-count and ADR-index drift across North Star, ADRs, research,
+  and CHANGELOG
+status: approved
+issue_ids:
+- 19
+coupling_justification: 
+objective: Run one reconciliation sweep so every skill-count reference in the North
+  Star planning authority, the ADR consequence lines, the ADR/decision index, the
+  research-alignment doc, and the CHANGELOG agrees with the validated package count
+  (eighteen lifecycle skills + one standalone issue-triage = 19 reported by scripts/validate-repo.rb),
+  and so every shipped skill (notably northstar-question-resolution and controller-loop)
+  and every accepted ADR (ADR-0009, ADR-0010) is traced to a requirement and listed
+  in the ADR index.
+desired_outcome: PRQ-007/ARQ-007/ARCH-004 and every per-ADR consequence line state
+  the "eighteen lifecycle + one standalone" framing already adopted in README.md,
+  WORKFLOW.md, and docs/lifecycle.md; ARCH-010 ADR index includes ADR-0009 and ADR-0010;
+  northstar-question-resolution and controller-loop each map to a PRQ/ARQ traceability
+  row; docs/research/industry-alignment.md counts both added loops; and CHANGELOG.md
+  appends entries for the additive skills/ADRs while leaving the frozen 1.0.0 historical
+  line in place. No surface remains self-falsifying against scripts/validate-repo.rb.
+non_goals:
+- No code changes to scripts/validate-repo.rb in this lane; the optional drift-guard
+  CI check is owned by lane-canonical-lifecycle and out of scope here.
+- No changes to the actual skill set, lifecycle order, or config/lifecycle.yaml.
+- No edits to README.md, WORKFLOW.md, or docs/lifecycle.md beyond confirming their
+  framing is the reconciliation target.
+- No formal module contract exists for this documentation-only package; the governed
+  surfaces are the North Star, ADR, research, and changelog markdown files listed
+  below.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/skill-count-drift
+module_contracts:
+- ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+- ".agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - North Star planning-authority artifacts
+  - ADR set and decision index
+  - Research alignment and changelog narrative
+  owned_paths:
+  - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+  - ".agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+  - docs/research/industry-alignment.md
+  - docs/decisions/ADR-0004-readiness-loop-skills.md
+  - docs/decisions/ADR-0005-northstar-planning-loop.md
+  - docs/decisions/ADR-0006-northstar-evidence-registry.md
+  - docs/decisions/ADR-0008-northstar-interview-skill.md
+  - docs/decisions/ADR-0009-northstar-question-resolution-skill.md
+  - docs/decisions/ADR-0010-comprehensive-planning-review-loop.md
+  - CHANGELOG.md
+  prohibited_paths:
+  - scripts/validate-repo.rb
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  - config/lifecycle.yaml
+  coordination_required_paths:
+  - README.md
+  - WORKFLOW.md
+  - docs/lifecycle.md
+  owned_interfaces: []
+dependencies:
+  hard: []
+  soft:
+  - lane_id: lane-canonical-lifecycle
+    coordination: Both lanes touch documented skill counts; lane-canonical-lifecycle
+      makes config/lifecycle.yaml the single source and may add a validator drift-guard.
+      Align on the canonical count (19 reported / eighteen lifecycle + one standalone)
+      and on whether the validator enforces it so this lane's reconciled docs do not
+      contradict its source-of-truth or CI check.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: Every skill-count reference in NORTHSTAR_PRODUCT.md (PRQ-007 and the
+    ARCH-004 mapping) and NORTHSTAR_ARCHITECTURE.md (ARQ-007, ARCH-004 component list,
+    traceability) states the validated 'eighteen lifecycle + one standalone' framing
+    matching scripts/validate-repo.rb (19), and every per-ADR consequence line (ADR-0004/0005/0006/0008/0009)
+    agrees.
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff of the North Star and ADR files showing each 'seventeen'/'eighteen'/'eight'/'nine'
+    count reconciled to the validated framing.
+  - grep output over .agent-workflow/northstar and docs/decisions showing no surviving
+    stale 'seventeen'-skill assertion.
+- id: LANE-AC-02
+  statement: ARCH-010 ADR index lists ADR-0009 and ADR-0010; northstar-question-resolution
+    and controller-loop each map to a PRQ/ARQ traceability row; docs/research/industry-alignment.md
+    counts both added loops; and CHANGELOG.md appends additive skill/ADR entries with
+    the frozen 1.0.0 line preserved.
+  sprint_acceptance_ids:
+  - SPR-AC-06
+  evidence_required:
+  - Diff showing ADR-0009/ADR-0010 rows in ARCH-010 and new PRQ/ARQ rows for northstar-question-resolution
+    and controller-loop.
+  - grep showing northstar-question-resolution and controller-loop now present in
+    NORTHSTAR_PRODUCT.md/NORTHSTAR_ARCHITECTURE.md and industry-alignment.md, plus
+    the appended CHANGELOG entries.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the package still validates (19 skills, 40 schemas) and the edited
+    artifacts pass repository validation.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the full test/eval suite to confirm no regression from the documentation
+    edits.
+  required: true
+- id: no-stale-count
+  command: grep -rn 'seventeen' .agent-workflow/northstar docs/decisions docs/research
+    CHANGELOG.md
+  purpose: 'Confirm no stale ''seventeen''-skill assertion survives in the governed
+    surfaces (expected: no skill-count match).'
+  required: true
+required_evidence:
+- Output of `ruby scripts/validate-repo.rb` showing the validated skill count and
+  passing run.
+- Output of `make test` showing a green suite.
+- grep evidence that no stale skill count survives and that the two previously-untraced
+  skills and two untraced ADRs now appear in the North Star and index.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The reconciliation requires changing config/lifecycle.yaml or scripts/validate-repo.rb
+  (a prohibited path owned by lane-canonical-lifecycle) to make the counts agree,
+  rather than editing documentation alone.
+- lane-canonical-lifecycle selects a different canonical skill count/framing than
+  'eighteen lifecycle + one standalone (19)', requiring this lane's target framing
+  to change.
+- A shipped skill or accepted ADR has no defensible requirement to trace it to, requiring
+  a North Star requirement decision beyond the issue scope.
+definition_of_done:
+- 'Issue #19 acceptance is satisfied with diff and grep evidence for both LANE-AC-01
+  and LANE-AC-02.'
+- ruby scripts/validate-repo.rb and make test are green on the lane branch.
+- Branch lane/skill-count-drift is pushed and a PR is open and ready for the independent
+  critic.
+- Coordination with lane-canonical-lifecycle on the canonical count is recorded in
+  the PR or lane evidence.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

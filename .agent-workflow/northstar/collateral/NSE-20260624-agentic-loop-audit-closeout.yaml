@@ -1,0 +1,42 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260624-agentic-loop-audit-closeout
+reference: northstar://evidence/NSE-20260624-agentic-loop-audit-closeout
+title: Agentic loop audit closeout summary
+evidence_type: observation
+evidence_status: reported
+ingested_at: '2026-06-24T17:03:10Z'
+source:
+  uri: codex-attachment://0f39cc5c-8e0e-4417-9252-8d73d986d756/pasted-text-1.txt
+  original_path: "/Users/jason/.codex/attachments/0f39cc5c-8e0e-4417-9252-8d73d986d756/pasted-text-1.txt"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-audit-closeout-pasted-text-1-txt"
+  sha256: 72d145fdbdec193afd79a4ea42968cf049f44a00d7db7307eaee31dcb7d85e7f
+summary: 'Session closeout summary reporting that the agentic-loop audit was ingested,
+  North Star drafts were updated, platform issues #1995-#2000 were created, validations
+  passed, and the route remains in northstar-planning artifact-loop pending signoff.'
+tags:
+- agentic-loop
+- audit
+- governance
+- platform
+- skills
+- validation
+claims:
+- The prior audit work registered the agentic-loop best-practices report as NSE-20260624-agentic-loop-sdlc-best-practices.
+- The prior audit produced AGENTIC_LOOP_SKILL_AUDIT.md covering 19 skills, SDLC chaining,
+  compliance, drift, missing capabilities, existing decisions, and the agents.vallery.net
+  baseline.
+- 'The prior audit created jvallery/agents issues #1995 through #2000 for missing
+  runtime/MCP/platform controls.'
+- The prior audit left the route at NORTHSTAR_ARTIFACTS_INCOMPLETE with next skill
+  northstar-planning and mode artifact-loop pending North Star signoff.
+planning_relevance:
+- Supports this North Star planning turn by capturing the previous audit closeout,
+  validation claims, and remaining signoff state as registered evidence.
+- Highlights that platform issues were created while skills-repo adjustment issues
+  should be reconciled against the existing Verdify skills backlog.
+limitations:
+- This is a session closeout summary and should remain reported evidence unless independently
+  verified against files, commands, and GitHub state.

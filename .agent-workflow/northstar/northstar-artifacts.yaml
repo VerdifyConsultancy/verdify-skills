@@ -3,14 +3,14 @@ schema_ref: northstar-artifacts.schema.yaml
 kind: NorthStarArtifacts
 schema_version: '1.0'
 project_id: verdify-skills
-status: iterating
-iteration: 23
+status: review_requested
+iteration: 26
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-06-23T20:18:26Z'
+updated_at: '2026-06-24T17:21:26Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
-  status: draft
-  summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, Orbit daily brief, review script, planning questions, and traceability.
+  status: review_requested
+  summary: Review-requested product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, shared bounded agentic-loop skill contract, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, Orbit daily brief, review script, planning questions, and traceability.
   section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
@@ -41,11 +41,13 @@ product:
   - NSE-20260623-gravity-core-extraction-implementation-b
   - NSE-20260623-north-star-research-queue-completion
   - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260624-agentic-loop-sdlc-best-practices
+  - NSE-20260624-agentic-loop-audit-closeout
   open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-  status: draft
-  summary: Iterating architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw/Orbit planning layer, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
+  status: review_requested
+  summary: Review-requested architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, shared bounded agentic-loop skill contract, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw/Orbit planning layer, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
   section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
@@ -76,6 +78,8 @@ architecture:
   - NSE-20260623-gravity-core-extraction-implementation-b
   - NSE-20260623-north-star-research-queue-completion
   - NSE-20260623-repo-controller-bootstrap-self-discovery
+  - NSE-20260624-agentic-loop-sdlc-best-practices
+  - NSE-20260624-agentic-loop-audit-closeout
   open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
 evidence_references:
 - id: NSE-20260623-long-horizon-agent-compounding-learning
@@ -218,6 +222,16 @@ evidence_references:
   title: Repo controller bootstrap and fleet self-discovery walk intake
   evidence_status: reported
   used_in: [both]
+- id: NSE-20260624-agentic-loop-sdlc-best-practices
+  reference: northstar://evidence/NSE-20260624-agentic-loop-sdlc-best-practices
+  title: Agentic loop execution and SDLC best practices
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260624-agentic-loop-audit-closeout
+  reference: northstar://evidence/NSE-20260624-agentic-loop-audit-closeout
+  title: Agentic loop audit closeout summary
+  evidence_status: reported
+  used_in: [both]
 cross_links:
 - from_id: PRQ-001
   to_id: ARQ-001
@@ -263,7 +277,7 @@ cross_links:
   relationship: The wave release architecture now has a validated environment GitOps reconciliation schema.
 - from_id: PRQ-007
   to_id: ARQ-007
-  relationship: Seventeen canonical skills require a package and validation architecture.
+  relationship: Eighteen lifecycle skills plus standalone issue-triage require a package and validation architecture.
 - from_id: PRQ-008
   to_id: ARQ-008
   relationship: CLI product surface requires dependency-light schema-driven CLI architecture.
@@ -402,6 +416,21 @@ cross_links:
 - from_id: WAVE-008
   to_id: ARCH-020
   relationship: Repo-controller bootstrap pilot requires a scope charter before controller ownership.
+- from_id: PRQ-030
+  to_id: ARQ-028
+  relationship: requires bounded agentic-loop runtime controls across skills and Agent Platform-backed sessions
+- from_id: PRQ-030
+  to_id: ARQ-029
+  relationship: requires a shared lifecycle-skill loop-control contract in the skills package
+- from_id: PRQ-030
+  to_id: VerdifyConsultancy/verdify-skills#43
+  relationship: creates the GitHub backlog anchor for applying the bounded loop contract across all lifecycle skills
+- from_id: SURF-020
+  to_id: IFACE-020
+  relationship: defines the agentic runtime control bundle interface
+- from_id: SURF-021
+  to_id: IFACE-021
+  relationship: defines the shared skill loop-control contract interface
 open_questions:
 - id: NSQ-001
   artifact: both
@@ -540,12 +569,12 @@ learning_capture:
   - .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
   open_proposal_ids: [NLP-001, NLP-002]
 review:
-  requested_at: '2026-06-23T04:30:38Z'
+  requested_at: '2026-06-24T17:21:26Z'
   reviewers: [Jason, James]
-  status: changes_requested
+  status: requested
   approvals: []
   signoff_required_for_downstream: true
 handoff:
   next_skill: northstar-planning
-  next_mode: artifact-loop
-  reason: The research queue, OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, and repo-controller bootstrap walk evidence have been synthesized into product and architecture drafts. Continue artifact-loop synthesis before requesting final lock approval.
+  next_mode: human-review
+  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, repo-controller bootstrap walk evidence, agentic-loop audit, platform issue map, and skills-side loop-contract issue #43 have been synthesized into review-requested product and architecture drafts. Human reviewers must approve, request changes, or reject before downstream skills treat the North Star as locked authority.

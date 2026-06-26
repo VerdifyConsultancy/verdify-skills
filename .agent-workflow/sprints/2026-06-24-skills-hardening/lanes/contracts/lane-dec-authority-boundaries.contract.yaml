@@ -1,0 +1,126 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-authority-boundaries
+title: ADR resolving North Star / project-definition / architecture-contracts authority
+  boundary (#8)
+status: approved
+issue_ids:
+- 8
+coupling_justification: 
+objective: 'Produce an Architecture Decision Record (ADR-0011 under docs/decisions/)
+  that resolves the ambiguous authority boundary among northstar-planning, project-definition,
+  and architecture-contracts, defining which artifact owns planning intent, approved
+  requirements/product/design surfaces, approved architecture decisions, and module
+  ownership, plus the handoff and project-router routing rules that distinguish draft
+  North Star inputs, locked North Star inputs, approved project definition, and approved
+  architecture/module contracts. This is a decision lane: no formal module contract
+  exists for the governed docs, so the deliverable is an ADR, not code.'
+desired_outcome: 'The lifecycle clearly separates North Star planning authority, approved
+  project definition authority, and implementable architecture/module-contract authority.
+  A merged ADR records the decision, an authority/ownership table, the distinction
+  between NORTHSTAR_ARCHITECTURE.md (planning input) and .agent-workflow/architecture/architecture.yaml
+  (approved authority), and at least one worked routing example for an ambiguous change
+  request. Issue #8 references the ADR.'
+non_goals:
+- No code changes in this lane; the only deliverable is an ADR markdown file under
+  docs/decisions/.
+- Do not remove North Star planning from the lifecycle.
+- Do not collapse project-definition and architecture-contracts into one skill.
+- Do not implement a Gravity-specific decision loop; keep this about general skill
+  authority boundaries.
+- Do not edit the SKILL.md, docs/lifecycle.md, or project-router rule files in this
+  lane; the ADR records the decision and follow-up implementation is out of scope.
+- No formal module contract exists for docs/decisions/, so no module-contract conformance
+  is asserted beyond the ADR deliverable.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-authority-boundaries
+module_contracts:
+- docs/decisions/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - lifecycle-authority-decisions
+  - architecture-decision-records
+  owned_paths:
+  - docs/decisions/ADR-0011-northstar-projectdef-architecture-authority.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - skills/northstar-planning/SKILL.md
+  - skills/project-definition/SKILL.md
+  - skills/architecture-contracts/SKILL.md
+  - skills/project-router/SKILL.md
+  - docs/lifecycle.md
+  coordination_required_paths:
+  - config/authority-matrix.yaml
+  owned_interfaces:
+  - docs/decisions/ADR-0011-*.md
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'A new ADR (docs/decisions/ADR-0011-*.md) is merged that explicitly defines
+    which artifact owns planning intent, approved requirements/product/design surfaces,
+    approved architecture decisions, and module ownership; distinguishes draft North
+    Star inputs, locked North Star inputs, approved project definition, and approved
+    architecture/module contracts; states the project-router routing rules for ambiguous
+    requirement/product/architecture/high-level-design changes; documents the NORTHSTAR_ARCHITECTURE.md
+    vs architecture.yaml distinction; and includes at least one worked ambiguous-change-request
+    routing example. Issue #8 references the ADR.'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the merged docs/decisions/ADR-0011-*.md file.
+  - 'GitHub comment or issue body link showing issue #8 references the ADR by number.'
+  - Output of ruby scripts/validate-repo.rb showing it still passes.
+validation_commands:
+- id: adr-exists
+  command: ls docs/decisions/ADR-0011-*.md
+  purpose: Confirm the decision lane's ADR deliverable exists under docs/decisions/.
+  required: true
+- id: adr-references-issue
+  command: grep -l '#8' docs/decisions/ADR-0011-*.md
+  purpose: Confirm the ADR links the resolved issue (#8).
+  required: true
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository validation (schemas, references, manifest) still passes
+    after adding the ADR.
+  required: true
+required_evidence:
+- Path to the new docs/decisions/ADR-0011-*.md file.
+- Output of ruby scripts/validate-repo.rb showing a passing run.
+- 'Evidence that issue #8 references the merged ADR.'
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on the chosen authority-boundary option (e.g. whether locked
+  North Star is a durable milestone source of truth or pre-approval ideation only).
+- Resolving the boundary requires editing skill files, docs/lifecycle.md, or schemas
+  beyond the ADR, expanding scope past this decision lane.
+definition_of_done:
+- 'Issue #8 acceptance intent is satisfied by a merged ADR with an authority/ownership
+  table, handoff rules, routing rules, the NORTHSTAR_ARCHITECTURE.md vs architecture.yaml
+  distinction, and one worked routing example.'
+- 'ADR-0011 is merged and issue #8 references it by number.'
+- Branch lane/dec-authority-boundaries is pushed and a PR is open and ready for the
+  independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

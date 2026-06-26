@@ -1,0 +1,138 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-controller-state-fields
+title: Persist mandated controller session fields and specify wave-supervision state
+status: approved
+issue_ids:
+- 22
+coupling_justification: 
+objective: Reconcile the controller-loop skill procedure with its typed artifacts
+  so the per-session liveness fields the procedure mandates (owner, start time, heartbeat
+  expectations, stop_condition, wave) can be persisted in controller-state and/or
+  session-ledger, and so the wave-supervision mode has a defined, validatable artifact
+  contract. No formal module contract exists for the controller-loop package; the
+  primary governed files are the controller state/session-ledger schemas and the controller-loop
+  skill.
+desired_outcome: 'controller-loop SKILL.md step 4 and config/lifecycle.yaml wave-supervision
+  mode are consistent with the schemas: every mandated session field is either representable
+  in a typed artifact or removed from the procedure, and wave-supervision either has
+  a schema+template+Validate line or wave state is folded into controller-state with
+  the standalone waves artifact and mode removed. validate-repo.rb and make test stay
+  green.'
+non_goals:
+- No formal module contract exists for the controller-loop package; this lane does
+  not create one and does not redesign the broader controller architecture beyond
+  the session/wave fields named in issue
+- Does not modify the validator engine, CLI, or repo-validation tooling (lib/verdify/cli.rb,
+  scripts/validate-repo.rb) owned by other lanes.
+- Does not redefine the controller ownership/authority boundary, which is decided
+  by lane-dec-controller-ownership and consumed here.
+- Does not touch the wave-release-plan schema or sprint-planning wave assets.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/controller-state-fields
+module_contracts:
+- schemas/controller-state.schema.yaml
+- schemas/session-ledger.schema.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - controller-loop durable orchestration state
+  - controller session and wave artifact schemas
+  owned_paths:
+  - schemas/controller-state.schema.yaml
+  - schemas/session-ledger.schema.yaml
+  - skills/controller-loop/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - schemas/wave-release-plan.schema.yaml
+  - skills/sprint-planning/assets/wave-release-plan.template.yaml
+  - docs/decisions/
+  coordination_required_paths:
+  - config/lifecycle.yaml
+  owned_interfaces:
+  - controller-state session item schema (sessions[].* fields)
+  - session-ledger session item schema
+  - controller-loop wave-supervision artifact contract
+dependencies:
+  hard:
+  - lane_id: lane-dec-controller-ownership
+    required_output: controller ownership ADR
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The mandated per-session fields (owner, started_at, heartbeat expectations/deadline,
+    stop_condition, wave) are either representable in a typed controller artifact
+    or removed from controller-loop SKILL.md step 4, so a literal controller run can
+    record session liveness without dropping fields or failing schema validation.
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - Diff of schemas/controller-state.schema.yaml and/or schemas/session-ledger.schema.yaml
+    (or SKILL.md step 4) showing the reconciliation
+  - A sample/template artifact instance validating green against the schema
+- id: LANE-AC-02
+  statement: 'The wave-supervision mode has a defined, validatable contract: either
+    a wave-state schema + template + Validate line is added, or wave state is folded
+    into controller-state and the standalone waves/<wave-id>.yaml artifact and (if
+    unimplemented) the wave-supervision mode are removed from config/lifecycle.yaml
+    and SKILL.md, consistent with the controller ownership ADR.'
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - Diff of config/lifecycle.yaml and skills/controller-loop/SKILL.md showing the
+    wave-supervision resolution
+  - validate-repo.rb output showing the controller artifacts validate
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository invariants and schema/artifact consistency hold
+  required: true
+- id: validate-controller-state-schema
+  command: ruby bin/verdify artifact validate --file skills/controller-loop/assets/controller-state.template.yaml
+  purpose: Confirm the controller-state template still validates after field changes
+  required: true
+- id: validate-session-ledger-schema
+  command: ruby bin/verdify artifact validate --file skills/controller-loop/assets/session-ledger.template.yaml
+  purpose: Confirm the session-ledger template still validates after field changes
+  required: true
+- id: test
+  command: make test
+  purpose: Confirm the full test suite passes
+  required: true
+required_evidence:
+- Diffs of the changed schemas, controller-loop SKILL.md/assets, and config/lifecycle.yaml
+- validate-repo.rb output (green) referencing the controller artifacts
+- make test output (green)
+- Reference to the controller ownership ADR justifying the wave-state and field decisions
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- 'The fix requires a public interface or schema change beyond the scope of issue
+  #22.'
+- The controller ownership ADR (lane-dec-controller-ownership) is unresolved or contradicts
+  whether wave state is a separate artifact or folded into controller-state, blocking
+  the wave-supervision decision.
+definition_of_done:
+- 'Issue #22 acceptance is satisfied with evidence (mandated session fields representable
+  or removed; wave-supervision has a validatable contract or is removed).'
+- Branch pushed and PR opened ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- Changes are consistent with and reference the merged controller ownership ADR.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

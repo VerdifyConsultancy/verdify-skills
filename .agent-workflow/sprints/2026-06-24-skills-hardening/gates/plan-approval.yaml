@@ -1,0 +1,28 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: plan-approval-2026-06-24-skills-hardening
+sprint_id: 2026-06-24-skills-hardening
+lane_id: null
+type: plan_approval
+status: approved
+question: >-
+  Approve the 26-lane, 8-wave skills-hardening sprint that carves all 33 open implementable issues (#1-3, #7-36)
+  into wave-gated decision and implementation lanes, dispatched strictly by dependency_order with the 7 decision
+  ADRs (Wave 1) as hard prerequisites?
+owner: skills-maintainer
+evidence_required:
+  - .agent-workflow/strategy/state-of-union.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/sprint-plan.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/lane-map.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/
+allowed_decisions: [approve, approve-wave-1-only, revise, reject]
+decision: approve
+rationale: >-
+  Jason approved via goal directive on 2026-06-24 and directed dispatch of the worktree lanes. Dispatch proceeds
+  by dependency_order; Wave 1 (6 decision/ADR lanes) is dependency-ready and dispatched first. Local worktree +
+  tmux + iTerm2 execution is authorized by the local-dispatch-fallback policy exception (Agent Platform MCP path
+  is unreachable from this operator machine per issue #12).
+opened_at: "2026-06-24T16:45:00Z"
+resolved_at: "2026-06-24T17:00:00Z"
+resume_state: ORCHESTRATE

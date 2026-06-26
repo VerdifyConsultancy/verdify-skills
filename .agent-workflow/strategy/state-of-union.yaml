@@ -1,0 +1,539 @@
+schema_ref: state-of-union.schema.yaml
+kind: StateOfUnion
+schema_version: "1.0"
+strategy_id: skills-self-hardening-2026-06-24
+status: approved
+repository: VerdifyConsultancy/verdify-skills
+baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
+assessed_at: "2026-06-24T16:30:00Z"
+inputs:
+  - id: IN-001
+    type: north-star
+    location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+    summary: Product North Star (iteration 22, status iterating, review changes_requested) — not locked.
+    evidence_status: verified
+  - id: IN-002
+    type: north-star
+    location: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+    summary: Architecture North Star (iteration 22, iterating) — ADR index stops at ADR-0008 though ADR-0009/0010 exist.
+    evidence_status: verified
+  - id: IN-003
+    type: project-definition
+    location: .agent-workflow/project/project-definition.yaml
+    summary: Project definition is status=draft; not an approved foundation.
+    evidence_status: verified
+  - id: IN-004
+    type: github-issues
+    location: https://github.com/VerdifyConsultancy/verdify-skills/issues
+    summary: 34 open issues — #1-4 capability proposals, #7-11 boundary/drift problems, #12-36 adversarial-review findings.
+    evidence_status: verified
+  - id: IN-005
+    type: adversarial-review
+    location: subagents/workflows (2026-06-24 review) + scratchpad/platform-ground-truth.md
+    summary: Live-audited platform ground truth (jvallery/agents) backing the grounding findings #12/#27/#33/#34/#36.
+    evidence_status: verified
+  - id: IN-006
+    type: validator
+    location: scripts/validate-repo.rb
+    summary: Package validates ("19 skills, 40 schemas") and make test passes on baseline.
+    evidence_status: verified
+source_freshness:
+  - surface: git
+    source_ref: main@fa8fb8a
+    status: fresh
+    captured_at: "2026-06-24T16:30:00Z"
+    limitation: Branch was rebased+fast-forward-merged from codex/issue-4 during the review; clean tree.
+  - surface: github_issues
+    source_ref: https://github.com/VerdifyConsultancy/verdify-skills/issues
+    status: fresh
+    captured_at: "2026-06-24T16:13:00Z"
+    limitation: None; live query.
+  - surface: github_pull_requests
+    source_ref: gh pr list
+    status: fresh
+    captured_at: "2026-06-24T16:13:00Z"
+    limitation: Zero open PRs.
+  - surface: north_star
+    source_ref: .agent-workflow/northstar/northstar-artifacts.yaml
+    status: stale
+    captured_at: "2026-06-24T16:30:00Z"
+    limitation: Status iterating / review changes_requested; never locked. northstar gate cancelled.
+  - surface: project_definition
+    source_ref: .agent-workflow/project/project-definition.yaml
+    status: stale
+    captured_at: "2026-06-24T16:30:00Z"
+    limitation: status=draft; not an approved foundation.
+  - surface: architecture
+    source_ref: .agent-workflow/architecture/
+    status: missing
+    captured_at: null
+    limitation: No repo-level architecture.yaml or module contracts exist for the skills package itself.
+  - surface: sprint_artifacts
+    source_ref: .agent-workflow/sprints/2026-06-24-issue-triage
+    status: not_applicable
+    captured_at: "2026-06-24T16:30:00Z"
+    limitation: Prior issue-triage sprint (separate concluded slice); not the active strategy target.
+  - surface: deployment_runtime
+    source_ref: n/a (skills package; no deployed runtime)
+    status: not_applicable
+    captured_at: null
+    limitation: This package ships as a library/CLI; runtime health belongs to consuming repos.
+  - surface: external_dependency
+    source_ref: jvallery/agents (target platform)
+    status: fresh
+    captured_at: "2026-06-24T15:45:00Z"
+    limitation: Read-only live audit; epics #1816/#1834/#1836 confirm platform-native skill divergence.
+planning_inventory:
+  - artifact_type: north_star
+    location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md + NORTHSTAR_ARCHITECTURE.md
+    status: blocked
+    finding: Iterating/changes_requested; says "seventeen" skills while package ships 19 (issue #19); ADR index incomplete.
+    action: Keep as open product-direction track; not a blocker for package-correctness lanes.
+  - artifact_type: project_definition
+    location: .agent-workflow/project/project-definition.yaml
+    status: incomplete
+    finding: Draft; describes the skills product but is not approved.
+    action: Route to project-definition only when product direction (not these fixes) is the goal.
+  - artifact_type: architecture
+    location: .agent-workflow/architecture/
+    status: missing
+    finding: The skills package has no self-architecture/module-contract artifact.
+    action: Optional follow-up; not required for the maintenance sprint.
+  - artifact_type: state_of_union
+    location: .agent-workflow/strategy/state-of-union.yaml
+    status: current
+    finding: This artifact; first strategy run for the repo.
+    action: Hand off to sprint-planning.
+  - artifact_type: sprint_plan
+    location: .agent-workflow/sprints/2026-06-24-issue-triage/
+    status: not_applicable
+    finding: Prior concluded slice that added the issue-triage skill.
+    action: Reference for lane conventions; not active.
+  - artifact_type: gate
+    location: .agent-workflow/gates/northstar.yaml
+    status: blocked
+    finding: status=cancelled, decision=changes_requested.
+    action: Product-direction gate; tracked separately from this sprint.
+north_star:
+  goal: A correct, internally consistent, platform-grounded, secure lifecycle-skills package that can safely drive the jvallery/agents SDLC fleet.
+  alignment_status: drift
+  source_refs: [IN-001, IN-002, IN-005, IN-006]
+current_state:
+  summary: >-
+    The package validates and tests pass, but a 2026-06-24 adversarial review (filed as #12-#36) plus prior
+    boundary problems (#7-#11) and capability proposals (#1-#4) leave 34 open issues spanning critical platform
+    grounding gaps, correctness/schema bugs, security-enforcement gaps, consistency drift, weak evals, and new
+    capabilities. Product-direction foundations (North Star, project definition) remain unlocked but do not block
+    package-correctness work owned by the skills maintainer.
+  lifecycle_state: PLANNING
+  active_sprint: null
+  open_gates:
+    - "northstar (cancelled/changes_requested) — product direction, out of scope for this sprint"
+  delivery_risks:
+    - "High file-surface contention: many fixes touch scripts/validate-repo.rb, lib/verdify/*.rb, config/lifecycle.yaml, and schemas/ — lanes must be sequenced/owned to avoid collisions."
+    - "Seven issues are decisions (#8,#9,#10,#11,#23,#25,#36) that shape how dependent implementation lanes are built; they must resolve first."
+    - "Regrounding lanes (#12,#27,#33,#34,#36) depend on live platform contracts that can change (agents #1776/#1948)."
+delivery_health:
+  status: not_applicable
+  diagnostic_refs: []
+  deployment_refs: []
+  log_refs: []
+  telemetry_refs: []
+  discovered_health_issues: []
+issue_inventory:
+  - issue: 1
+    title: "Repo-bootstrap lifecycle skill"
+    state: OPEN
+    classification: deferred
+    rationale: Valid new-skill build but large and depends on boundary decisions; sequence after foundations stabilize.
+    dependencies: ["#36", "#8"]
+    action: Defer to capability wave (SEQ-008).
+  - issue: 2
+    title: "Controller-loop telemetry, context reset, recovery contract"
+    state: OPEN
+    classification: blocked
+    rationale: Extends controller-loop; shape depends on controller/orchestrator ownership decision.
+    dependencies: ["#9", "#23"]
+    action: Sequence in orchestrator wave (SEQ-005) after decisions.
+  - issue: 3
+    title: "Adversarial skill architecture audit and consensus review loop"
+    state: OPEN
+    classification: blocked
+    rationale: Overlaps the platform's existing consensus-review skill; resolve reconciliation decision first.
+    dependencies: ["#36"]
+    action: Defer to capability wave (SEQ-008) after #36.
+  - issue: 4
+    title: "Human-gated question research and decision loop skill"
+    state: OPEN
+    classification: done
+    rationale: Implemented as the shipped northstar-question-resolution skill (scripts + references present).
+    dependencies: []
+    action: Close as delivered (ACT-001); fold residual defects into #14.
+  - issue: 7
+    title: "Lifecycle definition drift across router/workflow/config/docs/validator"
+    state: OPEN
+    classification: candidate
+    rationale: Concrete consistency defect; partially depends on the canonical-definition decisions.
+    dependencies: ["#8"]
+    action: Sequence in consistency wave (SEQ-006).
+  - issue: 8
+    title: "North Star/project-definition/architecture authority boundaries ambiguous"
+    state: OPEN
+    classification: blocked
+    rationale: Authority-boundary decision that unblocks #7, #29, and downstream skill descriptions.
+    dependencies: []
+    action: Open decision gate (SEQ-001).
+  - issue: 9
+    title: "Controller-loop vs sprint-orchestrator event ownership"
+    state: OPEN
+    classification: blocked
+    rationale: Ownership decision shaping #2, #22, #23.
+    dependencies: []
+    action: Open decision gate (SEQ-001).
+  - issue: 10
+    title: "Platform-readiness vs gravity-readiness overlap"
+    state: OPEN
+    classification: blocked
+    rationale: Boundary decision shaping #27 readiness grounding.
+    dependencies: []
+    action: Open decision gate (SEQ-001).
+  - issue: 11
+    title: "State-of-union vs issue-triage action boundary"
+    state: OPEN
+    classification: blocked
+    rationale: Boundary decision between the two GitHub-issue-acting skills.
+    dependencies: []
+    action: Open decision gate (SEQ-001).
+  - issue: 12
+    title: "Sprint-orchestrator dispatch grounded on nonexistent MCP tools"
+    state: OPEN
+    classification: candidate
+    rationale: Critical grounding bug; the real contract (add_worktree_agent / POST /api/repos/.../agents) is known from the live audit.
+    dependencies: ["#36"]
+    action: Sequence first in orchestrator wave (SEQ-005); reground to real contract.
+  - issue: 13
+    title: "route-decision next_skill enum omits two skills, crashes route"
+    state: OPEN
+    classification: candidate
+    rationale: Self-contained schema+CLI bug; high severity, no decision dependency.
+    dependencies: []
+    action: Schema-correctness wave (SEQ-003).
+  - issue: 14
+    title: "northstar-question-resolution bogus .v1 schema_refs"
+    state: OPEN
+    classification: candidate
+    rationale: Self-contained; artifacts fail validation.
+    dependencies: []
+    action: Schema-correctness wave (SEQ-003).
+  - issue: 15
+    title: "Router bypasses project-definition approval gate"
+    state: OPEN
+    classification: candidate
+    rationale: Self-cert risk in lib route; self-contained CLI fix.
+    dependencies: []
+    action: CLI+security wave (SEQ-004).
+  - issue: 16
+    title: "Ingested research committed with no secret scanning"
+    state: OPEN
+    classification: candidate
+    rationale: Security gap in ingestion path; self-contained.
+    dependencies: []
+    action: CLI+security wave (SEQ-004).
+  - issue: 17
+    title: "Broken cross-skill reference + validator never checks it"
+    state: OPEN
+    classification: candidate
+    rationale: Fix the dangling ref AND add validator reference-checking (safety net).
+    dependencies: []
+    action: Validation-engine wave (SEQ-002).
+  - issue: 18
+    title: "build_execution_runbook.rb hardcodes dependency_state=ready"
+    state: OPEN
+    classification: candidate
+    rationale: Self-contained script bug.
+    dependencies: []
+    action: Orchestrator wave (SEQ-005).
+  - issue: 19
+    title: "Skill-count drift (seventeen vs 19) in North Star/ADR/docs"
+    state: OPEN
+    classification: candidate
+    rationale: Doc reconciliation; intersects the canonical-definition decision but mostly mechanical.
+    dependencies: ["#8"]
+    action: Consistency wave (SEQ-006).
+  - issue: 20
+    title: "Router/gate-resolution emit undeclared modes"
+    state: OPEN
+    classification: candidate
+    rationale: lib route + config/lifecycle.yaml consistency; pairs with validator mode-checking.
+    dependencies: []
+    action: Validation-engine wave (SEQ-002).
+  - issue: 21
+    title: "Ingestion skills lack prompt-injection/content-trust guidance"
+    state: OPEN
+    classification: candidate
+    rationale: Security/docs across ingestion skills; template exists in northstar-planning.
+    dependencies: []
+    action: CLI+security wave (SEQ-004).
+  - issue: 22
+    title: "controller-loop schema can't store mandated session fields"
+    state: OPEN
+    classification: blocked
+    rationale: Schema fix depends on the controller-loop scope decision.
+    dependencies: ["#9"]
+    action: Orchestrator wave (SEQ-005) after decision.
+  - issue: 23
+    title: "controller-loop vs sprint-orchestrator trigger overlap + ungated launch"
+    state: OPEN
+    classification: blocked
+    rationale: Decision on description boundaries + a control-request requirement.
+    dependencies: []
+    action: Open decision gate (SEQ-001).
+  - issue: 24
+    title: "Eval suites do not exercise hardest behaviors"
+    state: OPEN
+    classification: candidate
+    rationale: Per-skill eval uplift; large but parallelizable; depends on eval-strategy decision.
+    dependencies: ["#25"]
+    action: Evals wave (SEQ-007).
+  - issue: 25
+    title: "Evals are prose-only with no executable runner"
+    state: OPEN
+    classification: blocked
+    rationale: Decision on whether/how to add an executable eval runner.
+    dependencies: []
+    action: Open decision gate (SEQ-001); implement in SEQ-007.
+  - issue: 26
+    title: "lane-delivery READY_FOR_CRITIC + fix-forward + forbidden closeout eval"
+    state: OPEN
+    classification: candidate
+    rationale: Self-contained skill+eval correctness.
+    dependencies: []
+    action: Consistency wave (SEQ-006).
+  - issue: 27
+    title: "Readiness skills cite Cloudflare; undefined modes; ungrounded gravity evidence"
+    state: OPEN
+    classification: candidate
+    rationale: Regrounding to real edge (Traefik/Authentik); depends on platform/gravity boundary.
+    dependencies: ["#10"]
+    action: Orchestrator/platform wave (SEQ-005).
+  - issue: 28
+    title: "Schema/contract contradictions force invalid happy-path artifacts"
+    state: OPEN
+    classification: candidate
+    rationale: Multiple self-contained schema fixes.
+    dependencies: []
+    action: Schema-correctness wave (SEQ-003).
+  - issue: 29
+    title: "Skills declare artifacts/schemas/policies with no producer"
+    state: OPEN
+    classification: candidate
+    rationale: Orphan reconciliation; partly depends on authority-boundary decision.
+    dependencies: ["#8"]
+    action: Schema-correctness wave (SEQ-003).
+  - issue: 30
+    title: "SKILL.md frontmatter lifecycle-order drift; unchecked by validator"
+    state: OPEN
+    classification: candidate
+    rationale: Fix frontmatter AND add validator order-check; pairs with SEQ-002.
+    dependencies: []
+    action: Validation-engine wave (SEQ-002).
+  - issue: 31
+    title: "SchemaValidator ignores $ref/format/patternProperties/dependentRequired"
+    state: OPEN
+    classification: candidate
+    rationale: Core engine gap; prerequisite safety net for schema fixes.
+    dependencies: []
+    action: Validation-engine wave (SEQ-002) — run first.
+  - issue: 32
+    title: "Hardening: lease TOCTOU race, unguarded read-path, lease expiry"
+    state: OPEN
+    classification: candidate
+    rationale: Self-contained CLI hardening.
+    dependencies: []
+    action: CLI+security wave (SEQ-004).
+  - issue: 33
+    title: "AgentPlatformControlRequest has no approval-gate guard"
+    state: OPEN
+    classification: candidate
+    rationale: "Security: add semantic_validator case + derive human_gate; partly shaped by #36."
+    dependencies: ["#36"]
+    action: Schema-correctness/security wave (SEQ-003).
+  - issue: 34
+    title: "Worker credential isolation + deployment-verification not enforced"
+    state: OPEN
+    classification: candidate
+    rationale: Security enforcement across launch scripts + release-verification.
+    dependencies: []
+    action: CLI+security wave (SEQ-004).
+  - issue: 35
+    title: "Missing North Star capabilities (critic GH review, Orbit, architecture template)"
+    state: OPEN
+    classification: candidate
+    rationale: Mixed; architecture.template.yaml is quick, Orbit/critic-review larger.
+    dependencies: []
+    action: Capability wave (SEQ-008); split if needed in sprint-planning.
+  - issue: 36
+    title: "Verdify-skills not reconciled with platform's own skill system"
+    state: OPEN
+    classification: blocked
+    rationale: Foundational architecture decision (ADR) that shapes #12, #22, #33, #2, #3.
+    dependencies: []
+    action: Open architecture decision gate (SEQ-001) — highest leverage.
+gaps:
+  - id: GAP-001
+    type: decision
+    statement: "Authority boundary among North Star / project-definition / architecture-contracts (#8) is unresolved; gates consistency lanes (#7,#19,#29) in SEQ-006, not the ready next slice. Opened as a decision gate (ACT-002)."
+    owner: skills-maintainer
+    blocking: false
+    apply_through: human_gate
+  - id: GAP-002
+    type: decision
+    statement: "Controller-loop vs sprint-orchestrator ownership and ungated child-session launch (#9, #23) unresolved; gates controller-loop lanes #2/#22 in SEQ-005, not the ready next slice. Opened as a decision gate (ACT-003)."
+    owner: skills-maintainer
+    blocking: false
+    apply_through: human_gate
+  - id: GAP-003
+    type: architecture
+    statement: "Package<->platform skill-system reconciliation (#36) needs an ADR deciding which system owns durable state, review, and control dispatch; shapes #12/#33/#34 regrounding in SEQ-003/005, not the ready next slice. Opened as an architecture decision gate (ACT-004)."
+    owner: skills-maintainer + platform owner
+    blocking: false
+    apply_through: human_gate
+  - id: GAP-004
+    type: decision
+    statement: "Platform-readiness vs gravity-readiness boundary (#10) and eval-runner strategy (#25) unresolved; shape #27 and #24."
+    owner: skills-maintainer
+    blocking: false
+    apply_through: human_gate
+  - id: GAP-005
+    type: product_definition
+    statement: "Product North Star is unlocked (iterating/changes_requested) and project-definition is draft; product-direction work is a separate track from this maintenance sprint."
+    owner: Jason + James
+    blocking: false
+    apply_through: project_definition
+recommended_sequence:
+  - id: SEQ-001
+    outcome: "Resolve the seven blocking decisions/ADRs (authority, ownership, platform reconciliation, readiness boundary, eval strategy)."
+    issue_ids: [8, 9, 10, 11, 23, 25, 36]
+    prerequisites: ["Human decision owner available (skills-maintainer / platform owner)."]
+    risks: ["#36 may require platform-side coordination (jvallery/agents epic #1836)."]
+    depends_on: []
+  - id: SEQ-002
+    outcome: "Harden the validation engine so it catches references, modes, frontmatter order, and full draft-2020-12 keywords (safety net)."
+    issue_ids: [31, 17, 20, 30]
+    prerequisites: ["None — self-contained engine work."]
+    risks: ["Shared surface scripts/validate-repo.rb + lib/verdify/schema_validator.rb — sequence within the wave, single owner."]
+    depends_on: []
+  - id: SEQ-003
+    outcome: "Fix schema/contract correctness so documented happy-path artifacts validate."
+    issue_ids: [13, 14, 28, 29, 33]
+    prerequisites: ["SEQ-002 validator improvements merged (regression guard).", "SEQ-001: #8 for #29; #36 for #33."]
+    risks: ["Several schemas touched; coordinate with SEQ-002 owner."]
+    depends_on: [SEQ-002, SEQ-001]
+  - id: SEQ-004
+    outcome: "Close security-enforcement and CLI-hardening gaps (gate bypass, secret scanning, prompt-injection guidance, cred isolation, lease races)."
+    issue_ids: [15, 16, 21, 32, 34]
+    prerequisites: ["None blocking; #34 coordinates with release-verification."]
+    risks: ["lib/verdify/cli.rb contention between #15 and #32 — sequence."]
+    depends_on: [SEQ-002]
+  - id: SEQ-005
+    outcome: "Reground orchestrator/platform/controller skills to the real platform contracts."
+    issue_ids: [12, 18, 22, 27, 2]
+    prerequisites: ["SEQ-001 decisions #36/#9/#23/#10.", "Live platform contract confirmed."]
+    risks: ["Platform contracts evolving (agents #1776/#1948)."]
+    depends_on: [SEQ-001]
+  - id: SEQ-006
+    outcome: "Reconcile lifecycle definitions, skill counts, and lane-delivery instructions across docs/config."
+    issue_ids: [7, 19, 26]
+    prerequisites: ["SEQ-001 #8 (canonical authority).", "SEQ-002 validator can enforce."]
+    risks: ["config/lifecycle.yaml is touched by SEQ-002 (#20) — sequence after."]
+    depends_on: [SEQ-001, SEQ-002]
+  - id: SEQ-007
+    outcome: "Uplift eval suites and (if decided) add an executable runner."
+    issue_ids: [24, 25]
+    prerequisites: ["SEQ-001 #25 eval-strategy decision."]
+    risks: ["Per-skill eval work is broad; parallelize by skill."]
+    depends_on: [SEQ-001]
+  - id: SEQ-008
+    outcome: "Build deferred new capabilities (repo-bootstrap, consensus/audit workflow, missing North Star capabilities)."
+    issue_ids: [1, 3, 35]
+    prerequisites: ["SEQ-001 #36/#8 decisions.", "Stable foundations from SEQ-002..006."]
+    risks: ["Largest scope; may need its own North Star alignment."]
+    depends_on: [SEQ-001, SEQ-003, SEQ-005]
+next_sprint_candidates:
+  - outcome: "Validation-engine hardening — the safety net other fixes rely on."
+    issue_ids: [31, 17, 20, 30]
+    readiness: ready
+    rationale: Fully self-contained, no decision dependency, and makes subsequent schema/consistency fixes regression-guarded.
+    required_actions:
+      - "sprint-planning: create one coupled lane group owned by a single worker for scripts/validate-repo.rb + lib/verdify/schema_validator.rb to avoid collisions."
+  - outcome: "Schema/contract correctness for the documented happy path."
+    issue_ids: [13, 14, 28]
+    readiness: ready
+    rationale: Self-contained schema/CLI bugs (#13 enum, #14 schema_refs, #28 contradictions) with no decision dependency.
+    required_actions:
+      - "sprint-planning: lane per issue; sequence after the validation-engine lane merges."
+  - outcome: "Resolve blocking decisions in parallel (decision track via gates ACT-002..005)."
+    issue_ids: [36, 8, 9]
+    readiness: needs_issue_updates
+    rationale: ADR/decision lanes that unblock SEQ-003/005/006/008; run as decision gates alongside the implementation sprint. Each needs its allowed-decisions and evidence recorded on the issue before a decision lane opens.
+    required_actions:
+      - "sprint-planning: model #8/#9/#36 as decision lanes whose deliverable is an ADR/decision record, not code."
+      - "Add allowed-decisions + required-evidence to issues #8/#9/#36 before opening their decision lanes."
+actions:
+  - id: ACT-001
+    type: close_duplicate
+    target: "issue #4 (delivered as northstar-question-resolution)"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-002
+    type: open_gate
+    target: "decision gate for #8 authority boundaries"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-003
+    type: open_gate
+    target: "decision gate for #9/#23 controller-loop vs orchestrator ownership"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-004
+    type: open_gate
+    target: "architecture decision gate (ADR) for #36 package<->platform skill-system reconciliation"
+    owner: skills-maintainer + platform-owner
+    status: proposed
+  - id: ACT-005
+    type: open_gate
+    target: "decision gate for #10 readiness boundary and #25 eval-runner strategy"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-006
+    type: set_dependency
+    target: "#33 depends-on #36; #22 depends-on #9; #2 depends-on #9/#23; #7/#19/#29 depends-on #8; #27 depends-on #10; #24 depends-on #25"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-007
+    type: plan_sprint
+    target: "Sprint 2026-06-24-skills-hardening covering next_sprint_candidates + decision lanes"
+    owner: skills-maintainer
+    status: proposed
+  - id: ACT-008
+    type: no_op
+    target: "Product North Star lock (GAP-005) — intentionally deferred to a separate product-direction track"
+    owner: Jason + James
+    status: not_applicable
+handoff:
+  next_skill: sprint-planning
+  next_mode: issue-readiness
+  reason: >-
+    34 open issues are classified and sequenced into 8 dependency-ordered waves (SEQ-001..008). The ready slice
+    (#31,#17,#20,#30 then #13,#14,#28) plus parallel decision lanes (#36,#8,#9) are ready for an executable sprint
+    transaction. sprint-planning must create the lane map, per-issue lane contracts, ownership boundaries for the
+    shared surfaces (scripts/validate-repo.rb, lib/verdify/*.rb, config/lifecycle.yaml, schemas/), review plan, and
+    plan-approval gate. Product North Star lock is a separate, non-blocking track (GAP-005).
+  required_before_handoff:
+    - "Treat #8/#9/#10/#11/#23/#25/#36 as decision lanes (deliverable = ADR/decision record) sequenced first."
+    - "Close #4 as delivered."
+    - "Owner must accept that this is a skills-maintainer package-hardening sprint, not product-direction work."
+approval:
+  status: approved
+  approver: "jason (goal directive 2026-06-24: review all work + carve issues into lanes)"
+  approved_at: "2026-06-24T16:30:00Z"

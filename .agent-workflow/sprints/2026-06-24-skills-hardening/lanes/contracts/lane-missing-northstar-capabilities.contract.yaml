@@ -1,0 +1,168 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-missing-northstar-capabilities
+title: 'Ground missing North Star capabilities: critic GitHub review submission, Orbit
+  daily-brief scaffold-or-defer, and architecture.yaml authoring template (#35)'
+status: approved
+issue_ids:
+- 35
+coupling_justification: 
+objective: 'Make three declared-but-ungrounded North Star/skill capabilities actionable
+  or explicitly deferred: (1) specify the exact independent-critic GitHub review-submission
+  command and the mapping from the five critic outcomes to `gh pr review` events plus
+  a defined authorization gate, or relocate the action and remove it from independent-critic/SKILL.md;
+  (2) ship a minimal Orbit daily-brief schema+reference under a declared owner skill
+  OR add an explicit WAVE/MS deferral row for PRQ-028/IFACE-018 so it is no longer
+  presented as covered; (3) add skills/architecture-contracts/assets/architecture.template.yaml
+  mirroring the module-contract template and point Mode 1 at both the template and
+  the existing worked example. No formal module contract exists for this skills/schemas
+  package, so the governed files below stand in as the contract surface.'
+desired_outcome: independent-critic/SKILL.md states a concrete, authorized review-submission
+  command with an outcome->review-event mapping (or delegates and removes the step);
+  the Orbit requirement is either implemented as a minimal schema+reference under
+  a named owner or carries an explicit tracked deferral; architecture-contracts ships
+  a schema-valid architecture.template.yaml and Mode 1 references it and the worked
+  example; all touched skills and schemas validate and validate-repo.rb passes.
+non_goals:
+- No code changes to lib/verdify/ or scripts/validate-repo.rb (validator-engine and
+  other lanes own those).
+- 'Do not author the platform<->package reconciliation decision; that is the #36 ADR
+  lane (lane-dec-platform-reconciliation).'
+- Do not build a full Orbit product surface; only a minimal schema+reference or an
+  explicit deferral row.
+- No formal module contract exists for this package; this lane does not introduce
+  one.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/missing-northstar-capabilities
+module_contracts:
+- skills/independent-critic/SKILL.md
+- skills/architecture-contracts/SKILL.md
+- skills/architecture-contracts/assets/architecture.template.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - independent-critic
+  - architecture-contracts
+  - schemas
+  owned_paths:
+  - skills/independent-critic/SKILL.md
+  - skills/architecture-contracts/SKILL.md
+  - skills/architecture-contracts/assets/architecture.template.yaml
+  - schemas/
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - config/authority-matrix.yaml
+  - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
+  - ".agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md"
+  - ".agent-workflow/northstar/northstar-artifacts.yaml"
+  - skills/northstar-planning/SKILL.md
+  - skills/platform-readiness/SKILL.md
+  owned_interfaces:
+  - independent-critic review-submission command + outcome-to-gh-pr-review-event mapping
+  - architecture.template.yaml authoring scaffold (CMP-001 stub, baseline_sha, decision_ids,
+    approval block)
+dependencies:
+  hard: []
+  soft:
+  - lane_id: lane-dec-platform-reconciliation
+    coordination: 'SPR-AC-08 expects capabilities reconciled with the platform per
+      the #36 ADR. Align the critic review-submission delegation choice and any Orbit
+      deferral with that ADR''s package/platform boundary if it lands first; otherwise
+      note the assumption in closeout.'
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: independent-critic/SKILL.md specifies the concrete GitHub review-submission
+    command (gh pr review <n> --approve|--request-changes|--comment) with an explicit
+    mapping of the five critic outcomes (approve, approve_with_risks, request_fixes,
+    block_integration, needs_human_review) to review events and a defined "when authorized"
+    gate, OR the step is delegated to the orchestrator/release-verification and removed.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - diff of skills/independent-critic/SKILL.md showing the command/mapping or the
+    delegation+removal
+  - ruby scripts/validate-repo.rb output showing pass
+- id: LANE-AC-02
+  statement: The Orbit daily-brief requirement (PRQ-028 / IFACE-018) is either implemented
+    as a minimal schema+reference under a declared owner skill (northstar-planning
+    or platform-readiness) OR carries an explicit tracked WAVE/MS deferral row so
+    it is no longer presented as a delivered surface.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - diff adding the Orbit schema+reference, or the deferral row referencing PRQ-028/IFACE-018
+  - grep showing northstar-artifacts.yaml no longer presents Orbit as covered without
+    a deferral marker
+- id: LANE-AC-03
+  statement: skills/architecture-contracts/assets/architecture.template.yaml exists,
+    is schema-valid against schemas/architecture.schema.yaml (19 required fields,
+    CMP-001 stub, baseline_sha placeholder, decision_ids, pending approval block),
+    and Mode 1 of architecture-contracts/SKILL.md references both the template and
+    the worked example at examples/minimal-project/.agent-workflow/architecture/architecture.yaml.
+  sprint_acceptance_ids:
+  - SPR-AC-08
+  evidence_required:
+  - ruby bin/verdify artifact validate --file skills/architecture-contracts/assets/architecture.template.yaml
+    output showing valid
+  - diff of skills/architecture-contracts/SKILL.md Mode 1 referencing the template
+    and worked example
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: 'Whole-repo integrity: schemas, skills, and artifacts validate after the
+    changes.'
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the package test suite to confirm no regressions.
+  required: true
+- id: validate-architecture-template
+  command: ruby bin/verdify artifact validate --file skills/architecture-contracts/assets/architecture.template.yaml
+  purpose: Confirm the new architecture authoring template is schema-valid against
+    architecture.schema.yaml.
+  required: true
+required_evidence:
+- ruby scripts/validate-repo.rb output (pass)
+- make test output (pass)
+- ruby bin/verdify artifact validate --file skills/architecture-contracts/assets/architecture.template.yaml
+  output (valid)
+- diffs of skills/independent-critic/SKILL.md and skills/architecture-contracts/SKILL.md
+- the Orbit schema+reference or the explicit deferral row for PRQ-028/IFACE-018
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Grounding the critic review-submission step requires a public CLI/interface or schema
+  change beyond the issue scope (e.g. a new `lane review submit` command).
+- Choosing implement-vs-defer for Orbit requires an owner or North Star authority
+  decision the lane cannot make alone.
+- 'The #36 platform-reconciliation ADR has not landed and its boundary would materially
+  change the delegation or deferral choice.'
+definition_of_done:
+- 'Issue #35 acceptance satisfied with evidence for all three capabilities (critic
+  submission, Orbit, architecture template).'
+- skills/architecture-contracts/assets/architecture.template.yaml is schema-valid
+  and referenced from Mode 1 alongside the worked example.
+- Orbit is either implemented (minimal schema+reference) or explicitly deferred with
+  a tracked rationale.
+- ruby scripts/validate-repo.rb and make test are green.
+- Branch pushed and PR opened, ready for the independent critic; no self-merge.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

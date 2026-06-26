@@ -1,0 +1,193 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-platform-control-regrounding
+title: Reground sprint-orchestrator dispatch, dependency ordering, control-request
+  approval gate, and worker credential isolation to the real Agent Platform control
+  plane
+status: approved
+issue_ids:
+- 12
+- 18
+- 33
+- 34
+coupling_justification: 'Issues #12, #18, #33, and #34 all rewrite the sprint-orchestrator
+  runbook/control-request generators (build_execution_runbook.rb, build_platform_control_requests.rb)
+  and the AgentPlatformControlRequest contract plus its semantic validation. The MCP
+  regrounding (#12), dependency_order honoring (#18), approval-gate guard (#33), and
+  credential/deployment isolation (#34) are inseparable at the merge boundary because
+  they edit the same generator scripts, the same control-request schema, and the same
+  SemanticValidator dispatch.'
+objective: Reground the sprint-orchestrator dispatch surface to the real in-pod controller
+  MCP contract (add_worktree_agent), compute per-lane dependency_state from the planned
+  dependency_order, machine-enforce the approval gate for protected/production control-request
+  mutations, and enforce worker credential isolation plus verifier-distinct-from-deployer
+  in release verification. No formal black-box module contract exists for these surfaces;
+  the governed files in module_contracts are the primary generator scripts and the
+  control-request schema.
+desired_outcome: The execution-runbook and platform-control-request generators emit
+  only tools/operations that exist on the real controller MCP surface; dependency_state
+  reflects dependency_order waves (only first-not-complete wave lanes are ready);
+  AgentPlatformControlRequest with protected_write/production_write mutation cannot
+  reach authorized/executing/complete without human_gate_required and an approved
+  decision; launch scripts no longer leak the operator's full environment into worker
+  sessions; and a release cannot reach verified status with the deployer as its own
+  verifier or without a recorded deployment approval. validate-repo.rb and make test
+  pass.
+non_goals:
+- No formal module contract exists for these files; this lane does not author or change
+  any black-box module contract.
+- No changes to the sprint-plan or lane-map schemas or to lib/verdify/cli.rb (owned
+  by other concerns).
+- No changes to scripts/validate-repo.rb wiring beyond what these surfaces already
+  call.
+- Does not implement or fix the live platform controller write path (operator project
+  agents#1776); this lane only grounds the skill artifacts against the real contract.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/platform-control-regrounding
+module_contracts:
+- skills/sprint-orchestrator/scripts/build_execution_runbook.rb
+- skills/sprint-orchestrator/scripts/build_platform_control_requests.rb
+- schemas/agent-platform-control-request.schema.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - sprint-orchestrator dispatch and control-request generation
+  - agent-platform control-request contract and semantic validation
+  - worker credential isolation and release-verification independence
+  owned_paths:
+  - skills/sprint-orchestrator/scripts/build_execution_runbook.rb
+  - skills/sprint-orchestrator/scripts/build_platform_control_requests.rb
+  - skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml
+  - skills/sprint-orchestrator/references/platform-execution.md
+  - schemas/agent-platform-control-request.schema.yaml
+  - schemas/release-verification.schema.yaml
+  - lib/verdify/semantic_validator.rb
+  - scripts/launch-codex.sh
+  - scripts/launch-claude.sh
+  - skills/lane-delivery
+  - skills/release-verification
+  - skills/platform-readiness/references/agent-platform-control.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - schemas/sprint-plan.schema.yaml
+  - schemas/sprint-execution-runbook.schema.yaml
+  - skills/sprint-planning
+  coordination_required_paths:
+  - schemas/agent-platform-control-request.schema.yaml
+  - schemas/release-verification.schema.yaml
+  - lib/verdify/semantic_validator.rb
+  - verdify.workflow.yaml
+  owned_interfaces:
+  - AgentPlatformControlRequest semantic-validation rules (SemanticValidator)
+  - sprint-execution-runbook dependency_state derivation
+  - controller MCP tool mapping (add_worktree_agent) in the runbook/control-request
+    generators
+dependencies:
+  hard:
+  - lane_id: lane-dec-platform-reconciliation
+    required_output: platform-reconciliation ADR (real control contract)
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The runbook and control-request generators emit only the real controller
+    MCP surface (add_worktree_agent / POST /api/repos/<o>/<n>/agents over in-pod stdio)
+    with GitHub/poll-based observation; no agent_platform.session.* or agent_platform.terminal.*
+    tools or session.create payloads remain in build_execution_runbook.rb, build_platform_control_requests.rb,
+    the runbook template, or references/platform-execution.md (#12).
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - diff showing removal of agent_platform.session.*/terminal.* tools and session.create
+    payload
+  - grep output confirming no agent_platform.session/terminal references remain in
+    the affected files
+- id: LANE-AC-02
+  statement: 'build_execution_runbook.rb derives dependency_state per lane from plan[''dependency_order'']:
+    first not-yet-complete wave lanes are ready, later-wave lanes are waiting/blocked;
+    a test feeds a two-wave dependency_order and asserts only first-wave lanes are
+    emitted ready (#18).'
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - test output asserting first-wave-only ready for a two-wave dependency_order
+- id: LANE-AC-03
+  statement: SemanticValidator rejects an AgentPlatformControlRequest whose mutation_level
+    is protected_write/production_write reaching authorized/executing/complete without
+    review.human_gate_required == true and an approved decision; build_platform_control_requests.rb
+    derives human_gate_required from mutation_level rather than hardcoding false (#33).
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - test/validator output showing a protected/production write without approval is
+    rejected
+  - diff of build_platform_control_requests.rb deriving human_gate_required from mutation_level
+- id: LANE-AC-04
+  statement: Launch scripts start workers with an explicit minimal/allowlisted environment
+    (no inherited production credentials), lane-delivery restates the no-production-credentials
+    boundary, and validate_release requires a recorded deployment approval and verifier
+    distinct from the deployer when status == verified (#34).
+  sprint_acceptance_ids:
+  - SPR-AC-05
+  evidence_required:
+  - diff of launch-codex.sh/launch-claude.sh showing env scrubbing/allowlist
+  - test/validator output showing verified with deployer==verifier or no approval
+    is rejected
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Whole-repo schema and semantic validation gate (wires SemanticValidator).
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the repo test suite including the new runbook dependency_state and
+    validator guard tests.
+  required: true
+- id: validate-contract
+  command: ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-platform-control-regrounding.contract.yaml
+  purpose: Confirm this lane contract validates against lane-contract.schema.yaml.
+  required: true
+required_evidence:
+- Diffs of build_execution_runbook.rb, build_platform_control_requests.rb, and the
+  runbook template/references regrounded to add_worktree_agent
+- Grep output confirming no agent_platform.session.*/terminal.* references remain
+  in the affected files
+- Test output proving dependency_state is derived from dependency_order (first-wave-only
+  ready)
+- Validator/test output proving protected/production control-requests without approval
+  are rejected
+- Validator/test output proving self-verified releases (deployer==verifier or no approval)
+  are rejected
+- Green ruby scripts/validate-repo.rb and make test runs
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The real controller MCP contract from the platform-reconciliation ADR conflicts
+  with the issue evidence and the correct tool surface cannot be determined.
+- The fix requires a public interface or schema change beyond the four issues' scope
+  (e.g. a sprint-plan or runbook schema change).
+- Enforcing the approval gate or credential isolation would break another lane's owned
+  generator behavior and needs coordination on a shared schema/validator file.
+definition_of_done:
+- Acceptance criteria LANE-AC-01..04 satisfied with the required evidence attached.
+- Branch lane/platform-control-regrounding pushed and a pull request opened ready
+  for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- Issues
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

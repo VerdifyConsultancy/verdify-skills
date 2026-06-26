@@ -1,0 +1,133 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-validator-engine
+title: Harden validator and schema engine (reference-path checking + draft-2020-12
+  keyword coverage)
+status: approved
+issue_ids:
+- 17
+- 31
+coupling_justification: "#17 (SKILL reference-path existence checking and the dangling
+  release-verification cross-skill reference) and #31 (full draft-2020-12 keyword
+  support: $ref/format/ patternProperties/dependentRequired) both extend the validator
+  and schema engine on the same files (scripts/validate-repo.rb and lib/verdify/schema_validator.rb),
+  so they must be delivered in one lane to avoid conflicting edits to the validator
+  core."
+objective: 'Close two validator under-checking gaps on the same engine: (1) broaden
+  scripts/validate-repo.rb so SKILL.md reference tokens of the form skills/<name>/{references,assets,scripts}/...
+  and ../<name>/... are existence-checked, and fix the dangling release-verification
+  Mode 2 cross-skill reference; and (2) make lib/verdify/schema_validator.rb either
+  enforce the draft-2020-12 keywords it currently drops ($ref, format, patternProperties,
+  dependentRequired, prefixItems, if/then) or have validate-repo.rb reject any schema
+  declaring keywords the validator does not enforce, so the declared $schema and actual
+  enforcement cannot silently diverge.'
+desired_outcome: The validator existence-checks all backticked repo reference tokens
+  in SKILL bodies (including cross-skill forms) and fails on the previously-undetected
+  broken release-verification reference until it is fixed; and a schema can only pass
+  while declaring draft 2020-12 if every keyword it uses is actually enforced (or
+  detected as unsupported), with regression coverage so neither gap can reopen silently.
+non_goals:
+- No formal module contract exists for this package; this lane does not introduce
+  one and operates against the governed source files directly.
+- No changes to schema documents under schemas/ beyond what is required to exercise
+  the new validator behavior.
+- No public CLI interface or output-format changes beyond the new validation errors
+  required by the issues.
+- No refactor of unrelated validator sections or skill content outside the cited evidence.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/validator-engine
+module_contracts:
+- scripts/validate-repo.rb
+- lib/verdify/schema_validator.rb
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Repository validator engine
+  - JSON Schema validation engine
+  owned_paths:
+  - scripts/validate-repo.rb
+  - lib/verdify/schema_validator.rb
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  coordination_required_paths:
+  - skills/release-verification/SKILL.md
+  owned_interfaces:
+  - 'validate-repo.rb: SKILL reference-path existence check (validate_skills)'
+  - SchemaValidator#validate keyword enforcement surface
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: validate-repo.rb existence-checks cross-skill and sibling-skill reference
+    tokens in SKILL bodies (skills/<name>/{references,assets,scripts}/... and ../<name>/...),
+    the dangling release-verification Mode 2 reference is fixed to a resolving path,
+    and a regression check fails if a SKILL body names a non-existent path under another
+    skill's directory (#17).
+  sprint_acceptance_ids:
+  - SPR-AC-02
+  evidence_required:
+  - ruby scripts/validate-repo.rb output showing the suite passes after the reference
+    fix
+  - Test/probe output showing the broadened regex now captures and existence-checks
+    the previously-uncaptured cross-skill token
+- id: LANE-AC-02
+  statement: 'SchemaValidator no longer silently drops draft-2020-12 keywords: $ref/format/
+    patternProperties/dependentRequired (and prefixItems/if-then) are either enforced
+    or detected as unsupported by validate-repo.rb, so a schema declaring draft 2020-12
+    cannot pass while using a keyword that is not actually validated (#31).'
+  sprint_acceptance_ids:
+  - SPR-AC-02
+  evidence_required:
+  - Test output demonstrating an unsupported/newly-supported keyword is enforced or
+    rejected rather than ignored
+  - ruby scripts/validate-repo.rb output confirming all existing schemas still pass
+validation_commands:
+- id: VC-01
+  command: ruby scripts/validate-repo.rb
+  purpose: Full repository validation including the broadened SKILL reference-existence
+    check and schema declaration enforcement.
+  required: true
+- id: VC-02
+  command: make test
+  purpose: Run the test suite including regression tests for cross-skill reference
+    checking and schema keyword enforcement.
+  required: true
+required_evidence:
+- ruby scripts/validate-repo.rb passing output
+- make test passing output including new regression tests
+- Diff of scripts/validate-repo.rb and lib/verdify/schema_validator.rb implementing
+  both fixes
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public CLI interface or schema-document change beyond the scope
+  of issues
+- Fixing the dangling reference requires editing skills/release-verification/SKILL.md
+  beyond the single coordinated path correction, conflicting with another lane.
+- Full $ref resolution proves infeasible and the team must decide between enforcing
+  vs rejecting unsupported keywords as the chosen approach.
+definition_of_done:
+- Issue
+- Branch lane/validator-engine pushed and PR opened, ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green with the new regression coverage.
+- The previously-broken release-verification Mode 2 reference resolves and is existence-checked
+  by the validator.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

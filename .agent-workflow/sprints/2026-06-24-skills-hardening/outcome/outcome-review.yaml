@@ -1,0 +1,43 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-06-24-skills-hardening
+decision: accepted_with_risks
+reviewed_at: "2026-06-24T20:48:00Z"
+reviewer: "controller (Claude orchestrator) — recorded for Jason's outcome acceptance"
+intended_outcome: >-
+  Harden the Verdify lifecycle-skills package (correctness, internal consistency, platform grounding, security)
+  by carving all 33 open adversarial-review + boundary + capability issues into wave-gated lanes and delivering
+  them through worktree workers, independent critics, and GitHub PR merges.
+delivered_outcomes:
+  - "All 33 sprint lane-issues delivered and merged to main across 26 lanes (6 decision ADRs + 20 implementation/new-skill lanes)."
+  - "6 ADRs (ADR-0011..0016) resolved the authority/ownership/readiness/triage/eval/platform-reconciliation decisions, incl. NSQ-007."
+  - "Validator/schema engine hardened (#17/#31): reference-path checking + draft-2020-12 keywords + route-enum drift guard."
+  - "Security: secret scanning on ingested research (#16), AgentPlatformControlRequest approval-gate + structured-payload guards (#33), worker credential isolation (#34), router gate-bypass fix (#15), prompt-injection/content-trust guidance (#21)."
+  - "Platform grounding: orchestrator dispatch regrounded to the real add_worktree_agent contract per ADR-0016 (#12/#18); readiness skills regrounded to Traefik/Authentik (#27)."
+  - "Schema/CLI correctness (#13/#14/#28/#29/#20/#30/#32), lifecycle-definition reconciliation (#7), eval uplift (#24), controller-loop recovery (#2), lane-delivery correctness (#26)."
+  - "2 new skills added: consensus-audit-workflow (#3, reconciled with platform consensus-review) and repo-bootstrap (#1); plus missing North Star capabilities (#35)."
+  - "main validates clean: 21 skills, 45 schemas; make test (validate-repo + schema + CLI + PR policy + npm install) PASS; 0 open PRs."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pulls?q=is:pr+is:merged (PRs #37-#64)"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/critic/code-batch-1..7-review.md"
+  - ".agent-workflow/sprints/2026-06-24-skills-hardening/status.yaml"
+  - "ruby scripts/validate-repo.rb -> 21 skills, 45 schemas; make test PASS on main@HEAD"
+incomplete_items: []
+residual_risks:
+  - "Critic-flagged deferred coordination items (drift guards / SemanticValidator NorthStarQuestion cases / architecture-contracts AC-02 hardening / MANIFEST policy) are follow-up enhancements tracked in #54, not blocking incompletes."
+  - "Every lane was reviewed by an automated independent codex critic, not a human reviewer; the 6 ADRs were human-ratified by Jason but the code lanes were merged on critic-approval + green CI."
+  - "Decision ADRs (#36 platform reconciliation) assert a boundary with jvallery/agents that the platform side has not formally agreed (one-sided)."
+  - "New skills (repo-bootstrap, consensus-audit) are minimally-scoped facades; their full behavior is unproven against the live platform."
+follow_up_issues: [54, 43]
+lessons_learned:
+  - "Contract owned_paths were systematically under-specified vs acceptance criteria (excluded tests/, MANIFEST, and cross-lane validation files), causing repeated worker stops; the lane-contract template should include tests/ and scope-out cross-lane assertions by default."
+  - "The single-owner conflict-resolver blanked one lane's owned_paths to a bogus placeholder (router-gate-bypass) — automated ownership rewrites need a non-empty-owned invariant check."
+  - "Controller miscounted: a false-positive merge signal (#44) and a held-and-forgotten lane (#16 secret-scanning) were both caught only on a late re-audit; a definitive merge/dispatch ledger reconciliation per poll would prevent this."
+  - "Serializing merges on shared registry files (config/lifecycle.yaml) and rebasing late-branched lanes (#44, #63) was necessary as main advanced; new-skill lanes inherently contend on the skill registry."
+  - "One automated critic per batch (vs per-lane) preserved role-purity and caught real defects (#44 reference band-aid, #52 prose-not-payload, #57 PR-ref typo) while conserving model budget."
+rationale: >-
+  All 33 intended lane-issues are delivered and merged, main validates clean and make test passes, and every lane
+  passed an independent critic plus required GitHub checks with no self-certification. Accepted WITH RISKS because
+  review was automated-critic-based (not human code review), the platform-reconciliation ADR is one-sided, and
+  deferred coordination items remain open in #54. Final human outcome acceptance rests with Jason.

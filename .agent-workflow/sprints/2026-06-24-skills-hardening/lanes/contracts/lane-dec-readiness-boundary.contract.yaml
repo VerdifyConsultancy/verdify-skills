@@ -1,0 +1,139 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-readiness-boundary
+title: 'ADR: platform-readiness vs gravity-readiness ownership boundary for Gravity
+  pilot gating'
+status: approved
+issue_ids:
+- 10
+coupling_justification: 
+objective: 'Produce an Architecture Decision Record (ADR) under docs/decisions/ that
+  resolves the open question in issue #10: define the order, ownership boundary, and
+  artifact handoff between the platform-readiness and gravity-readiness skills, especially
+  for Gravity pilot decisions. The ADR must establish platform-readiness as the authoritative
+  owner of environment/control-plane readiness (and non-Gravity pilot proof) and gravity-readiness
+  as the owner of Gravity-specific product/repo/pilot readiness that consumes platform-readiness
+  output rather than duplicating it. No formal module contract exists for this package,
+  so this lane''s governance surface is the docs/decisions/ ADR set.'
+desired_outcome: 'The repo carries a merged ADR that clearly defines the order, ownership
+  boundary, and readiness artifact handoff between platform-readiness and gravity-readiness,
+  with at least two acceptance examples (platform not ready for any autonomous pilot;
+  platform ready but Gravity repo/pilot criteria still failing), and issue #10 references
+  the ADR.'
+non_goals:
+- No code changes in this lane; this is a decision/ADR lane only.
+- Do not remove or merge either readiness skill (platform-readiness, gravity-readiness).
+- Do not implement Gravity features.
+- Do not apply Kubernetes, GitOps, RBAC, or production changes from this issue.
+- Do not author or modify a formal module contract; no formal module contract exists
+  for this package.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-readiness-boundary
+module_contracts:
+- docs/decisions/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Lifecycle decisions / Architecture Decision Records
+  - Readiness skill ownership boundary (platform-readiness vs gravity-readiness)
+  owned_paths:
+  - docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - skills/platform-readiness/SKILL.md
+  - skills/gravity-readiness/SKILL.md
+  - verdify.workflow.yaml
+  - docs/lifecycle.md
+  coordination_required_paths: []
+  owned_interfaces: []
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: A new ADR file exists under docs/decisions/ (ADR-00NN-*.md) that defines
+    the order, ownership boundary, and readiness artifact handoff between platform-readiness
+    and gravity-readiness for Gravity pilot gating, naming platform-readiness as authoritative
+    owner of environment/control-plane readiness and non-Gravity pilot proof, and
+    gravity-readiness as consumer of that output for Gravity-specific product/repo/pilot
+    readiness.
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the new ADR file under docs/decisions/ and its decision section text.
+  - Quoted ADR statements naming platform-readiness as authoritative owner and gravity-readiness
+    as consumer.
+- id: LANE-AC-02
+  statement: The ADR states the expected ordering when both platform and Gravity readiness
+    are incomplete, requires readiness artifacts to cross-link platform evidence into
+    Gravity readiness without making .agent-workflow/gravity/ the authoritative owner
+    of platform state, and includes at least two acceptance examples (platform not
+    ready for any autonomous pilot; platform ready but Gravity repo/pilot criteria
+    still failing).
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Quoted ordering rule and cross-link requirement from the ADR.
+  - The two acceptance example cases as written in the ADR.
+- id: LANE-AC-03
+  statement: 'Issue #10 references the merged ADR (e.g., an ADR link added to the
+    issue or a cross-reference in the ADR back to issue #10).'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - 'The issue #10 -> ADR reference (issue comment/body link or ADR reference to #10).'
+validation_commands:
+- id: adr-exists
+  command: ls docs/decisions/ | grep -E 'readiness'
+  purpose: Confirm a readiness-boundary ADR file was added under docs/decisions/.
+  required: true
+- id: adr-references-issue
+  command: grep -rn '#10\|issue 10\|gravity-readiness\|platform-readiness' docs/decisions/
+  purpose: 'Confirm the ADR references issue #10 and both readiness skills it governs.'
+  required: true
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository-wide artifact/schema validation stays green after adding
+    the ADR.
+  required: true
+required_evidence:
+- Path to the new ADR file under docs/decisions/ (ADR-00NN-*.md).
+- Quoted ADR decision text defining the platform-readiness/gravity-readiness ownership
+  boundary, ordering, and artifact handoff.
+- The two acceptance example cases from the ADR.
+- 'The issue #10 -> ADR cross-reference.'
+- Output of ruby scripts/validate-repo.rb showing a green repository validation.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on the chosen ownership boundary or ordering option for platform-readiness
+  vs gravity-readiness.
+- Resolving the boundary would require code or skill-definition changes beyond an
+  ADR (e.g., editing skills/platform-readiness/SKILL.md, skills/gravity-readiness/SKILL.md,
+  verdify.workflow.yaml, or docs/lifecycle.md), which are out of this lane's scope.
+definition_of_done:
+- 'A new ADR (docs/decisions/ADR-00NN-*.md) resolving issue #10''s readiness-boundary
+  question is merged.'
+- 'Issue #10 acceptance intent is satisfied with evidence, and issue #10 references
+  the ADR.'
+- Branch lane/dec-readiness-boundary is pushed and a PR is open and ready for the
+  independent critic.
+- ruby scripts/validate-repo.rb is green.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

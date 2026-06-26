@@ -1,8 +1,8 @@
 # North Star Architecture
 
-Status: `iterating`
-Iteration: `22`
-Review: `changes_requested`
+Status: `review_requested`
+Iteration: `26`
+Review: `requested`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Product pair: `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
 Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
@@ -51,7 +51,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | ARQ-004 | Every repo/application must expose standard observability and diagnostic links. | operability | Metrics, logs, traces, endpoint health, storage health, deployment markers, signal assessments, and explicit missing-telemetry findings are recorded in review or diagnostic packets. | `PRQ-004`, `SURF-004` | all registered evidence items, especially `NSE-20260623-agent-platform-live-state-audit`, `NSE-20260623-review-inbox-product-examples`, `NSE-20260623-review-inbox-skill-implementation-best-p`, and `NSE-20260623-observability-diagnostics-implementation` |
 | ARQ-005 | Session and wave history must survive model context loss. | auditability | `session-ledger.schema.yaml` validates append-oriented events, parent/child sessions, correlation IDs, issue/branch/PR/deployment links, decisions, outcomes, artifact/evidence/external refs, checksums, and explicit exceptions. | `PRQ-005` | all registered evidence items, especially `NSE-20260623-session-ledger-implementation-best-pract` |
 | ARQ-006 | CI/CD based wave deployment must be modeled as a first-class architecture path. | delivery | Deployment-affecting waves validate `wave-release-plan.schema.yaml` with branch/merge model, CI events/checks, environments, GitOps desired state, deployment strategy, observability, rollback, release-health signals, and review handoff before dispatch; environment-sensitive waves validate `environment-gitops-reconciliation.schema.yaml` with desired state, controller status, namespace controls, health, drift, remediation, cleanup, and handoff. | `PRQ-006`, `PRQ-005` | `NSE-20260623-kubernetes-gitops-cicd-cardinality`, `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260623-wave-release-planning-implementation-bes`, `NSE-20260623-environment-gitops-implementation-best-p` |
-| ARQ-007 | The lifecycle must be packaged as seventeen coherent skills with progressive disclosure rather than one large prompt. | maintainability | Validator recognizes the canonical skills and rejects invalid skill metadata or broken host links. | `PRQ-007` | `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0006`, `ADR-0008` |
+| ARQ-007 | The lifecycle must be packaged as eighteen coherent lifecycle skills plus standalone `issue-triage`, with progressive disclosure rather than one large prompt. | maintainability | Validator recognizes all 19 validating skills, `config/lifecycle.yaml` remains the lifecycle-order source for the 18 lifecycle skills, and validation rejects invalid skill metadata or broken host links. | `PRQ-007` | `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0006`, `ADR-0008`, `ADR-0009`, `ADR-0010`, `config/lifecycle.yaml` |
 | ARQ-008 | The CLI must remain dependency-light and schema-driven for local and target repositories. | portability | Core commands run through Ruby standard-library code, validate artifacts by schema, and avoid hidden service dependencies. | `PRQ-008`, `PRQ-013` | `README.md`, `lib/verdify/cli.rb` |
 | ARQ-009 | Durable artifacts must be the handoff layer between roles and sessions. | reliability | `.agent-workflow` records carry route decisions, project definitions, contracts, leases, evidence, readiness, release, and review state. | `PRQ-009`, `PRQ-015` | `COMMON_OPERATING_CONTRACT.md` |
 | ARQ-010 | GitHub integration must reconcile with, not replace, durable artifact contracts. | governance | `github-backlog-sync.schema.yaml` validates source authority, snapshot freshness, issue/PR/lane/delivery findings, dependency/project/check/deployment gaps, actions, and handoff while GitHub remains the authoritative control plane. | `PRQ-010`, `PRQ-015` | `ADR-0001`, `NSE-20260623-github-backlog-sync-implementation-best` |
@@ -72,11 +72,13 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | ARQ-025 | Controller loops must emit enough telemetry for dashboards, alerts, recovery, and review. | observability/reliability | Prometheus/Grafana and diagnostic packets expose controller health, pod health, loop counts, stop reasons, ledger events, alert routing, recovery attempts, resource usage, and outstanding-work rehydration. | `PRQ-026`, `SURF-017` | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-observability-diagnostics-implementation`, `NSE-20260623-session-ledger-implementation-best-pract` |
 | ARQ-026 | Orbit-style daily briefs must be read-only summaries over authorized connectors and authoritative records. | interface/governance | Briefs report source freshness, privacy boundaries, missing connectors, linked GitHub/artifact/deployment records, and review items without recording approval or replacing backlog authority. | `PRQ-028`, `PST-019`, `SURF-018` | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-openclaw-hermes-local-evidence` |
 | ARQ-027 | Repo-associated agents must have a typed scope and responsibility contract before they claim ownership. | governance/security | `repo-agent-scope.schema.yaml` validates repository identity, scope, ownership, responsibilities, authority boundaries, discovery inputs, runtime context, escalation paths, review, handoff, and approval. | `PRQ-029`, `PST-020`, `SURF-019` | `NSE-20260623-repo-controller-bootstrap-self-discovery` |
+| ARQ-028 | Agent Platform-backed controller loops must expose bounded agentic runtime controls before broad autonomous rollout. | reliability/security/governance | Runtime evidence records include model/prompt/tool/skill/eval/image bundle identity, budget/rate/retry stop controls, emergency brake/read-only state, MCP/session tool-call and policy-denial traces, untrusted-input guardrails, provenance refs, and handoff/repair state. | `PRQ-030`, `SURF-020` | `NSE-20260624-agentic-loop-sdlc-best-practices` |
+| ARQ-029 | Verdify lifecycle skills must consume a shared bounded agentic-loop control contract before broad autonomous use. | governance/reliability/security | Each applicable `SKILL.md` includes or references controls for objective, evidence, plan, permissions, execution, observation, validation, repair, stop/budget, telemetry, reproducibility/runtime bundle dependency, content trust, provenance, and handoff; package-wide adoption is tracked in `VerdifyConsultancy/verdify-skills#43`. | `PRQ-030`, `SURF-021` | `NSE-20260624-agentic-loop-sdlc-best-practices`, `NSE-20260624-agentic-loop-audit-closeout` |
 
 ## ARCH-004 High-Level Design
 
 - System context: A target repository uses Verdify lifecycle skills and `.agent-workflow` artifacts. GitHub remains backlog and delivery control plane while local and cluster services provide execution, preview, observability, and review context.
-- Major components: seventeen lifecycle skills; `bin/verdify` CLI; schema validator; `.agent-workflow` artifacts; GitHub operating layer; Agent Platform MCP/API control layer; repo-controller bootstrap workflow; repo-agent scope contracts; controller pods with durable workspace state, tmux/web/API visibility, and worktree/session awareness; Hermes/OpenClaw/Orbit planning layer; learning-capture proposal packets; loop-readiness checks; lane/worktree lease manager; prompt compiler; reusable Gravity core and packs; host discovery symlinks; package/install scripts; tests and repository validator.
+- Major components: eighteen lifecycle skills plus standalone `issue-triage` as 19 validating package skills; `bin/verdify` CLI; schema validator; `.agent-workflow` artifacts; GitHub operating layer; shared skill loop-control contract; Agent Platform MCP/API control layer; repo-controller bootstrap workflow; repo-agent scope contracts; controller pods with durable workspace state, tmux/web/API visibility, and worktree/session awareness; Hermes/OpenClaw/Orbit planning layer; learning-capture proposal packets; loop-readiness checks; lane/worktree lease manager; prompt compiler; reusable Gravity core and packs; host discovery symlinks; package/install scripts; tests and repository validator.
 - Skill topology: router -> transcript/research intake -> North Star planning -> project definition -> architecture/contracts -> state-of-union -> repo hygiene -> sprint planning/orchestration -> controller/readiness/lane/critic/release loops.
 - Artifact topology: schemas define every durable YAML contract; Markdown artifacts provide human review surfaces; route decisions name exactly one next skill/mode; evidence and traceability records preserve provenance.
 - Runtime topology: local agent sessions and worktrees operate against Git repositories; Agent Platform agents run in namespace-scoped repo pods and app environments; Hermes/OpenClaw can act as the higher-level conversational planner through MCP/API; GitOps reconciles approved environment state.
@@ -125,6 +127,8 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | IFACE-017 | Fleet controller dashboard and alert routing | Controller-loop, platform readiness, SRE/operator | Prometheus/Grafana dashboards, Alertmanager routes, diagnostic packets, session-ledger refs, pod/controller/loop/resource/recovery signals | Dashboard and alert definitions are generated from platform readiness and controller-loop records, not hand-maintained private notes | `PRQ-026`, `SURF-017`, `PST-017` | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-observability-diagnostics-implementation` |
 | IFACE-018 | Orbit daily operating brief | Orbit/fleet planner, Jason, project owners | Read-only digest of authorized email/calendar/GitHub/repo-controller/issue/PR/deployment/agent-status sources with source freshness, privacy boundaries, missing connector notes, and authoritative links | Briefs cannot approve work or replace GitHub/artifact authority; connector scopes and retention must be explicit before scheduling | `PRQ-028`, `SURF-018`, `PST-019` | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-openclaw-hermes-local-evidence` |
 | IFACE-019 | Repo-agent scope and responsibility contract | Repo-hygiene discovery, repo controller, platform-readiness, controller-loop, state-of-union | `RepoAgentScope` artifact with agent identity, repository identity, purpose, in/out scope, owned/protected paths, stakeholders, ownership, `RAS-*` responsibilities, authority boundaries, discovery inputs, runtime context, escalation paths, review, handoff, and approval | First contract validates with `schemas/repo-agent-scope.schema.yaml` and starts from `skills/repo-hygiene/assets/repo-agent-scope.template.yaml`; approved scope may be copied into controller state with source reference | `PRQ-029`, `SURF-019`, `PST-020` | `NSE-20260623-repo-controller-bootstrap-self-discovery` |
+| IFACE-020 | Agentic runtime control bundle | Agent Platform runtime, controller-loop, sprint-orchestrator, platform-readiness, review inbox, release verification | Bundle and control record with controller/session identity, model ID, prompt/instruction bundle hash, skill bundle hash, MCP/tool schema hash, eval/canary version, image digest, budget policy and usage, retry/rate stop state, emergency brake state, content-trust verdicts, tool-call/policy-denial trace IDs, provenance refs, and handoff state | Platform-owned contract; Verdify skills consume it as evidence before dispatch, review-ready status, and broad rollout. First platform backlog is `jvallery/agents#1995`-`#2000`. | `PRQ-030`, `SURF-020` | `NSE-20260624-agentic-loop-sdlc-best-practices` |
+| IFACE-021 | Shared skill loop-control contract | Verdify lifecycle skills, validator, controller-loop, sprint-orchestrator, independent-critic, release-verification | Common contract or reference section for bounded agentic loops: objective/scope, evidence, plan, authority and permissions, execution, observation, deterministic validation, repair/fix-forward, stop/budget, telemetry, reproducibility/runtime bundle dependency, content trust, provenance, and handoff | Versioned with the skills package; first adoption backlog is `VerdifyConsultancy/verdify-skills#43`; platform-dependent controls link to `jvallery/agents#1995`-`#2000` rather than being silently assumed. | `PRQ-030`, `SURF-021` | `NSE-20260624-agentic-loop-sdlc-best-practices`, `NSE-20260624-agentic-loop-audit-closeout` |
 
 ## ARCH-007 Security, RBAC, And Secrets
 
@@ -189,6 +193,8 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | ADR-0006 | Add North Star evidence registry | accepted | `docs/decisions/ADR-0006-northstar-evidence-registry.md` | `PRQ-001` | all registered evidence items |
 | ADR-0007 | Split North Star into product and architecture artifacts | accepted | `docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md` | `PRQ-001`, `PRQ-002` | all registered evidence items |
 | ADR-0008 | Add North Star interview skill | accepted | `docs/decisions/ADR-0008-northstar-interview-skill.md` | `PRQ-016`, `PST-009` | `NSE-20260623-end-to-end-agent-based-sdlc` |
+| ADR-0009 | Add North Star question resolution skill | accepted | `docs/decisions/ADR-0009-northstar-question-resolution-skill.md` | `PRQ-001`, `PRQ-002`, `PRQ-007` | `NSE-20260623-end-to-end-agent-based-sdlc` |
+| ADR-0010 | Add comprehensive planning review loop | accepted | `docs/decisions/ADR-0010-comprehensive-planning-review-loop.md` | `PRQ-027`, `PRQ-030` | `NSE-20260624-agentic-loop-sdlc-best-practices` |
 
 ## ARCH-013 Operating Plane And Control Surface
 
@@ -320,7 +326,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `PRQ-006` | `ARQ-006` | requires CI/CD wave deployment architecture |
 | `ARQ-006` | `schemas/wave-release-plan.schema.yaml` | validates the first concrete wave release planning contract |
 | `ARQ-006` | `schemas/environment-gitops-reconciliation.schema.yaml` | validates the first concrete environment GitOps reconciliation contract |
-| `PRQ-007` | `ARQ-007` | requires seventeen-skill package architecture |
+| `PRQ-007` | `ARQ-007` | requires eighteen-lifecycle-plus-one-standalone skill package architecture |
 | `PRQ-008` | `ARQ-008` | requires dependency-light CLI architecture |
 | `PRQ-009` | `ARQ-009` | requires durable schema-governed artifacts |
 | `PRQ-010` | `ARQ-010` | requires GitHub reconciliation architecture |
@@ -351,6 +357,10 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `PRQ-029` | `ARQ-027` | requires a typed repo-agent scope and responsibility contract |
 | `PRQ-029` | `ARCH-020` | requires repo-agent scope, ownership, responsibility, authority, and escalation architecture |
 | `ARQ-027` | `schemas/repo-agent-scope.schema.yaml` | validates the first concrete repo-agent scope contract |
+| `PRQ-030` | `ARQ-028` | requires bounded agentic-loop runtime controls across skills and Agent Platform-backed sessions |
+| `PRQ-030` | `IFACE-020` | requires a consumable runtime control bundle interface for dispatch, review, and rollout evidence |
+| `PRQ-030` | `ARQ-029` | requires a shared lifecycle-skill loop-control contract in the skills package |
+| `PRQ-030` | `IFACE-021` | requires lifecycle skills to consume a common loop-control interface before broad autonomous use |
 | `SURF-004` | `IFACE-004` | defines review inbox interface |
 | `IFACE-004` | `schemas/review-inbox-packet.schema.yaml` | validates the first concrete review inbox packet contract |
 | `SURF-006` | `IFACE-005` | defines CLI interface |
@@ -370,6 +380,8 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `SURF-017` | `IFACE-017` | defines fleet controller dashboard and alert routing interface |
 | `SURF-018` | `IFACE-018` | defines the Orbit daily operating brief interface |
 | `SURF-019` | `IFACE-019` | defines the repo-agent scope and responsibility contract interface |
+| `SURF-020` | `IFACE-020` | defines the agentic runtime control bundle interface |
+| `SURF-021` | `IFACE-021` | defines the shared skill loop-control contract interface |
 | `IFACE-014` | `schemas/northstar-learning-proposals.schema.yaml` | validates proposal-only learning-capture packets |
 | `IFACE-014` | `skills/northstar-planning/references/learning-capture.md` | defines learning-capture source eligibility, redaction, verifier, stop, budget, permissions, and scheduling boundaries |
 | `IFACE-014` | `skills/northstar-planning/assets/northstar-learning-proposals.template.yaml` | provides a reusable proposal packet template |
@@ -378,6 +390,9 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `NSE-20260623-agent-platform-live-state-audit` | `ARQ-016` | proves live repo-pod, GitHub, Kubernetes, and Argo CD operating-plane surfaces plus readiness gaps |
 | `NSE-20260623-openclaw-hermes-reuse-interface-security-audit` | `ARQ-017` | supports MCP/API-first planning-agent control with constrained tool surfaces |
 | `NSE-20260623-agent-platform-control-implementation-be` | `ARQ-017` | supports durable Agent Platform control requests with operation identity, authorization, policy verdict, mutation level, target, evidence, result, review gate, and handoff |
+| `NSE-20260624-agentic-loop-sdlc-best-practices` | `ARQ-028` | supports runtime bundle identity, budget/rate controls, emergency brake, tool-call telemetry, content-trust guardrails, incident response, and provenance |
+| `NSE-20260624-agentic-loop-sdlc-best-practices` | `ARQ-029` | supports a shared planner-executor-validator loop contract across lifecycle skills |
+| `NSE-20260624-agentic-loop-audit-closeout` | `ARQ-029` | reports that the prior audit updated drafts and exposed the need to reconcile skills-repo backlog coverage for skill adjustments |
 | `NSE-20260623-sunshine-gravity-extraction-architecture-audit` | `ARQ-018` | sharpens the generic Gravity core versus Sunshine client-pack extraction path |
 | `NSE-20260623-gravity-core-extraction-implementation-b` | `ARQ-018` | supports source-object provenance, checksum strategy, reusable core boundaries, pack assumptions, migration risks, and local-filesystem pilot criteria |
 | `NSE-20260623-gravity-remote-onyx-confirmation` | `ARQ-018` | resolves the Gravity/Onyx dependency question for MVP planning |

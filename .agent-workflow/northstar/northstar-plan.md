@@ -1,14 +1,15 @@
 # North Star Plan
 
 Status: `proposed`
-Review state: `changes_requested`
+Review state: `requested`
 
 This artifact is the planning loop output for the skills repository. It turns
 the pinned walk transcript, routed intake evidence, registered research, the
 latest Agent Platform / Sunshine Gravity / OpenClaw priority review, the
 Brave-sourced research pass, local live-state audits, OpenClaw/Hermes workflow
-evidence, the agent-loop / learning-capture evidence, and the repo-controller
-bootstrap / fleet self-discovery walk into
+evidence, the agent-loop / learning-capture evidence, the attached Codex/Claude
+agentic-loop and SDLC best-practices report, and the repo-controller bootstrap
+/ fleet self-discovery walk into
 goals, requirements, user stories, architecture principles, milestones, risks,
 questions, conflicts, issues, research paths, and final approval state.
 
@@ -60,6 +61,15 @@ questions, conflicts, issues, research paths, and final approval state.
 - Require loop-readiness checks before recurring agent loops are scheduled or
   delegated: recurrence, verifier, state, stop condition, budget, objective
   done criteria, permissions, and one reliable manual run.
+- Treat every lifecycle skill as either a bounded planner-executor-validator
+  loop or an explicit handoff into one, with objective, evidence, plan,
+  permissions, execution, observation, validation, repair, stop condition,
+  telemetry, reproducibility, and security controls.
+- Require the Agent Platform runtime to expose the live controls the skills
+  depend on: runtime bundle identity, spend/rate/retry budgets, emergency
+  brake/read-only mode, MCP/session tool-call traces, untrusted-input
+  guardrails, and provenance for runtime images, skill bundles, and
+  agent-authored artifacts.
 - Make repo-controller bootstrap and self-discovery a standard workflow before
   broad autonomous rollout across active repositories.
 - Require every repo-associated controller or long-lived agent to declare scope,
@@ -136,7 +146,14 @@ questions, conflicts, issues, research paths, and final approval state.
   first `environment-gitops-reconciliation.schema.yaml` implementation
   contract, and the first `gravity-core-extraction-plan.schema.yaml`
   implementation contract, plus the reported repo-controller bootstrap and
-  fleet self-discovery walk evidence.
+  fleet self-discovery walk evidence, and
+  `northstar://evidence/NSE-20260624-agentic-loop-sdlc-best-practices` for
+  bounded autonomy, planner-executor-validator loops, eval/adversarial/chaos
+  testing, telemetry, budget/rate controls, incident response, prompt/tool
+  versioning, and supply-chain provenance, plus
+  `northstar://evidence/NSE-20260624-agentic-loop-audit-closeout` for the
+  audit closeout, validation summary, platform issue creation, and remaining
+  North Star signoff state.
 - Deeper follow-up is now gate-driven: watch/timestamp individual GitOpsCon
   sessions only if a release architecture claim depends on them; exercise live
   browser terminal/runtime endpoints/secret-controller config only during
@@ -174,6 +191,47 @@ questions, conflicts, issues, research paths, and final approval state.
   `VerdifyConsultancy/gravity#2`; and `jvallery/vast-cloud-tco#217`.
 - The VAST TCO calculator/object-storage comparison is routed to
   `jvallery/vast-cloud-tco#217` and local VAST North Star/backlog addenda.
+
+## Agentic Loop Skill Audit Update
+
+- New durable audit artifact:
+  `.agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md`.
+- The audit reviews all 19 current skills against the new agentic-loop
+  baseline and records compliant loop elements, drift, missing controls,
+  per-skill improvement paths, missing SDLC skills/capabilities, the full
+  lifecycle chain, and the platform issue map.
+- Main compliant foundations: GitHub as control plane, durable artifacts,
+  issue/lane/branch/worktree/session/PR defaults, explicit route decisions,
+  evidence registry, readiness gates, fresh critic review, release verification,
+  and schema validation.
+- Main drift clusters: skill-count/lifecycle-source drift, route/gate schema
+  drift, prose-only evals, ingestion secret/content-trust gaps, orchestrator
+  grounding against nonexistent MCP paths, controller/session field gaps,
+  worker credential isolation, and platform runtime controls that the skills
+  assume but agents.vallery.net does not yet expose.
+- Missing or mode-first Verdify capabilities remain: `repo-bootstrap`,
+  `consensus-audit-workflow`, executable `eval-runner`, `review-inbox`,
+  `wave-release-planning`, `observability-diagnostics`, `session-ledger`,
+  `agent-platform-control`, `learning-capture`, `environment-gitops`,
+  `github-backlog-sync`, and `gravity-core-extraction`.
+- Platform issues already covering A-F Skills Fleet gaps:
+  `jvallery/agents#1977` through `#1987`.
+- New platform issues created by this audit:
+  `jvallery/agents#1995` runtime governance bundle,
+  `#1996` spend/rate/retry/budget stops,
+  `#1997` emergency brake/read-only mode,
+  `#1998` MCP/session tool-call and policy-denial traces,
+  `#1999` untrusted-input guardrails,
+  and `#2000` runtime/skill/artifact provenance.
+- New skills-repo issue created by this planning turn:
+  `VerdifyConsultancy/verdify-skills#43` tracks the shared bounded
+  agentic-loop control contract that every applicable lifecycle skill must
+  include or reference.
+- Synthesis update: `PRQ-030` now splits into two architecture obligations:
+  `ARQ-028` for platform/runtime controls owned by Agent Platform and
+  `ARQ-029` for the Verdify Skills package contract consumed by the 19
+  lifecycle skills. This keeps platform gaps from hiding package-level skill
+  adjustments.
 
 ## Planning Questions
 
@@ -242,7 +300,10 @@ final approval unless Jason/James explicitly provide it.
   `.agent-workflow/northstar/SDLC_SKILL_DESIGN.md`.
 - OpenClaw workflow artifact:
   `.agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md`.
-- Keep the existing 17 lifecycle skills as the installable kernel.
+- Keep the existing lifecycle skills as the installable kernel, while resolving
+  the 17-versus-19 skill-count drift recorded in
+  `.agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md`,
+  `VerdifyConsultancy/verdify-skills#19`, and `jvallery/agents#1987`.
 - `review-inbox` now has its first executable packet/schema contract under
   `release-verification`: `schemas/review-inbox-packet.schema.yaml`,
   `skills/release-verification/references/review-inbox.md`, a template, and a
@@ -312,14 +373,13 @@ final approval unless Jason/James explicitly provide it.
 
 Next skill: `northstar-planning`
 
-Next mode: `artifact-loop`
+Next mode: `human-review`
 
-Reason: The OpenClaw SDLC workflow skill design, first review-inbox packet
-contract, first wave release plan contract, first observability diagnostic
-packet contract, first session ledger contract, first Agent Platform control
-request contract, first GitHub backlog sync contract, first environment
-GitOps reconciliation contract, first Gravity core extraction plan contract, and
-first repo-agent scope contract plus the repo-controller bootstrap walk evidence
-have been synthesized into product, architecture, SDLC design, schemas,
-examples, and structured plan artifacts. Continue the North Star artifact loop
-before any final lock approval request.
+Reason: The OpenClaw SDLC workflow skill design, typed
+review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps
+and Gravity extraction contracts, first repo-agent scope contract,
+repo-controller bootstrap walk evidence, agentic-loop audit, platform issue map,
+and skills-side loop-contract issue #43 have been synthesized into product,
+architecture, SDLC design, schemas, examples, and structured plan artifacts.
+The North Star packet is ready for Jason and James to approve, request changes,
+or reject before final lock.

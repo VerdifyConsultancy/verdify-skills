@@ -1,0 +1,116 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-router-gate-bypass
+title: Close the router project-definition approval-gate bypass
+status: approved
+issue_ids:
+- 15
+coupling_justification: 
+objective: In the project-definition branch of build_route_decision (lib/verdify/cli.rb),
+  after the stage_status check, also require project.dig("approval","status") == "approved"
+  or an approved .agent-workflow/gates/project-definition.yaml; otherwise route to
+  PROJECT_DEFINITION_GATE instead of falling through into the architecture branch.
+  Mirror the approval check already used for the architecture branch at lib/verdify/cli.rb:1112-1116.
+  Harden the architecture-contracts SKILL "Approval and handoff" section to require
+  recording the human gate before approval may be self-set. No formal module contract
+  exists for the verdify CLI package; the governed file lib/verdify/cli.rb is treated
+  as the contract surface for this lane.
+desired_outcome: An agent that self-sets all four project-definition stage_status
+  fields to approved but has not recorded an approved approval.status or .agent-workflow/gates/project-definition.yaml
+  is routed to PROJECT_DEFINITION_GATE, not advanced into architecture-contracts.
+  A regression test asserts this. The architecture-contracts SKILL requires a recorded
+  human gate before approval may be set.
+non_goals:
+- Changing any router branch other than the project-definition approval gate logic.
+- Altering the schema of project-definition.yaml or the gate file schema.
+- Adding new public CLI subcommands or changing the route-decision artifact shape.
+- Authoring a formal module contract for the verdify CLI package (none exists; lib/verdify/cli.rb
+  is the governed surface for this lane).
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/router-gate-bypass
+module_contracts:
+- lib/verdify/cli.rb
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - project-router
+  - lifecycle-gating
+  owned_paths:
+  - lib/verdify/cli.rb
+  prohibited_paths:
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - verdify.workflow.yaml
+  - schemas/project-definition.schema.yaml
+  - skills/architecture-contracts/SKILL.md
+  owned_interfaces:
+  - build_route_decision project-definition routing branch
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The project-definition branch of build_route_decision routes to PROJECT_DEFINITION_GATE
+    when all four stage_status fields are approved but neither approval.status ==
+    approved nor an approved .agent-workflow/gates/project-definition.yaml exists,
+    mirroring the architecture branch approval check.
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - diff of lib/verdify/cli.rb showing the added approval/gate check before the architecture
+    branch
+  - passing router regression test output asserting PROJECT_DEFINITION_GATE for the
+    self-cert case
+- id: LANE-AC-02
+  statement: The architecture-contracts SKILL "Approval and handoff" section requires
+    recording .agent-workflow/gates/architecture.yaml (actor outcome_owner) before
+    approval.status may be set to approved.
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - diff of skills/architecture-contracts/SKILL.md showing the human-gate requirement
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the repository remains structurally valid after the change.
+  required: true
+- id: unit-tests
+  command: make test
+  purpose: Run the test suite including the new router regression test.
+  required: true
+required_evidence:
+- lib/verdify/cli.rb diff adding the project-definition approval/gate check
+- router regression test source and passing output
+- skills/architecture-contracts/SKILL.md diff requiring the recorded human gate
+- make test and ruby scripts/validate-repo.rb green output
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or route-decision schema change beyond the issue
+  scope.
+- Closing the bypass requires a new gate-file schema or a change to verdify.workflow.yaml
+  transitions beyond what the issue authorizes.
+definition_of_done:
+- Issue
+- Branch pushed and a pull request is open and ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green.
+- Router regression test asserts PROJECT_DEFINITION_GATE for the self-certification
+  case.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

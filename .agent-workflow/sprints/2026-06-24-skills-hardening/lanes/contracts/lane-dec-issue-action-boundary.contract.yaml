@@ -1,0 +1,119 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-issue-action-boundary
+title: Decide and document the state-of-union vs issue-triage GitHub-action boundary
+  (#11)
+status: approved
+issue_ids:
+- 11
+coupling_justification: 
+objective: Produce an ADR under docs/decisions/ that resolves when to use standalone
+  tactical issue-triage versus lifecycle strategic state-of-union backlog reconciliation,
+  and defines the action rule for shared GitHub issue fields (direct create/update
+  with authority via issue-triage versus propose/record strategic actions in state-of-union).
+desired_outcome: 'A merged ADR (ADR-00NN) records the chosen boundary: issue-triage
+  is the standalone tactical path outside the lifecycle graph and is never returned
+  as a lifecycle handoff; state-of-union owns strategic backlog/architecture/drift
+  reconciliation; the two hand off without duplicate issue edits or private backlog
+  state. Issue #11 references the ADR.'
+non_goals:
+- No code changes in this lane; the deliverable is an ADR, not edits to SKILL.md,
+  README.md, or the validator.
+- Do not merge issue-triage into state-of-union or vice versa.
+- Do not make issue-triage create sprint plans, lane contracts, branches, worktrees,
+  or PRs.
+- Do not make state-of-union replace the issue-triage investigation workflow.
+- No formal module contract exists for this package; the governed file is the ADR
+  document itself.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-issue-action-boundary
+module_contracts:
+- docs/decisions/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - lifecycle decision records (ADRs)
+  - state-of-union / issue-triage skill boundary
+  owned_paths:
+  - docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - skills/state-of-union/SKILL.md
+  - skills/issue-triage/SKILL.md
+  - skills/project-router/SKILL.md
+  - README.md
+  coordination_required_paths: []
+  owned_interfaces:
+  - ADR-00NN boundary decision between state-of-union and issue-triage
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: A new ADR file under docs/decisions/ documents that issue-triage is the
+    standalone tactical path (user-reported problems, bugs, gaps, duplicate searches,
+    evidence audits, issue-template create/update) outside lifecycle strategy review,
+    and that state-of-union owns approved-intent/backlog/architecture/drift reconciliation.
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the new ADR file under docs/decisions/
+  - ADR section text stating the tactical-vs-strategic boundary
+- id: LANE-AC-02
+  statement: 'The ADR defines the shared GitHub issue-field action rule (issue-triage
+    creates/updates directly with authority; state-of-union proposes/records strategic
+    actions when write authority is absent or the change depends on approved strategy)
+    and states issue-triage sits outside the lifecycle graph and is not a lifecycle
+    handoff. Issue #11 references the ADR.'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - ADR section text with the GitHub issue-field action rule
+  - 'Link/comment showing issue #11 references the ADR'
+validation_commands:
+- id: adr-exists
+  command: ls docs/decisions/ADR-00*-issue*action*boundary*.md
+  purpose: Confirm the decision ADR file was created for this lane.
+  required: true
+- id: adr-references-issue
+  command: grep -RIl '#11' docs/decisions/ADR-00*-issue*action*boundary*.md
+  purpose: 'Confirm the ADR references issue #11 per the boundary decision.'
+  required: true
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository validation still passes after adding the ADR.
+  required: true
+required_evidence:
+- Path to the new ADR file under docs/decisions/
+- Output of ruby scripts/validate-repo.rb showing pass
+- 'Evidence that issue #11 references the merged ADR'
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on whether state-of-union should ever directly mutate GitHub
+  issues or only emit strategy-proposed actions.
+- Resolving the boundary requires code/SKILL changes beyond an ADR, exceeding this
+  decision lane's scope.
+definition_of_done:
+- 'Issue #11 acceptance intent is satisfied by a merged ADR with evidence.'
+- 'ADR-00NN is merged under docs/decisions/ and issue #11 references it.'
+- ruby scripts/validate-repo.rb and make test are green.
+- Branch pushed and PR ready for the independent critic.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

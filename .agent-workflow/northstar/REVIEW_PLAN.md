@@ -1,88 +1,73 @@
 # North Star Review Plan
 
 Status: `requested`
-Requested at: `2026-06-23T04:30:38Z`
+Requested at: `2026-06-24T17:21:26Z`
 Reviewers: Jason, James
 
 ## Review Target
 
-Approve or request changes for the Verdify Skills repository North Star:
+Approve, request changes, or reject the Verdify Skills North Star packet:
 
 - `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
 - `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
 - `.agent-workflow/northstar/northstar-artifacts.yaml`
 - `.agent-workflow/northstar/northstar-plan.yaml`
 - `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`
+- `.agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md`
+- `.agent-workflow/northstar/SDLC_SKILL_DESIGN.md`
 
-Approval locks the North Star for the next milestone. Feedback returns the
-loop to `northstar-planning` / `artifact-loop`.
+Approval locks the North Star for the next milestone. Requested changes return
+the loop to `northstar-planning` / `artifact-loop`.
 
 ## Evidence In Scope
 
-- `northstar://evidence/NSE-20260623-walk-transcript-agent-platform-gravity-skills`
-- `northstar://evidence/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`
-- `northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality`
+The evidence registry contains 40 registered evidence records. The review should
+focus first on these records because they drove the current packet:
+
+- `northstar://evidence/NSE-20260624-agentic-loop-sdlc-best-practices`
+- `northstar://evidence/NSE-20260624-agentic-loop-audit-closeout`
+- `northstar://evidence/NSE-20260623-repo-controller-bootstrap-self-discovery`
+- `northstar://evidence/NSE-20260623-agent-platform-live-state-audit`
+- `northstar://evidence/NSE-20260623-agent-platform-sunshine-gravity-ip-priorities`
+- `northstar://evidence/NSE-20260623-openclaw-hermes-reuse-interface-security-audit`
+- `northstar://evidence/NSE-20260623-openclaw-hermes-local-evidence`
 - `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc`
-- `COMMON_OPERATING_CONTRACT.md`
-- `README.md`
-- `verdify.workflow.yaml`
-- `docs/decisions/ADR-0001-github-control-plane.md`
-- `docs/decisions/ADR-0002-cohesive-skills.md`
-- `docs/decisions/ADR-0003-worktree-leases.md`
-- `docs/decisions/ADR-0004-readiness-loop-skills.md`
-- `docs/decisions/ADR-0005-northstar-planning-loop.md`
-- `docs/decisions/ADR-0006-northstar-evidence-registry.md`
-- `docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md`
-- `docs/decisions/ADR-0008-northstar-interview-skill.md`
+- `northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning`
+- `northstar://evidence/NSE-20260623-long-horizon-learning-loop-source-verification`
 
 ## Review Checks
 
-1. Confirm the product North Star covers the intended scope of this repository:
-   lifecycle skills, CLI, schemas, host discovery, durable artifacts, GitHub
-   authority, lane/worktree execution, review, release verification, readiness,
-   and CI/CD wave deployment.
-2. Confirm the architecture North Star gives each product requirement a
-   corresponding architecture requirement, interface, control, or traceability
-   entry.
-3. Confirm the only North Star planning gate is final approval to lock the
-   North Star for the next milestone.
-4. Confirm deferred questions are correctly routed:
-   - `NSQ-002` branch/session/worktree/wave naming goes to release architecture.
-   - `NSQ-003` Gravity/Onyx dependency goes to `gravity-readiness`.
-5. Confirm Gravity feature implementation remains blocked until platform and
-   Gravity readiness approvals pass.
-6. Confirm CI/CD based wave deployment remains a core plan requirement.
-7. Confirm repo/application/environment/namespace cardinality is sufficient for
-   planning: repository/application is the product boundary; dev, staging,
-   production, and preview use environment-scoped namespaces or namespace sets
-   with quota, RBAC, NetworkPolicy, secret references, endpoints, deployment
-   path, and observability.
-8. Confirm the next route should remain `northstar-planning` / `human-review`
-   until approval or changes-requested feedback is recorded.
-9. Confirm the `NORTHSTAR_INTERVIEW.md` P0 questions are accepted, modified, or
-   rejected before final lock approval.
+1. Confirm the product and architecture North Star consistently model 18
+   lifecycle skills plus standalone `issue-triage`, for 19 validating skills in
+   the package.
+2. Confirm `PRQ-030`, `ARQ-029`, and `IFACE-021` correctly define the shared
+   bounded agentic-loop contract for lifecycle skills.
+3. Confirm `VerdifyConsultancy/verdify-skills#43` is the skills-side backlog
+   anchor for auditing and updating applicable skills against that contract.
+4. Confirm platform follow-up issues `jvallery/agents#1995` through `#2000`
+   cover the Agent Platform counterparts and should remain outside this
+   repository's implementation scope.
+5. Confirm the North Star still blocks Gravity implementation until
+   `platform-readiness` and `gravity-readiness` pass.
+6. Confirm open North Star questions are review inputs, not hidden gates, unless
+   reviewers explicitly promote one to a blocking decision.
+7. Confirm the final-lock gate is still the only approval that lets downstream
+   lifecycle skills treat these artifacts as core planning authority.
+8. Confirm the next route should be `northstar-planning` / `human-review` until
+   approval, changes-requested feedback, or rejection is recorded.
 
-## Agent Readiness Audit
+## Readiness Audit
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Paired North Star artifacts exist | pass | `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`, `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md` |
-| Product artifact covers required sections | pass | Purpose, personas, PRD, stories, requirements, milestones, waves, surfaces, review script, questions, traceability |
-| Architecture artifact covers required sections | pass | Intent, stories, requirements, high-level design, environments, interfaces, RBAC/secrets, observability, release/rollback, ADRs, questions, traceability |
-| Every product requirement has architecture or artifact traceability | pass | `PRQ-001` through `PRQ-015` all appear in architecture links, `northstar-artifacts.yaml`, or the traceability indexes |
-| Every architecture requirement links back to product value | pass | `ARQ-001` through `ARQ-014` cite product requirements, stories, waves, or surfaces |
-| Evidence registry is referenceable | pass | Four `northstar://evidence/...` records are present in `.agent-workflow/northstar/evidence-registry.yaml` |
-| North Star interview packet exists | pass | `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md` contains prioritized P0/P1/P2 questions, proposed defaults, tradeoffs, affected IDs, evidence, and answer-capture rules |
-| Ordinary planning questions are not gates | pass | `NSQ-002` and `NSQ-003` are deferred, nonblocking, and routed to release architecture or `gravity-readiness` |
-| Final-lock gate is durable and open | pass | `.agent-workflow/gates/northstar.yaml` has `status: open` and `resume_state: northstar-planning/human-review` |
-| Router points to human review | pass | `.agent-workflow/router/route-decision.yaml` reports `OPEN_GATE`, `northstar-planning`, `human-review` |
-| Deterministic validation has passed | pass | `bin/verdify artifact validate`, `ruby scripts/validate-repo.rb`, `make test`, and `git diff --check` passed on this review packet |
-| Approval is intentionally not recorded | pass | `northstar-artifacts.yaml` keeps `review.status: requested` and `approvals: []` |
-
-Remaining final decision: Jason and James either approve the lock, request
-changes, or reject this review packet. Requested changes return the loop to
-`artifact-loop`; approval allows downstream skills to treat the paired North
-Star artifacts as authority for the next milestone.
+| Paired North Star artifacts exist | pass | `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md` |
+| Structured signoff artifact exists | pass | `northstar-artifacts.yaml` |
+| Evidence registry is current | pass | 40 `northstar://evidence/...` records |
+| Skill-count drift is reconciled | pass | North Star now states 18 lifecycle skills plus standalone `issue-triage` |
+| Agentic-loop audit exists | pass | `AGENTIC_LOOP_SKILL_AUDIT.md` |
+| Skills-side follow-up exists | pass | `VerdifyConsultancy/verdify-skills#43` |
+| Platform follow-ups exist | pass | `jvallery/agents#1995` through `#2000` |
+| Approval is intentionally not recorded | pass | `review.status: requested`, `approvals: []` |
 
 ## Approval Decision
 

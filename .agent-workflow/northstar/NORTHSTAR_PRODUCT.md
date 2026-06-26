@@ -1,8 +1,8 @@
 # North Star Product
 
-Status: `iterating`
-Iteration: `22`
-Review: `changes_requested`
+Status: `review_requested`
+Iteration: `26`
+Review: `requested`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Architecture pair: `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
 Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
@@ -83,7 +83,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | PRQ-004 | Review-ready work must include CI evidence, exact reviewed head SHA, preview or deployed environment, human test steps, telemetry links or diagnostic packet, risks, security disposition, and rollback context. | non_functional | Review inbox entries validate against `review-inbox-packet.schema.yaml` and include an `observability-diagnostic-packet.yaml` when runtime evidence is material. | must | `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260623-review-inbox-skill-implementation-best-p`, `NSE-20260623-observability-diagnostics-implementation` | release-verification |
 | PRQ-005 | Downstream work must trace from North Star IDs to issues, branches/worktrees, PRs, tests, deployments, reviews, sessions, and wave events. | non_functional | `session-ledger.yaml` validates and links accepted work items to North Star evidence, artifacts, GitHub refs, deployment refs, and parent/child session history. | must | all registered evidence items, especially `NSE-20260623-session-ledger-implementation-best-pract` | controller-loop, state-of-union, sprint-planning |
 | PRQ-006 | CI/CD based wave deployment must be a core part of the broader delivery plan. | functional | Deployment-affecting waves produce a validated `wave-release-plan.yaml` with CI evidence, branch/merge model, preview/review deployment, GitOps desired state, promotion path, rollback information, release-health evidence, and review-inbox handoff before dispatch; environment-sensitive waves link validated `environment-gitops-reconciliation.yaml` records. | must | `NSE-20260623-kubernetes-gitops-cicd-cardinality`, `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260623-wave-release-planning-implementation-bes`, `NSE-20260623-environment-gitops-implementation-best-p` | sprint-planning, controller-loop, release-verification |
-| PRQ-007 | The package must expose seventeen canonical lifecycle skills with progressive disclosure and host discovery links for Codex and Claude. | functional | Validator reports seventeen skills; `.agents/skills` and `.claude/skills` links resolve. | must | `README.md`, `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0006`, `ADR-0008` | scripts/validate-repo.rb |
+| PRQ-007 | The package must expose eighteen canonical lifecycle skills plus the standalone `issue-triage` skill with progressive disclosure and host discovery links for Codex and Claude. | functional | Validator reports 19 skills total, `config/lifecycle.yaml` lists the 18 lifecycle skills in order, and `.agents/skills` plus `.claude/skills` links resolve. | must | `README.md`, `docs/lifecycle.md`, `config/lifecycle.yaml`, `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0006`, `ADR-0008`, `ADR-0009`, `ADR-0010` | scripts/validate-repo.rb |
 | PRQ-008 | The CLI must support initialization, route decisions, artifact validation, evidence ingest/query, sprint skeletons, lane leases, prompt compilation, and GitHub bootstrap/snapshot/reconcile. | functional | `bin/verdify --help` exposes the command set and CLI tests cover lifecycle commands. | must | `README.md`, `lib/verdify/cli.rb` | project-router, sprint-planning |
 | PRQ-009 | Machine-readable schemas must define every durable artifact used for routing, definition, architecture, sprint, lane, critic, release, readiness, evidence, and North Star state. | non_functional | Repository validation reports all schemas and validates example/current artifacts. | must | `README.md`, `schemas/` | all lifecycle skills |
 | PRQ-010 | GitHub must remain the backlog and delivery control plane until an approved migration changes that authority. | constraint | GitHub Issues/PRs/checks/reviews/deployments remain the authoritative operational records; validated `github-backlog-sync.yaml` records classify issue, PR, lane, dependency, project, check, deployment, and action findings while local snapshots stay caches. | must | `ADR-0001`, `COMMON_OPERATING_CONTRACT.md`, `NSE-20260623-source-control-migration-local-forges`, `NSE-20260623-github-backlog-sync-implementation-best` | project-router, state-of-union, github commands |
@@ -106,6 +106,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | PRQ-027 | Material fleet plans must include adversarial review and stakeholder consensus signals before final lock. | functional | Review packets include Codex and Claude adversarial review, lane-owner objections, product/manager/finance/infrastructure/SRE/security lenses, evidence-quality scoring, dispositions, and open questions. | should | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-learning-capture-implementation-best-pra` | northstar-planning, northstar-interview |
 | PRQ-028 | Orbit or an equivalent higher-level planner should provide a daily operating brief from authorized sources without becoming a source of authority. | functional | The brief records source freshness, missing connectors, privacy boundaries, cross-repo work needing review, and links to authoritative GitHub, `.agent-workflow`, review, and deployment records. | should | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-openclaw-hermes-local-evidence` | northstar-planning, platform-readiness |
 | PRQ-029 | Each repo-associated controller or long-lived agent must have a standard scope, ownership, responsibility, authority, and escalation contract tied to repo exploration and discovery. | functional | Repo hygiene/bootstrap produces a validated `.agent-workflow/hygiene/repo-agent-scope.yaml` from `skills/repo-hygiene/assets/repo-agent-scope.template.yaml` before a controller claims operational ownership. | must | `NSE-20260623-repo-controller-bootstrap-self-discovery` | repo-hygiene, controller-loop, platform-readiness |
+| PRQ-030 | Every lifecycle skill and Agent Platform-backed controller loop must be expressible as a bounded agentic loop or an explicit handoff into one. | non_functional | Skill and platform evidence records show objective, evidence, plan, permission boundary, execution, observation, validation, repair, stop condition, budget/rate controls, tool-call telemetry, runtime bundle identity, content-trust handling, emergency brake/read-only behavior, provenance, handoff, and a GitHub backlog anchor for package-wide skill adoption. | must | `NSE-20260624-agentic-loop-sdlc-best-practices`, `NSE-20260624-agentic-loop-audit-closeout` | all lifecycle skills, platform-readiness, controller-loop, `VerdifyConsultancy/verdify-skills#43` |
 
 ## PRODUCT-006 Milestones
 
@@ -158,6 +159,8 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | SURF-017 | Fleet controller dashboard and alerts | Platform operator, controller owner, SRE | Pod health, controller status, loop events, session ledger, alerts, resource usage, stop reasons, recovery attempts | Grafana dashboard, diagnostic packet links, Alertmanager routing, outstanding-work rehydration status | healthy, degraded, alerting, recovering, blocked | stale metrics, missing ledger event, controller unreachable, pod restart without state recovery | `NSE-20260623-repo-controller-bootstrap-self-discovery`, `NSE-20260623-observability-diagnostics-implementation` | `ARCH-017`, `IFACE-017` |
 | SURF-018 | Orbit daily operating brief | Jason, Orbit/fleet planner, platform owner | Authorized email, calendar, GitHub, repo-controller, issue, PR, deployment, and agent-status sources | Source-fresh daily brief with links to authoritative records, missing-source notes, privacy boundaries, and review queue | draft, ready, stale, partial, blocked | stale connector, privacy boundary missing, unlinked claim, mistaken approval | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `ARCH-019`, `IFACE-018` |
 | SURF-019 | Repo-agent scope and responsibility charter | Repo controller, repo owner, platform operator, state-of-union owner | Repo identity, discovery evidence, `AGENTS.md`, GitHub state, owned/protected paths, runtime context, credential refs, authority limits, stakeholders | Validated `repo-agent-scope.yaml` with purpose, in/out scope, ownership, responsibilities, allowed/prohibited operations, escalation paths, review, handoff, and approval | draft, proposed, active, blocked, superseded | overbroad authority, missing owner, missing protected paths, raw secret reference, stale discovery evidence, no escalation owner | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `ARCH-020`, `IFACE-019` |
+| SURF-020 | Agentic runtime control bundle | Platform operator, controller owner, reviewer, SRE | Controller/session identity, model and prompt bundle, skill/tool schema hashes, eval/canary version, image digest, budget settings, policy verdicts, trace IDs, provenance refs | Runtime governance bundle, budget stop record, emergency-brake state, tool-call/policy-denial traces, content-trust verdicts, provenance links | proposed, active, budget_exhausted, read_only, blocked, complete | missing bundle identity, budget overrun, untrusted input used as instruction, missing trace, unproven provenance, unsafe write allowed | `NSE-20260624-agentic-loop-sdlc-best-practices` | `ARCH-008`, `ARCH-013`, `ARCH-017`, `IFACE-020` |
+| SURF-021 | Shared skill loop-control contract | Skills maintainer, lifecycle skill author, critic, controller owner | Current `SKILL.md`, common operating contract, audit findings, platform capability refs, existing issue map | Standard loop-control section or shared reference for each skill, justified no-op records, validation evidence, backlog links | proposed, adopted, exception_recorded, needs_platform, validated | missing skill coverage, stale audit mapping, duplicated guidance, platform-dependent control with no issue link, unvalidated contract | `NSE-20260624-agentic-loop-sdlc-best-practices`, `NSE-20260624-agentic-loop-audit-closeout` | `ARQ-029`, `IFACE-021`, `VerdifyConsultancy/verdify-skills#43` |
 
 ## PRODUCT-009 Review Script
 
@@ -207,7 +210,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `PRQ-006` | `ARCH-009` | requires CI/CD wave deployment architecture |
 | `PRQ-006` | `schemas/wave-release-plan.schema.yaml` | now validates the first wave release planning contract |
 | `PRQ-006` | `schemas/environment-gitops-reconciliation.schema.yaml` | now validates the first environment GitOps reconciliation contract |
-| `PRQ-007` | `ARCH-004` | requires seventeen-skill component architecture |
+| `PRQ-007` | `ARCH-004` | requires eighteen-lifecycle-plus-one-standalone skill component architecture |
 | `PRQ-008` | `ARCH-006` | requires CLI interface contracts |
 | `PRQ-009` | `ARCH-006` | requires schema-governed artifact interfaces |
 | `PRQ-010` | `ARCH-006` | requires GitHub operating interface and reconciliation |
@@ -259,6 +262,8 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-027` | supports adversarial review and stakeholder consensus requirements |
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-028` | supports Orbit daily operating brief product surface |
 | `NSE-20260623-repo-controller-bootstrap-self-discovery` | `PRQ-029` | supports standard repo-agent scope, ownership, responsibility, and escalation contracts |
+| `NSE-20260624-agentic-loop-sdlc-best-practices` | `PRQ-030` | supports bounded autonomy, planner-executor-validator loops, budget/rate controls, telemetry, incident response, reproducibility, content trust, and provenance |
+| `NSE-20260624-agentic-loop-audit-closeout` | `PRQ-030` | reports that the agentic-loop audit was created, platform issues were filed, validation passed, and skills-repo adjustment coverage needed explicit backlog reconciliation |
 | `PRQ-023` | `ARCH-017` | requires repo-controller bootstrap architecture |
 | `PRQ-024` | `ARCH-018` | requires safe credential-reference and access-boundary architecture |
 | `PRQ-025` | `ARCH-018` | requires namespace, storage, route, and image policy architecture |
@@ -267,10 +272,15 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | `PRQ-029` | `ARCH-020` | requires repo-agent scope and responsibility architecture |
 | `PRQ-029` | `schemas/repo-agent-scope.schema.yaml` | now validates the repo-agent scope and responsibility contract |
 | `PRQ-029` | `skills/repo-hygiene/assets/repo-agent-scope.template.yaml` | now provides a starter template for repo exploration and discovery |
+| `PRQ-030` | `ARQ-028` | requires bounded agentic-loop runtime controls across skills and Agent Platform-backed sessions |
+| `PRQ-030` | `ARQ-029` | requires a shared lifecycle-skill loop-control contract in the skills package |
+| `PRQ-030` | `VerdifyConsultancy/verdify-skills#43` | creates the GitHub backlog anchor for applying the bounded loop contract across all lifecycle skills |
 | `SURF-016` | `IFACE-016` | defines the repo-bootstrap self-discovery packet |
 | `SURF-017` | `IFACE-017` | defines the fleet controller dashboard and alert surface |
 | `SURF-018` | `IFACE-018` | defines the Orbit daily operating brief surface |
 | `SURF-019` | `IFACE-019` | defines the repo-agent scope and responsibility charter interface |
+| `SURF-020` | `IFACE-020` | defines the agentic runtime control bundle interface |
+| `SURF-021` | `IFACE-021` | defines the shared skill loop-control contract interface |
 | `PRQ-020` | `schemas/northstar-learning-proposals.schema.yaml` | requires typed learning proposal packet validation |
 | `PRQ-020` | `skills/northstar-planning/references/learning-capture.md` | now defines learning-capture source eligibility, redaction, verifier, stop, budget, permissions, and scheduling boundaries |
 | `SURF-014` | `.agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml` | records the first manual alignment-loop proposal packet |

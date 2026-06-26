@@ -13,8 +13,9 @@ Detailed OpenClaw workflow artifact:
 `.agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md`.
 
 The answer is not "create a large new skill for every noun in the plan." The
-current 17-skill kernel is the right base. OpenClaw should expose a smaller set
-of user-facing SDLC workflow skills that delegate into that kernel. The missing
+current 18-lifecycle-skill kernel, plus standalone `issue-triage`, is the right
+base. OpenClaw should expose a smaller set of user-facing SDLC workflow skills
+that delegate into that kernel. The missing
 work is to add explicit skill coverage for review aggregation, wave release
 planning, diagnostics, ledger behavior, Agent Platform control actions, and
 learning capture, while keeping low-evidence ideas as modes until repeated use
@@ -22,26 +23,27 @@ proves they deserve a first-class skill.
 
 ## Design Position
 
-Verdify Skills should keep the existing 17 canonical lifecycle skills as the
-installable kernel:
+Verdify Skills should keep the existing 18 canonical lifecycle skills as the
+installable kernel, with `issue-triage` remaining standalone:
 
 1. `project-router`
 2. `transcript-replan`
 3. `northstar-research-ingest`
 4. `northstar-planning`
 5. `northstar-interview`
-6. `project-definition`
-7. `architecture-contracts`
-8. `state-of-union`
-9. `repo-hygiene`
-10. `platform-readiness`
-11. `gravity-readiness`
-12. `sprint-planning`
-13. `sprint-orchestrator`
-14. `controller-loop`
-15. `lane-delivery`
-16. `independent-critic`
-17. `release-verification`
+6. `northstar-question-resolution`
+7. `project-definition`
+8. `architecture-contracts`
+9. `state-of-union`
+10. `repo-hygiene`
+11. `sprint-planning`
+12. `sprint-orchestrator`
+13. `controller-loop`
+14. `platform-readiness`
+15. `gravity-readiness`
+16. `lane-delivery`
+17. `independent-critic`
+18. `release-verification`
 
 The full SDLC loop needs six promoted capabilities next. These should start as
 explicit artifacts or modes where possible, then become top-level skills only
@@ -536,7 +538,7 @@ runtime platform actions.
 
 | Design item | North Star IDs |
 | --- | --- |
-| 17-skill kernel | `PRQ-007`, `ARQ-007` |
+| 18-lifecycle-skill kernel plus standalone `issue-triage` | `PRQ-007`, `ARQ-007` |
 | Final-lock-only North Star gate | `PRQ-002`, `ARQ-001`, `NSQ-001` |
 | Review inbox | `PRQ-004`, `SURF-004`, `IFACE-004`, `ARCH-008`, `ARCH-009` |
 | Wave release planning | `PRQ-006`, `ARQ-006`, `ARCH-009`, `NSQ-002` |
@@ -550,7 +552,7 @@ runtime platform actions.
 
 ## Acceptance Signals
 
-- The current 17 skills still validate as the kernel.
+- The current 18 lifecycle skills plus standalone `issue-triage` validate as the package's 19 skills.
 - `review-inbox` has a validated packet schema, template, operator reference,
   and example artifact before it is promoted into the canonical skill kernel.
 - `wave-release-planning` has a validated plan schema, template, operator

@@ -1,0 +1,134 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-dec-controller-ownership
+title: 'Decision: controller-loop vs sprint-orchestrator event ownership and gated
+  child-session launch'
+status: approved
+issue_ids:
+- 9
+- 23
+coupling_justification: "#9 and #23 are the same controller-loop vs sprint-orchestrator
+  ownership/launch boundary decision: #9 asks who is the authoritative writer for
+  orchestration/session-ledger/gate/state events, and #23 asks how the two skills
+  disambiguate the 'controller loop' trigger and whether controller-loop child-session
+  launches must go through the agent-platform-control-request gate. Both resolve to
+  one ownership and launch-boundary decision and must be decided together to avoid
+  contradictory guidance."
+objective: 'Produce an ADR (docs/decisions/ADR-0011-*.md) that resolves the controller-loop
+  vs sprint-orchestrator authority boundary: an explicit responsibility/event-ownership
+  matrix (authoritative writer per event class), a handoff sequence, trigger disambiguation
+  between the two skills, and a ruling on whether controller-loop child-session launches
+  must use the agent-platform-control-request gate. No formal module contract exists
+  for these skills; the ADR is the governing decision artifact.'
+desired_outcome: 'A merged ADR names the single authoritative writer for session-ledger
+  events, controller state, sprint status, lane lease state, gate state, and GitHub
+  reconciliation records; expresses the sprint-orchestrator<->controller-loop handoff
+  as a sequence (dispatch, heartbeat/status, blocker, closeout, critic result, CI
+  failure, lease expiry, gate decision, integration handoff, session loss); disambiguates
+  the two skills'' invocation triggers; and rules on requiring an agent-platform-control-request
+  artifact for controller-loop child-session launches. Issues #9 and #23 reference
+  the ADR.'
+non_goals:
+- No code changes in this lane; the deliverable is an ADR document only.
+- Do not implement an Agent Platform runtime.
+- Do not change worker or critic lane behavior except as captured by the decision.
+- 'Do not close or replace issue #2 (controller-loop telemetry/recovery contract).'
+- Editing the affected SKILL.md / verdify.workflow.yaml / schema files is downstream
+  implementation work, not part of this decision lane.
+- No formal module contract exists for controller-loop or sprint-orchestrator; this
+  ADR is the governing artifact and this lane does not create one.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/dec-controller-ownership
+module_contracts:
+- docs/decisions/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - lifecycle-orchestration-authority
+  - architecture-decision-records
+  owned_paths:
+  - docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md
+  prohibited_paths:
+  - skills/sprint-orchestrator/SKILL.md
+  - skills/controller-loop/SKILL.md
+  - verdify.workflow.yaml
+  - skills/project-router/SKILL.md
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  coordination_required_paths:
+  - docs/decisions/
+  owned_interfaces:
+  - ADR-0011 controller-loop vs sprint-orchestrator ownership decision
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: An ADR docs/decisions/ADR-0011-*.md exists that names the single authoritative
+    writer for session-ledger events, controller state, sprint status, lane lease
+    state, gate state, and GitHub reconciliation records, and expresses the sprint-orchestrator<->controller-loop
+    handoff sequence.
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Path to the merged ADR file.
+  - Quoted ADR section showing the event-ownership matrix and handoff sequence.
+- id: LANE-AC-02
+  statement: 'The ADR disambiguates the controller-loop vs sprint-orchestrator invocation
+    triggers and rules on whether controller-loop child-session launches must use
+    an agent-platform-control-request artifact, addressing the #23 ungated-launch
+    concern.'
+  sprint_acceptance_ids:
+  - SPR-AC-01
+  evidence_required:
+  - Quoted ADR decision text on trigger disambiguation and the child-session-launch
+    gate ruling.
+  - 'Confirmation that issues #9 and #23 reference the ADR.'
+validation_commands:
+- id: vc-adr-exists
+  command: ls docs/decisions/ADR-0011-*.md
+  purpose: Confirm the decision ADR file was created.
+  required: true
+- id: vc-adr-references-issues
+  command: grep -E '#9|#23' docs/decisions/ADR-0011-*.md
+  purpose: Confirm the ADR records and links the resolved issues.
+  required: true
+- id: vc-validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the repository remains structurally valid after adding the ADR.
+  required: true
+required_evidence:
+- Path to the merged ADR (docs/decisions/ADR-0011-*.md).
+- Quoted ADR event-ownership matrix and handoff sequence.
+- Quoted ADR ruling on trigger disambiguation and the child-session-launch gate.
+- 'Confirmation that issues #9 and #23 reference the ADR.'
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Reviewers cannot agree on the chosen ownership option (controller-loop as parent
+  driver vs peer lifecycle state).
+- The decision would require code/schema changes beyond this lane's documentation
+  scope, requiring a follow-up implementation lane or issue.
+definition_of_done:
+- ADR docs/decisions/ADR-0011-*.md is merged and resolves the event-ownership matrix,
+  handoff sequence, trigger disambiguation, and child-session-launch gate ruling.
+- 'Issues #9 and #23 reference the ADR with evidence.'
+- Branch pushed and PR opened ready for the independent critic.
+- ruby scripts/validate-repo.rb is green.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

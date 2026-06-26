@@ -1,0 +1,121 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-route-decision-enum
+title: Add northstar-interview and northstar-question-resolution to route-decision
+  next_skill enum
+status: approved
+issue_ids:
+- 13
+coupling_justification: 
+objective: Add `northstar-interview` and `northstar-question-resolution` to the `next_skill`
+  enum in `schemas/route-decision.schema.yaml` so a valid approved state-of-union
+  handoff into either skill no longer crashes `bin/verdify route` with a schema-validation
+  error, and add a `scripts/validate-repo.rb` assertion that the route-decision `next_skill`
+  enum equals the state-of-union `handoff.next_skill` enum so the two routable lists
+  cannot drift again.
+desired_outcome: "`bin/verdify route` emits a valid route decision (rather than raising)
+  when an approved strategy hands off to `northstar-interview` or `northstar-question-resolution`;
+  the route-decision next_skill enum matches the state-of-union handoff enum; and
+  `ruby scripts/validate-repo.rb` fails fast if the two enums diverge in future."
+non_goals:
+- No formal module contract exists for this package; module_contracts lists the primary
+  governed schema file as the contract surface.
+- Do not change the state-of-union handoff enum (schemas/state-of-union.schema.yaml)
+  — route-decision is being aligned TO it, not the reverse.
+- Do not assert equality of the route enum with REQUIRED_SKILLS, which intentionally
+  includes the standalone issue-triage skill absent from both routable enums.
+- Do not modify lib/verdify/cli.rb routing logic; the fix is schema + validator only.
+- 'Do not resolve the unrelated lifecycle-definition drift tracked in #7.'
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/route-decision-enum
+module_contracts:
+- schemas/route-decision.schema.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - route-decision-schema
+  - repository-validation
+  owned_paths:
+  - schemas/route-decision.schema.yaml
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - schemas/state-of-union.schema.yaml
+  - lib/verdify/semantic_validator.rb
+  coordination_required_paths:
+  - scripts/validate-repo.rb
+  owned_interfaces:
+  - route-decision.schema.yaml#/properties/next_skill/enum
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The `next_skill` enum in schemas/route-decision.schema.yaml includes
+    `northstar-interview` and `northstar-question-resolution` and equals the `handoff.next_skill`
+    enum in schemas/state-of-union.schema.yaml.
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - diff of schemas/route-decision.schema.yaml showing the two added enum members
+  - command output showing the two enums are now identical sets
+- id: LANE-AC-02
+  statement: scripts/validate-repo.rb asserts the route-decision next_skill enum equals
+    the state-of-union handoff next_skill enum and `ruby scripts/validate-repo.rb`
+    passes on the fixed schema and would fail on divergence.
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - passing `ruby scripts/validate-repo.rb` output
+  - evidence the new assertion fails when the enums are made to differ (e.g. demonstration
+    run)
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm repository validation passes including the new enum cross-check
+    assertion.
+  required: true
+- id: validate-route-schema
+  command: ruby bin/verdify artifact validate --file schemas/route-decision.schema.yaml
+  purpose: Confirm the edited route-decision schema is itself a well-formed artifact.
+  required: false
+- id: make-test
+  command: make test
+  purpose: Run the package test suite to confirm no regression from the schema/validator
+    change.
+  required: true
+required_evidence:
+- diff of schemas/route-decision.schema.yaml adding northstar-interview and northstar-question-resolution
+  to next_skill.enum
+- diff of scripts/validate-repo.rb adding the route/state-of-union enum equality assertion
+- passing `ruby scripts/validate-repo.rb` output
+- passing `make test` output
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or schema change beyond the issue scope (e.g.
+  altering the state-of-union handoff enum or REQUIRED_SKILLS).
+- The route-decision and state-of-union enums cannot be reconciled without changing
+  routable lifecycle skills semantics.
+definition_of_done:
+- 'Issue #13 acceptance satisfied with evidence: both skills added to the route-decision
+  next_skill enum and the validator cross-check in place.'
+- Branch pushed and PR opened, ready for the independent critic; self-merge not performed.
+- "`ruby scripts/validate-repo.rb` and `make test` are green with the change."
+- 'PR references issue #13.'
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

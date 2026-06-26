@@ -1,0 +1,156 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-eval-uplift
+title: Uplift eval suites to exercise each skill's hardest declared behaviors
+status: approved
+issue_ids:
+- 24
+coupling_justification: 
+objective: 'For each high-risk skill called out in issue #24, add targeted evaluations
+  under evaluations/ that exercise the hardest declared modes and safety behaviors
+  currently shipping untested: architecture-contracts north-star-architecture schema-valid
+  output; gravity-readiness core-extraction-plan gating and blocked/failed-to-pass
+  upgrade refusal; release-verification review-inbox SHA-mismatch block, new-commit
+  integration revalidation, and self-deploy refusal; sprint-planning wave-release-plan
+  production plus a stop-condition route-back; northstar-research-ingest secret /
+  unknown-provenance refusal; and sprint-orchestrator reconcile and gate-management
+  modes. This lane edits only eval packs under evaluations/; no formal black-box module
+  contract exists for this package, so the governed surface is the eval-pack JSON
+  files themselves.'
+desired_outcome: 'Each declared-but-untested high-risk mode and safety refusal named
+  in issue #24 is exercised by at least one new or expanded eval whose assertions
+  assert the safety/gating/schema-validity behavior, all eval packs still satisfy
+  the structural validator (>=2 evals, unique ids, >=3 assertions, required keys),
+  and validate-repo.rb plus make test stay green.'
+non_goals:
+- No formal module contract exists for this package; this lane defines no new module
+  contract and edits no module-contract artifact.
+- No changes to scripts/validate-repo.rb in this lane; the mode-to-eval coverage validator
+  rule and any eval-count threshold change are owned by lane-validator-engine and
+  must be coordinated, not implemented here.
+- No changes to config/lifecycle.yaml in this lane; mode declarations are owned by
+  lane-canonical-lifecycle.
+- No changes to skill SKILL.md, reference, or asset files; only eval packs change.
+- No changes to evaluations/lane-delivery/, which is owned by lane-lane-delivery-correctness.
+- No new executable eval-runner is built here; the runner strategy is the dependency
+  lane-dec-eval-strategy's ADR.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/eval-uplift
+module_contracts:
+- evaluations/
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - skill-evaluation-packs
+  owned_paths:
+  - evaluations/architecture-contracts/
+  - evaluations/gravity-readiness/
+  - evaluations/release-verification/
+  - evaluations/sprint-planning/
+  - evaluations/sprint-orchestrator/
+  - evaluations/northstar-research-ingest/
+  - evaluations/northstar-planning/
+  - evaluations/controller-loop/
+  - evaluations/independent-critic/
+  prohibited_paths:
+  - scripts/validate-repo.rb
+  - lib/verdify/schema_validator.rb
+  - lib/verdify/cli.rb
+  - config/lifecycle.yaml
+  - evaluations/lane-delivery/
+  coordination_required_paths:
+  - scripts/validate-repo.rb
+  - config/lifecycle.yaml
+  owned_interfaces:
+  - evaluations/*/evals.json eval-pack schema (skill_name, evals[].{id,prompt,expected_output,assertions})
+dependencies:
+  hard:
+  - lane_id: lane-dec-eval-strategy
+    required_output: eval-runner ADR
+  soft:
+  - lane_id: lane-validator-engine
+    coordination: lane-validator-engine owns scripts/validate-repo.rb and the proposed
+      mode-to-eval coverage rule plus any per-skill min-eval-count change; align new
+      evals with the rule's expected mode field/shape so both lanes converge instead
+      of conflicting.
+  - lane_id: lane-canonical-lifecycle
+    coordination: lane-canonical-lifecycle owns config/lifecycle.yaml declared modes;
+      confirm the canonical mode list before asserting per-mode eval coverage so this
+      lane's evals target the modes that survive lifecycle single-sourcing.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'New or expanded evals exercise every high-risk mode and safety refusal
+    named in issue #24 (architecture-contracts north-star-architecture schema-valid
+    output; gravity-readiness core-extraction-plan gating and blocked/failed-to-pass
+    upgrade refusal; release-verification review-inbox SHA-mismatch block, new-commit
+    integration revalidation, self-deploy refusal; sprint-planning wave-release-plan
+    plus stop-condition route-back; northstar-research-ingest secret/unknown-provenance
+    refusal; sprint-orchestrator reconcile and gate-management), each with assertions
+    that assert the safety/gating/schema-validity behavior.'
+  sprint_acceptance_ids:
+  - SPR-AC-07
+  evidence_required:
+  - diff of the changed evaluations/*/evals.json files showing the new eval ids and
+    assertions
+  - mapping table from each issue
+- id: LANE-AC-02
+  statement: All edited eval packs still satisfy the structural validator (>=2 evals,
+    unique ids, every eval has id/prompt/expected_output/assertions, >=3 assertions
+    per eval) and validate-repo.rb plus make test pass.
+  sprint_acceptance_ids:
+  - SPR-AC-07
+  evidence_required:
+  - 'captured output of: ruby scripts/validate-repo.rb'
+  - 'captured output of: make test'
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm every edited eval pack still passes the structural eval-pack validator
+    and the repo validates.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the full repo validation and test suite including the eval-pack checks.
+  required: true
+- id: eval-pack-json-parse
+  command: ruby -rjson -e "Dir['evaluations/*/evals.json'].each { |f| JSON.parse(File.read(f))
+    }"
+  purpose: Confirm all edited eval packs remain valid parseable JSON.
+  required: true
+required_evidence:
+- diff of changed evaluations/*/evals.json files
+- mapping from each issue
+- captured output of ruby scripts/validate-repo.rb showing no errors
+- captured output of make test passing
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or schema change beyond the issue scope (e.g.
+  the eval-pack JSON schema must gain a mode field), which is owned by lane-validator-engine.
+- Asserting per-mode coverage requires editing config/lifecycle.yaml or scripts/validate-repo.rb,
+  both owned by other lanes.
+- lane-dec-eval-strategy's ADR mandates an eval format or runner contract incompatible
+  with the current evals.json shape.
+definition_of_done:
+- Issue
+- Branch lane/eval-uplift is pushed and a pull request is opened and ready for the
+  independent critic.
+- ruby scripts/validate-repo.rb and make test are green with the changes.
+- The pull request references issue
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

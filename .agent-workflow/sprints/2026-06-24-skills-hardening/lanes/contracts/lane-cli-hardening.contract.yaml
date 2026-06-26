@@ -1,0 +1,127 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-cli-hardening
+title: 'Harden bin/verdify: lease TOCTOU race, read-path crash, best-effort lease
+  expiry'
+status: approved
+issue_ids:
+- 32
+coupling_justification: 
+objective: 'Fix three localized robustness defects in lib/verdify/cli.rb (#32): the
+  read-check-then-write lease race in lane create/review (621-625/658), the unguarded
+  entry["title"][0,32] crash in northstar evidence list (445/464), and the non-best-effort
+  expire_stale_leases! that aborts read-only lane list (1517-1526 via 747). No formal
+  module contract exists for this package; the governed file lib/verdify/cli.rb is
+  treated as the primary contract surface.'
+desired_outcome: 'Concurrent same-lane lane create calls cannot both write a lease
+  (atomic flock/O_EXCL); a malformed evidence registry yields a verdify: <message>
+  line instead of a raw stack trace; and a single schema-invalid on-disk lease no
+  longer aborts lane list/lane create — expire_stale_leases! is best-effort.'
+non_goals:
+- No public CLI interface, command surface, or output schema changes beyond the three
+  fixes.
+- No changes to lease schema (schemas/lane-lease.schema.yaml) or evidence-registry
+  schema.
+- No formal module contract is authored or modified in this lane (none exists for
+  this package).
+- No router/gate logic changes (those are lane-router-gate-bypass's concern in the
+  same file).
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/cli-hardening
+module_contracts:
+- lib/verdify/cli.rb
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - bin/verdify CLI runtime robustness (lease lifecycle, read-path command safety)
+  owned_paths:
+  - lib/verdify/cli.rb
+  prohibited_paths:
+  - scripts/validate-repo.rb
+  - lib/verdify/semantic_validator.rb
+  coordination_required_paths:
+  - lib/verdify/cli.rb
+  owned_interfaces:
+  - verdify lane create / lane review (lease creation)
+  - verdify lane list (expire_stale_leases!)
+  - verdify northstar evidence list (registry formatting)
+dependencies:
+  hard:
+  - lane_id: lane-router-gate-bypass
+    required_output: merged cli.rb changes (shared file lib/verdify/cli.rb)
+  soft: []
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: The lane create/review lease check-then-write is atomic (exclusive flock
+    or O_CREAT|O_EXCL keyed on lane_id), so two concurrent same-lane lane create calls
+    cannot both write an active worker lease.
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - Diff of lib/verdify/cli.rb showing the lock/atomic-create around the lease read-check-write.
+  - Test or reproduction showing the second concurrent lane create fails with the
+    conflict error.
+- id: LANE-AC-02
+  statement: 'northstar evidence list with a null/missing-title entry produces a verdify:
+    <message> line (typed error), not a raw Ruby stack trace.'
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - 'Command output showing verdify: <message> for a malformed registry entry.'
+- id: LANE-AC-03
+  statement: 'expire_stale_leases! is best-effort: a single schema-invalid on-disk
+    lease no longer aborts lane list / lane create (exit 0, other leases processed).'
+  sprint_acceptance_ids:
+  - SPR-AC-04
+  evidence_required:
+  - Reproduction showing lane list succeeds with one malformed lease present.
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Repository-wide artifact and schema validation stays green.
+  required: true
+- id: unit-tests
+  command: make test
+  purpose: CLI unit/integration tests, including new regression tests for the three
+    fixes.
+  required: true
+- id: contract-self-validate
+  command: ruby bin/verdify artifact validate --file .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/contracts/lane-cli-hardening.contract.yaml
+  purpose: This lane contract validates against lane-contract.schema.yaml.
+  required: true
+required_evidence:
+- Diff of lib/verdify/cli.rb covering all three fixes (lease atomicity, title coercion/validation,
+  best-effort expiry).
+- Passing run of ruby scripts/validate-repo.rb and make test.
+- Regression reproductions for AC-01, AC-02, and AC-03.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public CLI interface or output-schema change beyond the issue
+  scope.
+- The lease atomicity fix requires changing the lease schema or on-disk lease layout.
+- Merge of lane-router-gate-bypass into lib/verdify/cli.rb conflicts and cannot be
+  reconciled without re-scoping either lane.
+definition_of_done:
+- 'Issue #32 acceptance satisfied with evidence for all three defects.'
+- Branch lane/cli-hardening pushed and PR opened, ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green on the branch.
+- Hard dependency lane-router-gate-bypass's cli.rb changes are merged and reconciled
+  before this lane's PR merges.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'

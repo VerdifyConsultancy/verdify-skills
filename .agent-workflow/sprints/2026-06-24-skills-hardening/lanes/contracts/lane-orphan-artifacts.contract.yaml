@@ -1,0 +1,158 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-06-24-skills-hardening
+lane_id: lane-orphan-artifacts
+title: Back or remove declared-but-unproduced artifacts, schemas, and policies
+status: approved
+issue_ids:
+- 29
+coupling_justification: 
+objective: 'Resolve the cluster of dangling-reference defects in #29 by, for each
+  declared-but-unbacked output, either supplying a backing producer step/template/schema
+  or removing the orphan declaration and reconciling it with verdify.workflow.yaml.
+  Specifically: (1) sprint-planning must reference schemas/lane-map.schema.yaml, add
+  a procedure step that writes lanes/lane-map.yaml, and ship skills/sprint-planning/assets/lane-map.template.yaml;
+  (2) northstar-planning must add create/maintain steps and a template for northstar-plan.{yaml,md}
+  or drop the unproduced file(s); (3) sprint-orchestrator must back status-event.example.yaml
+  with a VerdifyStatusEvent schema referenced by the skill, or delete the orphan asset;
+  (4) project-router must define the incident policy concretely (config/authority-matrix.yaml
+  clause naming the authorized resolver and recording requirement) and point router/routing-rules
+  at it, or remove the incident-bypass; (5) repo-hygiene must add .agent-workflow/gates/repo-hygiene.yaml
+  (validated against human-gate.schema.yaml) to its canonical artifacts and tie the
+  Stop-conditions gate instruction to that path. No formal black-box module contract
+  exists for these skill/schema files; the primary governed surfaces are the skill
+  SKILL.md/reference/asset files, the schemas/ directory, config/authority-matrix.yaml,
+  and verdify.workflow.yaml.'
+desired_outcome: Every canonical artifact, schema, or gating policy named by the affected
+  skills has a backing producer step, template, or schema reference, or has been removed
+  and reconciled with verdify.workflow.yaml. No skill names an output an agent cannot
+  produce or validate, and the incident-bypass route is no longer self-authorizing.
+  Repo validation and tests stay green.
+non_goals:
+- No formal black-box module contract exists for these skill/schema files; this lane
+  does not author one.
+- No changes to lib/verdify/cli.rb or scripts/validate-repo.rb (owned by lane-cli-hardening
+  and others).
+- No changes to the route-decision schema enum or question-resolution schema_refs
+  (owned by lane-route-decision-enum and lane-qr-schemarefs).
+- No changes to schema cross-field contradictions owned by lane-schema-contradictions
+  beyond coordinating on shared schema files.
+- No re-architecture of the lifecycle or workflow beyond backing/removing the named
+  orphan references.
+baseline_sha: fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e
+branch: lane/orphan-artifacts
+module_contracts:
+- skills/sprint-planning/SKILL.md
+- skills/northstar-planning/SKILL.md
+- skills/sprint-orchestrator/assets/status-event.example.yaml
+- skills/project-router/SKILL.md
+- skills/repo-hygiene/SKILL.md
+- verdify.workflow.yaml
+- config/authority-matrix.yaml
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+  - Lifecycle skill artifact declarations and producer steps
+  - Schema backing for declared assets
+  - Incident-policy authority definition
+  owned_paths:
+  - skills/sprint-planning/SKILL.md
+  - skills/sprint-planning/assets/lane-map.template.yaml
+  - skills/northstar-planning/SKILL.md
+  - skills/northstar-planning/assets/northstar-plan.template.yaml
+  - skills/sprint-orchestrator/SKILL.md
+  - skills/sprint-orchestrator/assets/status-event.example.yaml
+  - skills/project-router/references/routing-rules.md
+  - skills/repo-hygiene/SKILL.md
+  - schemas/status-event.schema.yaml
+  - config/authority-matrix.yaml
+  prohibited_paths:
+  - lib/verdify/cli.rb
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  - schemas/route-decision.schema.yaml
+  coordination_required_paths:
+  - schemas/lane-map.schema.yaml
+  - schemas/human-gate.schema.yaml
+  - schemas/sprint-plan.schema.yaml
+  - verdify.workflow.yaml
+  - skills/project-router/SKILL.md
+  owned_interfaces:
+  - VerdifyStatusEvent status-event asset shape
+  - lane-map.yaml producer step in sprint-planning
+  - incident-policy authority clause in config/authority-matrix.yaml
+dependencies:
+  hard:
+  - lane_id: lane-dec-authority-boundaries
+    required_output: authority-boundary ADR
+  soft:
+  - lane_id: lane-schema-contradictions
+    coordination: Coordinate on shared schemas/ edits so status-event/lane-map/human-gate
+      schema changes do not collide with contradiction fixes.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: 'Each orphan reference in #29 is either backed (producer step + template/schema
+    reference present and reconciled with verdify.workflow.yaml) or removed and reconciled;
+    the incident-bypass route is no longer self-authorizing because config/authority-matrix.yaml
+    defines the authorized resolver and recording requirement (or the bypass is removed).'
+  sprint_acceptance_ids:
+  - SPR-AC-03
+  evidence_required:
+  - ruby scripts/validate-repo.rb output showing the repo still validates after the
+    changes
+  - Diff showing each named output now has a backing producer/template/schema reference
+    or is removed and reconciled with verdify.workflow.yaml
+  - Grep output for "incident policy" / "VerdifyStatusEvent" demonstrating each named
+    reference now resolves to a definition or is gone
+validation_commands:
+- id: validate-repo
+  command: ruby scripts/validate-repo.rb
+  purpose: Confirm the repository skill/schema/workflow structure still validates
+    after backing or removing the orphan references.
+  required: true
+- id: make-test
+  command: make test
+  purpose: Run the repository validation/test target to confirm no regressions.
+  required: true
+- id: artifact-validate-status-event
+  command: ruby bin/verdify artifact validate --file skills/sprint-orchestrator/assets/status-event.example.yaml
+  purpose: Confirm the status-event asset validates against its newly backing VerdifyStatusEvent
+    schema (only if the asset is backed rather than removed).
+  required: false
+required_evidence:
+- ruby scripts/validate-repo.rb passing output
+- make test passing output
+- Diff per affected skill showing producer/template/schema backing or removal and
+  verdify.workflow.yaml reconciliation
+- Grep evidence that "incident policy" and "VerdifyStatusEvent" references now resolve
+  to a definition or are removed
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The fix requires a public interface or schema change beyond the scope of issue
+- Backing the incident policy requires an authority-boundary decision not yet resolved
+  by lane-dec-authority-boundaries' ADR.
+- A shared schema edit (lane-map/human-gate) conflicts with lane-schema-contradictions
+  and cannot be coordinated cleanly.
+definition_of_done:
+- Issue
+- The incident-policy bypass is no longer self-authorizing per the authority-boundary
+  ADR.
+- Branch lane/orphan-artifacts pushed and PR ready for the independent critic.
+- ruby scripts/validate-repo.rb and make test are green with captured output.
+approval:
+  status: approved
+  approver: jason (plan-approval 2026-06-24)
+  approved_at: '2026-06-24T17:00:00Z'
