@@ -1,7 +1,7 @@
 # North Star Architecture
 
 Status: `review_requested`
-Iteration: `26`
+Iteration: `27`
 Review: `requested`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Product pair: `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
@@ -181,6 +181,25 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 - Product links: `PRQ-004`, `PRQ-005`, `PRQ-006`, `PRQ-012`, `PRQ-015`, `WAVE-002`, `WAVE-004`.
 - Evidence: `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260623-kubernetes-gitops-cicd-cardinality`, `NSE-20260623-source-control-migration-local-forges`, `NSE-20260623-opengitops-events-session-specificity`, `NSE-20260623-opengitops-session-shortlist`, `NSE-20260623-wave-release-planning-implementation-bes`.
 
+## ARCH-021 Delivery Loop Topology, Decision Rights, And Glossary
+
+- Wave model: a wave is a versioned, bounded delivery envelope (stories, committed tasks, dependencies, risk limits, exit evidence), not a loop. It advances through one durable controller state machine: `Observe -> DraftWave -> Approve -> Execute -> Verify -> Integrate -> DeployPreview -> Review -> Accept`, with `Replan` and `Escalate` as explicit transitions. Planning and implementation are phases of one lifecycle (ADR-0011).
+- Controller model: the repository controller is a deterministic reconciler over a durable event log, not a model that holds state in conversation. Workers propose events (`candidate_done`, `blocked`, `scope_change_requested`, `human_decision_required`, `retry_recommended`); the control plane validates each against state and policy, applies an idempotent transition, schedules ready tasks, enforces retry/cost/risk/time budgets, and persists evidence. Polling detects lost workers only (ADR-0012).
+- Nested loops: L0 North Star planning loop (locked by approved PR) -> L1 wave lifecycle (human/Orbit review cadence) -> L2 rolling-wave planning phase -> L3 execution phase (reconciler plus lanes) -> L4 lane/task loop (`Orient -> LocalPlan -> Implement -> LocalChecks -> SelfReview -> CommitCandidate -> IndependentReview`).
+- Lane model: a lane is a temporary, per-wave write-conflict partition one worker can own without colliding with other active writers; derived from the dependency and file-conflict graph, seeded from functional areas (ADR-0013). One active writer per worktree/branch; ADR-0003 isolation retained.
+- Planning model: rolling-wave -- complete outcome-level roadmap traceability, issue-level decomposition only for the next one or two waves; issues are an output of planning (ADR-0014).
+- Verification model: no self-certification. A per-task fresh-context verifier plus deterministic checks decide task completion; a cumulative wave-diff security/intent review precedes human review (ADR-0015).
+- Orchestration model: event-driven via a vendor-neutral worker adapter (`start`/`events`/`send`/`cancel`/`collect`) with normalized run events; Claude and Codex are interchangeable execution engines selected per host; the runtime is Agent Platform owned (ADR-0016, ADR-0018).
+- Sources of truth: Git owns approved intent; GitHub owns backlog/delivery; the runtime state store owns execution state; CI and policy are the gate authority.
+- Vocabulary (ADR-0017): milestone = observable outcome (never a branch/worktree); wave = delivery envelope and review cadence; user story = vertical user-observable behavior; task/issue = smallest committed unit; lane = per-wave partition; attempt = one worker run. "Sprint" is retained only as a skill/directory name.
+- Decision rights: product priority/North Star to human/Orbit; wave objective/stories to the wave planner; wave-scope approval to human, with risk policy auto-approving low-risk waves; task DAG to planner plus deterministic validation; lane assignment to the scheduler; local implementation to the worker; scope change to a controller-authorized change request; task-completion candidate to the worker; task completion to deterministic checks plus an independent verifier; wave releasability to CI/security/acceptance gates; product-intent acceptance to human/Orbit; production to risk policy with explicit human approval for high risk.
+- Build order: M0 contracts plus state machine, M1 single-task closed loop, M2 independent verification, M3 sequential wave, M4 parallel lanes, M5 provider parity, M6 risk-based autonomy, M7 learning plus eval loop, M8 Orbit multi-repo. Prove correctness before parallelism (ADR-0018).
+- Layer boundary: verdify-skills owns method (skills, typed contracts/schemas, gates); the Agent Platform (`jvallery/agents`) owns the control-plane runtime (state machine, event/state store, scheduler, worker adapters). Reinforces ARCH-013; resolves `NSQ-007`/`NSQ-011`; advances `VerdifyConsultancy/verdify-skills#36`.
+- Method-layer contracts: `schemas/wave-contract.schema.yaml` (wave envelope, state, exit gates), `schemas/task-contract.schema.yaml` (committed unit with write scope, acceptance, risk, budgets), `schemas/worker-run-event.schema.yaml` (normalized adapter event plus controller-message vocabulary). Detailed in `skills/controller-loop/references/delivery-loop-model.md`.
+- Product links: `PRQ-005`, `PRQ-006`, `PRQ-011`, `PRQ-012`.
+- Decisions: `ADR-0011`, `ADR-0012`, `ADR-0013`, `ADR-0014`, `ADR-0015`, `ADR-0016`, `ADR-0017`, `ADR-0018`.
+- Evidence: `NSE-20260625-walk-transcript-delivery-loop-topology`, `NSE-20260625-recommended-event-driven-sdlc-control-plane`, `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260624-agentic-loop-sdlc-best-practices`.
+
 ## ARCH-010 ADR And Decision Index
 
 | Decision ID | Decision / topic | Status | ADR path | Product links | Evidence |
@@ -195,6 +214,14 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | ADR-0008 | Add North Star interview skill | accepted | `docs/decisions/ADR-0008-northstar-interview-skill.md` | `PRQ-016`, `PST-009` | `NSE-20260623-end-to-end-agent-based-sdlc` |
 | ADR-0009 | Add North Star question resolution skill | accepted | `docs/decisions/ADR-0009-northstar-question-resolution-skill.md` | `PRQ-001`, `PRQ-002`, `PRQ-007` | `NSE-20260623-end-to-end-agent-based-sdlc` |
 | ADR-0010 | Add comprehensive planning review loop | accepted | `docs/decisions/ADR-0010-comprehensive-planning-review-loop.md` | `PRQ-027`, `PRQ-030` | `NSE-20260624-agentic-loop-sdlc-best-practices` |
+| ADR-0011 | Wave = versioned delivery envelope on a durable state machine | accepted | `docs/decisions/ADR-0011-wave-delivery-envelope-state-machine.md` | `PRQ-006`, `ARQ-006` | `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
+| ADR-0012 | Controller = deterministic reconciler, not god of the repo | accepted | `docs/decisions/ADR-0012-controller-deterministic-reconciler.md` | `PRQ-005` | `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
+| ADR-0013 | Lane = dynamic write-conflict partition (amends ADR-0003) | accepted | `docs/decisions/ADR-0013-dynamic-write-conflict-lanes.md` | `PRQ-011`, `NSQ-002` | `NSE-20260625-walk-transcript-delivery-loop-topology` |
+| ADR-0014 | Rolling-wave planning; issues are a planning output | accepted | `docs/decisions/ADR-0014-rolling-wave-planning.md` | `PRQ-006` | `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
+| ADR-0015 | Two-tier verification with no self-certification | accepted | `docs/decisions/ADR-0015-two-tier-no-self-certification.md` | `PRQ-012`, `ARQ-029` | `NSE-20260624-agentic-loop-sdlc-best-practices` |
+| ADR-0016 | Event-driven vendor-neutral worker adapter | accepted | `docs/decisions/ADR-0016-event-driven-worker-adapter.md` | `ARQ-017`, `NSQ-011` | `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
+| ADR-0017 | Delivery vocabulary: wave/task/attempt; retire sprint as scope owner | accepted | `docs/decisions/ADR-0017-delivery-vocabulary-wave-task-attempt.md` | `ARCH-002`, `PRODUCT-007` | `NSE-20260625-walk-transcript-delivery-loop-topology` |
+| ADR-0018 | M0-M8 build order and Skills/Platform layer boundary | accepted | `docs/decisions/ADR-0018-build-order-and-layer-boundary.md` | `NSQ-007`, `ARCH-013` | `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
 
 ## ARCH-013 Operating Plane And Control Surface
 
@@ -298,7 +325,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 | Question ID | Question | Owner | Blocking only for final lock? | Proposed resolution or research path | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | NSQ-001 | What exact approval rule applies to protected North Star product and architecture artifacts? | Jason and James | false | Resolved for this loop: only final approval to lock the North Star and proceed to the next milestone is a gate. | `NSE-20260623-walk-transcript-agent-platform-gravity-skills` |
-| NSQ-002 | Should execution identity remain one issue/lane/branch/worktree/session/PR or introduce wave-level branches? | Jason, James, release owner | false | Defer exact naming to release architecture; treat wave as the CI/CD deployment and review unit. | `NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`, `NSE-20260623-kubernetes-gitops-cicd-cardinality` |
+| NSQ-002 | Should execution identity remain one issue/lane/branch/worktree/session/PR or introduce wave-level branches? | Jason, James, release owner | false | Resolved 2026-06-25 by ADR-0013 and ADR-0011: a lane is a dynamic per-wave write-conflict partition (one active writer per worktree/branch, ADR-0003 retained); a task keeps its own PR and fresh critic; the wave is the versioned delivery envelope with a wave integration branch. | `NSE-20260625-walk-transcript-delivery-loop-topology`, `NSE-20260625-recommended-event-driven-sdlc-control-plane` |
 | NSQ-005 | What is the exact repo/application/environment/namespace cardinality for the Agent Platform pilot? | Platform/security owner | false | Resolved by primary-source research: repository/application is the durable product boundary; dev, staging, production, and preview use environment-scoped namespaces or namespace sets with quota, RBAC, NetworkPolicy, secret references, endpoints, and observability. | `NSE-20260623-kubernetes-gitops-cicd-cardinality` |
 | NSQ-003 | Does Gravity still depend on Onyx? | Jason and Gravity readiness owner | false | Resolved for this loop: current evidence says Gravity does not depend on Onyx ingestion for the MVP; Onyx remains a separate planned/gated vault or search front door and post-MVP/control-plane concern. | `NSE-20260623-gravity-local-repo-evidence`, `NSE-20260623-gravity-remote-onyx-confirmation` |
 | NSQ-006 | Which P0 North Star interview decisions should be accepted, modified, or rejected before final lock? | Jason and James | false | Use `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`; answers return to `northstar-planning` / `review-feedback` and do not themselves record final approval. | `NSE-20260623-end-to-end-agent-based-sdlc` |

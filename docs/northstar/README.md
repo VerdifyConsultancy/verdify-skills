@@ -33,6 +33,8 @@ queried with `bin/verdify northstar evidence list`.
 | Source ID | Pinned at | Source date | Status | Evidence | North Star impact |
 | --- | --- | --- | --- | --- | --- |
 | `SRC-NS-001` | 2026-06-23 | Not provided | Reported transcript extraction | [Walk transcript: Agent Platform, Gravity, and Skills](evidence/2026-06-23-walk-transcript-agent-platform-gravity-skills.md) | Establishes a reported Gravity readiness gate and expands the skills North Star around protected planning, transcript intake, repo hygiene, wave orchestration, deployed review, observability, and cross-repo platform readiness. |
+| `SRC-NS-002` | 2026-06-25 | 2026-06-25 | Reported transcript extraction | `northstar://evidence/NSE-20260625-walk-transcript-delivery-loop-topology` | Defines the wave/loop/lane delivery topology, the North Star -> milestone -> wave -> user story -> issue traceability spine, and the per-wave human review cadence. |
+| `SRC-NS-003` | 2026-06-25 | 2026-06-25 | Reported adversarial review | `northstar://evidence/NSE-20260625-recommended-event-driven-sdlc-control-plane` | Reconciles topology and operating contract: wave envelope on a deterministic control plane, reconciler controller, dynamic lanes, vendor-neutral worker adapter, rolling-wave planning, two-tier verification, and an M0-M8 build order. Source for ADR-0011 through ADR-0018. |
 
 ## Current Reconciliation Notes
 
@@ -45,10 +47,12 @@ queried with `bin/verdify northstar evidence list`.
   `northstar-artifacts.yaml` before project definition and architecture consume
   them.
 - It should not be treated as `DESIGN_COMMITTED` evidence by itself.
-- It introduces an explicit conflict with the current default identity model:
-  this repository currently says one issue equals one lane, branch, worktree,
-  session, pull request, and preview by default; the transcript explores one
-  branch per wave.
+- It introduced an explicit conflict with the prior default identity model (one
+  issue equals one lane/branch/worktree/session/PR versus one branch per wave).
+  **Resolved 2026-06-25** by ADR-0013 (a lane is a dynamic per-wave
+  write-conflict partition; one active writer per worktree/branch, with ADR-0003
+  isolation retained) and ADR-0011 (the wave is the versioned delivery envelope
+  with a wave integration branch). Tracked as `NSQ-002` (resolved).
 - It raises planning questions for branch identity, RBAC, secrets handling, wave
   taxonomy, rollback signals, and controller versus specialist infrastructure
   ownership. These questions feed the planning loop unless final North Star lock

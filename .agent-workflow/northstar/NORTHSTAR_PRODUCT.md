@@ -1,7 +1,7 @@
 # North Star Product
 
 Status: `review_requested`
-Iteration: `26`
+Iteration: `27`
 Review: `requested`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Architecture pair: `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
@@ -46,6 +46,7 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 - Dependencies: GitHub, repo-local instructions, `.agent-workflow` artifacts, CI/CD checks, GitOps environment reconciliation, observability, and credentials/RBAC boundaries.
 - Planning loop: distill evidence, propose research, answer questions where evidence supports an answer, propose design, accept human feedback, return to the loop, and request final lock approval only when the North Star is ready to advance to the next milestone.
 - Owned-IP bias: own the lifecycle/evidence/control-plane/Gravity-engine contracts and compose commodity Git, Kubernetes, GitOps, database, vector, and observability primitives rather than rebuilding them.
+- Delivery model: work moves through versioned wave delivery envelopes on a deterministic controller state machine; lanes are per-wave write-conflict partitions; tasks (issues) are the smallest committed unit with their own PR and fresh-context review; planning is rolling-wave; orchestration is event-driven through a vendor-neutral worker adapter selecting Claude or Codex per host. See `ARCH-021` and `ADR-0011` through `ADR-0018`.
 - Evidence: all registered evidence items.
 
 ## PRODUCT-004 User Stories

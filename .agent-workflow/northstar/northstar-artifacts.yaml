@@ -4,9 +4,9 @@ kind: NorthStarArtifacts
 schema_version: '1.0'
 project_id: verdify-skills
 status: review_requested
-iteration: 26
+iteration: 27
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-06-24T17:21:26Z'
+updated_at: '2026-06-25T18:55:00Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   status: review_requested
@@ -43,12 +43,14 @@ product:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260624-agentic-loop-sdlc-best-practices
   - NSE-20260624-agentic-loop-audit-closeout
-  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+  - NSE-20260625-walk-transcript-delivery-loop-topology
+  - NSE-20260625-recommended-event-driven-sdlc-control-plane
+  open_question_ids: [NSQ-006, NSQ-008, NSQ-009, NSQ-010, NSQ-012, NSQ-013, NSQ-014]
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
   status: review_requested
   summary: Review-requested architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, shared bounded agentic-loop skill contract, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw/Orbit planning layer, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
-  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020]
+  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020, ARCH-021]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
@@ -80,7 +82,9 @@ architecture:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260624-agentic-loop-sdlc-best-practices
   - NSE-20260624-agentic-loop-audit-closeout
-  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+  - NSE-20260625-walk-transcript-delivery-loop-topology
+  - NSE-20260625-recommended-event-driven-sdlc-control-plane
+  open_question_ids: [NSQ-006, NSQ-008, NSQ-009, NSQ-010, NSQ-012, NSQ-013, NSQ-014]
 evidence_references:
 - id: NSE-20260623-long-horizon-agent-compounding-learning
   reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
@@ -230,6 +234,16 @@ evidence_references:
 - id: NSE-20260624-agentic-loop-audit-closeout
   reference: northstar://evidence/NSE-20260624-agentic-loop-audit-closeout
   title: Agentic loop audit closeout summary
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260625-walk-transcript-delivery-loop-topology
+  reference: northstar://evidence/NSE-20260625-walk-transcript-delivery-loop-topology
+  title: 'Walk transcript: wave/loop/lane SDLC topology design'
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260625-recommended-event-driven-sdlc-control-plane
+  reference: northstar://evidence/NSE-20260625-recommended-event-driven-sdlc-control-plane
+  title: Recommended event-driven SDLC control-plane model and loop-architecture critique
   evidence_status: reported
   used_in: [both]
 cross_links:
@@ -431,6 +445,15 @@ cross_links:
 - from_id: SURF-021
   to_id: IFACE-021
   relationship: defines the shared skill loop-control contract interface
+- from_id: ARCH-021
+  to_id: schemas/wave-contract.schema.yaml
+  relationship: The wave delivery envelope, state machine, and exit gates now have a validated contract schema.
+- from_id: ARCH-021
+  to_id: schemas/task-contract.schema.yaml
+  relationship: The committed task unit (write scope, acceptance, risk, budgets) now has a validated contract schema.
+- from_id: ARCH-021
+  to_id: schemas/worker-run-event.schema.yaml
+  relationship: The vendor-neutral worker adapter event and controller-message vocabulary now have a validated schema.
 open_questions:
 - id: NSQ-001
   artifact: both
@@ -446,11 +469,13 @@ open_questions:
   question: Should execution identity remain one issue/lane/branch/worktree/session/PR or introduce wave-level branches?
   owner: Jason, James, and release owner
   blocking: false
-  status: deferred
+  status: resolved
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
-  proposed_resolution: Treat wave as the CI/CD deployment and review unit; defer exact branch/session/worktree naming to release architecture before automation is encoded.
+  - NSE-20260625-walk-transcript-delivery-loop-topology
+  - NSE-20260625-recommended-event-driven-sdlc-control-plane
+  proposed_resolution: Resolved 2026-06-25 by ADR-0013 and ADR-0011. A lane is a dynamic per-wave write-conflict partition (one active writer per worktree/branch, ADR-0003 isolation retained); a task keeps its own PR and fresh-context critic; the wave is the versioned delivery envelope with a wave integration branch.
 - id: NSQ-005
   artifact: architecture
   question: What is the exact repo/application/environment/namespace cardinality for the Agent Platform pilot?
@@ -487,12 +512,13 @@ open_questions:
   question: What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw, and Gravity?
   owner: Jason and architecture owner
   blocking: false
-  status: open
+  status: resolved
   source_ids:
   - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
   - NSE-20260623-agent-platform-live-state-audit
   - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
-  proposed_resolution: Skills owns lifecycle contracts and artifacts; Agent Platform owns runtime/control APIs and k3s/source-control/CI/CD operational integration; Hermes/OpenClaw owns higher-level conversation/planning orchestration constrained through MCP/API tool surfaces; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs.
+  - NSE-20260625-recommended-event-driven-sdlc-control-plane
+  proposed_resolution: Accepted 2026-06-25 as ADR-0018. Skills owns lifecycle method (skills, typed contracts/schemas, gates); Agent Platform owns the control-plane runtime (state machine, event/state store, scheduler, worker adapters); Hermes/OpenClaw owns higher-level conversation/planning through MCP/API; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs.
 - id: NSQ-008
   artifact: both
   question: What is the safest extraction path from Sunshine Club into reusable Gravity core?
@@ -529,11 +555,12 @@ open_questions:
   question: Should repo-controller orchestration use Codex, Claude, or a controller abstraction that selects the model/tooling per task and failure mode?
   owner: Platform architecture owner
   blocking: false
-  status: open
+  status: resolved
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260623-openclaw-hermes-local-evidence
-  proposed_resolution: Prefer a model-neutral controller contract with Codex/Claude as interchangeable or task-specific workers; validate with a manual bootstrap pilot before scheduling.
+  - NSE-20260625-recommended-event-driven-sdlc-control-plane
+  proposed_resolution: Accepted 2026-06-25 as ADR-0016. A vendor-neutral worker adapter (start/events/send/cancel/collect) with normalized run events makes Codex and Claude interchangeable execution engines selected per host; polling/heartbeats only detect lost workers; validate against live SDK docs before implementation.
 - id: NSQ-012
   artifact: both
   question: Which infrastructure domain agents are allowed broader scoped access, and what owner, audit, approval, and rollback rules apply?
@@ -577,4 +604,4 @@ review:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, repo-controller bootstrap walk evidence, agentic-loop audit, platform issue map, and skills-side loop-contract issue #43 have been synthesized into review-requested product and architecture drafts. Human reviewers must approve, request changes, or reject before downstream skills treat the North Star as locked authority.
+  reason: The OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, repo-controller bootstrap walk evidence, agentic-loop audit, platform issue map, and skills-side loop-contract issue #43 have been synthesized into review-requested product and architecture drafts. The 2026-06-25 delivery-loop architecture is now locked as accepted ADR-0011 through ADR-0018 (wave envelope, reconciler controller, dynamic lanes, rolling-wave, two-tier verification, event-driven worker adapter, vocabulary, M0-M8 build order and Skills/Platform layer boundary), reflected in ARCH-021 and new wave/task/worker-event contract schemas, resolving NSQ-002, NSQ-007, and NSQ-011. Human reviewers must approve, request changes, or reject before downstream skills treat the North Star as locked authority.
