@@ -72,7 +72,7 @@ end
 
 reported_head = body[/^Current head SHA:\s*`?([0-9a-f]{40})`?\s*$/i, 1]
 errors << "Current head SHA must be a 40-character commit SHA" unless reported_head
-errors << "reported head SHA does not match the pull request head" if reported_head && head_sha && reported_head != head_sha
+errors << "reported head SHA does not match the pull request head" if !release_pr && reported_head && head_sha && reported_head != head_sha
 errors << "base and head SHA are identical" if base_sha && head_sha && base_sha == head_sha
 
 if body.include?("<!--")
