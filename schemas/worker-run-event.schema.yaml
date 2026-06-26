@@ -1,0 +1,64 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/worker-run-event.schema.yaml
+title: Verdify Worker Run Event
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, event_id, run_id, task_id, wave_id, attempt_number, event_type, emitted_at, source]
+properties:
+  schema_ref: {const: worker-run-event.schema.yaml}
+  kind: {const: WorkerRunEvent}
+  schema_version: {const: "1.0"}
+  event_id: {type: string, minLength: 1}
+  run_id: {type: string, minLength: 1}
+  task_id: {type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]*$'}
+  wave_id: {type: string, pattern: '^wave-[a-z0-9][a-z0-9-]*$'}
+  lane_id: {type: [string, 'null']}
+  attempt_number: {type: integer, minimum: 1}
+  event_type:
+    type: string
+    enum: [run.started, task.oriented, plan.created, command.started, file.changed, test.completed, progress.reported, decision.requested, task.blocked, candidate.completed, run.failed, run.stopped]
+  proposal:
+    type: [string, 'null']
+    enum: [candidate_done, blocked, scope_change_requested, human_decision_required, retry_recommended, null]
+  emitted_at: {type: string, minLength: 1}
+  source:
+    type: object
+    additionalProperties: false
+    required: [provider, adapter]
+    properties:
+      provider: {type: string, enum: [claude, codex, other]}
+      adapter: {type: string, minLength: 1}
+      host: {type: [string, 'null']}
+  correlation:
+    type: object
+    additionalProperties: false
+    properties:
+      session_id: {type: [string, 'null']}
+      plan_id: {type: [string, 'null']}
+      pr_id: {type: [string, 'null']}
+      deployment_id: {type: [string, 'null']}
+      policy_decision_id: {type: [string, 'null']}
+  policy:
+    type: object
+    additionalProperties: false
+    required: [verdict]
+    properties:
+      verdict: {type: string, enum: [allow, deny, needs_review, not_applicable]}
+      decision_id: {type: [string, 'null']}
+  state_transition:
+    type: object
+    additionalProperties: false
+    required: [committed]
+    properties:
+      from: {type: [string, 'null']}
+      to: {type: [string, 'null']}
+      committed: {type: boolean}
+  evidence_refs: {type: array, items: {type: string}}
+  payload:
+    type: object
+    additionalProperties: true
+    properties:
+      summary: {type: string}
+      command: {type: string}
+      exit_code: {type: [integer, 'null']}
+      paths: {type: array, items: {type: string}}

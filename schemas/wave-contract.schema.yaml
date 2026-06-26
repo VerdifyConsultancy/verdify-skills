@@ -1,0 +1,103 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/wave-contract.schema.yaml
+title: Verdify Wave Contract
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, wave_id, north_star_version, status, objective, milestone_ids, stories, committed_tasks, lane_partition_policy, exit_gates, branch_model, review, approval, planner, prepared_at]
+properties:
+  schema_ref: {const: wave-contract.schema.yaml}
+  kind: {const: WaveContract}
+  schema_version: {const: "1.0"}
+  wave_id: {type: string, pattern: '^wave-[a-z0-9][a-z0-9-]*$'}
+  north_star_version: {type: integer, minimum: 1}
+  status: {type: string, enum: [observe, draft, awaiting_approval, executing, verifying, integrating, deploy_preview, review, accepted, replanning, escalated, superseded]}
+  objective: {type: string, minLength: 1}
+  milestone_ids: {type: array, minItems: 1, uniqueItems: true, items: {type: string}}
+  northstar_ids: {type: array, items: {type: string}}
+  stories:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, acceptance]
+      properties:
+        id: {type: string, minLength: 1}
+        statement: {type: string}
+        acceptance: {type: string, minLength: 1}
+  committed_tasks:
+    type: array
+    uniqueItems: true
+    items:
+      type: object
+      additionalProperties: false
+      required: [task_id]
+      properties:
+        task_id: {type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]*$'}
+        issue: {type: [integer, 'null'], minimum: 1}
+  lane_partition_policy:
+    type: object
+    additionalProperties: false
+    required: [strategy, one_active_writer_per_worktree]
+    properties:
+      strategy: {type: string, enum: [dependency_and_conflict_graph, functional_seed, explicit]}
+      one_active_writer_per_worktree: {const: true}
+      notes: {type: string}
+  risk:
+    type: object
+    additionalProperties: false
+    required: [class]
+    properties:
+      class: {type: string, enum: [low, medium, high, critical]}
+      notes: {type: string}
+  exit_gates:
+    type: object
+    additionalProperties: false
+    required: [all_committed_tasks_terminal, integration_ci_green, cumulative_security_review_passed, acceptance_scenarios_passed, preview_deployment_healthy, evidence_bundle_complete]
+    properties:
+      all_committed_tasks_terminal: {type: boolean}
+      integration_ci_green: {type: boolean}
+      cumulative_security_review_passed: {type: boolean}
+      acceptance_scenarios_passed: {type: boolean}
+      preview_deployment_healthy: {type: boolean}
+      evidence_bundle_complete: {type: boolean}
+  branch_model:
+    type: object
+    additionalProperties: false
+    required: [model, base_ref, integration_ref]
+    properties:
+      model: {type: string, enum: [wave_branch, per_lane_branches, merge_queue, manual, other]}
+      base_ref: {type: string, minLength: 1}
+      integration_ref: {type: [string, 'null']}
+  review:
+    type: object
+    additionalProperties: false
+    required: [human_review_required, review_inbox_packet_required, reviewer]
+    properties:
+      human_review_required: {type: boolean}
+      review_inbox_packet_required: {type: boolean}
+      reviewer: {type: [string, 'null']}
+  approval:
+    type: object
+    additionalProperties: false
+    required: [mode, status, approver, approved_at, approved_version]
+    properties:
+      mode: {type: string, enum: [human, orbit_policy, auto_low_risk]}
+      status: {type: string, enum: [pending, approved, rejected]}
+      approver: {type: [string, 'null']}
+      approved_at: {type: [string, 'null']}
+      approved_version: {type: [integer, 'null'], minimum: 1}
+  amendments:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, reason, recorded_at]
+      properties:
+        id: {type: string, pattern: '^AMD-[0-9]{2,}$'}
+        reason: {type: string, minLength: 1}
+        recorded_at: {type: string, minLength: 1}
+        version: {type: [integer, 'null'], minimum: 1}
+  evidence_bundle_ref: {type: [string, 'null']}
+  planner: {type: string, minLength: 1}
+  prepared_at: {type: string, minLength: 1}
