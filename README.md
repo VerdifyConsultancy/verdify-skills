@@ -6,6 +6,41 @@ The repository is deliberately not one giant sprint prompt. Lifecycle skills own
 
 `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, ordering, and standalone skill treatment. `verdify.workflow.yaml`, router behavior, docs, and SKILL.md frontmatter are derived views that must validate against that config.
 
+## The loops
+
+Two loops drive every repository. A **North Star loop** agrees the target and locks it as plan of record with an approved PR. A **delivery loop** then ships one reviewable wave at a time through plan → execute → verify → review. A human (or Orbit) stays in the loop at review, and the locked North Star guides every wave.
+
+```mermaid
+flowchart TB
+    H(["Human / Orbit"])
+
+    subgraph L1["1 — North Star loop · agree the target"]
+      direction LR
+      RES["research · planning · interview"]
+      Q{"approved PR?"}
+      NS[("North Star<br/>plan of record")]
+      RES --> Q
+      Q -- "iterate" --> RES
+      Q -- "lock" --> NS
+    end
+
+    subgraph L2["2 — Delivery loop · ship a wave"]
+      direction LR
+      PLAN["PLAN<br/>state-of-union<br/>sprint-planning"]
+      EXEC["EXECUTE<br/>sprint-orchestrator<br/>controller-loop · lane-delivery"]
+      VER["VERIFY<br/>independent-critic<br/>CI green"]
+      REV["REVIEW<br/>release-verification"]
+      PLAN --> EXEC --> VER --> REV
+      VER -- "changes requested" --> EXEC
+    end
+
+    H --> RES
+    NS -. "guides every wave" .-> PLAN
+    REV --> H
+    H -- "feedback: next wave" --> PLAN
+    H -- "feedback: new direction" --> RES
+```
+
 ## Lifecycle
 
 ```text
