@@ -6,6 +6,7 @@
 
 - Added npm release automation: PR release preflight checks, a `main` publish workflow using Trusted Publishing/OIDC, GitHub release artifact creation, and documentation for updating installed target repositories.
 - Added the `dev -> main` release branch model, auto-generated release PR workflow, release-specific PR policy validation, and documentation for protecting `main` from direct pushes.
+- Added package repository metadata required by npm provenance verification and allowed same-version release-repair PRs when npm confirms that version is still unpublished.
 
 ## 1.1.0 - 2026-06-25
 
