@@ -4,7 +4,7 @@ description: Ingests research notes, reports, source documents, benchmark findin
 compatibility: Requires a target repository initialized with Verdify or permission to create `.agent-workflow/northstar/`. The Verdify CLI command scans local research files for secret/PII-shaped content before copying them and writing YAML artifacts; do not ingest raw secrets or restricted data.
 metadata:
   author: Verdify
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # North Star Research Ingest

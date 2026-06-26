@@ -11,6 +11,9 @@ Mandatory repository rules:
 
 - GitHub Issues are the backlog source of truth.
 - GitHub is the delivery control plane; do not replace issues or pull requests with private chat state.
+- Treat `dev` as this repository's working branch. Before editing, confirm you are on `dev` or on a short-lived branch based on `dev` that targets `dev`.
+- Commit and push normal repository changes through the `dev` workflow. Implementation/lane pull requests target `dev`; `main` only receives generated `dev -> main` release pull requests.
+- Never edit, commit, or push normal work directly on `main`; `main` must stay aligned with the published npm package and GitHub release for the current version.
 - One issue, lane, branch, worktree, worker session, and pull request is the default unit of implementation.
 - Acquire a lane lease before coding and never share an active worktree between coding sessions.
 - Follow `COMMON_OPERATING_CONTRACT.md` and `config/authority-matrix.yaml`.

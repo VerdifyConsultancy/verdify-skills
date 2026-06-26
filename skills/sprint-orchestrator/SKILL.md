@@ -4,7 +4,7 @@ description: Coordinates an approved Verdify sprint or wave by reconciling GitHu
 compatibility: Requires Git, the Verdify CLI, approved sprint artifacts, GitHub CLI for live reconciliation, and Agent Platform API/MCP details when platform sessions are launched. It coordinates but does not implement lane code or review its own work.
 metadata:
   author: Verdify
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Sprint Orchestrator

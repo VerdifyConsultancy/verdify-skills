@@ -137,9 +137,14 @@ bash scripts/verify-package.sh /path/to/verdify-lifecycle-skills-v1.0.0.zip
 
 ## Branch and release flow
 
-`dev` is the long-running development integration branch. Implementation and
-lane pull requests target `dev`. `main` is the protected release branch; it
-should only receive release pull requests from `dev`.
+`dev` is the long-running development integration branch and the working branch
+for current repository changes. Humans and agents should make normal changes on
+`dev`, or on short-lived lane branches based on `dev` with pull requests back to
+`dev`. Do not use `main` for day-to-day edits, commits, or pushes.
+
+`main` is the protected release branch. It should only receive generated release
+pull requests from `dev`, and its tree should match the package version
+published to npm and the corresponding GitHub release.
 
 Every push to `dev` runs validation and `.github/workflows/release-pr.yml`,
 which opens or updates a `dev -> main` release PR for the current package
@@ -338,7 +343,7 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 ## Repository-specific setup still required
 
-Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should also configure a ruleset or protected branch for `main` with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), at least one approving review, conversation resolution, no direct pushes, and no force pushes or branch deletion. On busy repositories, add a merge queue. Deployment environments and their approvers remain project-specific.
+Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should configure a ruleset or protected branch for `main` with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), strict up-to-date checks, conversation resolution, no direct pushes, and no force pushes or branch deletion. The current release flow does not require approving reviews; add review gates, code-owner gates, or a merge queue only by an explicit governance decision. Deployment environments and their approvers remain project-specific.
 
 ## Design documentation
 
