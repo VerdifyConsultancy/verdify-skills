@@ -65,6 +65,18 @@ Read `references/critic-rubric.md` and `references/evidence-review.md`.
 
 Approval means the current head SHA satisfies the contract with adequate evidence. Any new commit invalidates approval until policy rechecks it.
 
+## Cumulative wave review
+
+Per-task review is necessary but not sufficient. At wave integration, also review
+the **cumulative wave diff** and intended end state for security and product
+intent: individually routine tasks can compose into vulnerable or off-intent
+outcomes that are invisible in isolated task PRs (ADR-0015). Confirm the wave exit
+gates (integration CI green, acceptance scenarios passed, cumulative security
+review passed, preview deployment healthy, evidence bundle complete) before the
+wave is presented for human review. Evidence strength order: deterministic checks
+-> behavior/browser evidence -> fresh-context review -> LLM semantic judgment ->
+human review for ambiguity or high risk.
+
 ## Handoff
 
 - Fixes -> `lane-delivery` through the orchestrator

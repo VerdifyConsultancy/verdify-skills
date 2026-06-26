@@ -13,6 +13,33 @@ metadata:
 Own durable orchestration state. Do not implement lane code, review your own
 work, or bypass human gates.
 
+## Reconciler model
+
+The controller is a **deterministic reconciler over a durable event log**, not a
+model that holds state in conversation (ADR-0012). Lane workers are proposers:
+they emit normalized events (`candidate_done`, `blocked`, `scope_change_requested`,
+`human_decision_required`, `retry_recommended`); the controller validates each
+event against current state and policy, applies an idempotent transition,
+schedules newly-ready tasks, enforces retry/cost/risk/time budgets, and persists
+the decision with evidence. A worker never moves authoritative state to `done`.
+
+A **wave** is a versioned delivery envelope, not a loop: it advances through one
+state machine (`Observe -> DraftWave -> Approve -> Execute -> Verify -> Integrate
+-> DeployPreview -> Review -> Accept`, with `Replan` and `Escalate` as explicit
+transitions; ADR-0011). Periodic polling exists only to detect lost workers
+(expired leases, missing heartbeats, undelivered CI events, GitHub/controller
+drift) — never to infer progress from terminal text.
+
+Sources of truth: Git owns approved intent; GitHub owns backlog/delivery; the
+runtime state store owns execution state (claims, leases, attempts, events,
+costs); CI and policy are gate authority. The state-machine, event store, and
+scheduler **runtime** are Agent Platform responsibilities (`jvallery/agents`
+loop-runtime/loop-state); this skill owns the contracts and gate semantics
+(ADR-0018).
+
+Read `references/delivery-loop-model.md` for the full loop topology, decision
+rights, and glossary.
+
 ## Canonical artifacts
 
 - `.agent-workflow/controller/controller-state.yaml` - durable controller state
@@ -21,6 +48,7 @@ work, or bypass human gates.
 
 Validate controller state against `../../schemas/controller-state.schema.yaml`
 and the session ledger against `../../schemas/session-ledger.schema.yaml`.
+Normalized lane-worker events follow `../../schemas/worker-run-event.schema.yaml`.
 
 ## Procedure
 
@@ -51,5 +79,7 @@ worker, or the controller would need to make a protected design decision.
 
 ## Load references only when needed
 
+- Read `references/delivery-loop-model.md` for the wave state machine, nested
+  loops, decision rights, and glossary.
 - Read `references/state-machine.md` before defining transitions, waves, or
   failure recovery.

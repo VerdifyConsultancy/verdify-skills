@@ -10,7 +10,12 @@ metadata:
 
 # Lane Delivery
 
-You are a bounded worker. Implement one lane and finish its closeout in the same session.
+You are a bounded worker. Implement one task contract and finish its closeout in
+the same session. Your output is a **candidate**, never a self-certified
+completion: emit `candidate_done` with evidence and let deterministic checks plus
+a fresh independent critic decide completion (ADR-0015). A task is the smallest
+committed unit (`../../schemas/task-contract.schema.yaml`); a failed attempt does
+not change its committed objective (ADR-0017).
 
 ## Start checks
 
@@ -35,6 +40,11 @@ Read `references/worker-procedure.md` before implementation.
 - Use the lease's isolated database, container, cache, port, and namespace values.
 - Run validation incrementally.
 - Keep commits coherent and attributable.
+- Report progress and blockers as normalized events
+  (`../../schemas/worker-run-event.schema.yaml`); propose state changes
+  (`candidate_done`, `blocked`, `scope_change_requested`,
+  `human_decision_required`) and let the controller authorize transitions
+  (ADR-0012). Do not mutate durable controller state yourself.
 - Create or update one PR linked to the issue and lane contract.
 - Create/propose a GitHub issue for discovered work; do not smuggle it into this lane.
 
@@ -54,7 +64,7 @@ Closeout is the final worker action, not a separate skill.
 4. Confirm commits are pushed and PR/head SHA are current.
 5. Record untracked files, residual risks, discovered issues, and deployment implications.
 6. Write `.agent-workflow/sprints/<sprint-id>/lanes/closeout/<lane-id>.closeout.yaml` and validate it against `../../schemas/lane-closeout.schema.yaml`.
-7. Set the lane to `READY_FOR_CRITIC`; do not mark it integrated or complete.
+7. Mark the task `candidate_done` (lane `READY_FOR_CRITIC`); never mark it integrated, done, or complete — the fresh critic and wave gates decide (ADR-0015).
 
 Read `references/closeout-procedure.md`.
 

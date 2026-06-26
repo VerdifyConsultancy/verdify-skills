@@ -136,7 +136,11 @@ without the configured approval rule.
 CI/CD based wave deployment is core planning scope when the broader delivery
 architecture is discussed. The North Star must preserve wave deployment,
 preview/review environments, promotion, rollback, and CI evidence requirements
-as architecture-significant planning content.
+as architecture-significant planning content. The North Star maintainer keeps
+complete outcome-level traceability for the roadmap (North Star -> milestone ->
+wave) while leaving issue-level decomposition to the next one or two waves under
+rolling-wave planning (ADR-0014); waves are versioned delivery envelopes on a
+deterministic controller state machine (ADR-0011, ADR-0012).
 
 Self-improvement is also core planning scope, but it is proposal-first. A
 session-mining or learning-capture loop may scan, redact, classify, and stage

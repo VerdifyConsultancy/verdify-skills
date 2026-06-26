@@ -15,10 +15,27 @@ Turn backlog problems into an approved, executable sprint transaction. GitHub Is
 ## Default unit
 
 ```text
-one issue -> one lane -> one contract -> one branch -> one worktree -> one worker session -> one PR
+one task (issue) -> one task contract -> one PR -> one fresh-context review
+lanes = per-wave write-conflict partitions; tasks converge on the wave branch
 ```
 
-Use multiple issues in one lane only when they are inseparable at acceptance and merge boundaries. Record `coupling_justification` and obtain explicit plan approval.
+A **task** (GitHub issue) is the smallest committed, independently reviewable and
+mergeable unit and keeps its own PR and fresh critic (ADR-0015). A **lane** is a
+temporary, per-wave partition of tasks one worker can own without colliding with
+other active writers — derived from the task DAG and file-conflict graph, seeded
+from functional areas, not a permanent silo (ADR-0013). The default isolation
+guarantee is unchanged: one active worker per worktree/branch (ADR-0003). Couple
+tasks in one PR only when inseparable at acceptance and merge boundaries; record
+`coupling_justification` and obtain plan approval.
+
+## Rolling-wave planning
+
+Keep complete outcome-level traceability for the roadmap (North Star -> milestone
+-> wave) but decompose only the next one or two waves to task-level contracts;
+issues are an **output** of planning, not its raw input (ADR-0014). The wave is a
+versioned delivery envelope (`../../schemas/wave-contract.schema.yaml`) with
+explicit exit gates; tasks are typed (`../../schemas/task-contract.schema.yaml`).
+Read `references/rolling-wave-planning.md` for the planning-pass order.
 
 ## Prerequisites
 
@@ -37,7 +54,7 @@ Perform these steps as one transaction:
 
 1. **Issue readiness.** Verify each candidate issue describes a problem/outcome, acceptance intent, risk, dependencies, and exclusions. Create or propose missing issues rather than inventing private backlog items.
 2. **Sprint selection.** Choose a bounded outcome and explicit non-goals. Record milestone/Project links, baseline, acceptance criteria, risks, deployment expectations, and human gates.
-3. **Lane topology.** Assign each issue to exactly one lane by default. Decide parallel versus serial execution based on contracts and dependency risk, not desired agent count.
+3. **Lane topology.** Partition the wave's tasks into lanes from the dependency DAG and expected write-set/file-conflict graph so each lane has one active writer and non-overlapping write scope (ADR-0013). Decide parallel versus serial execution from conflicts and dependency risk, not desired agent count.
 4. **Lane contracts.** Compile objective, ownership, dependencies, runtime namespace policy, validation, evidence, Git policy, escalation triggers, and definition of done.
 5. **Cross-lane review.** Detect overlapping paths, interfaces, runtime resources, database migrations, and incompatible baselines.
 6. **Review and reporting plan.** Record the stakeholder-readable answer:

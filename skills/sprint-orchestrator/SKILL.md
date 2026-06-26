@@ -69,11 +69,14 @@ running the controller poll loop.
 
 ## Dispatch
 
-For each ready lane, create exactly one worker worktree/session. Prefer the
-configured Agent Platform MCP/API operation recorded in the runbook and control
-request. Use `bin/verdify lane create` only for local lease/worktree identity
-or documented fallback; do not replace platform dispatch with ad hoc local tmux
-or Claude CLI sessions.
+Derive lanes for this wave from the task DAG and the expected write-set /
+file-conflict graph (ADR-0013); a lane is a temporary partition, not a fixed
+silo. For each ready lane, create exactly one worker worktree/session through the
+adapter the runbook authorizes for this host — an Agent Platform MCP/API
+operation or a host-local Claude/Codex run, recorded as a control request when
+platform mediation applies (ADR-0016). Use `bin/verdify lane create` for the
+local lease/worktree identity. Record the substrate, lease ID, and session;
+never run an unrecorded substrate.
 
 ```bash
 ../../bin/verdify lane create \
@@ -92,10 +95,17 @@ workers into the same lane/worktree.
 
 ## Monitor events
 
-Run the configured controller loop, typically every five minutes unless the
-runbook says otherwise. Poll durable platform/session state and terminal panes
-only to observe or answer the assigned lane agent. Handle durable events rather
-than trusting free-form chat narratives:
+Orchestration is **event-driven** through a vendor-neutral worker adapter
+(ADR-0016): consume normalized `../../schemas/worker-run-event.schema.yaml`
+events from the adapter (`start`/`events`/`send`/`cancel`/`collect`), validate
+each `proposal` against state and policy, and record the authorized transition.
+Both substrates implement the adapter — Claude (Agent SDK / in-session fan-out)
+and Codex (`exec --json` / SDK threads) — and the controller selects per host.
+A periodic poll exists only to detect lost workers (expired leases, missing
+heartbeats, undelivered CI events, GitHub/controller drift), not to scrape
+terminal text for progress. Read `references/worker-adapter-contract.md`.
+
+Handle durable events rather than trusting free-form chat narratives:
 
 - heartbeat/status update;
 - blocker;
@@ -130,8 +140,8 @@ Read `references/github-reconciliation.md`.
 - Do not approve your own material plan exception.
 - Do not bypass required checks, reviews, or deployment approvals.
 - Do not close a sprint before release verification and outcome review.
-- Do not launch local tmux/Claude/Codex sessions when the approved execution
-  path is Agent Platform MCP unless a recorded fallback gate authorizes it.
+- Do not launch a worker on a substrate the runbook does not authorize for the
+  host; record the chosen Claude/Codex/platform adapter and its session.
 - Do not copy raw session logs, secrets, or private terminal payloads into
   durable artifacts.
 
