@@ -1,0 +1,26 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: plan-approval-2026-06-25-first-pilot
+sprint_id: 2026-06-25-first-pilot
+lane_id:
+type: plan_approval
+status: approved
+question: Approve the completed sprint plan, lane topology, contracts, risks, and
+  exceptions?
+owner: jason
+evidence_required:
+- sprint plan
+- lane map
+- lane contracts
+- risk review
+allowed_decisions:
+- approve
+- revise
+- reject
+decision: approve
+rationale: Jason approved the audit-driven first-pilot plan to deliver the PR-policy lightweight path (issue #69) as the first end-to-end lane.
+opened_at: '2026-06-26T03:06:47Z'
+resolved_at: '2026-06-26T03:10:00Z'
+resume_state: ORCHESTRATE

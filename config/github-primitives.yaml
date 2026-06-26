@@ -35,6 +35,12 @@ required_pull_request_sections:
   - Scope proof
   - Evidence
   - Risk and deployment impact
+# PRs carrying one of these labels use the reduced contract (closing issue +
+# Outcome + Evidence) instead of the full lane contract above.
+lightweight_pull_request_labels:
+  - "verdify:policy-exempt"
+  - "type:docs"
+  - "type:chore"
 recommended_default_branch_rules:
   required_checks: [validate, policy]
   approving_reviews: 1

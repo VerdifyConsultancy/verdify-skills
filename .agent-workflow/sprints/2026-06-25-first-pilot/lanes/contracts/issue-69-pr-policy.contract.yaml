@@ -1,0 +1,77 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+lane_id: issue-69-pr-policy
+title: PR policy lightweight path
+status: dispatched
+issue_ids: [69]
+coupling_justification: null
+objective: Make pr-policy honor exempt labels with a reduced contract and make the PR-body head SHA optional.
+desired_outcome: Issue #69 is resolved; docs/chore/exempt PRs pass without a fabricated lane contract, and standard PRs no longer require re-editing a head SHA into the body on every push.
+non_goals:
+  - Add the change_class fast-lane (tracked separately as issue #70).
+  - Change the full standard lane PR contract for code changes.
+baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
+branch: pilot/first-test-pass
+module_contracts:
+  - COMMON_OPERATING_CONTRACT.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [CI pull-request policy]
+  owned_paths:
+    - scripts/pr-policy.rb
+    - tests/test_pr_policy.sh
+    - config/github-primitives.yaml
+    - .github/PULL_REQUEST_TEMPLATE/**
+  prohibited_paths:
+    - lib/verdify/**
+    - skills/**
+  coordination_required_paths: []
+  owned_interfaces: [pr-policy CLI contract]
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: An exempt-labelled PR with a reduced body (closing issue + Outcome + Evidence) passes, and the same body without an exempt label is rejected.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [tests/test_pr_policy.sh passes, make test green]
+  - id: LANE-AC-02
+    statement: A standard PR with no "Current head SHA" line still passes the policy.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [tests/test_pr_policy.sh passes]
+validation_commands:
+  - id: pr-policy-test
+    command: bash tests/test_pr_policy.sh
+    purpose: Exercise the exempt, non-exempt, and optional-SHA paths.
+    required: true
+  - id: make-test
+    command: make test
+    purpose: Full package gate.
+    required: true
+required_evidence:
+  - Test output for the exempt, non-exempt, and optional-SHA cases.
+  - Scope review confirming only owned CI-policy paths changed.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The standard lane PR contract for code changes must change.
+  - A schema change becomes necessary to express the exemption.
+definition_of_done:
+  - Both lane acceptance criteria are satisfied with evidence.
+  - Branch is pushed and the linked PR is ready for criticism.
+approval:
+  status: approved
+  approver: jason
+  approved_at: "2026-06-25T19:00:00Z"
