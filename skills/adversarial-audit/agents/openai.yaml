@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Adversarial Audit"
+  short_description: "Audit plans through product, engineering, security, and business lenses"
+  default_prompt: "Use $adversarial-audit to pressure-test this plan or handoff through product, engineering, security, and business lenses."
+policy:
+  allow_implicit_invocation: true

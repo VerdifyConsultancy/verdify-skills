@@ -22,6 +22,7 @@ module Verdify
       lane-delivery
       independent-critic
       release-verification
+      adversarial-audit
       consensus-audit-workflow
     ].freeze
     SECRET_SCAN_LINE_PATTERNS = [

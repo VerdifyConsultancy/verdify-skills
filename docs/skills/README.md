@@ -54,6 +54,7 @@ flowchart TD
     end
     subgraph VERIFY["Verify, Review, Release"]
       IC[independent-critic]
+      AA[adversarial-audit]
       CA[consensus-audit-workflow]
       RV[release-verification]
     end
@@ -111,7 +112,8 @@ flowchart LR
 | 17 | [lane-delivery](per-skill/lane-delivery.md) | Implement + close out one leased lane | `lane-closeout` |
 | 18 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
 | 19 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
-| 20 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
+| 20 | [adversarial-audit](per-skill/adversarial-audit.md) | Product, engineering, security, and business lens audit | — |
+| 21 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
 | — | [issue-triage](per-skill/issue-triage.md) | Standalone: research and create GitHub issues | — |
 
 ## How to read a per-skill page
