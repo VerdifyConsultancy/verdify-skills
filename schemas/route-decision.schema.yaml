@@ -13,7 +13,7 @@ properties:
   current_state: {type: string, minLength: 1}
   next_skill:
     type: string
-    enum: [project-router, repo-bootstrap, transcript-replan, northstar-research-ingest, northstar-planning, northstar-interview, northstar-question-resolution, project-definition, architecture-contracts, state-of-union, repo-hygiene, sprint-planning, sprint-orchestrator, controller-loop, platform-readiness, gravity-readiness, lane-delivery, independent-critic, release-verification, consensus-audit-workflow, issue-triage]
+    enum: [project-router, repo-bootstrap, transcript-replan, northstar-research-ingest, northstar-planning, northstar-interview, northstar-question-resolution, project-definition, architecture-contracts, state-of-union, repo-hygiene, sprint-planning, sprint-replan, sprint-orchestrator, controller-loop, platform-readiness, gravity-readiness, lane-delivery, independent-critic, release-verification, consensus-audit-workflow, issue-triage]
   next_mode: {type: string, minLength: 1}
   reason: {type: string, minLength: 1}
   evidence:

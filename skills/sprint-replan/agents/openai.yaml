@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Sprint Replan"
+  short_description: "Create a standard sprint replan handoff"
+  default_prompt: "Use $sprint-replan to summarize the changed sprint scope, deferred work, route caveats, and review milestones."
+policy:
+  allow_implicit_invocation: true
