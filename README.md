@@ -1,6 +1,6 @@
 # Verdify Lifecycle Skills
 
-Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages eighteen coherent lifecycle Agent Skills, one standalone issue-triage skill, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
+Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages twenty-one coherent lifecycle Agent Skills, one standalone issue-triage skill, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
 
 The repository is deliberately not one giant sprint prompt. Lifecycle skills own bounded responsibilities, consume durable artifacts, produce durable artifacts, and hand off without relying on hidden chat history. Standalone skills support adjacent GitHub-native work without entering the lifecycle graph.
 
@@ -74,6 +74,8 @@ project-router
        |-> independent-critic (fresh session and review worktree)
   -> release-verification
        review inbox packet -> diagnostics -> integration -> deployment verification -> outcome review
+  -> adversarial-audit
+       product + engineering + security + business lens review for plans and handoffs
   -> project-router
 ```
 
@@ -100,7 +102,7 @@ See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/la
 ## Repository contents
 
 ```text
-skills/                     Eighteen lifecycle skills plus issue-triage
+skills/                     Twenty-one lifecycle skills plus issue-triage
 .agents/skills/             Codex discovery links
 .claude/skills/             Claude Code discovery links
 bin/verdify                 Dependency-free lifecycle CLI
