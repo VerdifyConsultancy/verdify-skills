@@ -21,6 +21,7 @@ module Verdify
       gravity-readiness
       lane-delivery
       independent-critic
+      controller-merge
       release-verification
       consensus-audit-workflow
     ].freeze

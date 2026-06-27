@@ -1,0 +1,27 @@
+{
+  "skill_name": "controller-merge",
+  "evals": [
+    {
+      "id": "stale-pr-head-return-for-fix",
+      "prompt": "A lane closeout says ready_for_critic, but the PR body reports an old Current head SHA and the branch has advanced.",
+      "expected_output": "Classifies the lane as return_for_fix or metadata-fix-needed, records the stale evidence, and does not mark the lane merge-ready.",
+      "files": [],
+      "assertions": [
+        "The PR head mismatch prevents merge-ready classification.",
+        "The next action is a bounded fix or metadata refresh.",
+        "The controller does not override the stale evidence by assertion."
+      ]
+    },
+    {
+      "id": "critic-approved-integration-handoff",
+      "prompt": "A lane has a valid closeout, a fresh critic approval, current PR-policy fields, passing checks, and no merge conflicts.",
+      "expected_output": "Classifies the lane as merge_ready and hands exact PR/head/check/critic evidence to release-verification for integration and review inbox.",
+      "files": [],
+      "assertions": [
+        "The decision cites closeout, critic report, PR head, checks, and mergeability.",
+        "The handoff goes to release-verification rather than self-certifying deployment.",
+        "Any residual release or human-review caveats remain explicit."
+      ]
+    }
+  ]
+}
