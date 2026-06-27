@@ -67,23 +67,26 @@ skills:
   - name: controller-loop
     order: 14
     modes: [state-machine, session-ledger, wave-supervision]
-  - name: platform-readiness
+  - name: subagent-worktree
     order: 15
+    modes: [dispatch, prompt-bind, monitor, critic-handoff]
+  - name: platform-readiness
+    order: 16
     modes: [inventory, target-contract, readiness-gate, pilot-plan]
   - name: gravity-readiness
-    order: 16
+    order: 17
     modes: [inventory, readiness-checklist, pilot-design]
   - name: lane-delivery
-    order: 17
+    order: 18
     modes: [implementation, closeout, fix-forward]
   - name: independent-critic
-    order: 18
+    order: 19
     modes: [lane-review, evidence-review, risk-review]
   - name: release-verification
-    order: 19
+    order: 20
     modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
   - name: consensus-audit-workflow
-    order: 20
+    order: 21
     modes: [skill-audit, adversarial-review, consensus-review, decision-record]
 standalone_skills:
   - name: issue-triage
@@ -104,6 +107,7 @@ default_cycle:
   - sprint-planning
   - sprint-orchestrator
   - controller-loop
+  - subagent-worktree
   - platform-readiness
   - gravity-readiness
   - lane-delivery
