@@ -61,29 +61,32 @@ skills:
   - name: sprint-planning
     order: 12
     modes: [issue-readiness, sprint-plan, lane-transaction, review-plan, wave-release-plan, plan-approval]
-  - name: sprint-orchestrator
+  - name: sprint-replan
     order: 13
+    modes: [intake, scope-replan, markdown-handoff, route-caveat]
+  - name: sprint-orchestrator
+    order: 14
     modes: [execution-runbook, platform-dispatch, monitor, reconcile, gate-management]
   - name: controller-loop
-    order: 14
+    order: 15
     modes: [state-machine, session-ledger, wave-supervision]
   - name: platform-readiness
-    order: 15
+    order: 16
     modes: [inventory, target-contract, readiness-gate, pilot-plan]
   - name: gravity-readiness
-    order: 16
+    order: 17
     modes: [inventory, readiness-checklist, pilot-design]
   - name: lane-delivery
-    order: 17
+    order: 18
     modes: [implementation, closeout, fix-forward]
   - name: independent-critic
-    order: 18
+    order: 19
     modes: [lane-review, evidence-review, risk-review]
   - name: release-verification
-    order: 19
+    order: 20
     modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
   - name: consensus-audit-workflow
-    order: 20
+    order: 21
     modes: [skill-audit, adversarial-review, consensus-review, decision-record]
 standalone_skills:
   - name: issue-triage
@@ -102,6 +105,7 @@ default_cycle:
   - state-of-union
   - repo-hygiene
   - sprint-planning
+  - sprint-replan
   - sprint-orchestrator
   - controller-loop
   - platform-readiness

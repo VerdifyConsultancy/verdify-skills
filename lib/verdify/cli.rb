@@ -15,6 +15,7 @@ module Verdify
       state-of-union
       repo-hygiene
       sprint-planning
+      sprint-replan
       sprint-orchestrator
       controller-loop
       platform-readiness
