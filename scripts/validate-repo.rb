@@ -24,7 +24,7 @@ SUPPORTED_SCHEMA_KEYWORDS = %w[
 REQUIRED_SKILLS = %w[
   project-router repo-bootstrap transcript-replan northstar-research-ingest northstar-planning northstar-interview
   northstar-question-resolution project-definition architecture-contracts state-of-union repo-hygiene sprint-planning
-  sprint-orchestrator controller-loop platform-readiness gravity-readiness lane-delivery
+  sprint-orchestrator controller-loop subagent-worktree platform-readiness gravity-readiness lane-delivery
   independent-critic release-verification consensus-audit-workflow issue-triage
 ].freeze
 STANDALONE_SKILLS = %w[issue-triage].freeze
