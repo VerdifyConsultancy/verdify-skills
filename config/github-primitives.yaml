@@ -35,6 +35,13 @@ required_pull_request_sections:
   - Scope proof
   - Evidence
   - Risk and deployment impact
+# PRs carrying one of these labels use the reduced contract (closing issue +
+# Outcome + Evidence) instead of the full lane contract above. A dev -> main
+# release PR is never lightweight, regardless of labels.
+lightweight_pull_request_labels:
+  - "verdify:policy-exempt"
+  - "type:docs"
+  - "type:chore"
 release_branch_flow:
   development_branch: dev
   release_branch: main

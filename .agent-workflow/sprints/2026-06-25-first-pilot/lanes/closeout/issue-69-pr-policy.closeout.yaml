@@ -1,0 +1,80 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+lane_id: issue-69-pr-policy
+status: ready_for_critic
+issue_ids: [69]
+pull_request: 78
+baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
+head_sha: "765e47369e4bab2f43cebc454ba07678fd6904a7"
+contract_hash: "cc901993944e2a2dd7a959c1f7a5695841962a67115de5748ae232f14071db27"
+changed_paths:
+  - scripts/pr-policy.rb
+  - tests/test_pr_policy.sh
+  - config/github-primitives.yaml
+  - .github/PULL_REQUEST_TEMPLATE/lightweight.md
+  - .github/workflows/policy.yml
+  - .agent-workflow/sprints/2026-06-25-first-pilot/** (lane lifecycle bookkeeping; see FIND-004 note in limitations)
+validation_results:
+  - id: pr-policy-test
+    command: bash tests/test_pr_policy.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-01T20:58:27Z"
+    artifact: https://github.com/VerdifyConsultancy/verdify-skills/pull/78/checks
+  - id: make-test
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-01T20:58:53Z"
+    artifact: https://github.com/VerdifyConsultancy/verdify-skills/pull/78/checks
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [pr-policy-test]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [pr-policy-test]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - The lane contract had to point module_contracts at COMMON_OPERATING_CONTRACT.md because no module contract applies to a CI-policy change — an instance of the audit's lane-contract friction (issue #70/#76).
+  - Optional body head SHA weakens the anti-stale signal for lane PRs; mitigated because the SHA is still verified when present (regression-tested) and the gate receives the true head from the event payload.
+  - Exempt labels are applied by humans/agents with triage rights; a mislabelled code PR would bypass the full lane contract. Release PRs (dev->main) can never be demoted by labels (regression-tested).
+worktree_clean: true
+worker_session_id: claude-fix-20260701T2
+completed_at: "2026-07-01T21:00:00Z"
+limitations:
+  - >-
+    Fix-forward session for critic verdict request_fixes (PR #78 review,
+    2026-07-01T20:39Z). Addressed FIND-001 (merged origin/main fffa61c into the
+    lane branch; unified three-mode policy: release_pr / lightweight / standard)
+    and FIND-002 (policy.yml now triggers on labeled/unlabeled).
+  - >-
+    FIND-002 coordination note: .github/workflows/policy.yml is outside this
+    lane's owned_paths and is a shared workflow surface. The one-line trigger
+    change (add labeled, unlabeled) was made on the critic's explicit requested
+    action; no other lane currently owns that file. Recorded here because the
+    contract schema has no coordination field.
+  - >-
+    FIND-003 head-SHA bookkeeping: head_sha above is the last substantive
+    commit (765e4736). Committing this closeout advances the branch by exactly
+    one commit that touches only this .agent-workflow closeout file; the
+    post-closeout head SHA is recorded in a PR #78 comment immediately after
+    push. Critics should verify the closeout commit adds only .agent-workflow
+    bookkeeping.
+  - >-
+    Loop-machinery finding (for issue #77): bin/verdify lane create could not
+    materialize the fix-forward lease because the lane branch
+    pilot/first-test-pass is checked out in the operator's primary clone
+    (git worktree add refuses: "already used by worktree"). The fix session
+    used a locked detached worktree at the prior head 61f2bf57 plus a manually
+    written schema-valid lease, and pushed fast-forward to the lane branch
+    (no force push). The lane machinery needs a documented path for lanes
+    whose branch lives in the primary clone.
+  - >-
+    Repo convention changed under this lane: implementation PRs now target dev
+    (AGENTS.md; docs/github-operating-model.md), so PR #78 was retargeted from
+    main to dev after the fix push. dev and main trees were identical at fix
+    time (git diff origin/main origin/dev empty at fffa61c/9dfe7530).
+  - Fresh independent-critic review is the next step and must run in a separate session against the current PR head.

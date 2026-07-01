@@ -1,0 +1,10 @@
+---
+schema_ref: status.schema.yaml
+kind: SprintStatus
+schema_version: '1.0'
+sprint_id: 2026-06-25-first-pilot
+state: PLANNING
+updated_at: '2026-06-26T03:06:47Z'
+active_lanes: []
+blockers: []
+next_action: Run sprint-planning and complete the plan transaction.
