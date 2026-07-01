@@ -2,7 +2,7 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-06-24T15:13:12Z'
+generated_at: '2026-06-26T18:48:56Z'
 repository: VerdifyConsultancy/verdify-skills
 current_state: NORTHSTAR_ARTIFACTS_INCOMPLETE
 next_skill: northstar-planning

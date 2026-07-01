@@ -9,9 +9,11 @@ done
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 unzip -q "$archive" -d "$TMP"
-mapfile -t roots < <(find "$TMP" -mindepth 1 -maxdepth 1 -type d | sort)
-[[ ${#roots[@]} -eq 1 ]] || { echo "archive must contain exactly one root directory" >&2; exit 1; }
-root="${roots[0]}"
+roots_file="$TMP/.roots"
+find "$TMP" -mindepth 1 -maxdepth 1 -type d | sort > "$roots_file"
+root_count="$(wc -l < "$roots_file" | tr -d ' ')"
+[[ "$root_count" -eq 1 ]] || { echo "archive must contain exactly one root directory" >&2; exit 1; }
+root="$(sed -n '1p' "$roots_file")"
 [[ -f "$root/MANIFEST.sha256" ]] || { echo "MANIFEST.sha256 is missing" >&2; exit 1; }
 (
   cd "$root"

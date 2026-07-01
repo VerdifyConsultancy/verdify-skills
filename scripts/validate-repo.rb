@@ -134,10 +134,11 @@ class RepoValidator
       CONTRIBUTING.md SECURITY.md CHANGELOG.md VERSION Makefile verdify.workflow.yaml
       package.json npm/bin/verdify.js
       config/authority-matrix.yaml config/github-primitives.yaml config/lifecycle.yaml
-      bin/verdify scripts/validate-repo.rb scripts/setup-agent-hosts.rb scripts/pr-policy.rb
+      bin/verdify scripts/validate-repo.rb scripts/setup-agent-hosts.rb scripts/pr-policy.rb scripts/release-preflight.rb
       scripts/bootstrap-agent-session.sh scripts/verify-package.sh .github/pull_request_template.md
       .github/ISSUE_TEMPLATE/problem.yml .github/ISSUE_TEMPLATE/decision.yml
-      .github/workflows/validate.yml .github/workflows/policy.yml
+      .github/workflows/validate.yml .github/workflows/policy.yml .github/workflows/release-pr.yml
+      .github/workflows/publish-npm.yml
     ].each do |relative|
       path = ROOT.join(relative)
       error(path, "required file is missing") unless path.file?
@@ -570,8 +571,9 @@ class RepoValidator
   def validate_scripts
     script_paths = %w[
       bin/verdify scripts/setup-agent-hosts.rb scripts/validate-repo.rb scripts/pr-policy.rb
+      scripts/release-preflight.rb
       scripts/bootstrap-agent-session.sh scripts/launch-codex.sh scripts/launch-claude.sh scripts/package.sh scripts/verify-package.sh
-      npm/bin/verdify.js tests/test_npm_install.sh
+      npm/bin/verdify.js tests/test_npm_install.sh tests/test_release_preflight.sh
     ].map { |relative| ROOT.join(relative) }
     script_paths += Dir[ROOT.join("skills/*/scripts/*")].sort.map { |path| Pathname.new(path) }.select(&:file?)
 

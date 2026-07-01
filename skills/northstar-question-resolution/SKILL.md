@@ -3,7 +3,7 @@ name: northstar-question-resolution
 description: Inventories, clusters, researches, and resolves large sets of human-gated or open North Star planning questions across docs, issue exports, interview packets, and `.agent-workflow` artifacts. Use when Codex must process many `[QUESTION:*]`, `NSQ-*`, `NQI-*`, human-gate, decision, architecture, product, schema, storage, security, or delivery questions with delegated authority, Brave Search or other evidence sources, North Star evidence ingestion, and explicit escalation for the few decisions that still require humans.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 # North Star Question Resolution

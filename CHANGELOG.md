@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 1.1.2 - 2026-06-26
+
+- Clarified that `dev` is the repository working branch for current changes,
+  while `main` is the protected release branch that mirrors the published npm
+  package and GitHub release.
+- Added mandatory agent instructions to work from `dev` or branches targeting
+  `dev`, never directly from `main`.
+- Aligned branch-protection documentation with the live release flow, which
+  requires checks and conversation resolution but not approving reviews.
+
+## 1.1.1 - 2026-06-26
+
+- Added npm release automation: PR release preflight checks, a `main` publish workflow using Trusted Publishing/OIDC, GitHub release artifact creation, and documentation for updating installed target repositories.
+- Added the `dev -> main` release branch model, auto-generated release PR workflow, release-specific PR policy validation, and documentation for protecting `main` from direct pushes.
+- Added package repository metadata required by npm provenance verification and allowed same-version release-repair PRs when npm confirms that version is still unpublished.
+
 ## 1.1.0 - 2026-06-25
 
 - Added the executable compliance gate: `verdify gate compliance` (`Verdify::ComplianceAssessor`) — a deterministic, hermetic, gem-free assessor of the fleet-standard repo shape (AGENTS.md managed markers, North Star present, vendored skills + discovery symlinks, no committed secrets), emitting a schema-valid `ComplianceAssessment`.

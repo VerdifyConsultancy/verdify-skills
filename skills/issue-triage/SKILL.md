@@ -3,7 +3,7 @@ name: issue-triage
 description: Investigates user-reported codebase or product problems, searches GitHub for existing issues, audits relevant implementation and evidence, and creates or updates issue-template GitHub Issues. Use when users ask to triage bugs or product problems, turn a list of findings into issues, find duplicate or related issues, research likely causes and fixes, or populate repository issue templates after code/log investigation.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.2"
   category: standalone
 ---
 

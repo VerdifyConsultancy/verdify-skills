@@ -4,7 +4,7 @@ description: Determines the next Verdify lifecycle skill and mode by inspecting 
 compatibility: Requires repository read access. Git is required; GitHub CLI is recommended when live GitHub state is relevant.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 # Project Router

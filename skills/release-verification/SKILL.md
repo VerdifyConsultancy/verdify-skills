@@ -4,7 +4,7 @@ description: Assembles review-ready evidence packets, records observability diag
 compatibility: Requires fresh integration context, GitHub checks/reviews, repository release tooling, and separately authorized deployment access. Production credentials must not come from worker lanes.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 # Release Verification

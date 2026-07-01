@@ -11,8 +11,9 @@ for command in ruby rsync zip; do
   command -v "$command" >/dev/null || { echo "$command is required to package Verdify" >&2; exit 1; }
 done
 
-make -C "$ROOT" test
 mkdir -p "$OUT" "$STAGE/$NAME"
+OUT="$(cd "$OUT" && pwd)"
+make -C "$ROOT" test >&2
 rsync -a \
   --exclude '/.git' \
   --exclude '/.agent-skills' \

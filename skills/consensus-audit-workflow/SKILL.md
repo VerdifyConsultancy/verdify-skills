@@ -4,7 +4,7 @@ description: Runs a skill-architecture audit and consensus-review workflow for V
 compatibility: Requires repository read access, current GitHub issue or PR context, registered evidence references, and permission to write review packet artifacts or issue/PR comments. Human approval is required for protected decisions.
 metadata:
   author: Verdify
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 # Consensus Audit Workflow

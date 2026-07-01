@@ -7,13 +7,16 @@ require "pathname"
 require "yaml"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
-options = { event: nil, body: nil, base: nil, head: nil, labels: [] }
+options = { event: nil, body: nil, base: nil, head: nil, base_ref: nil, head_ref: nil, labels: [] }
 OptionParser.new do |o|
-  o.banner = "Usage: ruby scripts/pr-policy.rb --event EVENT.json | --body FILE [--base SHA --head SHA] [--label NAME]"
+  o.banner = "Usage: ruby scripts/pr-policy.rb --event EVENT.json | --body FILE " \
+             "[--base SHA --head SHA --base-ref REF --head-ref REF] [--label NAME]"
   o.on("--event PATH") { |v| options[:event] = v }
   o.on("--body PATH") { |v| options[:body] = v }
   o.on("--base SHA") { |v| options[:base] = v }
   o.on("--head SHA") { |v| options[:head] = v }
+  o.on("--base-ref REF") { |v| options[:base_ref] = v }
+  o.on("--head-ref REF") { |v| options[:head_ref] = v }
   o.on("--label NAME") { |v| options[:labels] << v }
   o.on("-h", "--help") { puts o; exit 0 }
 end.parse!
@@ -23,6 +26,8 @@ errors = []
 body = ""
 base_sha = options[:base]
 head_sha = options[:head]
+base_ref = options[:base_ref]
+head_ref = options[:head_ref]
 labels = options[:labels].dup
 
 if options[:body]
@@ -33,6 +38,8 @@ elsif options[:event]
   body = pr["body"].to_s
   base_sha ||= pr.dig("base", "sha")
   head_sha ||= pr.dig("head", "sha")
+  base_ref ||= pr.dig("base", "ref")
+  head_ref ||= pr.dig("head", "ref")
   labels.concat(Array(pr["labels"]).map { |l| l.is_a?(Hash) ? l["name"].to_s : l.to_s })
 else
   warn "--event or --body is required"
@@ -40,15 +47,35 @@ else
 end
 
 config = YAML.safe_load(ROOT.join("config/github-primitives.yaml").read, permitted_classes: [], aliases: false)
+
+# Mode selection, in precedence order:
+# 1. release: the generated dev -> main release PR (decided by refs; labels cannot demote it);
+# 2. lightweight: an exempt-labelled PR using the reduced contract;
+# 3. standard: the full implementation-lane contract.
+release_pr = base_ref == "main" && head_ref == "dev"
 exempt_labels = Array(config["lightweight_pull_request_labels"])
 exempt_labels = %w[verdify:policy-exempt type:docs type:chore] if exempt_labels.empty?
-lightweight = labels.any? { |label| exempt_labels.include?(label) }
+lightweight = !release_pr && labels.any? { |label| exempt_labels.include?(label) }
 
-# Every PR, lane or not, must link the issue it closes.
+# Every PR, in every mode, must link the issue it closes.
 closing = body.scan(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?[ \t]+#(\d+)\b/i).flatten.map(&:to_i).uniq
 errors << "PR body must link at least one issue with a closing keyword" if closing.empty?
 
-if lightweight
+if release_pr
+  Array(config["required_release_pull_request_sections"]).each do |section|
+    errors << "missing required section: ## #{section}" unless body.match?(/^##\s+#{Regexp.escape(section)}\s*$/i)
+  end
+
+  package = JSON.parse(ROOT.join("package.json").read)
+  version = ROOT.join("VERSION").read.strip
+  package_version = package.fetch("version").to_s
+  body_version = body[/^- VERSION:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+  package_line = body[/^- Package:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+
+  errors << "package.json version does not match VERSION" unless package_version == version
+  errors << "release PR VERSION must be #{version}" unless body_version == version
+  errors << "release PR package line must be #{package.fetch('name')}@#{version}" unless package_line == "#{package.fetch('name')}@#{version}"
+elsif lightweight
   # Reduced contract for docs/chore/exempt PRs: outcome + evidence only.
   %w[Outcome Evidence].each do |section|
     errors << "missing required section: ## #{section}" unless body.match?(/^##\s+#{Regexp.escape(section)}\s*$/i)
@@ -63,19 +90,30 @@ else
   errors << "lane ID is missing or still a placeholder" if lane.to_s.empty? || lane.include?("<!--")
   errors << "lane contract path is missing or still a placeholder" if contract.to_s.empty? || contract.include?("<!--")
   errors << "lane contract must be under .agent-workflow/sprints/.../lanes/contracts" unless contract.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
-
-  # The head SHA in the body is optional (the gate already has the real head);
-  # when present it must still match, which preserves the anti-stale check.
-  reported_head = body[/^Current head SHA:\s*`?([0-9a-f]{40})`?\s*$/i, 1]
-  errors << "reported head SHA does not match the pull request head" if reported_head && head_sha && reported_head != head_sha
-  errors << "base and head SHA are identical" if base_sha && head_sha && base_sha == head_sha
 end
 
-errors << "pull request template still contains unresolved HTML placeholders" if body.include?("<!--")
+reported_head = body[/^Current head SHA:\s*`?([0-9a-f]{40})`?\s*$/i, 1]
+if release_pr
+  # Release PR bodies are generated with the head SHA, so presence stays
+  # mandatory; the value is not compared because dev may legitimately advance
+  # after the body is generated (release SHA race).
+  errors << "Current head SHA must be a 40-character commit SHA" unless reported_head
+else
+  # For standard-lane and lightweight PRs the body head SHA is optional (the
+  # gate already receives the real head); when present it must still match,
+  # which preserves the anti-stale check.
+  errors << "reported head SHA does not match the pull request head" if reported_head && head_sha && reported_head != head_sha
+end
+errors << "base and head SHA are identical" if base_sha && head_sha && base_sha == head_sha
+
+if body.include?("<!--")
+  errors << "pull request template still contains unresolved HTML placeholders"
+end
 
 if errors.empty?
+  kind = release_pr ? "release" : "implementation"
   mode = lightweight ? " (lightweight)" : ""
-  puts "Verdify pull request policy passed#{mode} for issue(s): #{closing.map { |n| "##{n}" }.join(', ')}"
+  puts "Verdify #{kind} pull request policy passed#{mode} for issue(s): #{closing.map { |n| "##{n}" }.join(', ')}"
   exit 0
 end
 warn "Verdify pull request policy failed:"
