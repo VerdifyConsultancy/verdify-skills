@@ -1,0 +1,74 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+status: active
+goal: Prove the core loop end-to-end on one real change by delivering the PR-policy lightweight path.
+baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: First pilot
+  project: Verdify delivery
+issue_ids: [69]
+scope:
+  - Make pr-policy honor exempt labels with a reduced contract and make the PR-body head SHA optional.
+  - Run the change through a real lane contract, closeout, and fresh critic as the first end-to-end pilot.
+non_goals:
+  - Add the change_class fast-lane (issue #70).
+  - Implement the quality keystones (issues #71-#74) in this lane.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: The PR-policy lightweight path is implemented, tested, and delivered through a validated lane contract and closeout ready for a fresh critic.
+    lane_ids: [issue-69-pr-policy]
+    evidence_expected: [tests/test_pr_policy.sh passes, make test green, validated closeout]
+risks:
+  - id: RISK-01
+    severity: low
+    statement: Relaxing the PR-body head SHA could weaken the anti-stale check.
+    mitigation: The SHA remains verified when present; it is only no longer mandatory in the body.
+lanes:
+  - lane_id: issue-69-pr-policy
+    issue_ids: [69]
+    contract_path: .agent-workflow/sprints/2026-06-25-first-pilot/lanes/contracts/issue-69-pr-policy.contract.yaml
+    branch: pilot/first-test-pass
+    owner: pilot-worker
+    reviewer: pilot-critic
+    summary: Implement the PR-policy lightweight path and prove the first end-to-end lane.
+dependency_order:
+  - [issue-69-pr-policy]
+deployment_expectations:
+  - No runtime deployment; CI checks (validate, policy) are the delivery evidence for this package change.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Lane validation and fresh critic review
+      due: "before merge"
+      evidence_expected:
+        - tests/test_pr_policy.sh and make test pass on the lane head.
+        - An independent critic approves the reviewed head SHA from a separate session.
+  human_review_milestones:
+    - id: HR-01
+      name: Review the pilot lane
+      owner: jason
+      trigger: Closeout is ready for critic and CI is green.
+      review_packet_path: .agent-workflow/sprints/2026-06-25-first-pilot/review/review-inbox-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As a contributor, I can open a docs/chore/exempt PR without fabricating a lane contract.
+      issue_ids: [69]
+      lane_ids: [issue-69-pr-policy]
+      acceptance_refs: [SPR-AC-01]
+  reporting_summary:
+    included:
+      - Issue #69 PR-policy lightweight path as the first end-to-end pilot lane.
+    deferred:
+      - Issues #70-#76 (change_class, quality keystones, eval runner, simplification).
+    ownership:
+      - lane_id: issue-69-pr-policy
+        owner: pilot-worker
+        responsibility: Implementation, tests, and lane evidence.
+    next_review: Fresh critic review begins once the closeout is committed and CI is green.
+approval:
+  status: approved
+  approver: jason
+  approved_at: "2026-06-25T19:00:00Z"
