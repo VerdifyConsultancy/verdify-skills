@@ -18,6 +18,7 @@ module Verdify
       sprint-replan
       sprint-orchestrator
       controller-loop
+      subagent-worktree
       platform-readiness
       gravity-readiness
       lane-delivery

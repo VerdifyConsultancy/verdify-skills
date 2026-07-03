@@ -1,6 +1,6 @@
 # Verdify Skills Reference
 
-This is the reference manual for the **21 Verdify lifecycle skills** — what each
+This is the reference manual for the **22 Verdify lifecycle skills** — what each
 one does, what it reads, what it writes, the schemas it owns, the tools it calls,
 and how it hands off. It complements the prose in [`../lifecycle.md`](../lifecycle.md)
 (stages and gates), [`../authority-model.md`](../authority-model.md) (who owns what
@@ -51,6 +51,7 @@ flowchart TD
     subgraph EXEC["Execute"]
       SO[sprint-orchestrator]
       CL[controller-loop]
+      SW[subagent-worktree]
       LD[lane-delivery]
     end
     subgraph VERIFY["Verify, Review, Release"]
@@ -90,7 +91,7 @@ flowchart LR
     REVb --> DONE["wave accepted"]
 ```
 
-## The 21 skills
+## The 22 skills
 
 | # | Skill | Does | Owns schemas |
 |---|---|---|---|
@@ -109,12 +110,13 @@ flowchart LR
 | 13 | [sprint-replan](per-skill/sprint-replan.md) | Standard Markdown replan handoff for changed sprint scope | — |
 | 14 | [sprint-orchestrator](per-skill/sprint-orchestrator.md) | Dispatch lane sessions, monitor, reconcile | `sprint-execution-runbook`, `status-event` |
 | 15 | [controller-loop](per-skill/controller-loop.md) | Durable outer-loop state + session ledger | `controller-state`, `session-ledger` |
-| 16 | [platform-readiness](per-skill/platform-readiness.md) | Gate Agent Platform + environment readiness | `platform-readiness`, `agent-platform-control-request`, `environment-gitops-reconciliation` |
-| 17 | [gravity-readiness](per-skill/gravity-readiness.md) | Gate Gravity before autonomous build | `gravity-readiness`, `gravity-core-extraction-plan` |
-| 18 | [lane-delivery](per-skill/lane-delivery.md) | Implement + close out one leased lane | `lane-closeout` |
-| 19 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
-| 20 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
-| 21 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
+| 16 | [subagent-worktree](per-skill/subagent-worktree.md) | Local Codex/Claude worker dispatch into one leased worktree | `lane-lease`, `compiled-prompt-manifest` |
+| 17 | [platform-readiness](per-skill/platform-readiness.md) | Gate Agent Platform + environment readiness | `platform-readiness`, `agent-platform-control-request`, `environment-gitops-reconciliation` |
+| 18 | [gravity-readiness](per-skill/gravity-readiness.md) | Gate Gravity before autonomous build | `gravity-readiness`, `gravity-core-extraction-plan` |
+| 19 | [lane-delivery](per-skill/lane-delivery.md) | Implement + close out one leased lane | `lane-closeout` |
+| 20 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
+| 21 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
+| 22 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
 | — | [issue-triage](per-skill/issue-triage.md) | Standalone: research and create GitHub issues | — |
 
 ## How to read a per-skill page

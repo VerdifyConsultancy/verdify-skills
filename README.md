@@ -70,6 +70,7 @@ project-router
   -> sprint-orchestrator
        execution runbook -> Agent Platform dispatch -> monitor -> reconcile
        |-> controller-loop (durable controller state + session ledger)
+       |-> subagent-worktree (local Codex/Claude worker lease + prompt fallback)
        |-> platform-readiness (Agent Platform, environment/GitOps gates, and control requests)
        |-> gravity-readiness (Gravity pilot gate + core extraction plan)
        |-> lane-delivery (one worker session in one worktree)

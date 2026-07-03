@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Subagent Worktree"
+  short_description: "Launch one local worker in one leased worktree"
+  default_prompt: "Use $subagent-worktree to create a leased local Codex or Claude worker worktree and hand it to critic review."
+policy:
+  allow_implicit_invocation: true
