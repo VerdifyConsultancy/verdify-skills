@@ -46,6 +46,7 @@ flowchart TD
     subgraph PLAN["Strategize and Plan"]
       SU[state-of-union]
       SP[sprint-planning]
+      SR[sprint-replan]
     end
     subgraph EXEC["Execute"]
       SO[sprint-orchestrator]
@@ -63,6 +64,7 @@ flowchart TD
     end
 
     R --> ORIENT --> NS --> DEF --> PLAN --> EXEC --> VERIFY --> R
+    SP --> SR --> EXEC
     PLAN -. before autonomous execution .-> GATES
     GATES -. gate .-> EXEC
     R -. backlog work .-> IT[issue-triage]:::standalone
@@ -104,14 +106,15 @@ flowchart LR
 | 10 | [state-of-union](per-skill/state-of-union.md) | Backlog/health triage → execution strategy | `state-of-union`, `github-backlog-sync` |
 | 11 | [repo-hygiene](per-skill/repo-hygiene.md) | Wave 0 compliance gate | `repo-hygiene`, `repo-agent-scope` |
 | 12 | [sprint-planning](per-skill/sprint-planning.md) | Sprint plan, lanes, contracts, wave release plan | `sprint-plan`, `lane-contract`, `lane-map`, `wave-release-plan` |
-| 13 | [sprint-orchestrator](per-skill/sprint-orchestrator.md) | Dispatch lane sessions, monitor, reconcile | `sprint-execution-runbook`, `status-event` |
-| 14 | [controller-loop](per-skill/controller-loop.md) | Durable outer-loop state + session ledger | `controller-state`, `session-ledger` |
-| 15 | [platform-readiness](per-skill/platform-readiness.md) | Gate Agent Platform + environment readiness | `platform-readiness`, `agent-platform-control-request`, `environment-gitops-reconciliation` |
-| 16 | [gravity-readiness](per-skill/gravity-readiness.md) | Gate Gravity before autonomous build | `gravity-readiness`, `gravity-core-extraction-plan` |
-| 17 | [lane-delivery](per-skill/lane-delivery.md) | Implement + close out one leased lane | `lane-closeout` |
-| 18 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
-| 19 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
-| 20 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
+| 13 | [sprint-replan](per-skill/sprint-replan.md) | Standard Markdown replan handoff for changed sprint scope | — |
+| 14 | [sprint-orchestrator](per-skill/sprint-orchestrator.md) | Dispatch lane sessions, monitor, reconcile | `sprint-execution-runbook`, `status-event` |
+| 15 | [controller-loop](per-skill/controller-loop.md) | Durable outer-loop state + session ledger | `controller-state`, `session-ledger` |
+| 16 | [platform-readiness](per-skill/platform-readiness.md) | Gate Agent Platform + environment readiness | `platform-readiness`, `agent-platform-control-request`, `environment-gitops-reconciliation` |
+| 17 | [gravity-readiness](per-skill/gravity-readiness.md) | Gate Gravity before autonomous build | `gravity-readiness`, `gravity-core-extraction-plan` |
+| 18 | [lane-delivery](per-skill/lane-delivery.md) | Implement + close out one leased lane | `lane-closeout` |
+| 19 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
+| 20 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
+| 21 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
 | — | [issue-triage](per-skill/issue-triage.md) | Standalone: research and create GitHub issues | — |
 
 ## How to read a per-skill page

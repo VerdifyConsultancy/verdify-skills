@@ -1,0 +1,63 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-27-ship-verify-skills
+lane_id: issue-90-sprint-replan
+status: ready_for_critic
+issue_ids: [90]
+pull_request: 94
+baseline_sha: fffa61c09cbe09f8d0dd32681029a967c59066ee
+head_sha: 32502319336563f4dc86bcfe7cc5d6569166fddd
+contract_hash: 9e06edf9aa0546f0d00d44b8b318df2449c323664bc156ff9d6105665cbe519d
+changed_paths:
+  - .agents/skills/sprint-replan
+  - .claude/skills/sprint-replan
+  - README.md
+  - config/lifecycle.yaml
+  - docs/skills/README.md
+  - docs/skills/per-skill/sprint-replan.md
+  - docs/sprint-plans/2026-06-27-sprint-replan-demo.md
+  - evaluations/sprint-replan/evals.json
+  - lib/verdify/cli.rb
+  - schemas/route-decision.schema.yaml
+  - scripts/validate-repo.rb
+  - skills/sprint-replan/SKILL.md
+  - skills/sprint-replan/agents/openai.yaml
+  - skills/sprint-replan/references/markdown-output.md
+validation_results:
+  - id: validate-repo
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-27T22:43:33Z"
+    artifact: null
+  - id: test
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-27T22:44:07Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - skills/sprint-replan/SKILL.md
+      - skills/sprint-replan/references/markdown-output.md
+      - docs/skills/per-skill/sprint-replan.md
+      - docs/sprint-plans/2026-06-27-sprint-replan-demo.md
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - evaluations/sprint-replan/evals.json
+      - .agents/skills/sprint-replan
+      - .claude/skills/sprint-replan
+      - ruby scripts/validate-repo.rb
+      - make test
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Shared lifecycle registration surfaces will conflict with the other P0 skill PRs until controller-merge reconciles them.
+worktree_clean: true
+worker_session_id: worker-90-20260627c
+completed_at: "2026-06-27T22:45:13Z"
+limitations:
+  - Closeout head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.
