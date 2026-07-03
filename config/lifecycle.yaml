@@ -91,8 +91,11 @@ skills:
   - name: release-verification
     order: 22
     modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
-  - name: consensus-audit-workflow
+  - name: adversarial-audit
     order: 23
+    modes: [scope, lens-review, risk-register, decision-route]
+  - name: consensus-audit-workflow
+    order: 24
     modes: [skill-audit, adversarial-review, consensus-review, decision-record]
 standalone_skills:
   - name: issue-triage
@@ -121,5 +124,6 @@ default_cycle:
   - independent-critic
   - controller-merge
   - release-verification
+  - adversarial-audit
   - consensus-audit-workflow
   - project-router
