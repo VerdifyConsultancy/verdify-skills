@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Sprint Handoff"
+  short_description: "Produce a sprint-boundary status and handoff packet"
+  default_prompt: "Use $sprint-handoff to report previous sprint status, next sprint plan summary, agent handoff state, and human-attention items."
+policy:
+  allow_implicit_invocation: true

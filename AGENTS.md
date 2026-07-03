@@ -14,6 +14,8 @@ Mandatory repository rules:
 - Treat `dev` as this repository's working branch. Before editing, confirm you are on `dev` or on a short-lived branch based on `dev` that targets `dev`.
 - Commit and push normal repository changes through the `dev` workflow. Implementation/lane pull requests target `dev`; `main` only receives generated `dev -> main` release pull requests.
 - Never edit, commit, or push normal work directly on `main`; `main` must stay aligned with the published npm package and GitHub release for the current version.
+- Every pull request must use `.github/pull_request_template.md`: keep the required section headings, close the backing issue with a supported keyword, include the lane contract path under `.agent-workflow/sprints/.../lanes/contracts`, and update `Current head SHA` to the exact 40-character PR head commit.
+- When adding or renaming a skill, run `make links` or `ruby scripts/setup-agent-hosts.rb` before validation and commit the resulting `.agents/skills/<skill>` and `.claude/skills/<skill>` symlinks with the skill source.
 - One issue, lane, branch, worktree, worker session, and pull request is the default unit of implementation.
 - Acquire a lane lease before coding and never share an active worktree between coding sessions.
 - Follow `COMMON_OPERATING_CONTRACT.md` and `config/authority-matrix.yaml`.

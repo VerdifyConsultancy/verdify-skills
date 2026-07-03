@@ -1,6 +1,6 @@
 # Verdify Skills Reference
 
-This is the reference manual for the **24 Verdify lifecycle skills** — what each
+This is the reference manual for the **25 Verdify lifecycle skills** — what each
 one does, what it reads, what it writes, the schemas it owns, the tools it calls,
 and how it hands off. It complements the prose in [`../lifecycle.md`](../lifecycle.md)
 (stages and gates), [`../authority-model.md`](../authority-model.md) (who owns what
@@ -60,6 +60,7 @@ flowchart TD
       AA[adversarial-audit]
       CA[consensus-audit-workflow]
       RV[release-verification]
+      SH[sprint-handoff]
     end
     subgraph GATES["Readiness gates"]
       PR[platform-readiness]
@@ -93,7 +94,7 @@ flowchart LR
     REVb --> DONE["wave accepted"]
 ```
 
-## The 24 skills
+## The 25 skills
 
 | # | Skill | Does | Owns schemas |
 |---|---|---|---|
@@ -119,8 +120,9 @@ flowchart LR
 | 20 | [independent-critic](per-skill/independent-critic.md) | Fresh-context review of a lane | `critic-report` |
 | 21 | [controller-merge](per-skill/controller-merge.md) | Reconcile lane PRs for merge-ready or fix-forward | — |
 | 22 | [release-verification](per-skill/release-verification.md) | Review inbox, deploy proof, outcome | `review-inbox-packet`, `release-verification`, `outcome-review`, `observability-diagnostic-packet` |
-| 23 | [adversarial-audit](per-skill/adversarial-audit.md) | Product, engineering, security, and business lens audit | — |
-| 24 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
+| 23 | [sprint-handoff](per-skill/sprint-handoff.md) | Sprint-boundary status, next-plan summary, agent handoff, and human-attention packet | — |
+| 24 | [adversarial-audit](per-skill/adversarial-audit.md) | Product, engineering, security, and business lens audit | — |
+| 25 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
 | — | [issue-triage](per-skill/issue-triage.md) | Standalone: research and create GitHub issues | — |
 
 ## How to read a per-skill page

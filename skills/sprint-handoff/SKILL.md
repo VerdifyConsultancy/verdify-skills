@@ -4,7 +4,7 @@ description: Produces the sprint-boundary handoff packet — an executive status
 compatibility: Requires repository read access and GitHub issue/PR access or a current snapshot. The previous sprint's closeout artifacts and the next sprint's plan artifacts should already exist. Writing GitHub updates, closing gates, or dispatching work requires explicit authority from repository policy or the user — this skill reports and hands off; it does not approve, deploy, or close gates on its own.
 metadata:
   author: Verdify
-  version: "0.1.0"
+  version: "1.1.4"
 ---
 
 # Sprint Handoff

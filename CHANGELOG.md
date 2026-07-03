@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 1.1.4 - 2026-07-03
+
+- Added the `sprint-handoff` lifecycle skill for sprint-boundary status packets
+  with previous sprint status, next sprint plan summary, agent handoff state,
+  and ordered human-attention items.
+- Documented the required pull request template fields and new-skill host
+  symlink workflow for future agents and contributors.
+- Added the missing Codex and Claude host symlinks for `sprint-handoff`.
+
 ## 1.1.3 - 2026-07-03
 
 - Added four lifecycle skills from the failed sprint PR set:

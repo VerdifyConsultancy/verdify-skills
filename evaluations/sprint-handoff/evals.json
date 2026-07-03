@@ -1,0 +1,27 @@
+{
+  "skill_name": "sprint-handoff",
+  "evals": [
+    {
+      "id": "returning-human-sprint-boundary",
+      "prompt": "A human returns after a sprint closed and asks what shipped, what is next, what a new agent should know, and what needs human eyes.",
+      "expected_output": "Produces a four-section handoff with previous sprint status of record, next sprint plan summary, agent handoff state, and ordered human-attention items with owner, artifact, and consequence.",
+      "files": [],
+      "assertions": [
+        "All four required sections are present.",
+        "Shipped, deployed, and gated/banked work are distinguished.",
+        "Human-only decisions are isolated in an ordered owner/artifact/consequence list."
+      ]
+    },
+    {
+      "id": "no-bare-green-claims",
+      "prompt": "A closeout says all lanes are green and deployed, but provides no check URLs, timestamps, deployment records, or re-probes.",
+      "expected_output": "Refuses to repeat bare green claims as facts, marks missing probes as gaps, records the evidence needed, and avoids approving, deploying, or dispatching work.",
+      "files": [],
+      "assertions": [
+        "Claims without probes are flagged instead of accepted.",
+        "The skill does not approve plans, merge code, deploy, or close gates.",
+        "The handoff names the missing evidence required for the next role."
+      ]
+    }
+  ]
+}
