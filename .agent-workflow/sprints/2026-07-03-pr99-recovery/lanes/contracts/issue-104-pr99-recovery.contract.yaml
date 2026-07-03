@@ -1,0 +1,116 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-03-pr99-recovery
+lane_id: issue-104-pr99-recovery
+title: "Recover sprint-handoff PR validation and document required PR/new-skill workflow"
+status: approved
+issue_ids:
+  - 104
+coupling_justification: "User requested fixing the current failing PR, documenting the required template for future agents, merging the PR, and advancing the npm package version in one recovery lane."
+objective: "Make PR #99 pass repository policy and validation, close issue #104, and prepare the next npm package release for the new sprint-handoff skill."
+desired_outcome: "Future agents see the required PR template and new-skill host-link command before opening a PR, PR #99 has valid host links and policy metadata, and the package version advances beyond the currently published 1.1.3 release."
+non_goals:
+  - "Do not redesign the lifecycle router or PR policy semantics."
+  - "Do not weaken the host symlink invariant."
+  - "Do not change unrelated skills beyond version metadata required by repository validation."
+baseline_sha: d65f5935b847bef1b1e57bc70b1336c390a2f94a
+branch: issue-104-pr99-leased
+module_contracts:
+  - "skills/sprint-handoff/**"
+  - ".agents/skills/sprint-handoff"
+  - ".claude/skills/sprint-handoff"
+  - "AGENTS.md"
+  - "CLAUDE.md"
+  - "CONTRIBUTING.md"
+  - "CHANGELOG.md"
+  - "VERSION"
+  - "package.json"
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains:
+    - "PR #99 validation recovery"
+    - "Agent-facing PR/new-skill workflow instructions"
+    - "Package version metadata for the next npm release"
+  owned_paths:
+    - "skills/sprint-handoff/**"
+    - ".agents/skills/sprint-handoff"
+    - ".claude/skills/sprint-handoff"
+    - ".agent-workflow/sprints/2026-07-03-pr99-recovery/**"
+    - "AGENTS.md"
+    - "CLAUDE.md"
+    - "CONTRIBUTING.md"
+    - "CHANGELOG.md"
+    - "VERSION"
+    - "package.json"
+  prohibited_paths:
+    - "schemas/**"
+    - "lib/**"
+    - "bin/**"
+    - ".github/workflows/**"
+  coordination_required_paths:
+    - "README.md"
+    - "docs/**"
+  owned_interfaces:
+    - "Agent instructions for required PR template and new-skill host links"
+    - "npm package version metadata"
+dependencies:
+  hard: []
+  soft:
+    - lane_id: existing-pr-99
+      coordination: "PR #99 exists and remains the sprint-handoff branch."
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: "The sprint-handoff skill has valid Codex and Claude host symlinks, so `ruby scripts/setup-agent-hosts.rb --check` passes."
+    sprint_acceptance_ids:
+      - "ISSUE-104-AC-01"
+    evidence_required:
+      - "make test"
+  - id: LANE-AC-02
+    statement: "Agent-facing instructions explicitly require using `.github/pull_request_template.md`, a closing issue link, lane contract metadata, current head SHA, and `make links`/`ruby scripts/setup-agent-hosts.rb` for new skills."
+    sprint_acceptance_ids:
+      - "ISSUE-104-AC-02"
+    evidence_required:
+      - "File diff"
+  - id: LANE-AC-03
+    statement: "Package metadata advances from the published 1.1.3 version to an unpublished SemVer version and the changelog records the sprint-handoff release."
+    sprint_acceptance_ids:
+      - "ISSUE-104-AC-03"
+    evidence_required:
+      - "ruby scripts/release-preflight.rb --require-version-bump origin/main --require-unpublished"
+validation_commands:
+  - id: make-test
+    command: "make test"
+    purpose: "Run repository validation, schema validator, CLI tests, PR-policy tests, and npm-install test."
+    required: true
+  - id: release-preflight
+    command: "ruby scripts/release-preflight.rb --require-version-bump origin/main --require-unpublished"
+    purpose: "Confirm the next release version differs from origin/main and is not already published."
+    required: true
+required_evidence:
+  - "Current-head make test output"
+  - "Release preflight output"
+  - "PR #99 policy check passing after PR body update"
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - "A repository protection rule blocks merging after all required checks pass."
+  - "npm publish fails after merge and cannot be rerun safely."
+definition_of_done:
+  - "PR #99 is merged."
+  - "Issue #104 is closed by the merged PR."
+  - "The latest npm package version reflects this release or the publish failure is recorded with exact evidence."
+approval:
+  status: approved
+  approver: "user-request"
+  approved_at: "2026-07-03T16:30:00Z"
