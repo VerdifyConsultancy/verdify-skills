@@ -25,6 +25,7 @@ module Verdify
       independent-critic
       controller-merge
       release-verification
+      sprint-handoff
       adversarial-audit
       consensus-audit-workflow
     ].freeze

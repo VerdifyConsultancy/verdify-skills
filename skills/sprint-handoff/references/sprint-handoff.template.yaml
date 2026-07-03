@@ -1,0 +1,57 @@
+# sprint-handoff.template.yaml — canonical structure for .agent-workflow/sprints/<id>/handoff/sprint-handoff.yaml
+# The four sections are always all present. The .md view renders this; it adds no new decisions.
+kind: SprintHandoff
+schema_version: "0.1"
+sprint_boundary:
+  closed_sprint_id: <previous-sprint-id>
+  next_sprint_id: <next-sprint-id>
+  prepared_at: <UTC ISO-8601>
+  prepared_by: <agent/operator>
+
+# 1) PREVIOUS SPRINT — status of record (verified, not narrative)
+previous_sprint:
+  goal: <what the closed sprint set out to do>
+  outcome:
+    lanes_merged: <int>
+    issues_closed: <int>
+    board_delta: { before: <int>, after: <int> }
+    main_ci: <green|red + literal probe>
+  deploy_state: <shipped-not-deployed | deployed | n/a>   # ship != deploy
+  quality_record:
+    defects_caught_before_merge: <int + one-line each>
+    fix_forwards: [<...>]
+  durable_claims:                                          # every green claim, timestamped + re-probed
+    - claim: <...>
+      probe: <copy-pasteable command>
+      green_at: <T>
+      reverified_at: <T+N>
+
+# 2) NEXT SPRINT — plan summary (planned, not yet dispatched)
+next_sprint:
+  goal: <one paragraph>
+  coverage: { open_issues: <int>, covered: <int>, missing: [], duplicated: [] }
+  topology: { waves: <int>, lanes: <int>, gates: <int> }
+  delivery_split: { deploy: <int>, build: <int>, change_gate: <int> }
+  plan_artifacts: [<paths / PR link>]
+  top_risks:
+    - { severity: <low|medium|high|critical>, statement: <...>, mitigation: <...> }
+
+# 3) AGENT HANDOFF — what a cold agent needs to continue
+agent_handoff:
+  baseline_sha: <sha>
+  start_here: <single pointer>
+  open_prs: [{ number: <int>, title: <...>, state: <...>, checks: <...> }]
+  in_flight_branches_worktrees: [<...>]
+  open_gates: [<gate-id: question>]
+  gotchas: [<learned-the-hard-way notes>]
+
+# 4) HUMAN EYES ON — ordered, owner + artifact + consequence (nothing else parked here)
+human_eyes_on:
+  - { order: 1, item: <plan approval>, owner: <name>, artifact: <path>, consequence: <what blocks if undone> }
+  - { order: 2, item: <credential rotation>, owner: <name>, artifact: <issue#>, consequence: <...> }
+  - { order: 3, item: <decision gate>, owner: <name>, artifact: <issue#>, consequence: <...> }
+
+# optional, for executive/business audiences
+talking_points:
+  product: [<...>]
+  architecture: [<...>]
