@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verdify Controller Merge"
+  short_description: "Reconcile lane PRs for merge or fix-forward"
+  default_prompt: "Use $controller-merge to reconcile completed lane branches against closeout, critic, checks, and review-packet evidence."
+policy:
+  allow_implicit_invocation: true
