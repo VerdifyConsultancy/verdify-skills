@@ -85,11 +85,14 @@ skills:
   - name: independent-critic
     order: 20
     modes: [lane-review, evidence-review, risk-review]
-  - name: release-verification
+  - name: controller-merge
     order: 21
+    modes: [reconcile, merge-ready, return-for-fix, integration-handoff]
+  - name: release-verification
+    order: 22
     modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
   - name: consensus-audit-workflow
-    order: 22
+    order: 23
     modes: [skill-audit, adversarial-review, consensus-review, decision-record]
 standalone_skills:
   - name: issue-triage
@@ -116,6 +119,7 @@ default_cycle:
   - gravity-readiness
   - lane-delivery
   - independent-critic
+  - controller-merge
   - release-verification
   - consensus-audit-workflow
   - project-router

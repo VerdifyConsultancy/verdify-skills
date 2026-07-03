@@ -77,6 +77,7 @@ project-router
        |-> independent-critic (fresh session and review worktree)
   -> release-verification
        review inbox packet -> diagnostics -> integration -> deployment verification -> outcome review
+       controller-merge reconciles critic-approved PR heads before integration
   -> project-router
 ```
 
