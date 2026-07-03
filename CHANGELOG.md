@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 1.1.3 - 2026-07-03
+
+- Added four lifecycle skills from the failed sprint PR set:
+  `sprint-replan`, `subagent-worktree`, `controller-merge`, and
+  `adversarial-audit`.
+- Reconciled shared lifecycle registration, route schema, validator,
+  host links, per-skill docs, evaluations, and reference demos for the merged
+  skill set.
+
 ## 1.1.2 - 2026-06-26
 
 - Clarified that `dev` is the repository working branch for current changes,
