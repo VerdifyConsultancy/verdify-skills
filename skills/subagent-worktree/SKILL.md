@@ -4,7 +4,7 @@ description: Creates and supervises one local Codex or Claude subagent in one is
 compatibility: Requires Git, the Verdify lane CLI, an approved lane contract, and permission to create local worktrees, branches, leases, and worker prompts. It does not grant production, deployment, or protected decision authority.
 metadata:
   author: Verdify
-  version: "1.1.2"
+  version: "1.1.3"
 ---
 
 # Subagent Worktree
