@@ -4,7 +4,7 @@ description: Specifies or operates the long-lived Verdify outer loop that persis
 compatibility: Requires approved lifecycle prerequisites, repository artifacts, access to session/runtime records, and Agent Platform API or MCP details when child sessions are actually launched.
 metadata:
   author: Verdify
-  version: "1.1.4"
+  version: "1.2.0"
 ---
 
 # Controller Loop
@@ -29,6 +29,10 @@ thresholds, or recoverable failure behavior.
 - `.agent-workflow/controller/controller-state.yaml` - durable controller state,
   including current wave and wave-supervision state
 - `.agent-workflow/controller/session-ledger.yaml` - append-oriented session map
+- `.agent-fleet/loop.yaml` - platform durable-loop substrate config (watchdog
+  staleness, iteration prompt path, wake signals)
+- the work-level heartbeat file named by `.agent-fleet/loop.yaml` - freshened by
+  every live controller session; staleness is the watchdog takeover signal
 
 Validate controller state against `../../schemas/controller-state.schema.yaml`
 and the session ledger against `../../schemas/session-ledger.schema.yaml`.

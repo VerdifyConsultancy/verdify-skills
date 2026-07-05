@@ -21,6 +21,10 @@ Assess these domains before a Gravity pilot:
     risks, recommendations, and rollback information.
 12. Session ledger and semantic history handoff.
 13. Non-Gravity pilot scope, rollback plan, and human sign-off.
+14. Durable loop armed: supervisor loop mode active for the repository, the
+    work-level heartbeat fresh or the watchdog armed to take over, and
+    `.agent-fleet/loop.yaml` present and valid with a repo-committed iteration
+    prompt.
 
 `pass` requires inspected evidence. `warn` means a pilot can proceed only with
 recorded limitation. `fail` blocks the pilot. `blocked` requires human or

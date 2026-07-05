@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 1.2.0 - 2026-07-05
+
+- Bound the loop/recovery contract to the platform durable-loop substrate:
+  `controller-loop` gains the Platform Loop Substrate section (work-level
+  heartbeat file contract and session-start freshener duty, watchdog takeover
+  semantics with wake signals and memory-pressure deferral, resume-check-first
+  on any controller restart, stranded-branch recovery, `.agent-fleet/loop.yaml`
+  as the per-repo config surface, and the session-scoped-cron trap warning),
+  plus the heartbeat and `loop.yaml` canonical-artifact pointers.
+- Added durable-output lane discipline to `sprint-orchestrator` (push lane
+  branches early, branch-or-PR visibility at all times, no scratchpad-only
+  artifacts), the off-pod heavy-workload rule (Kubernetes Jobs with their own
+  resource limits), and resume-check at controller (re)start.
+- Added the "durable loop armed" readiness domain to `platform-readiness`
+  (supervisor loop mode active, heartbeat fresh or watchdog armed, valid
+  `.agent-fleet/loop.yaml` with a repo-committed iteration prompt).
+- Added the durable-loop scaffolding step to `repo-bootstrap` (commit
+  `.agent-fleet/loop.yaml` and the iteration prompt when initializing a
+  long-lived repo controller).
+
 ## 1.1.4 - 2026-07-03
 
 - Added the `sprint-handoff` lifecycle skill for sprint-boundary status packets
