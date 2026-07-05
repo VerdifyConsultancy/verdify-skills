@@ -21,6 +21,36 @@ to Agent Fleet observability.
   artifact refs, then either resumes an existing objective, records a stale
   session or failure event, or exits with no-op status.
 
+## Platform Loop Substrate
+
+The fleet runtime arms a pod-level watchdog (agent-supervisor) that owns loop
+durability. Its per-repo config surface is `.agent-fleet/loop.yaml`: `enabled`,
+`staleness_secs`, `check_secs`, `iteration_timeout_secs`, `prompt` (a
+repo-committed iteration prompt path), and `wake_signals`.
+
+- Heartbeat file contract: the watchdog watches a work-level heartbeat file.
+  Every live controller session starts a backgrounded heartbeat freshener at
+  session start (touch roughly every four minutes) that dies with the session.
+  A stale heartbeat is the takeover signal, not an error.
+- Watchdog takeover: when the heartbeat is stale beyond `staleness_secs`, the
+  watchdog spawns one headless controller iteration from the repo-committed
+  iteration prompt, bounded by `iteration_timeout_secs`, with backoff after
+  failed iterations. Wake signals (new assigned issues, PR review requests,
+  CI red on main) shorten the effective staleness window; memory pressure
+  defers a spawn.
+- Resume-check first: any controller (re)start runs the baked `resume-check`
+  helper before other work. It diffs every `lane/*` branch against main to
+  flag pushed-but-PR-less stranded work and lists uncommitted
+  `.agent-workflow` controller state, open PRs, and main CI status.
+- Stranded-branch recovery: treat a pushed branch with no PR as recoverable
+  work, not noise. Reconstruct its lane state from the branch diff and GitHub
+  refs, then finish or hand off the visible next step.
+- On resume, trust disk mtimes and GitHub server times over ledger claims.
+  Write ledger timestamps only from `date -u` at write time.
+- Session-scoped crons are a trap: they die with the session and must never be
+  the loop's durability layer. Durability belongs to the watchdog plus the
+  heartbeat contract.
+
 ## Loop Record
 
 Every active loop needs a durable loop record or status event whose payload can
