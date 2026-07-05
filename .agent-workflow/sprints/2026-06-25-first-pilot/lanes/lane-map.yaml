@@ -1,0 +1,13 @@
+schema_ref: lane-map.schema.yaml
+kind: LaneMap
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+lanes:
+  - lane_id: issue-69-pr-policy
+    issue_ids: [69]
+    module_contracts:
+      - COMMON_OPERATING_CONTRACT.md
+    contract_path: .agent-workflow/sprints/2026-06-25-first-pilot/lanes/contracts/issue-69-pr-policy.contract.yaml
+    parallel_group: 1
+dependency_order:
+  - [issue-69-pr-policy]

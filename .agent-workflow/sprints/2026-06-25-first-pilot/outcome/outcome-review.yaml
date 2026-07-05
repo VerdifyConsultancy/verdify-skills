@@ -1,0 +1,48 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+decision: accepted_with_risks
+reviewed_at: "2026-07-01T21:15:00Z"
+reviewer: "jason (2026-07-01 workstream approval: fix lane -> fresh critic -> merge -> release verification); recorded by session claude-fix-20260701T2"
+intended_outcome: >-
+  Issue #69: pr-policy honors exempt labels with a reduced contract and the
+  PR-body head SHA becomes optional for lane PRs; and (issue #77) the Verdify
+  core loop is proven end-to-end once on a real lane.
+delivered_outcomes:
+  - "Unified three-mode PR policy on dev@b618cd32: release (dev->main; sections + version evidence + mandatory generated head-SHA line, value not compared), lightweight (exempt label; closing issue + Outcome + Evidence), standard lane (full contract; body head SHA optional, verified when present). Release > lightweight > standard precedence, regression-tested."
+  - "policy.yml re-runs on labeled/unlabeled events, so applying or removing an exempt label re-evaluates the gate (critic FIND-002)."
+  - "Core loop ran end-to-end once: worker closeout -> independent critic request_fixes (2026-07-01T20:39Z) -> fix lane (session claude-fix-20260701T2) -> fresh critic approve at 3949a0ba (21:10:53Z) -> squash merge b618cd32 (21:12:03Z) -> release verification at the integrated revision."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/78"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/78#pullrequestreview-4612893339"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28548098239"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28548112144"
+  - ".agent-workflow/sprints/2026-06-25-first-pilot/release/release-verification.yaml"
+  - ".agent-workflow/sprints/2026-06-25-first-pilot/lanes/closeout/issue-69-pr-policy.closeout.yaml"
+incomplete_items: []
+residual_risks:
+  - "Optional body head SHA weakens the anti-stale signal for lane PRs; mitigated: verified when present (regression-tested) and the gate receives the true head from the event payload."
+  - "A mislabelled code PR could bypass the full lane contract via an exempt label; mitigated: explicit config label list, and release PRs can never be demoted by labels (regression-tested)."
+  - "The labeled/unlabeled workflow trigger is deployed and suite/probe-verified, but a live label event on a real PR has not yet been observed; first live observation will come from the next labelled PR."
+follow_up_issues: [70, 76]
+lessons_learned:
+  - "Shared worker/critic GitHub identity forbids approve/request-changes self-reviews; critic verdicts ship as COMMENT reviews. A build loop needs a second (bot) identity or a status-check/label verdict channel."
+  - "bin/verdify lane create cannot materialize a fix-forward lease when the lane branch is checked out in the operator's primary clone; the fix session used a locked detached worktree plus a manually written schema-valid lease and fast-forward push. The machinery needs a documented path for this."
+  - "Committing the closeout always advances the head past the recorded head_sha; workable rule: head_sha = last substantive commit and the critic verifies the closeout commit touches only bookkeeping (applied here)."
+  - "Repo conventions can change under a long-lived lane (release-flow rework moved implementation PRs to dev); fix lanes must re-read AGENTS.md/operating docs, and PR #78 was retargeted to dev accordingly."
+  - "Retargeting a PR base does not re-trigger workflows whose pull_request types lack 'edited'; a close/reopen refreshed stale required checks without advancing the head SHA."
+  - "bin/verdify lane review can check out a stale local branch tip; critics must fetch and verify the checkout equals the live PR head before reviewing."
+rationale: >-
+  Both lane acceptance criteria were independently re-verified by a fresh
+  critic at the merged head, the integrated revision passes the full gate
+  locally and in CI, and all three policy modes are evidenced - two of them on
+  live GitHub PR events (implementation on PR #78, release on generated
+  release PR #101). The end-to-end loop execution itself is the pilot evidence
+  issue #77 asked for. Accepted under Jason's 2026-07-01 delegation for this
+  workstream. Ambient state, not defects of this lane: release PR #101 stays
+  red on the version-bump preflight until the next version bump lands on dev
+  (documented release-flow behavior); the review-inbox packet (release
+  verification mode 0) was intentionally skipped for this single-lane pilot
+  because the critic verdict is on the PR, the workstream had explicit human
+  pre-approval, and no preview/review deployment surface exists.

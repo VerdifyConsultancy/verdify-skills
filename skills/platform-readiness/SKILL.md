@@ -4,7 +4,7 @@ description: Inventories and gates Agent Platform readiness across Kubernetes na
 compatibility: Requires authorized read access to platform repositories, Kubernetes/GitOps state or supplied snapshots, credential location inventory, and CI/CD state. Production changes require a separate approved operator.
 metadata:
   author: Verdify
-  version: "1.1.4"
+  version: "1.2.0"
 ---
 
 # Platform Readiness
@@ -103,7 +103,10 @@ Validate environment GitOps reconciliation records against
    - observability by default;
    - browser terminal inspection;
    - review-ready deployed pull requests;
-   - controller and child-session APIs or MCP tools.
+   - controller and child-session APIs or MCP tools;
+   - durable loop armed: supervisor loop mode active, work heartbeat fresh or
+     watchdog armed, and a valid `.agent-fleet/loop.yaml` with a
+     repo-committed iteration prompt.
 4. Mark each domain `pass`, `warn`, `fail`, or `blocked`.
 5. Use an observability diagnostic packet when telemetry, runtime checks,
    deployment markers, or missing instrumentation determine readiness.

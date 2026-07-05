@@ -1,0 +1,66 @@
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: "1.0"
+sprint_id: 2026-06-25-first-pilot
+status: verified
+integrated_sha: "b618cd32ca2b18044f80952a7e5eb736fb5eb49f"
+release:
+  tag: null
+  url: null
+artifact_identity:
+  - type: git_commit
+    identifier: "b618cd32ca2b18044f80952a7e5eb736fb5eb49f (squash of PR #78 into dev, 2026-07-01T21:12:03Z)"
+  - type: github_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#78 (lane issue-69-pr-policy, critic-approved head 3949a0ba9c81a852511920b166cd53f9a22a99db)"
+integration_results:
+  - name: critic approval at merged head
+    result: passed
+    evidence: "Fresh critic claude-critic-20260701T3 outcome approve at 3949a0ba (https://github.com/VerdifyConsultancy/verdify-skills/pull/78#pullrequestreview-4612893339, 2026-07-01T21:10:53Z); merge performed with zero commits after the approved head"
+  - name: pr-policy suite at integrated revision (local)
+    result: passed
+    evidence: "bash tests/test_pr_policy.sh at b618cd3 in integration worktree, exit 0, 2026-07-01T21:12:29Z; covers standard (valid, event-env, no-SHA, stale-SHA-reject, no-closing-issue-reject), lightweight (exempt pass, non-exempt reject), release (valid, wrong-version reject, missing-SHA reject, label-cannot-demote)"
+  - name: full gate at integrated revision (local)
+    result: passed
+    evidence: "make test at b618cd3, exit 0, 2026-07-01T21:12:29Z-21:12:38Z (validate, 37-run/397-assertion schema suite, CLI, pr-policy, release-preflight, npm-install)"
+  - name: full gate at integrated revision (CI, push to dev)
+    result: passed
+    evidence: "validate push run success at b618cd3: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28548098239 (2026-07-01T21:12:04Z); compliance-selftest and release-pr push runs also success"
+deployment:
+  environment: github-actions-ci (pull-request policy gate; effective for dev-targeted PRs from dev@b618cd3)
+  deployment_id: null
+  deployed_at: "2026-07-01T21:12:03Z"
+  observed_revision: "b618cd32ca2b18044f80952a7e5eb736fb5eb49f"
+  deployer: jvallery (squash merge of PR #78; no separate deploy step exists for CI policy)
+  approval:
+    required: true
+    approved_by: "independent critic claude-critic-20260701T3 (approve) under Jason's 2026-07-01 workstream approval"
+    approved_at: "2026-07-01T21:10:53Z"
+    evidence: "https://github.com/VerdifyConsultancy/verdify-skills/pull/78#pullrequestreview-4612893339"
+runtime_checks:
+  - name: implementation mode on a live PR event
+    result: passed
+    observed_at: "2026-07-01T21:01:53Z"
+    evidence: "pull-request-policy run on PR #78 (base dev) evaluated the unified policy from the merge ref and passed: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28547523871"
+  - name: release mode on the live generated dev->main release PR
+    result: passed
+    observed_at: "2026-07-01T21:12:31Z"
+    evidence: "pull-request-policy run on release PR #101 output 'Verdify release pull request policy passed for issue(s): #100': https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/28548112144"
+  - name: lightweight mode (exempt label) behavior
+    result: passed
+    observed_at: "2026-07-01T21:12:29Z"
+    evidence: "Suite lightweight cases at b618cd3 ('passed (lightweight) for issue(s): #200'; non-exempt reduced body rejected) plus independent critic probes at 2026-07-01T21:07:53Z; no live exempt-labelled PR existed during verification"
+  - name: labeled/unlabeled trigger present in deployed workflow
+    result: passed
+    observed_at: "2026-07-01T21:12:29Z"
+    evidence: "git show b618cd3:.github/workflows/policy.yml types include labeled, unlabeled; behavioral re-run on a live label event remains to be observed on the next labelled PR"
+migrations:
+  - name: none
+    result: not_applicable
+    evidence: "CI policy change only; no data, schema, or runtime migrations"
+rollback:
+  ready: true
+  known_good_revision: "9dfe7530a0740ade3dcad9b6b22cd2d13232189f"
+  procedure: "git revert b618cd32 on dev (single squash commit) and push; the policy gate reverts to the pre-lane three-file state. No artifact or registry rollback required."
+incidents: []
+verified_at: "2026-07-01T21:14:00Z"
+verifier: claude-fix-20260701T2 (integration/verification session; worker of record for the fix lane)
