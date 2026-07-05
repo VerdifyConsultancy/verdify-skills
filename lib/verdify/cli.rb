@@ -15,13 +15,18 @@ module Verdify
       state-of-union
       repo-hygiene
       sprint-planning
+      sprint-replan
       sprint-orchestrator
       controller-loop
+      subagent-worktree
       platform-readiness
       gravity-readiness
       lane-delivery
       independent-critic
+      controller-merge
       release-verification
+      sprint-handoff
+      adversarial-audit
       consensus-audit-workflow
     ].freeze
     SECRET_SCAN_LINE_PATTERNS = [

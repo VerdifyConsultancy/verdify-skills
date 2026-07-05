@@ -1,0 +1,27 @@
+{
+  "skill_name": "sprint-replan",
+  "evals": [
+    {
+      "id": "scope-correction-with-external-owner",
+      "prompt": "The user says the Sunshine research skill is already being built by another agent but the rest of the proposed next sprint is still valid.",
+      "expected_output": "Updates the sprint handoff so Sunshine implementation and review are deferred or external, keeps the remaining issue-backed P0 scope, and names the review milestones that still gate the sprint.",
+      "files": [],
+      "assertions": [
+        "External or separately owned work is not kept in the sprint's done criteria.",
+        "Remaining included scope is tied to GitHub issues or marked as needs_issue.",
+        "Review milestones and route caveats remain explicit in the Markdown handoff."
+      ]
+    },
+    {
+      "id": "route-caveat-before-execution",
+      "prompt": "The route engine still says northstar-planning artifact-loop, but Jason asks to execute an approved four-lane skills sprint and stop at review.",
+      "expected_output": "Records the router mismatch as a route caveat or approval need, preserves the approved lane scope, and names sprint-orchestrator as the next controller only if the exception is explicit.",
+      "files": [],
+      "assertions": [
+        "Router mismatches are surfaced instead of hidden.",
+        "Execution is not recommended without an explicit approval or bounded exception.",
+        "The next controller action names the lifecycle skill and the evidence it must consume."
+      ]
+    }
+  ]
+}

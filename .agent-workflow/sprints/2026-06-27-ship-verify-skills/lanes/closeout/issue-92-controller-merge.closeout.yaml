@@ -1,0 +1,63 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "1.0"
+sprint_id: 2026-06-27-ship-verify-skills
+lane_id: issue-92-controller-merge
+status: ready_for_critic
+issue_ids: [92]
+pull_request: 96
+baseline_sha: fffa61c09cbe09f8d0dd32681029a967c59066ee
+head_sha: 992f1ddb76aa305b5c5668a06535de09e2b10023
+contract_hash: 0ab6b37209e39ee142d3c9ca0861a07bc38bd206605c7259730230d6ad931d43
+changed_paths:
+  - .agents/skills/controller-merge
+  - .claude/skills/controller-merge
+  - README.md
+  - config/lifecycle.yaml
+  - docs/skills/README.md
+  - docs/skills/per-skill/controller-merge.md
+  - docs/sprint-plans/2026-06-27-controller-merge-demo.md
+  - evaluations/controller-merge/evals.json
+  - lib/verdify/cli.rb
+  - schemas/route-decision.schema.yaml
+  - scripts/validate-repo.rb
+  - skills/controller-merge/SKILL.md
+  - skills/controller-merge/agents/openai.yaml
+  - skills/controller-merge/references/reconcile-and-merge.md
+validation_results:
+  - id: validate-repo
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-27T22:53:15Z"
+    artifact: null
+  - id: test
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-06-27T22:53:24Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - skills/controller-merge/SKILL.md
+      - skills/controller-merge/references/reconcile-and-merge.md
+      - docs/skills/per-skill/controller-merge.md
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - evaluations/controller-merge/evals.json
+      - .agents/skills/controller-merge
+      - .claude/skills/controller-merge
+      - docs/sprint-plans/2026-06-27-controller-merge-demo.md
+      - ruby scripts/validate-repo.rb
+      - make test
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Shared lifecycle registration surfaces will conflict with the other P0 skill PRs until controller-merge reconciles them.
+worktree_clean: true
+worker_session_id: worker-92-20260627a
+completed_at: "2026-06-27T22:54:20Z"
+limitations:
+  - Closeout head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.

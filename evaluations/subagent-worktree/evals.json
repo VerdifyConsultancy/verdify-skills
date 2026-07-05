@@ -1,0 +1,27 @@
+{
+  "skill_name": "subagent-worktree",
+  "evals": [
+    {
+      "id": "single-worker-lease",
+      "prompt": "A controller needs to launch a Codex worker for an approved lane and there is already an active worker lease for that lane.",
+      "expected_output": "Stops before launching another worker, reports the active lease, and routes to lease inspection or release rather than sharing the worktree.",
+      "files": [],
+      "assertions": [
+        "The skill refuses to dispatch a second worker into the same lane.",
+        "The active lease is treated as authoritative evidence.",
+        "The next step is inspect, release, fix-forward, or gate handling rather than ad hoc worktree reuse."
+      ]
+    },
+    {
+      "id": "local-fallback-gate",
+      "prompt": "The sprint-orchestrator runbook expects Agent Platform add_worktree_agent, but Jason asks to use local Claude workers instead.",
+      "expected_output": "Requires or records an explicit local-subagent policy exception, then creates one leased worktree and compiled prompt per approved lane.",
+      "files": [],
+      "assertions": [
+        "Local dispatch is not treated as an unstated fallback.",
+        "The policy exception or approval gate is recorded before launch.",
+        "The worker prompt binds lane ID, session ID, branch, worktree, contract, and closeout requirements."
+      ]
+    }
+  ]
+}

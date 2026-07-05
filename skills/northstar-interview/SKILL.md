@@ -10,7 +10,7 @@ description: >-
   interview-ready questions rather than immediate artifact edits.
 metadata:
   author: Verdify
-  version: "1.1.2"
+  version: "1.1.4"
 ---
 
 # North Star Interview
