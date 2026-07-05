@@ -4,7 +4,7 @@ description: Coordinates an approved Verdify sprint or wave by reconciling GitHu
 compatibility: Requires Git, the Verdify CLI, approved sprint artifacts, GitHub CLI for live reconciliation, and Agent Platform API/MCP details when platform sessions are launched. It coordinates but does not implement lane code or review its own work.
 metadata:
   author: Verdify
-  version: "1.1.4"
+  version: "1.2.0"
 ---
 
 # Sprint Orchestrator
@@ -30,6 +30,10 @@ Validate the runbook against
 event examples against `../../schemas/status-event.schema.yaml`.
 
 ## Start
+
+On any controller (re)start, run the baked `resume-check` helper before other
+work: it flags pushed-but-PR-less `lane/*` branches (stranded work), uncommitted
+`.agent-workflow` controller state, open PRs, and main CI status.
 
 1. Read the approved sprint plan, wave release plan when present, plan gate,
    lane contracts, module contracts, execution runbook when present, and
@@ -90,6 +94,11 @@ session ID, terminal/tmux/browser refs, branch, PR, issue, and agent session in
 the execution runbook, sprint status, and session ledger. Never dispatch two
 workers into the same lane/worktree.
 
+Encode durable-output discipline in every worker prompt: push the lane branch
+early, keep work visible as a pushed branch or PR at all times, and commit
+findings into the worktree - never scratchpad-only artifacts, because pod death
+wipes temporary directories.
+
 ## Monitor events
 
 Run the configured controller loop, typically every five minutes unless the
@@ -134,6 +143,9 @@ Read `references/github-reconciliation.md`.
   path is Agent Platform MCP unless a recorded fallback gate authorizes it.
 - Do not copy raw session logs, secrets, or private terminal payloads into
   durable artifacts.
+- Do not run heavy workloads (drill repros, load tests, bulk builds) on the
+  controller pod; dispatch them as Kubernetes Jobs with their own resource
+  limits.
 
 ## Handoffs
 

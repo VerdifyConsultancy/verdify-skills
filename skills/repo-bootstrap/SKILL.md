@@ -4,7 +4,7 @@ description: Runs a repository bootstrap and self-discovery facade over existing
 compatibility: Requires repository read access, Git, Verdify CLI, GitHub CLI or current GitHub snapshots, and only authorized runtime or credential-reference snapshots. Live cluster or secret access is optional and must be separately authorized.
 metadata:
   author: Verdify
-  version: "1.1.4"
+  version: "1.2.0"
 ---
 
 # Repo Bootstrap
@@ -43,9 +43,13 @@ Validate the packet against `../../schemas/repo-bootstrap.schema.yaml`. Use
    downstream definition, architecture, strategy, or implementation.
 6. Use `controller-loop` to record the controller/session handoff and durable
    next action when this bootstrap initializes a long-lived repo controller.
-7. Write the bootstrap packet, validate it, and open gap issues or a PR only
+7. Scaffold the platform durable-loop substrate when initializing a long-lived
+   repo controller: commit `.agent-fleet/loop.yaml` and the repo-committed
+   iteration prompt it points at, so the pod watchdog can arm takeover
+   iterations. Record the scaffold (or its gap) in the bootstrap packet.
+8. Write the bootstrap packet, validate it, and open gap issues or a PR only
    for changes already within authority. Link GitHub refs in the packet.
-8. Hand off to exactly one next skill and mode. Do not start implementation
+9. Hand off to exactly one next skill and mode. Do not start implementation
    work from the bootstrap session.
 
 ## Required Packet Coverage
