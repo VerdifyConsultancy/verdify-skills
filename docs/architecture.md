@@ -10,7 +10,7 @@ The package has four layers:
 ```mermaid
 flowchart TB
     subgraph L1["1 · Skills (role procedures)"]
-      S["21 lifecycle skills + issue-triage"]
+      S["25 lifecycle skills + issue-triage"]
     end
     subgraph L2["2 · Schemas and versioned artifacts"]
       A[".agent-workflow/*.yaml — intent, contracts, gates, status, evidence"]

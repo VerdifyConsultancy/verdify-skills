@@ -4,12 +4,12 @@ kind: NorthStarArtifacts
 schema_version: '1.0'
 project_id: verdify-skills
 status: iterating
-iteration: 23
+iteration: 24
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-06-23T20:18:26Z'
+updated_at: '2026-07-07T19:02:27Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
-  status: draft
+  status: review_requested
   summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, explicit Orbit daily brief deferral, review script, planning questions, and traceability.
   section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013]
   source_ids:
@@ -461,15 +461,15 @@ open_questions:
   proposed_resolution: Use `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`; answers return to `northstar-planning` / `review-feedback` and do not themselves record final approval.
 - id: NSQ-007
   artifact: both
-  question: What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw, and Gravity?
+  question: What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw (now Orbit), and Gravity?
   owner: Jason and architecture owner
   blocking: false
-  status: open
+  status: answered
   source_ids:
   - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
   - NSE-20260623-agent-platform-live-state-audit
   - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
-  proposed_resolution: Skills owns lifecycle contracts and artifacts; Agent Platform owns runtime/control APIs and k3s/source-control/CI/CD operational integration; Hermes/OpenClaw owns higher-level conversation/planning orchestration constrained through MCP/API tool surfaces; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs.
+  proposed_resolution: Resolved in practice (2026-07-07) as the working ruling — jvallery/agents owns the platform/substrate (runtime, control plane, durable-loop substrate); verdify-skills owns the method (portable lifecycle contracts plus platform-adapter skills per ADR-0016); jvallery/orbit owns the chief-of-staff/outer-loop conductor; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs. Final cross-repo ratification rides the jvallery/agents North Star lock.
 - id: NSQ-008
   artifact: both
   question: What is the safest extraction path from Sunshine Club into reusable Gravity core?
@@ -546,12 +546,12 @@ learning_capture:
   - .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
   open_proposal_ids: [NLP-001, NLP-002]
 review:
-  requested_at: '2026-06-23T04:30:38Z'
+  requested_at: '2026-07-07T19:02:27Z'
   reviewers: [Jason, James]
-  status: changes_requested
+  status: requested
   approvals: []
   signoff_required_for_downstream: true
 handoff:
   next_skill: northstar-planning
-  next_mode: artifact-loop
-  reason: The research queue, OpenClaw SDLC workflow skill design, typed review/release/diagnostics/ledger/platform-control/GitHub-sync/environment-GitOps/Gravity extraction contracts, repo-agent scope contract, and repo-controller bootstrap walk evidence have been synthesized into product and architecture drafts. Continue artifact-loop synthesis before requesting final lock approval.
+  next_mode: human-review
+  reason: Iteration 24 (2026-07-07) reconciled the product North Star to the shipped 1.2.0 package and the 2026-06-29 AI-OS/Orbit program (skill counts, primary-customer framing, Orbit naming annotations, NSQ-007 working ruling, WAVE-010 Orbit chief-of-staff skill suite). Review is requested from Jason and James before further artifact-loop iteration or final lock approval.
