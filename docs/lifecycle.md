@@ -1,6 +1,6 @@
 # Lifecycle and handoffs
 
-Verdify exposes eighteen lifecycle skills but preserves the detailed lifecycle as explicit modes. `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, order, and standalone skill treatment. `verdify.workflow.yaml`, router emissions, this document, and SKILL.md frontmatter are derived views and must validate against that config. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
+Verdify exposes twenty-five lifecycle skills but preserves the detailed lifecycle as explicit modes. The numbered sections below walk the core stage handoffs; [`skills/README.md`](skills/README.md) documents every skill individually. `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, order, and standalone skill treatment. `verdify.workflow.yaml`, router emissions, this document, and SKILL.md frontmatter are derived views and must validate against that config. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
 
 ## 1. Project router
 

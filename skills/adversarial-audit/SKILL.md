@@ -4,7 +4,7 @@ description: Runs a focused adversarial audit of sprint plans, skill proposals, 
 compatibility: Requires read access to the artifact being audited and any supporting issue, PR, evidence, or repository context. Human approval remains required for protected decisions.
 metadata:
   author: Verdify
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Adversarial Audit

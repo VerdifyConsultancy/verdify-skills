@@ -14,7 +14,7 @@ description: >-
   protected DESIGN_COMMITTED change.
 metadata:
   author: Verdify
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # North Star Planning
