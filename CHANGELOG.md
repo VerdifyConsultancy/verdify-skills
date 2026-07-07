@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 1.2.1 - 2026-07-07
+
+- Fixed `MANIFEST.sha256` integrity (#109): the committed root manifest was
+  hand-generated and never regenerated in the release path, so it had frozen at
+  an old commit (95 of 296 entries stale, 102 tracked files missing entirely) —
+  downstream vendors could not use it for `sha256sum -c` verification. The
+  manifest is now regenerated against the tree.
+- Extracted the manifest generator into `scripts/gen-manifest.sh` (single source
+  of truth for the exclude set + hashing), shared by `scripts/package.sh` and the
+  new `make manifest` / `make manifest-check` targets so the in-zip and committed
+  manifests can never diverge.
+- Wired `make manifest-check` into `make test` (the `validate` CI job), so any
+  future manifest drift fails the PR rather than riding a release unnoticed.
+
 ## 1.2.0 - 2026-07-05
 
 - Bound the loop/recovery contract to the platform durable-loop substrate:
