@@ -22,17 +22,9 @@ rsync -a \
   --exclude '/MANIFEST.sha256' \
   --exclude '/node_modules' \
   "$ROOT/" "$STAGE/$NAME/"
-(
-  cd "$STAGE/$NAME"
-  ruby -rdigest -e '
-    paths = Dir.glob("**/*", File::FNM_DOTMATCH).select do |path|
-      File.file?(path) && !File.symlink?(path) && path != "MANIFEST.sha256"
-    end.sort
-    File.open("MANIFEST.sha256", "w") do |manifest|
-      paths.each { |path| manifest.puts "#{Digest::SHA256.file(path).hexdigest}  #{path}" }
-    end
-  '
-)
+# Generate the in-zip manifest via the shared generator so it can never diverge from the committed
+# root MANIFEST.sha256 (same exclude set + hashing). #109
+bash "$ROOT/scripts/gen-manifest.sh" "$STAGE/$NAME" "$STAGE/$NAME/MANIFEST.sha256"
 (
   cd "$STAGE"
   zip -qry "$OUT/$NAME.zip" "$NAME"
