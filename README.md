@@ -353,7 +353,7 @@ Before enforcing code-owner review, replace the commented example in `.github/CO
 
 ## Design documentation
 
-- **`docs/skills/README.md` — the skills reference manual**: per-skill purpose, inputs, outputs, owned schemas, sequence diagrams, tools/MCP, and handoffs for all 21 skills, plus a 46-schema catalog, a CLI/MCP/GitHub tools reference, and end-to-end sequence diagrams
+- **`docs/skills/README.md` — the skills reference manual**: per-skill purpose, inputs, outputs, owned schemas, sequence diagrams, tools/MCP, and handoffs for all 25 lifecycle skills plus the standalone issue-triage skill, plus a 46-schema catalog, a CLI/MCP/GitHub tools reference, and end-to-end sequence diagrams
 - `docs/lifecycle.md` — stages, handoffs, and gates
 - `docs/authority-model.md` — typed source-of-truth boundaries
 - `docs/github-operating-model.md` — issues, PRs, Projects, checks, and deployments
