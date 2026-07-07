@@ -4,7 +4,7 @@ description: Reconciles completed Verdify lane branches after worker closeout an
 compatibility: Requires Git, GitHub PR/check access, validated lane closeout, critic report, and an approved sprint or review packet. It never substitutes for independent criticism or runtime deployment verification.
 metadata:
   author: Verdify
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Controller Merge

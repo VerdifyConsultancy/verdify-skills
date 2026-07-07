@@ -2,9 +2,14 @@
 
 ## Unreleased
 
-- Fixed `MANIFEST.sha256` integrity (#109): the committed root manifest was
-  hand-generated and never regenerated in the release path, so it froze at an
-  old commit (95 of 296 entries stale, 102 tracked files missing entirely) —
+## 1.2.1 - 2026-07-07
+
+Patch release: manifest integrity fix + CI gate, fleet vendoring standard, and
+North Star/doc refresh. No new skills or schemas.
+
+- Fixed `MANIFEST.sha256` integrity (#109, #111): the committed root manifest
+  was hand-generated and never regenerated in the release path, so it froze at
+  an old commit (95 of 296 entries stale, 102 tracked files missing entirely) —
   downstream vendors could not use it for `sha256sum -c` verification (v1.1.0
   had the same defect). The manifest is now regenerated against the tree.
 - Extracted the manifest generator into `scripts/gen-manifest.sh` (single source
@@ -12,9 +17,17 @@
   new `make manifest` / `make manifest-check` targets so the in-zip and committed
   manifests can never diverge.
 - Wired `make manifest-check` into `make test` (the `validate` CI job), so any
-  future manifest drift fails the PR rather than riding a release unnoticed. The
-  next release regenerates the manifest as part of the version bump (the gate
-  fails otherwise), delivering a correct manifest to vendors on the new tag.
+  future manifest drift fails the PR rather than riding a release unnoticed.
+- Added `docs/vendoring-standard.md` (#113): the fleet vendoring/version
+  standard — one pinned version dir under `.agent-skills/verdify-skills/<ver>/`,
+  an `UPSTREAM.yaml` provenance record, per-vendor manifest verification, and
+  host symlink layout — with the 2026-07-07 consumer census.
+- North Star iteration 24 (#113): reconciled `NORTHSTAR_PRODUCT.md` to the
+  shipped 1.2.0 reality and the Orbit chief-of-staff model (PRQ-007 corrected
+  to 25+1 skills, NSQ-007 resolved in practice, WAVE-010 added).
+- Skill-count truth pass (#113): WORKFLOW.md, docs/lifecycle.md,
+  docs/architecture.md, and README.md now state the real skill counts
+  (25 lifecycle skills + standalone issue-triage; validator reports 26).
 
 ## 1.2.0 - 2026-07-05
 
