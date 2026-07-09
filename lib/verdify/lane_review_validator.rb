@@ -156,14 +156,26 @@ module Verdify
       errors << "live pull request head must equal the critic report head" unless pull_head == report_head
       expected_reviewer = expected_reviewer_login.to_s.downcase
       expected_reviewer_id = expected_reviewer_id.to_i
-      reviewer_history = Array(submitted_reviews).select { |review| review["reviewer"].to_s.downcase == expected_reviewer }
-      effective_history = reviewer_history.select { |review| %w[APPROVED CHANGES_REQUESTED DISMISSED].include?(review["state"].to_s.upcase) }
-      latest_review = effective_history.max_by { |review| [review["submitted_at"].to_s, review["id"].to_s] }
+      effective_history = Array(submitted_reviews).select do |review|
+        %w[APPROVED CHANGES_REQUESTED DISMISSED].include?(review["state"].to_s.upcase)
+      end
+      latest_by_reviewer = effective_history.group_by { |review| review["reviewer"].to_s.downcase }.transform_values do |reviews|
+        reviews.max_by { |review| [review["submitted_at"].to_s, review["id"].to_s] }
+      end
+      latest_review = latest_by_reviewer[expected_reviewer]
+      unresolved_change_requests = latest_by_reviewer.values.select do |review|
+        review["state"].to_s.upcase == "CHANGES_REQUESTED"
+      end
       review_is_current = latest_review &&
                           latest_review["state"].to_s.upcase == "APPROVED" &&
                           latest_review["commit_id"] == report_head
       unless review_is_current
         errors << "no commit-bound GitHub review was submitted for the critic report head"
+      end
+      unless unresolved_change_requests.empty?
+        reviewers = unresolved_change_requests.map { |review| review["reviewer"].to_s }.reject(&:empty?).uniq.sort
+        suffix = reviewers.empty? ? "" : ": #{reviewers.join(', ')}"
+        errors << "an effective change-request review remains unresolved#{suffix}"
       end
       author = pull_request_author.to_s.downcase
       independent_actor = !expected_reviewer.empty? &&

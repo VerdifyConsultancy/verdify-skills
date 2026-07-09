@@ -229,6 +229,53 @@ class LaneReviewValidatorTest < Minitest::Test
     FileUtils.rm_rf(chain[:root]) if chain
   end
 
+  def test_change_request_from_another_reviewer_blocks_recorded_approval
+    chain = build_chain
+    result = validator(chain).validate_critic(tip_sha: chain[:report_head])
+    blocked = validator(chain).validate_submission(
+      result: result,
+      review_submission_head_sha: chain[:report_head],
+      expected_reviewer_login: "reviewer-a",
+      expected_reviewer_id: 2,
+      reviewer_permission: "admin",
+      pull_request_head_sha: chain[:report_head],
+      pull_request_author: "worker",
+      pull_request_author_id: 1,
+      submitted_reviews: [
+        { "id" => 1, "state" => "APPROVED", "commit_id" => chain[:report_head], "reviewer" => "reviewer-a", "reviewer_id" => 2, "submitted_at" => "2026-07-09T00:04:00Z" },
+        { "id" => 2, "state" => "CHANGES_REQUESTED", "commit_id" => chain[:report_head], "reviewer" => "reviewer-b", "reviewer_id" => 3, "submitted_at" => "2026-07-09T00:05:00Z" }
+      ]
+    )
+
+    refute blocked.valid?
+    assert blocked.errors.any? { |error| error.include?("effective change-request review remains unresolved") && error.include?("reviewer-b") }
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
+  def test_dismissed_review_from_another_reviewer_does_not_block_recorded_approval
+    chain = build_chain
+    result = validator(chain).validate_critic(tip_sha: chain[:report_head])
+    submitted = validator(chain).validate_submission(
+      result: result,
+      review_submission_head_sha: chain[:report_head],
+      expected_reviewer_login: "reviewer-a",
+      expected_reviewer_id: 2,
+      reviewer_permission: "admin",
+      pull_request_head_sha: chain[:report_head],
+      pull_request_author: "worker",
+      pull_request_author_id: 1,
+      submitted_reviews: [
+        { "id" => 1, "state" => "APPROVED", "commit_id" => chain[:report_head], "reviewer" => "reviewer-a", "reviewer_id" => 2, "submitted_at" => "2026-07-09T00:04:00Z" },
+        { "id" => 2, "state" => "DISMISSED", "commit_id" => chain[:report_head], "reviewer" => "reviewer-b", "reviewer_id" => 3, "submitted_at" => "2026-07-09T00:05:00Z" }
+      ]
+    )
+
+    assert submitted.valid?, submitted.errors.join("\n")
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
   def test_later_comment_does_not_revoke_commit_bound_approval
     chain = build_chain
     result = validator(chain).validate_critic(tip_sha: chain[:report_head])
