@@ -1,0 +1,197 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-09-issue-72-exact-head
+lane_id: issue-72-exact-head-evidence
+status: ready_for_critic
+issue_ids: [72]
+pull_request: 123
+baseline_sha: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
+implementation_head_sha: "f28016c99213023c131a054afa7a8c3cdceba014"
+validated_head_sha: "f28016c99213023c131a054afa7a8c3cdceba014"
+contract_hash: "47a7a78b82ba74ac08030bd21ccedae1362326e94eb8a302cd20cca0d5c7e59b"
+changed_paths:
+  - .agent-workflow/sprints/2026-06-24-issue-triage/lanes/closeout/issue-5-issue-triage.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-canonical-lifecycle.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-cli-hardening.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-consensus-audit-workflow.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-controller-recovery.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-controller-state-fields.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-authority-boundaries.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-controller-ownership.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-eval-strategy.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-issue-action-boundary.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-dec-readiness-boundary.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-eval-uplift.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-lane-delivery-correctness.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-missing-northstar-capabilities.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-orphan-artifacts.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-platform-control-regrounding.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-prompt-injection-guidance.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-qr-schemarefs.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-readiness-grounding.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-repo-bootstrap-skill.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-route-decision-enum.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-router-gate-bypass.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-schema-contradictions.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-secret-scanning.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-skill-count-drift.closeout.yaml
+  - .agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-validator-engine.closeout.yaml
+  - .agent-workflow/sprints/2026-06-25-first-pilot/lanes/closeout/issue-69-pr-policy.closeout.yaml
+  - .agent-workflow/sprints/2026-06-27-ship-verify-skills/lanes/closeout/issue-90-sprint-replan.closeout.yaml
+  - .agent-workflow/sprints/2026-06-27-ship-verify-skills/lanes/closeout/issue-91-subagent-worktree.closeout.yaml
+  - .agent-workflow/sprints/2026-06-27-ship-verify-skills/lanes/closeout/issue-92-controller-merge.closeout.yaml
+  - .agent-workflow/sprints/2026-06-27-ship-verify-skills/lanes/closeout/issue-93-adversarial-audit.closeout.yaml
+  - .github/pull_request_template.md
+  - .github/workflows/policy.yml
+  - AGENTS.md
+  - CLAUDE.md
+  - COMMON_OPERATING_CONTRACT.md
+  - CONTRIBUTING.md
+  - MANIFEST.sha256
+  - README.md
+  - docs/decisions/ADR-0010-comprehensive-planning-review-loop.md
+  - docs/decisions/ADR-0017-lane-review-evidence-chain.md
+  - docs/lifecycle.md
+  - docs/skills/per-skill/controller-merge.md
+  - docs/skills/per-skill/independent-critic.md
+  - docs/skills/per-skill/lane-delivery.md
+  - docs/skills/per-skill/release-verification.md
+  - docs/skills/per-skill/sprint-orchestrator.md
+  - docs/skills/schemas-catalog.md
+  - docs/skills/sequences.md
+  - docs/skills/tools-and-mcp.md
+  - docs/sprint-plans/2026-06-27-controller-merge-demo.md
+  - docs/sprint-plans/2026-06-27-subagent-worktree-demo.md
+  - evaluations/release-verification/evals.json
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/critic/issue-123-api.critic.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/evidence/evidence-manifest.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/outcome/outcome-review.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/sprint-plan.md
+  - examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml
+  - lib/verdify.rb
+  - lib/verdify/cli.rb
+  - lib/verdify/git_repository.rb
+  - lib/verdify/lane_review_validator.rb
+  - lib/verdify/semantic_validator.rb
+  - schemas/critic-report.schema.yaml
+  - schemas/lane-closeout.schema.yaml
+  - schemas/review-inbox-packet.schema.yaml
+  - scripts/pr-policy.rb
+  - scripts/validate-repo.rb
+  - skills/controller-loop/assets/loop-record.recoverable-failure.example.yaml
+  - skills/controller-merge/SKILL.md
+  - skills/controller-merge/references/reconcile-and-merge.md
+  - skills/independent-critic/SKILL.md
+  - skills/independent-critic/agents/openai.yaml
+  - skills/independent-critic/assets/critic-report.template.yaml
+  - skills/independent-critic/references/evidence-review.md
+  - skills/lane-delivery/SKILL.md
+  - skills/lane-delivery/agents/openai.yaml
+  - skills/lane-delivery/assets/lane-closeout.template.yaml
+  - skills/lane-delivery/references/closeout-procedure.md
+  - skills/lane-delivery/references/worker-procedure.md
+  - skills/release-verification/SKILL.md
+  - skills/release-verification/assets/review-inbox-packet.template.yaml
+  - skills/release-verification/references/integration.md
+  - skills/release-verification/references/review-inbox.md
+  - skills/sprint-orchestrator/SKILL.md
+  - skills/sprint-orchestrator/assets/sprint-execution-runbook.template.yaml
+  - skills/sprint-orchestrator/references/github-reconciliation.md
+  - skills/sprint-orchestrator/references/platform-execution.md
+  - skills/sprint-orchestrator/scripts/build_execution_runbook.rb
+  - skills/sprint-planning/assets/wave-release-plan.template.yaml
+  - skills/sprint-planning/references/review-and-reporting.md
+  - tests/test_cli.sh
+  - tests/test_lane_review_validator.rb
+  - tests/test_pr_policy.sh
+  - tests/test_router_gate_bypass.sh
+  - tests/test_schema_validator.rb
+validation_results:
+  - id: schema-tests
+    command: ruby tests/test_schema_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:36:00Z"
+    artifact: null
+  - id: cli-tests
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:36:00Z"
+    artifact: null
+  - id: pr-policy-tests
+    command: bash tests/test_pr_policy.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:36:00Z"
+    artifact: null
+  - id: repo-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:36:00Z"
+    artifact: null
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:36:00Z"
+    artifact: null
+  - id: lane-review-tests
+    command: ruby tests/test_lane_review_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:37:00Z"
+    artifact: null
+  - id: historical-closeout-migration
+    command: for each tracked lane closeout run bin/verdify artifact validate
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:25:00Z"
+    artifact: null
+  - id: scope-audit
+    command: compare all post-dispatch changed paths to frozen lane ownership
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:31:00Z"
+    artifact: null
+  - id: diff-hygiene
+    command: git diff --check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-09T22:37:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [schema-tests, historical-closeout-migration]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [lane-review-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [pr-policy-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [cli-tests, lane-review-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [repo-validation, scope-audit]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [full-suite, historical-closeout-migration, diff-hygiene]
+    assessment: satisfied
+discovered_issues: [198, 2889, 406]
+residual_risks:
+  - PR #123 still requires a fresh critic-report commit and an external current-head approval from an admin or maintainer other than the PR author.
+  - Consumer repositories must reconcile legacy sprint transactions before the fail-closed router can advance them.
+worktree_clean: true
+worker_agent: root
+worker_session_id: root-issue72-20260709a
+completed_at: "2026-07-09T22:37:52Z"
+limitations:
+  - No runtime was deployed or mutated; runtime verification remains separate from merge success.
+  - The integer-only discovered_issues field records jvallery/orbit#198, jvallery/agents#2889, and VerdifyConsultancy/gravity#406; durable repository-qualified links are in PR #123.
