@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-readiness-grounding
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 27
 pull_request: 59
 baseline_sha: "79c4b63418edfdfdbbaf29718a11ee3e3506434f"
-head_sha: "a69607e8f265fdb560d500aaab2fa2957b966d45"
+implementation_head_sha: "a69607e8f265fdb560d500aaab2fa2957b966d45"
+validated_head_sha: "a69607e8f265fdb560d500aaab2fa2957b966d45"
 contract_hash: "0f7214e47648de9e91e525890a733120ed61fc106a006c7eff04b7d59f05a872"
 changed_paths:
   - "skills/platform-readiness/SKILL.md"
@@ -95,9 +96,10 @@ residual_risks:
   - "Fresh independent critic review is still required before integration."
   - "GitHub PR checks must be evaluated on the final pushed closeout commit before integration."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-readygnd"
 completed_at: "2026-06-24T18:08:00Z"
 limitations:
   - "No tests were added because the lane is prose-only and tests/ is outside owned_paths; coverage is through contract greps, validate-repo, make test, and closeout validation."
   - "The compiled lane contract records sprint baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lane lease was created from 79c4b63418edfdfdbbaf29718a11ee3e3506434f after dependency ADR work landed, so closeout diff scope uses the lease baseline."
-  - "head_sha records the implementation commit before the closeout metadata commit; PR #59 will be updated with the final branch head after closeout is pushed."
+  - "implementation_head_sha records the implementation commit before the closeout metadata commit; PR #59 will be updated with the final branch head after closeout is pushed."

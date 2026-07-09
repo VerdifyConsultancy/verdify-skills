@@ -77,7 +77,7 @@ project-router
        |-> independent-critic (fresh session and review worktree)
   -> release-verification
        review inbox packet -> diagnostics -> integration -> deployment verification -> outcome review
-       controller-merge reconciles critic-approved PR heads before integration
+       controller-merge reconciles critic-reviewed, externally approved PR heads before integration
   -> adversarial-audit
        product + engineering + security + business lens review for plans and handoffs
   -> project-router
@@ -96,9 +96,10 @@ The 17 detailed delivery stages from the original outline remain represented in 
   prevents two workers from owning the same lane. Critics use a fresh session
   and a separate detached review worktree.
 - **Worktrees are disposable execution locations, not durable identity.** Lane ID, issue, branch, baseline SHA, contract, and lease identify work.
-- **No self-certification.** Deterministic checks, a fresh critic, and a
-  complete review inbox packet precede integration when work claims review-ready
-  status.
+- **No self-certification.** Deterministic checks, a fresh critic, an external
+  commit-bound approval from an admin or maintainer other than the PR author,
+  and a complete review inbox packet precede integration when work claims
+  review-ready status.
 - **Merge is not deployment.** The intended revision must be proven in the target environment before outcome acceptance.
 
 See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/lane-worktrees.md` for the precise rules.
@@ -349,7 +350,7 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 ## Repository-specific setup still required
 
-Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should configure a ruleset or protected branch for `main` with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), strict up-to-date checks, conversation resolution, no direct pushes, and no force pushes or branch deletion. The current release flow does not require approving reviews; add review gates, code-owner gates, or a merge queue only by an explicit governance decision. Deployment environments and their approvers remain project-specific.
+Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should configure rulesets for protected branches with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), strict up-to-date checks, conversation resolution, no direct pushes, and no force pushes or branch deletion. Every implementation lane also requires a commit-bound `APPROVED` review on the critic-report head from a repository admin or maintainer other than the PR author. The generated `dev -> main` release and package publication remain separately authorized; deployment environments and their approvers remain project-specific.
 
 ## Design documentation
 

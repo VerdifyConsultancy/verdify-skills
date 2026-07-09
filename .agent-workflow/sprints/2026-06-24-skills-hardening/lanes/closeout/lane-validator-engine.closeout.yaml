@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-validator-engine
 status: ready_for_critic
@@ -9,7 +9,8 @@ issue_ids:
   - 31
 pull_request: 44
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "e7e697982d0c24e72a245e806267a55cc3dc61a9"
+implementation_head_sha: "e7e697982d0c24e72a245e806267a55cc3dc61a9"
+validated_head_sha: "e7e697982d0c24e72a245e806267a55cc3dc61a9"
 contract_hash: "d9b64b7f9f68314124585963156a54897e499d708e5a23656c12967e95d47d26"
 changed_paths:
   - "scripts/validate-repo.rb"
@@ -82,6 +83,7 @@ residual_risks:
   - "Fresh critic approval is still required before integration."
   - "No runtime deployment is involved; merge success still needs normal GitHub checks."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-validator"
 completed_at: "2026-06-24T18:09:10Z"
 limitations:

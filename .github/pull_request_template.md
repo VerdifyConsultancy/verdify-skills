@@ -31,6 +31,10 @@ Closes #<!-- issue number -->
 |---|---|---|
 | `LANE-AC-01` | <!-- command/check/evidence ID --> | <!-- pass/fail --> |
 
+Implementation head SHA: `<!-- last substantive implementation SHA -->`
+
+Evidence head SHA: `pending`
+
 Current head SHA: `<!-- SHA -->`
 
 ## Risk and deployment impact
@@ -44,7 +48,8 @@ Current head SHA: `<!-- SHA -->`
 ## Checklist
 
 - [ ] One issue maps to this lane by default, or the approved coupling justification is linked.
-- [ ] Required validation ran against the current head SHA.
-- [ ] Worker closeout is committed or linked.
+- [ ] Required implementation validation ran against the Implementation head SHA.
+- [ ] Evidence head is either `pending` while current head equals I, or adds only the canonical closeout after I.
+- [ ] Final current head adds only the canonical critic report after E and will receive a distinct admin or maintainer approval before merge.
 - [ ] No secrets or sensitive runtime data are included.
 - [ ] I have not self-approved this change.

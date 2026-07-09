@@ -4,13 +4,13 @@ schema_version: "1.0"
 manifest_id: evidence-2026-06-22-a
 sprint_id: 2026-06-22-a
 lane_id: issue-123-api
-revision: "2222222222222222222222222222222222222222"
-environment: staging
-generated_at: "2026-06-22T13:45:00Z"
+revision: abcdef1234567890abcdef1234567890abcdef12
+environment: review
+generated_at: "2026-06-22T13:00:00Z"
 items:
   - id: EV-001
     type: test
-    source: ruby -Itest tests/api/health_test.rb
+    source: ruby -Itest tests/api/health_test.rb at implementation head I 2222222222222222222222222222222222222222
     observed_at: "2026-06-22T12:15:00Z"
     result: passed
     artifact: artifacts/api-test.log
@@ -18,17 +18,17 @@ items:
     limitations: [Does not prove staging configuration.]
   - id: EV-002
     type: diff_review
-    source: Pull request #456 at reviewed head SHA
-    observed_at: "2026-06-22T12:40:00Z"
+    source: "GitHub pull request #123 chain I 2222222222222222222222222222222222222222 -> E 3333333333333333333333333333333333333333 -> S abcdef1234567890abcdef1234567890abcdef12"
+    observed_at: "2026-06-22T12:55:00Z"
     result: passed
-    artifact: https://github.com/example/example-service/pull/456
-    interpretation: Changed paths remain inside the lane contract.
-    limitations: []
+    artifact: https://github.com/example/minimal-project/pull/123
+    interpretation: "PR #123 has substantive implementation at I, a closeout-only evidence commit at E, a critic-report-only commit at S, and a separate admin or maintainer approval on S."
+    limitations: [The external approval remains live GitHub evidence and must be rechecked before merge.]
   - id: EV-003
     type: runtime_probe
-    source: curl https://staging.example.test/health
-    observed_at: "2026-06-22T13:40:00Z"
+    source: curl https://issue-123-api.example.test/healthz at review head S abcdef1234567890abcdef1234567890abcdef12
+    observed_at: "2026-06-22T12:50:00Z"
     result: passed
-    artifact: artifacts/staging-health.json
-    interpretation: Staging reports healthy and the integrated revision.
-    limitations: [Single post-deployment observation.]
+    artifact: artifacts/review-health.json
+    interpretation: The review environment reports healthy at the exact externally approved lane head S.
+    limitations: [Single pre-merge observation; it does not prove the later integrated or production revision.]

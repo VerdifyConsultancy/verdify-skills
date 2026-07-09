@@ -1,8 +1,8 @@
 schema_ref: review-inbox-packet.schema.yaml
 kind: ReviewInboxPacket
-schema_version: "1.0"
+schema_version: "2.0"
 packet_id: review-2026-06-22-a-api
-status: ready
+status: approved
 scope:
   review_unit: lane
   sprint_id: 2026-06-22-a
@@ -13,8 +13,12 @@ scope:
 traceability:
   repository: example/minimal-project
   base_ref: main
-  head_ref: lane/issue-123-api
-  reviewed_head_sha: abcdef1234567890abcdef1234567890abcdef12
+  head_ref: controller/2026-06-22-a
+  review_submissions:
+  - pull_request: 123
+    review_submission_head_sha: abcdef1234567890abcdef1234567890abcdef12
+    reviewer_login: human-reviewer
+    reviewer_id: 12345
   artifact_paths:
   - .agent-workflow/sprints/2026-06-22-a/critic/issue-123-api.critic.yaml
   - .agent-workflow/sprints/2026-06-22-a/evidence/evidence-manifest.yaml
@@ -27,14 +31,14 @@ pull_requests:
   state: open
   author: example-agent
   requested_reviewers: [human-reviewer]
-  latest_review_state: pending
+  latest_review_state: approved
 checks:
 - name: validate
   provider: github_actions
   status: completed
   conclusion: success
   url: https://github.com/example/minimal-project/actions/runs/123
-  observed_at: "2026-06-22T12:00:00Z"
+  observed_at: "2026-06-22T12:55:00Z"
 deployments:
 - environment: review/issue-123-api
   environment_type: review
@@ -47,7 +51,7 @@ deployments:
   reconciliation_evidence:
   - Argo CD application minimal-project-issue-123-api is synced and healthy.
   log_url: https://logs.example.test/minimal-project/issue-123-api
-  observed_at: "2026-06-22T12:05:00Z"
+  observed_at: "2026-06-22T12:50:00Z"
 reviewer_guidance:
   human_test_steps:
   - Open the review URL and confirm `/healthz` returns ok.
@@ -97,7 +101,8 @@ questions:
 evidence_completeness:
   verdict: complete
   satisfied_required:
-  - PR identity and exact reviewed head SHA are present.
+  - PR identity, exact commit-bound review-submission head, reviewer login, and reviewer ID are present per lane.
+  - The latest effective review from the recorded admin or maintainer is APPROVED on critic-report head S.
   - Required CI check passed.
   - Review deployment and observed revision are present.
   - Rollback readiness is recorded.
@@ -108,8 +113,8 @@ recommendation:
   rationale: Required review evidence is complete for this example lane.
 feedback_route:
   route: release_verification
-  instructions: Proceed to release verification after human approval is recorded.
+  instructions: Merge the approved lane PR individually, then verify the integrated revision and runtime separately; do not merge the controller evidence branch.
   target_refs:
   - .agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml
-prepared_at: "2026-06-22T12:10:00Z"
+prepared_at: "2026-06-22T13:05:00Z"
 preparer: release-verifier

@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-lane-delivery-correctness
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 26
 pull_request: 55
 baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
-head_sha: "53c980888db3ee9b8fc577454d72895eb5365233"
+implementation_head_sha: "53c980888db3ee9b8fc577454d72895eb5365233"
+validated_head_sha: "53c980888db3ee9b8fc577454d72895eb5365233"
 contract_hash: "dff65bda30983ec62cd0e65e14469c8701678af594fd75972a0d20137706517b"
 changed_paths:
   - "skills/lane-delivery/SKILL.md"
@@ -96,6 +97,7 @@ residual_risks:
   - "Fresh independent critic approval is still required before integration."
   - "GitHub checks must be evaluated on the final pushed branch head after the closeout metadata commit."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-lanedeliv"
 completed_at: "2026-06-24T18:00:00Z"
 limitations:

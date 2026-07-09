@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-issue-action-boundary
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 11
 pull_request: 40
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "fe88344a0fbaa31d3822c6a28795e8c6cbcb2fb0"
+implementation_head_sha: "fe88344a0fbaa31d3822c6a28795e8c6cbcb2fb0"
+validated_head_sha: "fe88344a0fbaa31d3822c6a28795e8c6cbcb2fb0"
 contract_hash: "ce0f2879644e06c819f2b78c4fab398b38193c87c37ea3758f9890832e8a0ebf"
 changed_paths:
   - "docs/decisions/ADR-0014-state-of-union-vs-issue-triage-actions.md"
@@ -66,6 +67,7 @@ residual_risks:
   - "Fresh critic approval is still required before integration."
   - "ADR is not merged yet; self-merge is prohibited by lane policy."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-issueaction"
 completed_at: "2026-06-24T16:52:12Z"
 limitations:

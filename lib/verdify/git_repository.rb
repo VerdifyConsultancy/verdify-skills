@@ -18,6 +18,8 @@ module Verdify
         raise CommandError, "Command failed (#{command.shelljoin}): #{stderr.strip.empty? ? stdout.strip : stderr.strip}"
       end
       [stdout, stderr, status]
+    rescue Errno::ENOENT => e
+      raise CommandError, "Command not available: #{e.message}"
     end
 
     def output(*command)
@@ -30,6 +32,133 @@ module Verdify
 
     def head_sha(ref = "HEAD")
       git("rev-parse", "#{ref}^{commit}").first.strip
+    end
+
+    def commit_exists?(ref)
+      git("cat-file", "-e", "#{ref}^{commit}", allow_failure: true).last.success?
+    end
+
+    def ancestor?(ancestor, descendant)
+      git("merge-base", "--is-ancestor", ancestor.to_s, descendant.to_s, allow_failure: true).last.success?
+    end
+
+    def commit_parents(ref)
+      fields = git("rev-list", "--parents", "-n", "1", ref.to_s).first.strip.split
+      fields.drop(1)
+    end
+
+    def commits_between(ancestor, descendant)
+      return [] if ancestor.to_s == descendant.to_s
+
+      git("rev-list", "--reverse", "#{ancestor}..#{descendant}").first.lines.map(&:strip).reject(&:empty?)
+    end
+
+    def changed_paths(commit)
+      git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit.to_s).first.lines.map(&:strip).reject(&:empty?).uniq.sort
+    end
+
+    def tracked_paths(ref: "HEAD", pathspec: nil)
+      args = ["ls-tree", "-r", "--name-only", ref.to_s]
+      args.concat(["--", pathspec.to_s]) unless pathspec.to_s.empty?
+      git(*args).first.lines.map(&:strip).reject(&:empty?).uniq.sort
+    end
+
+    def last_change_sha(path, ref: "HEAD")
+      value = git("log", "-1", "--format=%H", ref.to_s, "--", path.to_s).first.strip
+      value.empty? ? nil : value
+    end
+
+    def file_at(ref, path)
+      git("show", "#{ref}:#{path}").first.b
+    end
+
+    def fetch_pull_request_head(number)
+      git("fetch", "--quiet", "origin", "pull/#{Integer(number)}/head")
+      head_sha("FETCH_HEAD")
+    end
+
+    def fetch_branch_head(branch)
+      git("fetch", "--quiet", "origin", "refs/heads/#{branch}")
+      head_sha("FETCH_HEAD")
+    end
+
+    def github_pull_request_evidence(number)
+      slug = github_slug
+      raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
+
+      pr = JSON.parse(output("gh", "api", "repos/#{slug}/pulls/#{Integer(number)}"))
+      rollup = JSON.parse(output("gh", "pr", "view", Integer(number).to_s, "--repo", slug, "--json", "author,baseRefName,headRefName,headRefOid,isDraft,mergeStateStatus,reviews,state,statusCheckRollup"))
+      final_pr = JSON.parse(output("gh", "api", "repos/#{slug}/pulls/#{Integer(number)}"))
+      observed_heads = [pr.dig("head", "sha"), rollup["headRefOid"], final_pr.dig("head", "sha")]
+      unless observed_heads.all? { |sha| sha.to_s.match?(/\A[0-9a-f]{40}\z/i) } && observed_heads.uniq.length == 1
+        raise CommandError, "Pull request head changed or was missing while evidence was being collected"
+      end
+      pr = final_pr
+      {
+        "number" => Integer(number),
+        "head_sha" => pr.dig("head", "sha"),
+        "head_ref" => rollup["headRefName"],
+        "base_ref" => rollup["baseRefName"],
+        "state" => rollup["state"],
+        "draft" => rollup["isDraft"],
+        "merged" => pr["merged"] == true || rollup["state"].to_s.upcase == "MERGED",
+        "merge_commit_sha" => pr["merge_commit_sha"],
+        "merge_state_status" => rollup["mergeStateStatus"],
+        "checks" => Array(rollup["statusCheckRollup"]).map do |check|
+          {
+            "id" => check["databaseId"] || check["id"] || check["detailsUrl"] || check["targetUrl"],
+            "name" => check["name"] || check["context"],
+            "status" => check["status"],
+            "conclusion" => check["conclusion"] || check["state"],
+            "workflow" => check["workflowName"],
+            "started_at" => check["startedAt"] || check["createdAt"],
+            "completed_at" => check["completedAt"] || check["updatedAt"]
+          }
+        end,
+        "author" => rollup.dig("author", "login"),
+        "author_id" => pr.dig("user", "id"),
+        "reviews" => Array(rollup["reviews"]).map do |review|
+          {
+            "id" => review["id"],
+            "state" => review["state"],
+            "commit_id" => review.dig("commit", "oid"),
+            "reviewer" => review.dig("author", "login"),
+            "submitted_at" => review["submittedAt"]
+          }
+        end
+      }
+    rescue JSON::ParserError, ArgumentError => e
+      raise CommandError, "Could not read GitHub pull request evidence: #{e.message}"
+    end
+
+    def github_collaborator_permission(login)
+      slug = github_slug
+      raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
+
+      payload = JSON.parse(output("gh", "api", "repos/#{slug}/collaborators/#{login}/permission"))
+      {
+        "permission" => payload["permission"],
+        "login" => payload.dig("user", "login"),
+        "id" => payload.dig("user", "id")
+      }
+    rescue JSON::ParserError => e
+      raise CommandError, "Could not read GitHub collaborator permission for #{login}: #{e.message}"
+    end
+
+    def github_pull_request_for_branch(branch)
+      slug = github_slug
+      raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
+
+      pr = JSON.parse(output("gh", "pr", "view", branch.to_s, "--repo", slug, "--json", "number,headRefOid"))
+      { "number" => pr["number"], "head_sha" => pr["headRefOid"] }
+    rescue JSON::ParserError => e
+      raise CommandError, "Could not find GitHub pull request for branch #{branch}: #{e.message}"
+    end
+
+    def remote_branch_sha(branch, remote: "origin")
+      output = git("ls-remote", "--heads", remote, "refs/heads/#{branch}").first.strip
+      sha = output.split.first
+      sha if sha&.match?(/\A[0-9a-f]{40}\z/i)
     end
 
     def current_branch

@@ -3,18 +3,19 @@ $id: https://verdify.example/schemas/lane-closeout.schema.yaml
 title: Verdify Lane Closeout
 type: object
 additionalProperties: false
-required: [schema_ref, kind, schema_version, sprint_id, lane_id, status, issue_ids, pull_request, baseline_sha, head_sha, contract_hash, changed_paths, validation_results, acceptance_evidence, discovered_issues, residual_risks, worktree_clean, worker_session_id, completed_at, limitations]
+required: [schema_ref, kind, schema_version, sprint_id, lane_id, status, issue_ids, pull_request, baseline_sha, implementation_head_sha, validated_head_sha, contract_hash, changed_paths, validation_results, acceptance_evidence, discovered_issues, residual_risks, worktree_clean, worker_agent, worker_session_id, completed_at, limitations]
 properties:
   schema_ref: {const: lane-closeout.schema.yaml}
   kind: {const: LaneCloseout}
-  schema_version: {const: "1.0"}
+  schema_version: {const: "2.0"}
   sprint_id: {type: string}
   lane_id: {type: string}
   status: {type: string, enum: [ready_for_critic, blocked, failed, decision_required]}
   issue_ids: {type: array, minItems: 1, items: {type: integer}}
   pull_request: {type: [integer, 'null'], minimum: 1}
-  baseline_sha: {type: string, minLength: 1}
-  head_sha: {type: string, minLength: 1}
+  baseline_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  implementation_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  validated_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
   contract_hash: {type: string, minLength: 1}
   changed_paths: {type: array, items: {type: string}}
   validation_results:
@@ -45,6 +46,7 @@ properties:
   discovered_issues: {type: array, items: {type: integer}}
   residual_risks: {type: array, items: {type: string}}
   worktree_clean: {type: boolean}
+  worker_agent: {type: string, minLength: 1}
   worker_session_id: {type: string, minLength: 1}
   completed_at: {type: string, minLength: 1}
   limitations: {type: array, items: {type: string}}

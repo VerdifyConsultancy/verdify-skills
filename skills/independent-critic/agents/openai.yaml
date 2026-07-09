@@ -1,6 +1,6 @@
 interface:
   display_name: "Verdify Independent Critic"
   short_description: "Fresh review of lane scope, code, and evidence"
-  default_prompt: "Independently review the assigned lane at its current PR head using a separate review worktree. Produce an evidence-backed critic decision and do not edit the worker branch."
+  default_prompt: "At closeout-only head E, verify approved dispatch D and independently review implementation I using a different agent, session, and detached worktree. Change only the canonical critic report, commit it as S, and hand S to a repository admin or maintainer other than the PR author for approval."
 policy:
   allow_implicit_invocation: false

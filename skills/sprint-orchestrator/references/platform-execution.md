@@ -111,8 +111,10 @@ Run the configured cadence, typically every five minutes:
    never as the durable source of truth.
 5. Answer questions that are inside the approved lane contract and delegated
    policy. Open gates for protected decisions.
-6. Route closeout to `independent-critic`, critic approval to
-   `release-verification` review-inbox mode, CI failure to the owning lane, and
+6. Route closeout-only E to an `independent-critic` with a different agent,
+   session, and worktree. Route report-only S to an external repository admin or
+   maintainer for commit-bound approval, then route approved S heads to
+   `release-verification` packet-only P. Route CI failure to the owning lane and
    deployment readiness gaps to `release-verification` or `platform-readiness`.
 7. Append controller and session-ledger events for each material transition.
 

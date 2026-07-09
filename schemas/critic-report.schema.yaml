@@ -3,14 +3,22 @@ $id: https://verdify.example/schemas/critic-report.schema.yaml
 title: Verdify Critic Report
 type: object
 additionalProperties: false
-required: [schema_ref, kind, schema_version, sprint_id, lane_id, reviewed_head_sha, critic_session_id, review_worktree, outcome, findings, acceptance_assessment, evidence_assessment, integration_risks, residual_risks, reviewed_at]
+required: [schema_ref, kind, schema_version, sprint_id, lane_id, pull_request, worker_agent, worker_session_id, critic_agent, implementation_head_sha, evidence_head_sha, reviewed_head_sha, closeout_path, closeout_sha256, critic_session_id, review_worktree, outcome, findings, acceptance_assessment, evidence_assessment, integration_risks, residual_risks, reviewed_at]
 properties:
   schema_ref: {const: critic-report.schema.yaml}
   kind: {const: CriticReport}
-  schema_version: {const: "1.0"}
+  schema_version: {const: "2.0"}
   sprint_id: {type: string}
   lane_id: {type: string}
-  reviewed_head_sha: {type: string, minLength: 1}
+  pull_request: {type: integer, minimum: 1}
+  worker_agent: {type: string, minLength: 1}
+  worker_session_id: {type: string, minLength: 1}
+  critic_agent: {type: string, minLength: 1}
+  implementation_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  evidence_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  reviewed_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  closeout_path: {type: string, pattern: '^\.agent-workflow/sprints/[^/]+/lanes/closeout/[^/]+\.closeout\.ya?ml$'}
+  closeout_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
   critic_session_id: {type: string, minLength: 1}
   review_worktree: {type: string, minLength: 1}
   outcome: {type: string, enum: [approve, approve_with_risks, request_fixes, block_integration, needs_human_review]}

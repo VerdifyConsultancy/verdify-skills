@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-skill-count-drift
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 19
 pull_request: 49
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "0a9bf4a8bbcc3eb5a921e4e6c85c57fcf6abf476"
+implementation_head_sha: "0a9bf4a8bbcc3eb5a921e4e6c85c57fcf6abf476"
+validated_head_sha: "0a9bf4a8bbcc3eb5a921e4e6c85c57fcf6abf476"
 contract_hash: "ce2a85875d4a21cbe1b11795edc25e67c309ad51f9cd9d1fcbb0f3a00e846dcc"
 changed_paths:
   - ".agent-workflow/northstar/NORTHSTAR_PRODUCT.md"
@@ -89,6 +90,7 @@ residual_risks:
   - "GitHub checks must be evaluated on the final pushed branch head after the closeout artifact commit."
   - "The exact broad no-stale-count command still finds one historical raw evidence-source line outside this lane's owned paths; governed planning-authority and owned documentation surfaces have no stale 'seventeen' assertions."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-countdrift"
 completed_at: "2026-06-24T17:30:00Z"
 limitations:

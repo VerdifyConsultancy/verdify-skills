@@ -9,11 +9,31 @@ jobs:
   pull-request-policy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out trusted policy engine from protected base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-policy
+          fetch-depth: 1
+      - name: Check out candidate head and full evidence history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          fetch-depth: 0
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
       - name: Check Verdify pull request contract
         env:
           GITHUB_EVENT_PATH: ${{ github.event_path }}
-        run: ruby scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH"
+        run: |
+          if ruby trusted-policy/scripts/pr-policy.rb --help | grep -q -- '--repo PATH'; then
+            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
+          else
+            # One-time bootstrap for the change that introduces trusted-candidate
+            # separation. The protected-base policy remains authoritative; the
+            # candidate validator is supplemental until this lands on dev.
+            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH"
+            ruby candidate/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
+          fi

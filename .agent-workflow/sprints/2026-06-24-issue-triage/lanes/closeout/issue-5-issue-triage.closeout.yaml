@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-issue-triage
 lane_id: issue-5-issue-triage
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 5
 pull_request: 6
 baseline_sha: "11470a91318d7c3102a6b5d1b49d8d839e0e26be"
-head_sha: "df1007b5d3ce4a29f7f100c072db090fbb4fccce"
+implementation_head_sha: "df1007b5d3ce4a29f7f100c072db090fbb4fccce"
+validated_head_sha: "df1007b5d3ce4a29f7f100c072db090fbb4fccce"
 contract_hash: "cd6c1626e6d71b0e2ef12983318886fe978bcb6bc8ebe0d9f172ac9b0a29b2c8"
 changed_paths:
   - ".agent-workflow/sprints/2026-06-24-issue-triage/lanes/contracts/issue-5-issue-triage.contract.yaml"
@@ -87,6 +88,7 @@ discovered_issues: []
 residual_risks:
   - "Fresh critic or reviewer approval is still required before integration."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-issue-5"
 completed_at: "2026-06-24T04:04:03Z"
 limitations:

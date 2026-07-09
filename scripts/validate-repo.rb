@@ -534,7 +534,15 @@ class RepoValidator
       error(template, "missing required section ## #{section}") unless body.match?(/^##\s+#{Regexp.escape(section)}\s*$/i)
     end
     error(template, "must include a closing issue keyword") unless body.match?(/Closes\s+#/i)
+    error(template, "must include implementation head SHA evidence") unless body.include?("Implementation head SHA")
+    error(template, "must include evidence head SHA evidence") unless body.include?("Evidence head SHA")
     error(template, "must include current head SHA evidence") unless body.include?("Current head SHA")
+
+    policy_workflow = ROOT.join(".github/workflows/policy.yml")
+    policy_body = policy_workflow.file? ? policy_workflow.read : ""
+    error(policy_workflow, "must check out the protected base policy engine") unless policy_body.include?("github.event.pull_request.base.sha") && policy_body.include?("path: trusted-policy")
+    error(policy_workflow, "must check out candidate history separately") unless policy_body.include?("path: candidate") && policy_body.include?("fetch-depth: 0")
+    error(policy_workflow, "must pass the candidate only as --repo input") unless policy_body.include?("trusted-policy/scripts/pr-policy.rb") && policy_body.include?("--repo \"$GITHUB_WORKSPACE/candidate\"")
 
     codeowners = ROOT.join(".github/CODEOWNERS")
     if codeowners.file? && codeowners.read.lines.any? { |line| line.strip.match?(/\A[^#].*@[\w-]+/) }
@@ -663,7 +671,14 @@ class RepoValidator
       closeout = load_yaml(closeout_path)
       critic = load_yaml(critic_path)
       error(critic_path, "critic session must differ from worker session") if critic["critic_session_id"] == closeout["worker_session_id"]
-      error(critic_path, "critic must review the closeout head SHA") unless critic["reviewed_head_sha"] == closeout["head_sha"]
+      error(critic_path, "critic agent must differ from worker agent") if critic["critic_agent"] == closeout["worker_agent"]
+      error(critic_path, "critic worker agent backlink must match closeout") unless critic["worker_agent"] == closeout["worker_agent"]
+      error(critic_path, "critic worker session backlink must match closeout") unless critic["worker_session_id"] == closeout["worker_session_id"]
+      error(critic_path, "critic implementation head must match closeout") unless critic["implementation_head_sha"] == closeout["implementation_head_sha"]
+      error(critic_path, "critic reviewed head must equal evidence head") unless critic["reviewed_head_sha"] == critic["evidence_head_sha"]
+      expected_closeout = ".agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml"
+      error(critic_path, "critic closeout path backlink is stale") unless critic["closeout_path"] == expected_closeout
+      error(critic_path, "critic closeout digest is stale") unless critic["closeout_sha256"] == Digest::SHA256.file(closeout_path).hexdigest
     end
   end
 
