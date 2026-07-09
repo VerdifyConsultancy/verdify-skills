@@ -1,0 +1,118 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-09-issue-72-exact-head
+status: approved
+scope:
+  sprint_id: 2026-07-09-issue-72-exact-head
+  issue_ids: [72]
+  lane_ids: [issue-72-exact-head-evidence]
+  northstar_ids: []
+  summary: Validate and integrate the exact-head evidence repair into the Verdify Skills development branch.
+  non_goals:
+    - Publish npm or promote dev to main as part of this lane.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: main
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-72
+  decision_notes: The lane PR targets dev; main receives only the separately generated release PR.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks:
+    - validate
+    - pull-request-policy
+    - compliance / compliance
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 30
+      evidence_expected:
+        - Repository validation, schema tests, and package tests pass.
+    - name: pull-request-policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected:
+        - Trusted-base policy validates the candidate evidence chain.
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected:
+        - Compliance self-test passes on the exact candidate head.
+  artifacts:
+    - Verdify Skills source and npm package preflight output.
+  required_events: [pull_request]
+environments:
+  - name: not-applicable
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: none
+    protection_rules: []
+    expected_revision_source: GitHub lane PR head SHA
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: []
+  remediation_policy: Package-policy changes do not mutate a runtime environment.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps: []
+observability:
+  dashboards: []
+  logs: []
+  metrics: []
+  traces: []
+  runtime_checks:
+    - Package installation and CLI smoke tests run in isolated temporary repositories.
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the dev merge before a generated release is promoted.
+  known_good_ref: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
+  procedure: Revert the issue #72 merge on dev and rerun the required package gates.
+  validation_steps:
+    - Confirm the reverted dev head passes validate, pull-request-policy, and compliance checks.
+release_health:
+  stabilization_window: null
+  signals:
+    - name: package gate
+      source: GitHub required checks
+      threshold: All configured checks succeed on the exact critic-report head.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-09-issue-72-exact-head/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Confirm the PR metadata names the implementation, closeout-evidence, and current critic-report heads.
+    - Confirm the latest external approval is by an admin or maintainer other than the PR author and is bound to the current head.
+    - Confirm the controller evidence branch contains no implementation paths.
+  approval_gate: Jason or James approves the exact final lane head before integration into dev.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A bootstrap policy error could either block the dev-to-main release path or admit stale evidence.
+    mitigation: Exercise trusted-base and separate-candidate checkouts, require exact current-head approval, and keep publication separate.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T20:28:34Z"
+prepared_at: "2026-07-09T20:28:34Z"
+planner: root

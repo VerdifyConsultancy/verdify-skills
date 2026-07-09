@@ -1,0 +1,97 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-09-issue-72-exact-head
+status: active
+goal: Repair lane evidence identity so implementation, closeout, critic, external approval, integration, deployment, and outcome revisions are independently verifiable.
+baseline_sha: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [72]
+scope:
+  - Replace the self-referential exact-head model with an implementation, evidence, critic-report, and external-review chain.
+  - Fail closed on stale or forged planning, gate, review, integration, deployment, and outcome evidence.
+  - Seed approved planning authority into worker branches before implementation.
+non_goals:
+  - Publish an npm release.
+  - Deploy a runtime service.
+  - Implement unrelated North Star recommendations.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: Version-2 closeout and critic artifacts separate implementation, evidence, report, worker, and critic identity.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [schema tests, migrated artifacts]
+  - id: SPR-AC-02
+    statement: Cross-document validation rejects self-review, stale heads, non-ancestor heads, and post-dispatch or post-review mutations.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [positive and adversarial evidence-chain tests]
+  - id: SPR-AC-03
+    statement: Trusted PR policy and live GitHub evidence bind the external approval and required checks to the current critic-report head.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [trusted two-checkout policy tests, fake-GitHub route tests]
+  - id: SPR-AC-04
+    statement: Router evaluation cannot advance through dirty, stale, forged, or phase-inappropriate lane and delivery evidence.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [router regression tests, controller-only clone tests]
+  - id: SPR-AC-05
+    statement: Operator documentation defines the evidence-only controller branch and separate integration and runtime verification phases.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [ADR, skill references, templates, examples]
+  - id: SPR-AC-06
+    statement: The repository validates with all historical closeouts migrated and the full package gate green.
+    lane_ids: [issue-72-exact-head-evidence]
+    evidence_expected: [repository validator, full test suite, manifest check]
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A partial migration could block existing pilot repositories or leave a bypass between lifecycle phases.
+    mitigation: Remove deprecated fields, test every phase transition, and file repo-local migration gaps before rollout.
+lanes:
+  - lane_id: issue-72-exact-head-evidence
+    issue_ids: [72]
+    contract_path: .agent-workflow/sprints/2026-07-09-issue-72-exact-head/lanes/contracts/issue-72-exact-head-evidence.contract.yaml
+    branch: lane/72-exact-head-evidence
+    owner: root
+    reviewer: fresh-independent-critic
+    summary: Implement and prove the repaired evidence chain and trusted routing gates.
+dependency_order:
+  - [issue-72-exact-head-evidence]
+deployment_expectations:
+  - No runtime deployment is required for this package-policy lane.
+  - Npm publication remains a separate generated dev-to-main release with Jason or James approval.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Exact evidence-chain and lifecycle transition validation
+      due: before external approval
+      evidence_expected:
+        - Full schema, CLI, PR-policy, release-preflight, and package tests pass.
+        - Fresh critic validates the immutable implementation/evidence/report chain.
+  human_review_milestones:
+    - id: HR-01
+      name: Independent current-head GitHub approval
+      owner: Jason or James
+      trigger: Critic-report-only head is pushed and all required checks pass.
+      review_packet_path: .agent-workflow/sprints/2026-07-09-issue-72-exact-head/review/review-inbox-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As a release approver, I can prove which implementation, closeout, critic report, checks, merge, deployment, and outcome were accepted.
+      issue_ids: [72]
+      lane_ids: [issue-72-exact-head-evidence]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05, SPR-AC-06]
+  reporting_summary:
+    included:
+      - Issue #72 evidence-chain repair, trusted policy bootstrap, router hardening, migrations, and documentation.
+    deferred:
+      - North Star iteration 25 lock and PR #122 rebase until this lane integrates.
+    ownership:
+      - lane_id: issue-72-exact-head-evidence
+        owner: root
+        responsibility: Implement, validate, publish, and obtain independent review for issue #72.
+    next_review: Fresh critic review followed by an external admin or maintainer approval on the exact final lane head.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T20:28:34Z"

@@ -1,0 +1,155 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-09-issue-72-exact-head
+lane_id: issue-72-exact-head-evidence
+title: Replace the impossible exact-head critic model with an explicit evidence chain
+status: approved
+issue_ids: [72]
+coupling_justification: null
+objective: Replace the ambiguous single-head lane review contract with a machine-enforced implementation, closeout-evidence, reviewed, and GitHub review-submission head model that cannot be bypassed by a worker or invalidated by self-referential Git hashes.
+desired_outcome: Consumer repositories fail closed when a worker self-reviews, a critic reviews stale substantive code, evidence commits contain unauthorized paths, or the GitHub review is submitted against a non-current head; valid closeout and critic evidence can be committed without claiming that a file knows its own containing commit SHA.
+non_goals:
+  - Change the one-issue, one-lane, one-branch, one-worktree, one-worker-session, and one-PR default.
+  - Add backward-compatibility aliases for the ambiguous v1 head fields.
+  - Change production deployment or package publication behavior.
+  - Implement unrelated North Star recommendations.
+baseline_sha: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
+branch: lane/72-exact-head-evidence
+module_contracts:
+  - COMMON_OPERATING_CONTRACT.md
+  - config/authority-matrix.yaml
+  - skills/lane-delivery/SKILL.md
+  - skills/independent-critic/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [lane evidence identity, critic independence, PR review policy, lifecycle routing]
+  owned_paths:
+    - AGENTS.md
+    - CLAUDE.md
+    - CONTRIBUTING.md
+    - COMMON_OPERATING_CONTRACT.md
+    - README.md
+    - .github/pull_request_template.md
+    - .github/workflows/policy.yml
+    - .agent-workflow/sprints/**
+    - docs/decisions/**
+    - docs/lifecycle.md
+    - docs/skills/**
+    - docs/sprint-plans/**
+    - examples/minimal-project/**
+    - evaluations/release-verification/evals.json
+    - schemas/lane-closeout.schema.yaml
+    - schemas/critic-report.schema.yaml
+    - schemas/review-inbox-packet.schema.yaml
+    - skills/lane-delivery/**
+    - skills/independent-critic/**
+    - skills/controller-merge/**
+    - skills/controller-loop/assets/loop-record.recoverable-failure.example.yaml
+    - skills/release-verification/**
+    - skills/sprint-planning/assets/wave-release-plan.template.yaml
+    - skills/sprint-planning/references/review-and-reporting.md
+    - skills/sprint-orchestrator/**
+    - lib/verdify.rb
+    - lib/verdify/cli.rb
+    - lib/verdify/git_repository.rb
+    - lib/verdify/semantic_validator.rb
+    - lib/verdify/lane_review_validator.rb
+    - scripts/pr-policy.rb
+    - scripts/validate-repo.rb
+    - tests/test_cli.sh
+    - tests/test_lane_review_validator.rb
+    - tests/test_pr_policy.sh
+    - tests/test_router_gate_bypass.sh
+    - tests/test_schema_validator.rb
+    - MANIFEST.sha256
+  prohibited_paths:
+    - npm/**
+    - package.json
+    - VERSION
+    - .github/workflows/release-pr.yml
+    - skills/northstar-planning/**
+  coordination_required_paths:
+    - config/github-primitives.yaml
+  owned_interfaces: [LaneCloseout v2, CriticReport v2, lane evidence-chain validation, implementation PR head metadata]
+dependencies:
+  hard: []
+  soft:
+    - lane_id: issue-119-northstar-review-feedback
+      coordination: PR #122 remains draft until this contract is integrated, rebased, and re-reviewed under the repaired evidence model.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: LaneCloseout and CriticReport use explicit version-2 fields for implementation, closeout evidence, reviewed, worker, and critic identity without retaining the ambiguous closeout head_sha contract.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [schema tests, migrated templates and examples, old-field rejection]
+  - id: LANE-AC-02
+    statement: Cross-document validation rejects a critic session equal to the worker session, mismatched implementation/evidence/reviewed heads, non-ancestor heads, and substantive changes after the implementation head.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [positive and negative evidence-chain tests, consumer-repo fixture]
+  - id: LANE-AC-03
+    statement: Standard implementation PR policy requires and validates explicit implementation, evidence, and exact current head metadata against the Git ancestry and evidence-only paths, while each authoritative review-submission head remains an external commit-bound GitHub review by an actor other than the PR author and must equal that lane's current PR head.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [PR policy tests, template and AGENTS.md inspection]
+  - id: LANE-AC-04
+    statement: Lane review and route evaluation run the cross-document rule so invalid critic evidence cannot advance to review inbox or integration.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [CLI/router regression tests, invalid-route fixture]
+  - id: LANE-AC-05
+    statement: The workflow documents the only valid sequence from implementation commit through closeout evidence, critic review, report-only commit, and GitHub review submission on the final current head.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [ADR, lane-delivery and independent-critic instructions]
+  - id: LANE-AC-06
+    statement: Repository validation and the full test suite pass with all tracked closeout/critic artifacts migrated to the new contract.
+    sprint_acceptance_ids: [SPR-AC-06]
+    evidence_required: [validate-repo output, full test output, clean diff]
+validation_commands:
+  - id: schema-tests
+    command: ruby tests/test_schema_validator.rb
+    purpose: Prove artifact and semantic invariants.
+    required: true
+  - id: cli-tests
+    command: bash tests/test_cli.sh
+    purpose: Prove lane review and router enforcement.
+    required: true
+  - id: pr-policy-tests
+    command: bash tests/test_pr_policy.sh
+    purpose: Prove exact PR head metadata enforcement.
+    required: true
+  - id: repo-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate repository-wide artifact and instruction coherence.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run the complete package gate.
+    required: true
+required_evidence:
+  - Schema-valid version-2 closeout and critic fixtures.
+  - Negative tests for self-review, stale implementation, invalid evidence paths, and stale review-submission head.
+  - Exact PR head and GitHub review-submission policy evidence.
+  - Full changed-path and historical-artifact migration audit.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The solution requires weakening fresh-critic independence or allowing substantive post-review changes.
+  - GitHub review identity cannot be reconciled without a manual exception.
+  - The change requires package publication, production mutation, or another issue's implementation scope.
+definition_of_done:
+  - Every acceptance criterion has durable evidence.
+  - The branch is pushed and linked to one draft PR targeting dev.
+  - A fresh critic reviews the final evidence chain from a separate session and worktree.
+  - Integration occurs only after current-head checks and the authorized review decision agree.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T20:28:34Z"
