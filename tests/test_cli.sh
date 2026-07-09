@@ -288,10 +288,61 @@ ruby -rtime -ryaml -e '
   "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" "$BASE"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" >/dev/null
 
+# Publish the approved sprint/wave/contract transaction before dispatch. Lane
+# creation copies this exact committed authority snapshot into each worker
+# branch as a dispatch-only commit before implementation begins.
+mkdir -p "$REPO/.agent-workflow/sprints/sprint-a/release"
+ruby -rtime -ryaml -e '
+  plan_src, wave_src, plan_dst, wave_dst, baseline = ARGV
+  plan = YAML.safe_load(File.read(plan_src), permitted_classes: [], aliases: false)
+  plan["sprint_id"] = "sprint-a"
+  plan["status"] = "active"
+  plan["baseline_sha"] = baseline
+  plan["github"]["repository"] = "example/test"
+  plan["issue_ids"] = [123, 124]
+  first = plan["lanes"].first
+  first["lane_id"] = "issue-123-api"
+  first["issue_ids"] = [123]
+  first["contract_path"] = ".agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml"
+  first["branch"] = "lane/123-health-api"
+  second = first.dup
+  second["lane_id"] = "issue-124-race"
+  second["issue_ids"] = [124]
+  second["contract_path"] = ".agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml"
+  second["branch"] = "lane/124-race"
+  plan["lanes"] = [first, second]
+  plan["acceptance_criteria"].first["lane_ids"] = ["issue-123-api", "issue-124-race"]
+  plan["dependency_order"] = [["issue-123-api", "issue-124-race"]]
+  plan["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
+  File.write(plan_dst, YAML.dump(plan))
+
+  wave = YAML.safe_load(File.read(wave_src), permitted_classes: [], aliases: false)
+  wave["wave_id"] = "wave-sprint-a"
+  wave["scope"]["sprint_id"] = "sprint-a"
+  wave["scope"]["issue_ids"] = [123, 124]
+  wave["scope"]["lane_ids"] = ["issue-123-api", "issue-124-race"]
+  wave["github"]["repository"] = "example/test"
+  wave["branch_model"]["base_ref"] = "main"
+  wave["github"]["required_checks"] = ["validate"]
+  wave["review_handoff"]["expected_review_packet_path"] = ".agent-workflow/sprints/sprint-a/review/review-inbox-packet.yaml"
+  wave["status"] = "approved"
+  wave["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
+  File.write(wave_dst, YAML.dump(wave))
+' "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml" \
+  "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/wave-release-plan.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/sprint-plan.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/release/wave-release-plan.yaml" "$BASE"
+git -C "$REPO" add .agent-workflow/sprints/sprint-a
+git -C "$REPO" commit -qm "approve sprint dispatch transaction"
+
 WORKTREE="$TMP/worker"
 "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-123-api --issue 123 \
   --session-id worker-test --agent test-agent --path "$WORKTREE" >/dev/null
 [[ -d "$WORKTREE" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/sprint-plan.yaml" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/release/wave-release-plan.yaml" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" ]]
+git -C "$WORKTREE" diff-tree --no-commit-id --name-only -r HEAD | grep -Fx '.agent-workflow/sprints/sprint-a/sprint-plan.yaml' >/dev/null
 "$ROOT/bin/verdify" lane inspect --repo "$REPO" --lease-id issue-123-api > "$TMP/lease.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["role"] == "worker" && d["worktree_exists"]' "$TMP/lease.json"
 
@@ -387,13 +438,60 @@ ruby -rjson -e '
 [[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.md" ]]
 [[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.manifest.json" ]]
 
+mkdir -p "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts"
+cp "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" \
+  "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml"
+printf 'implemented\n' > "$WORKTREE/implementation.txt"
+git -C "$WORKTREE" add implementation.txt .agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml
+git -C "$WORKTREE" commit -qm "implement lane"
+IMPLEMENTATION_HEAD="$(git -C "$WORKTREE" rev-parse HEAD)"
+mkdir -p "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/closeout"
+ruby -rdigest -rtime -ryaml -e '
+  path, contract, baseline, implementation = ARGV
+  document = {
+    "schema_ref"=>"lane-closeout.schema.yaml",
+    "kind"=>"LaneCloseout",
+    "schema_version"=>"2.0",
+    "sprint_id"=>"sprint-a",
+    "lane_id"=>"issue-123-api",
+    "status"=>"ready_for_critic",
+    "issue_ids"=>[123],
+    "pull_request"=>456,
+    "baseline_sha"=>baseline,
+    "implementation_head_sha"=>implementation,
+    "validated_head_sha"=>implementation,
+    "contract_hash"=>Digest::SHA256.file(contract).hexdigest,
+    "changed_paths"=>["implementation.txt"],
+    "validation_results"=>[{"id"=>"test", "command"=>"true", "exit_status"=>0, "result"=>"passed", "executed_at"=>Time.now.utc.iso8601, "artifact"=>nil}],
+    "acceptance_evidence"=>[{"criterion_id"=>"LANE-AC-01", "evidence_ids"=>["test"], "assessment"=>"satisfied"}],
+    "discovered_issues"=>[],
+    "residual_risks"=>[],
+    "worktree_clean"=>true,
+    "worker_agent"=>"test-agent",
+    "worker_session_id"=>"worker-test",
+    "completed_at"=>Time.now.utc.iso8601,
+    "limitations"=>[]
+  }
+  File.write(path, YAML.dump(document))
+' "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/closeout/issue-123-api.closeout.yaml" \
+  "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" "$BASE" "$IMPLEMENTATION_HEAD"
+git -C "$WORKTREE" add .agent-workflow/sprints/sprint-a/lanes/closeout/issue-123-api.closeout.yaml
+git -C "$WORKTREE" commit -qm "record worker closeout"
+
+# Independence comes from the committed closeout, even after the worker lease is released.
+"$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id issue-123-api --session-id worker-test >/dev/null
+if "$ROOT/bin/verdify" lane review --repo "$REPO" --lane-id issue-123-api \
+  --session-id worker-test --agent test-agent --path "$TMP/self-review" >/dev/null 2>&1; then
+  echo "expected self-review to be rejected without relying on an active worker lease" >&2
+  exit 1
+fi
+
 REVIEW="$TMP/review"
 "$ROOT/bin/verdify" lane review --repo "$REPO" --lane-id issue-123-api \
   --session-id critic-test --agent critic-agent --path "$REVIEW" >/dev/null
 [[ -d "$REVIEW" ]]
 CRITIC_LEASE="critic-issue-123-api-critic-test"
 "$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id "$CRITIC_LEASE" --session-id critic-test >/dev/null
-"$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id issue-123-api --session-id worker-test >/dev/null
 [[ ! -e "$WORKTREE" ]]
 [[ ! -e "$REVIEW" ]]
 

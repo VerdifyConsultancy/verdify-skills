@@ -1,13 +1,14 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-25-first-pilot
 lane_id: issue-69-pr-policy
 status: ready_for_critic
 issue_ids: [69]
 pull_request: 78
 baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
-head_sha: "765e47369e4bab2f43cebc454ba07678fd6904a7"
+implementation_head_sha: "765e47369e4bab2f43cebc454ba07678fd6904a7"
+validated_head_sha: "765e47369e4bab2f43cebc454ba07678fd6904a7"
 contract_hash: "cc901993944e2a2dd7a959c1f7a5695841962a67115de5748ae232f14071db27"
 changed_paths:
   - scripts/pr-policy.rb
@@ -42,6 +43,7 @@ residual_risks:
   - Optional body head SHA weakens the anti-stale signal for lane PRs; mitigated because the SHA is still verified when present (regression-tested) and the gate receives the true head from the event payload.
   - Exempt labels are applied by humans/agents with triage rights; a mislabelled code PR would bypass the full lane contract. Release PRs (dev->main) can never be demoted by labels (regression-tested).
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: claude-fix-20260701T2
 completed_at: "2026-07-01T21:00:00Z"
 limitations:
@@ -57,7 +59,7 @@ limitations:
     action; no other lane currently owns that file. Recorded here because the
     contract schema has no coordination field.
   - >-
-    FIND-003 head-SHA bookkeeping: head_sha above is the last substantive
+    FIND-003 head-SHA bookkeeping: implementation_head_sha above is the last substantive
     commit (765e4736). Committing this closeout advances the branch by exactly
     one commit that touches only this .agent-workflow closeout file; the
     post-closeout head SHA is recorded in a PR #78 comment immediately after

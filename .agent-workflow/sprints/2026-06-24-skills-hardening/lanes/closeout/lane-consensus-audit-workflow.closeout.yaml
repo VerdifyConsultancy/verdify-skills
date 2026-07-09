@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-consensus-audit-workflow
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 3
 pull_request: 62
 baseline_sha: "8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6"
-head_sha: "23827a835730867c879842e39d942fdef05a3849"
+implementation_head_sha: "23827a835730867c879842e39d942fdef05a3849"
+validated_head_sha: "23827a835730867c879842e39d942fdef05a3849"
 contract_hash: "fbc95d824e5e8fc34c7ff45e846543e8220a02b23eaef9d226be01d924684c02"
 changed_paths:
   - ".agents/skills/consensus-audit-workflow"
@@ -72,8 +73,9 @@ residual_risks:
   - "GitHub checks must be evaluated on the final pushed branch head after the closeout artifact commit."
   - "The new review packet is documented as a skill-owned format and template, not a shared schema; a future lane can promote it to a schema if consumers need machine validation."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-consaudit"
 completed_at: "2026-06-24T18:59:48Z"
 limitations:
   - "The approved prompt embedded an older baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is 8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6 after upstream lifecycle and validator lanes merged, so this closeout records the active lease baseline."
-  - "The head_sha records the implementation commit before this closeout-only artifact commit; the pull request records the current branch head after closeout is pushed."
+  - "The implementation_head_sha records the implementation commit before this closeout-only artifact commit; the pull request records the current branch head after closeout is pushed."

@@ -1,6 +1,6 @@
 ---
 name: release-verification
-description: Assembles review-ready evidence packets, records observability diagnostics for planning/review/release health, integrates critic-approved lanes, validates the whole system, verifies the intended revision in an authorized deployment environment, and completes human outcome review. Use after critic review, when a lane or wave claims review-ready status, when planning or state-of-union needs live deployment/log health evidence, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
+description: Assembles review-ready evidence packets, records observability diagnostics for planning/review/release health, integrates externally approved lane heads, validates the whole system, verifies the intended revision in an authorized deployment environment, and completes human outcome review. Use after critic review, when a lane or wave claims review-ready status, when planning or state-of-union needs live deployment/log health evidence, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
 compatibility: Requires fresh integration context, GitHub checks/reviews, repository release tooling, and separately authorized deployment access. Production credentials must not come from worker lanes.
 metadata:
   author: Verdify
@@ -13,14 +13,19 @@ Combine accepted lane outputs, prove runtime reality, and close the human outcom
 
 ## Mode 0: review inbox packet
 
-1. Verify PR or merge request identity, exact reviewed head SHA, linked issues,
-   lane/sprint IDs, North Star IDs, critic report, checks, preview or review
-   deployment, telemetry, rollback, risks, and open human questions.
+1. Verify each lane's dispatch D, PR identity, I/E/S chain, distinct worker/critic agent and
+   session identities, exact critic-report head S, and distinct repository
+   admin/maintainer's latest effective `APPROVED` review on S, plus linked
+   issues, lane/sprint IDs, North Star IDs, checks, preview or review deployment,
+   telemetry, rollback, risks, and open human questions.
 2. Block review-ready status when the exact SHA, required checks, required
    preview/review deployment, critical security disposition, rollback evidence,
    or reviewer test steps are missing.
-3. Write `.agent-workflow/sprints/<sprint-id>/review/review-inbox-packet.yaml`
-   and validate against `../../schemas/review-inbox-packet.schema.yaml`.
+3. On the evidence-only pushed `controller/<sprint-id>` branch, write
+   `.agent-workflow/sprints/<sprint-id>/review/review-inbox-packet.yaml`, validate
+   it against `../../schemas/review-inbox-packet.schema.yaml`, and commit it as
+   the only changed path in packet commit P. Do not use this branch as an
+   integration candidate.
 4. Route the recommendation to `approve`, `request_changes`, `reject`, or
    `escalate`; route follow-up to fix lane, replan, architecture review,
    release verification, human signoff, issue creation, or hold.
@@ -45,8 +50,10 @@ Read `references/observability-diagnostics.md`.
 ## Mode 1: integration
 
 1. Start a fresh integration session.
-2. Verify every required lane has current critic approval, required checks, clean issue/contract reconciliation, and no unresolved blocker.
-3. Determine dependency-aware merge order. Use the repository merge queue when configured.
+2. Using a protected-base or atomically installed validator, verify every required lane has a valid implementation/evidence/critic-report chain, a distinct admin/maintainer's latest `APPROVED` GitHub review on the live final PR head, live `SUCCESS` for every configured required check, clean issue/contract reconciliation, and no unresolved blocker.
+3. Determine dependency-aware merge order. Merge or queue every lane PR
+   individually against its approved base; never merge the controller evidence
+   branch. Use the repository merge queue when configured.
 4. Resolve conflicts without violating lane/module contracts; material conflict-driven redesign returns to planning or architecture.
 5. Run full-system, cross-module, migration, packaging, security, and release validation required by the sprint.
 6. Produce release notes, known issues, integrated commit SHA, artifact/image identity, and rollback prerequisites.
@@ -82,6 +89,7 @@ session-ledger events.
 ## Boundaries
 
 - A merged PR is not deployment proof.
+- A controller evidence branch is not an integration candidate.
 - A healthy process is not acceptance proof.
 - Do not let the worker self-deploy with production credentials.
 - Do not close unresolved follow-up work by hiding it in release notes.

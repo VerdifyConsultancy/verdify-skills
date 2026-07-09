@@ -9,7 +9,8 @@
 Turns an **approved sprint** into running lane work: builds the execution runbook,
 dispatches one worker session per dependency-ready lane through the Agent Platform,
 monitors durable lane events on a polling cadence, reconciles GitHub vs lease vs
-contract, and routes completed lanes to criticism, review inbox, and release
+contract, and routes closeout-only E heads to distinct critic agents/sessions,
+then externally approved report-only S heads to packet commit P and release
 verification.
 
 ## When to use / when not
@@ -71,9 +72,10 @@ sequenceDiagram
         LD-->>SO: durable events (status, blocker, closeout)
         SO->>SO: reconcile + persist status events
     end
-    SO->>IC: route closeout to fresh critic
-    IC-->>SO: approve / request fixes
-    SO->>SO: all lanes approved → release-verification
+    SO->>IC: route closeout-only E to fresh critic agent/session
+    IC-->>SO: report-only S / request fixes
+    SO->>GH: observe distinct admin/maintainer approval on S
+    SO->>SO: all S heads approved → packet-only P → release-verification
 ```
 
 ## Gates & stop conditions
@@ -95,7 +97,8 @@ execution substrate.
 
 - **Upstream:** `sprint-planning` (approved plan), `controller-loop` (durable state).
 - **Downstream:** `lane-delivery` (ready worker) · fresh `independent-critic`
-  (closeout) · `release-verification` (all lanes approved) · `sprint-planning`
+  (closeout E) · `release-verification` (all S heads have external approval;
+  create evidence-only packet P, then merge lane PRs individually) · `sprint-planning`
   (material replan) · `platform-readiness` / gate owner (CI/CD or readiness gap).
 
 ## References

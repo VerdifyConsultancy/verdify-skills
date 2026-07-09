@@ -112,7 +112,7 @@ than trusting free-form chat narratives:
 - scope-change request;
 - coordination request across lanes;
 - worker closeout;
-- critic changes requested or approval;
+- critic outcome, report-only head S, or external admin/maintainer review change;
 - CI failure;
 - review deployment readiness;
 - terminal/session loss;
@@ -150,9 +150,12 @@ Read `references/github-reconciliation.md`.
 ## Handoffs
 
 - Ready worker -> `lane-delivery`
-- Worker closeout -> fresh `independent-critic`
+- Worker closeout-only E -> fresh `independent-critic` with a different agent,
+  session, and worktree
 - Critic changes requested -> original or newly leased `lane-delivery` session per policy
-- All required lanes approved -> `release-verification` review-inbox packet mode
+- Every required lane has a valid dispatch D and I/E/S chain, live checks, and external
+  admin/maintainer approval on S -> `release-verification` packet-only P on the
+  evidence-only controller branch, then individual lane-PR integration
 - CI/CD or deployment readiness gap -> `release-verification`,
   `platform-readiness`, or a gate owner according to the runbook
 - Material replan -> `sprint-planning`

@@ -30,4 +30,6 @@ bin/verdify lane create \
 
 The controller records the lease, prompt manifest, PR, validation results, and
 closeout. The lane is not review-ready until the worker closeout is valid and a
-fresh critic has reviewed the current PR head.
+fresh critic with a different agent/session has reviewed closeout-only E and
+committed only the critic report as S. Integration still requires a separate
+admin/maintainer approval on S and packet-only P.

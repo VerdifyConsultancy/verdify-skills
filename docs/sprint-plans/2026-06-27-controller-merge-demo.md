@@ -14,12 +14,16 @@ This demo describes the reconciliation path for the Ship Verify P0 skill PRs.
 
 ## Reconciliation
 
-1. Validate closeout and critic report.
-2. Confirm PR body lane, contract, and current head SHA.
-3. Confirm GitHub checks and note whether failures are implementation failures
+1. Validate implementation I, closeout-only E, and critic-report-only S; require
+   different worker/critic agents and sessions.
+2. Confirm PR body lane, contract, I/E/S metadata, and exact final S head.
+3. Confirm a repository admin or maintainer other than the PR author has the
+   latest effective `APPROVED` review on S.
+4. Confirm GitHub checks and note whether failures are implementation failures
    or release-target policy caveats.
-4. Confirm mergeability and shared registration conflicts.
-5. Return `merge_ready`, `return_for_fix`, or `blocked`.
+5. Confirm packet-only P, mergeability, and shared registration conflicts.
+6. Return `merge_ready`, `return_for_fix`, or `blocked`; merge the lane PR
+   individually, never the controller evidence branch.
 
 ## Expected Output
 

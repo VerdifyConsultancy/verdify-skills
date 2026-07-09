@@ -179,11 +179,15 @@ module Verdify
 
     def validate_lane_closeout(document, errors)
       validate_sha(document["baseline_sha"], "$.baseline_sha", errors)
-      validate_sha(document["head_sha"], "$.head_sha", errors)
+      validate_sha(document["implementation_head_sha"], "$.implementation_head_sha", errors)
+      validate_sha(document["validated_head_sha"], "$.validated_head_sha", errors)
       return unless document["status"] == "ready_for_critic"
 
       errors << "$.pull_request: ready_for_critic requires a pull request" if document["pull_request"].nil?
       errors << "$.worktree_clean: ready_for_critic requires a clean worktree" unless document["worktree_clean"] == true
+      unless document["validated_head_sha"] == document["implementation_head_sha"]
+        errors << "$.validated_head_sha: ready_for_critic validation must apply to implementation_head_sha"
+      end
       Array(document["validation_results"]).each_with_index do |result, index|
         errors << "$.validation_results[#{index}]: ready_for_critic requires passed validation" unless result["result"] == "passed" && result["exit_status"].to_i.zero?
       end
@@ -193,7 +197,18 @@ module Verdify
     end
 
     def validate_critic_report(document, errors)
+      validate_sha(document["implementation_head_sha"], "$.implementation_head_sha", errors)
+      validate_sha(document["evidence_head_sha"], "$.evidence_head_sha", errors)
       validate_sha(document["reviewed_head_sha"], "$.reviewed_head_sha", errors)
+      if document["critic_session_id"] == document["worker_session_id"]
+        errors << "$.critic_session_id: critic session must differ from worker session"
+      end
+      if document["critic_agent"] == document["worker_agent"]
+        errors << "$.critic_agent: critic agent must differ from worker agent"
+      end
+      unless document["reviewed_head_sha"] == document["evidence_head_sha"]
+        errors << "$.reviewed_head_sha: must equal evidence_head_sha"
+      end
       return unless %w[approve approve_with_risks].include?(document["outcome"])
 
       Array(document["acceptance_assessment"]).each_with_index do |assessment, index|

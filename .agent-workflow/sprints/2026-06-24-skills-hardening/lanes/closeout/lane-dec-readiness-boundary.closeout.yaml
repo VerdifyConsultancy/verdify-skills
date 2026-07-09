@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-readiness-boundary
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 10
 pull_request: 38
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "03fc78dd2f9834931dff483e3c1f989a08ffaf50"
+implementation_head_sha: "03fc78dd2f9834931dff483e3c1f989a08ffaf50"
+validated_head_sha: "03fc78dd2f9834931dff483e3c1f989a08ffaf50"
 contract_hash: "d324a53750433c11e6f7d233bd21b02537a8b1987f17eea99872938b81c0f62e"
 changed_paths:
   - "docs/decisions/ADR-0013-platform-vs-gravity-readiness-boundary.md"
@@ -69,8 +70,9 @@ residual_risks:
   - "Fresh critic or reviewer approval is still required before integration."
   - "Worker authority stops at the pushed pull request; self-merge is not allowed."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-readiness"
 completed_at: "2026-06-24T16:47:00Z"
 limitations:
-  - "The closeout head_sha records the implementation commit before closeout-only metadata commits; the pull request body records the final branch head after closeout is pushed."
+  - "The closeout implementation_head_sha records the implementation commit before closeout-only metadata commits; the pull request body records the final branch head after closeout is pushed."
   - ".verdify/ dispatch metadata is intentionally not part of the pull request."

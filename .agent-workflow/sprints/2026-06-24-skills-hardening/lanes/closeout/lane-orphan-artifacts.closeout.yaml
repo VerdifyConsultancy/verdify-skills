@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-orphan-artifacts
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 29
 pull_request: 48
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "3374f0a1f8776ab4a1cd97a7f83f453f35005abd"
+implementation_head_sha: "3374f0a1f8776ab4a1cd97a7f83f453f35005abd"
+validated_head_sha: "3374f0a1f8776ab4a1cd97a7f83f453f35005abd"
 contract_hash: "c0d826af94680ea577363a440173cdd490b9b6759bb71c89bbd559e4d0eb5473"
 changed_paths:
   - "config/authority-matrix.yaml"
@@ -86,6 +87,7 @@ residual_risks:
   - "Fresh critic review is still required before integration."
   - "No runtime deployment target exists for this lane; deployment verification is not applicable to these lifecycle skill, schema, and policy documentation changes."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-orphan"
 completed_at: "2026-06-24T17:29:09Z"
 limitations:

@@ -111,6 +111,61 @@ class SchemaValidatorTest < Minitest::Test
     assert else_errors.any? { |e| e.include?("missing required property \"note\"") }
   end
 
+  def test_lane_closeout_v2_rejects_ambiguous_v1_head_field
+    closeout = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml")
+    )
+    closeout["schema_version"] = "1.0"
+    closeout["head_sha"] = closeout.delete("implementation_head_sha")
+    schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/lane-closeout.schema.yaml"))
+
+    errors = validator.validate(closeout, schema)
+
+    assert errors.any? { |error| error.include?("implementation_head_sha") }
+    assert errors.any? { |error| error.include?("unexpected property \"head_sha\"") }
+    assert errors.any? { |error| error.include?("expected constant \"2.0\"") }
+  end
+
+  def test_critic_v2_requires_worker_backlink_and_distinct_session
+    critic = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/critic/issue-123-api.critic.yaml")
+    )
+    critic["critic_session_id"] = critic["worker_session_id"]
+
+    errors = Verdify::SemanticValidator.validate(critic)
+
+    assert errors.any? { |error| error.include?("critic session must differ from worker session") }
+  end
+
+  def test_review_packet_v2_rejects_deprecated_reviewed_head_field
+    packet = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml")
+    )
+    packet["schema_version"] = "1.0"
+    packet["traceability"]["reviewed_head_sha"] = packet["traceability"].delete("review_submissions").first["review_submission_head_sha"]
+    schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/review-inbox-packet.schema.yaml"))
+
+    errors = validator.validate(packet, schema)
+
+    assert errors.any? { |error| error.include?("review_submissions") }
+    assert errors.any? { |error| error.include?("unexpected property \"reviewed_head_sha\"") }
+  end
+
+  def test_review_packet_v2_supports_one_submission_per_lane
+    packet = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml")
+    )
+    packet["traceability"]["review_submissions"] << {
+      "pull_request" => 124,
+      "review_submission_head_sha" => "1" * 40,
+      "reviewer_login" => "second-maintainer",
+      "reviewer_id" => 54321
+    }
+    schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/review-inbox-packet.schema.yaml"))
+
+    assert_empty validator.validate(packet, schema)
+  end
+
   def test_validate_repo_checks_cross_skill_reference_tokens
     repo_validator = RepoValidator.new
     skill = Verdify::ROOT.join("skills/release-verification/SKILL.md")

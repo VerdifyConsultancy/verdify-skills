@@ -1,9 +1,17 @@
 schema_ref: critic-report.schema.yaml
 kind: CriticReport
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-22-a
 lane_id: issue-123-api
-reviewed_head_sha: "2222222222222222222222222222222222222222"
+pull_request: 123
+worker_agent: example-worker
+worker_session_id: codex-20260622-001
+critic_agent: example-critic
+implementation_head_sha: "2222222222222222222222222222222222222222"
+evidence_head_sha: "3333333333333333333333333333333333333333"
+reviewed_head_sha: "3333333333333333333333333333333333333333"
+closeout_path: .agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml
+closeout_sha256: "fb9440f4b255d9fe06cc4c026601e403646d733d290c5e2aefe2f5b689d5a11d"
 critic_session_id: critic-20260622-001
 review_worktree: /tmp/example-review/issue-123-api
 outcome: approve_with_risks
@@ -16,9 +24,9 @@ findings:
 acceptance_assessment:
   - criterion_id: LANE-AC-01
     assessment: satisfied
-    evidence: ["EV-001", "EV-002", "PR #456 required checks"]
+    evidence: ["EV-001", "EV-002", "PR #123 required checks"]
 evidence_assessment:
-  - Worker evidence identifies the reviewed head SHA.
+  - Worker validation is bound to implementation head I; evidence head E adds only the canonical closeout, and this report reviews E before its report-only commit becomes S.
 integration_risks:
   - Ensure artifact build uses the same revision field exercised by tests.
 residual_risks:

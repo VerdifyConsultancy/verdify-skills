@@ -7,7 +7,7 @@ required: [schema_ref, kind, schema_version, packet_id, status, scope, traceabil
 properties:
   schema_ref: {const: review-inbox-packet.schema.yaml}
   kind: {const: ReviewInboxPacket}
-  schema_version: {const: "1.0"}
+  schema_version: {const: "2.0"}
   packet_id: {type: string, pattern: '^review-[a-z0-9][a-z0-9-]*$'}
   status: {type: string, enum: [draft, incomplete, ready, approved, changes_requested, rejected, escalated]}
   scope:
@@ -24,12 +24,26 @@ properties:
   traceability:
     type: object
     additionalProperties: false
-    required: [repository, base_ref, head_ref, reviewed_head_sha, artifact_paths, source_refs]
+    required: [repository, base_ref, head_ref, review_submissions, artifact_paths, source_refs]
     properties:
       repository: {type: string, minLength: 1}
       base_ref: {type: string, minLength: 1}
-      head_ref: {type: string, minLength: 1}
-      reviewed_head_sha: {type: string, pattern: '^[a-f0-9]{7,40}$'}
+      head_ref:
+        type: string
+        minLength: 1
+        description: Deterministic pushed controller/<sprint-id> evidence branch containing packet commit P; it is not a lane PR or integration candidate.
+      review_submissions:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [pull_request, review_submission_head_sha, reviewer_login, reviewer_id]
+          properties:
+            pull_request: {type: integer, minimum: 1}
+            review_submission_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+            reviewer_login: {type: string, minLength: 1}
+            reviewer_id: {type: integer, minimum: 1}
       artifact_paths: {type: array, items: {type: string}}
       source_refs: {type: array, items: {type: string}}
   pull_requests:

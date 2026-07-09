@@ -29,12 +29,15 @@ not leave ownership implicit in prose.
 
 The first human review milestone should normally trigger after:
 
-- worker closeout exists for required lanes;
-- independent critic approval covers the current head SHA;
-- required checks are observed;
+- worker closeout-only E exists for required lanes;
+- a different critic agent/session has committed only its report as S;
+- a repository admin or maintainer other than the PR author has the latest
+  effective `APPROVED` review on S;
+- required checks are observed with live `SUCCESS` on S;
 - preview/review deployment is active or explicitly not applicable;
 - review inbox packet is complete enough for a human to test without hidden
-  chat context.
+  chat context and is ready to be committed alone as P on the evidence-only
+  controller branch.
 
 Deployment-impacting work also needs the wave release plan to name review packet
 path, human test steps, release-health signals, and rollback evidence.

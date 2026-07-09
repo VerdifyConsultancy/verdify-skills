@@ -36,11 +36,11 @@
     },
     {
       "id": "review-inbox-sha-mismatch-block",
-      "prompt": "A lane claims review-ready status, but the critic report names SHA aaa111, the PR head is bbb222, required checks ran on ccc333, and the preview deployment cannot report its revision.",
+      "prompt": "A lane claims review-ready status, but the critic-report commit is aaa111, the PR head is bbb222, required checks ran on ccc333, and the preview deployment cannot report its revision.",
       "expected_output": "Marks the review inbox packet blocked or incomplete, refuses an approve recommendation, records the SHA mismatches and missing runtime identity, and routes back to fix lane, hold, or fresh review.",
       "files": [],
       "assertions": [
-        "The exact reviewed head SHA must match the PR, critic report, checks, and preview or review deployment before review-ready status can pass.",
+        "The critic-report head S must match the live PR head, required checks, and external commit-bound approval; any preview or review deployment must separately identify that exact revision before review-ready status can pass.",
         "Missing observed runtime revision is blocking when preview or review deployment evidence is required.",
         "Required check results are tied to the current head SHA with evidence URLs or observed timestamps, not summarized as CI passed.",
         "The recommendation is request_changes, reject, escalate, or hold rather than approve."
@@ -48,14 +48,14 @@
     },
     {
       "id": "integration-new-commit-revalidation",
-      "prompt": "A lane was critic-approved yesterday, then a worker pushed a new commit to the PR branch before integration started.",
-      "expected_output": "Treats the prior critic approval and checks as stale for the new head SHA, revalidates current checks and critic approval, and blocks integration until current evidence exists.",
+      "prompt": "A lane's critic-report head S received external admin or maintainer approval yesterday, then a worker pushed a new commit to the PR branch before integration started.",
+      "expected_output": "Treats the prior evidence chain, external approval, and checks as stale for the new head SHA, restarts the implementation-closeout-critic chain as required, and blocks integration until current evidence exists.",
       "files": [],
       "assertions": [
-        "Integration uses critic-approved head SHAs only.",
-        "Any new commit after critic approval invalidates prior approval for integration until fresh review or policy-approved revalidation occurs.",
+        "Integration uses only critic-report heads with current external admin or maintainer approval.",
+        "Any post-S commit invalidates the external approval and requires a valid current D-I-E-S evidence chain before a fresh commit-bound approval can authorize integration.",
         "Required checks are re-read for the current PR head SHA before merge order is finalized.",
-        "The integration session records the stale evidence and does not merge based on obsolete approval."
+        "The integration session records the stale chain, approval, and checks and does not merge based on obsolete evidence."
       ]
     },
     {

@@ -1,13 +1,14 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-27-ship-verify-skills
 lane_id: issue-92-controller-merge
 status: ready_for_critic
 issue_ids: [92]
 pull_request: 96
 baseline_sha: fffa61c09cbe09f8d0dd32681029a967c59066ee
-head_sha: 992f1ddb76aa305b5c5668a06535de09e2b10023
+implementation_head_sha: 992f1ddb76aa305b5c5668a06535de09e2b10023
+validated_head_sha: 992f1ddb76aa305b5c5668a06535de09e2b10023
 contract_hash: 0ab6b37209e39ee142d3c9ca0861a07bc38bd206605c7259730230d6ad931d43
 changed_paths:
   - .agents/skills/controller-merge
@@ -57,7 +58,8 @@ discovered_issues: []
 residual_risks:
   - Shared lifecycle registration surfaces will conflict with the other P0 skill PRs until controller-merge reconciles them.
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: worker-92-20260627a
 completed_at: "2026-06-27T22:54:20Z"
 limitations:
-  - Closeout head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.
+  - Closeout implementation_head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.

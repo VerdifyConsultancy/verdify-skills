@@ -181,9 +181,9 @@ runbook = {
     "poll_interval_minutes" => options[:poll_minutes],
     "heartbeat_timeout_minutes" => options[:heartbeat_minutes],
     "loop_until" => [
-      "All required lanes have closeout artifacts.",
-      "Independent critics approve current heads.",
-      "Review packet is complete with exact revision, CI, deployment, telemetry, rollback, and questions.",
+      "Every required lane has a separate approved dispatch D, implementation I, and closeout-only evidence head E.",
+      "A distinct critic agent/session commits only its report as S, required checks succeed, and a repository admin or maintainer other than the PR author has the latest effective APPROVED review on S.",
+      "The evidence-only controller branch has packet-only commit P with exact lane S heads, CI, deployment, telemetry, rollback, and questions.",
       "Deployment verification and outcome review are ready for the next role."
     ]
   },
@@ -200,7 +200,7 @@ runbook = {
       "Answer contract-scoped worker questions.",
       "Dispatch only dependency-ready lanes with no active worker lease or recorded worktree-agent result.",
       "Route scope changes to sprint-planning or architecture-contracts.",
-      "Route closeout to independent-critic and approved lanes to review-inbox."
+      "Route closeout E to a distinct critic agent/session, then route externally approved S heads to the packet-only review-inbox commit P."
     ],
     "coordination_request_policy" => "Resolve only within approved lane contracts and delegation; route protected changes to gates.",
     "escalation_paths" => []
@@ -208,7 +208,7 @@ runbook = {
   "ci_cd" => {
     "required_checks" => Array(wave&.dig("github", "required_checks") || []),
     "workflows" => Array(wave&.dig("ci", "workflows")).map { |item| item["name"] }.compact,
-    "merge_policy" => "Merge or queue only after critic approval, review packet readiness, and required checks.",
+    "merge_policy" => "Merge or queue each lane PR individually only after a valid D/I/E/S chain, external admin or maintainer approval on S, packet P, and required checks; never merge the controller evidence branch.",
     "deployment_trigger" => "Trigger review deployment only from approved release plan and authorized environment policy.",
     "evidence_refs" => []
   },
@@ -222,7 +222,7 @@ runbook = {
   },
   "review" => {
     "review_packet_path" => ".agent-workflow/sprints/#{options[:sprint]}/review/review-inbox-packet.yaml",
-    "human_review_trigger" => "Review packet complete with exact revision, checks, deployment evidence, telemetry, rollback, and open questions.",
+    "human_review_trigger" => "Packet-only commit P is complete on the evidence-only controller branch with every lane PR's exact S head, external approval, checks, deployment evidence, telemetry, rollback, and open questions.",
     "reviewer_visibility" => []
   },
   "ledger" => {

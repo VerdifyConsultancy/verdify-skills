@@ -37,9 +37,9 @@ cadence:
   poll_interval_minutes: 5
   heartbeat_timeout_minutes: 15
   loop_until:
-    - All required lanes have closeout artifacts.
-    - Independent critics approve current heads.
-    - Review packet, CI/CD, deployment, and outcome gates are ready for the next role.
+    - Every required lane has a separate approved dispatch D, implementation I, and closeout-only evidence head E.
+    - A distinct critic agent/session commits only its report as S, required checks succeed, and a repository admin or maintainer other than the PR author has the latest effective APPROVED review on S.
+    - The evidence-only controller branch has packet-only commit P; CI/CD, deployment, and outcome gates are ready for the next role.
 lanes: []
 coordination:
   poll_steps:
@@ -57,7 +57,7 @@ coordination:
 ci_cd:
   required_checks: []
   workflows: []
-  merge_policy: Merge or queue only after critic approval, review packet readiness, and required checks.
+  merge_policy: Merge or queue each lane PR individually only after a valid D/I/E/S chain, external admin or maintainer approval on S, packet P, and required checks; never merge the controller evidence branch.
   deployment_trigger: Trigger review deployment only from approved release plan and authorized environment policy.
   evidence_refs: []
 deployment:
@@ -69,7 +69,7 @@ deployment:
   rollback_refs: []
 review:
   review_packet_path: .agent-workflow/sprints/replace-me/review/review-inbox-packet.yaml
-  human_review_trigger: Review packet complete with exact revision, checks, deployment evidence, telemetry, rollback, and open questions.
+  human_review_trigger: Packet-only commit P is complete on the evidence-only controller branch with every lane PR's exact S head, external approval, checks, deployment evidence, telemetry, rollback, and open questions.
   reviewer_visibility: []
 ledger:
   controller_state_path: .agent-workflow/controller/controller-state.yaml

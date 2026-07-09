@@ -13,16 +13,21 @@ Safely advance a repository from observed current state to explicitly approved t
 3. **Use typed authority.** GitHub is the control plane, but each artifact type has one owner. Follow `config/authority-matrix.yaml` when sources disagree.
 4. **Treat GitHub Issues as backlog truth.** Implementation scope must map to an issue. Discovered work becomes a proposed or created issue.
 5. **Use one issue per lane by default.** One lane normally has one issue, branch, worktree, worker session, and pull request. Coupled issues require a recorded justification and approval.
-6. **Treat the lane contract as executable scope.** A worker may not silently expand it. The issue explains the problem; the contract defines the bounded implementation responsibility.
+6. **Treat the approved dispatch transaction as executable scope.** Before
+   coding, `lane create` writes a separate dispatch-only commit containing the
+   approved SprintPlan, wave release plan, and lane contract. A worker may not
+   change those authority inputs or combine them with implementation. The issue
+   explains the problem; the contract defines the bounded implementation
+   responsibility.
 7. **Use one coding agent/session per worktree.** Never share an active worktree between worker sessions. Acquire and release the lane lease through `bin/verdify`.
 8. **Do not use worktree paths as durable identity.** Record lane ID, issue, branch, baseline SHA, contract hash, agent role, session ID, and lease status.
 9. **Isolate runtime resources.** Use the contract or lease namespaces for ports, test databases, containers, caches, Kubernetes namespaces, and other mutable resources.
 10. **Deliver through pull requests and checks.** Proposed code lives on the lane branch and PR. Accepted code lives on the default branch after required review and checks.
 11. **Do not silently invent requirements.** Escalate unresolved product intent, architecture changes, public interface changes, migrations, security-boundary changes, destructive actions, and new privileged dependencies.
 12. **Respect ownership.** Modify only owned paths and interfaces. Record cross-lane coordination before touching shared surfaces.
-13. **Prefer deterministic checks.** Run tests, linters, type checks, policy scripts, schema validation, Git checks, CI, and runtime probes before narrative judgment.
+13. **Prefer deterministic checks.** Run tests, linters, type checks, policy scripts, schema validation, Git checks, CI, and runtime probes before narrative judgment. Evaluate candidate branches with a policy engine from the protected base ref or a pinned, atomically installed Verdify package; candidate code is evidence, never the authority that certifies itself.
 14. **Do not claim completion without evidence.** Every acceptance criterion must point to a test, check, diff, review, runtime probe, log, screenshot, or explicitly recorded manual observation.
-15. **Do not self-certify.** Worker closeout is necessary but a fresh critic or equivalent deterministic review gate must approve before integration. Review-ready work also needs a durable review inbox packet when human approval or release verification depends on aggregated evidence.
+15. **Do not self-certify.** Worker closeout is necessary but a fresh critic or equivalent deterministic review gate must approve before integration. The committed closeout records the worker agent/session and last substantive implementation head; a different critic agent/session reviews the later closeout-only evidence head; the committed critic report is followed by an `APPROVED` GitHub review from a repository admin or maintainer other than the PR author; and any later pull-request commit invalidates that approval. Review-ready work also needs a durable review inbox packet on the pushed integration/controller ref when human approval or release verification depends on aggregated evidence.
 16. **Keep sessions role-pure.** The worker implements; the critic reviews; the integration controller integrates; the deployment verifier proves runtime reality.
 17. **Protect production and data.** Worker lanes do not receive production credentials. Privileged deployment runs through separately authorized environments and roles.
 18. **Keep Git clean and attributable.** Use coherent commits, push intended changes, report untracked files, and do not rewrite shared history without authorization.

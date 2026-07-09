@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-controller-recovery
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 2
 pull_request: 57
 baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
-head_sha: "e30f0a19042551a6299ec463d0afc3432e6bac4b"
+implementation_head_sha: "e30f0a19042551a6299ec463d0afc3432e6bac4b"
+validated_head_sha: "e30f0a19042551a6299ec463d0afc3432e6bac4b"
 contract_hash: "ca4a4016a052ca1f576b37fa6f29f272c4e973b0fbf273c373fa36c5a7ba2e8b"
 changed_paths:
   - "skills/controller-loop/SKILL.md"
@@ -84,10 +85,11 @@ residual_risks:
   - "Loop-record fields are documented at the controller-loop contract and example-asset layer; no controller-state or session-ledger schema edits were made because those paths are coordination-required for this lane."
   - "The closeout artifact is outside implementation owned_paths; it is recorded as required lane-delivery metadata, not as controller-loop implementation scope."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-ctrlrecov"
 completed_at: "2026-06-24T18:00:32Z"
 limitations:
   - "The compiled lane contract lists baseline fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e; the active lease baseline is b5b6e05d08233a7ab28667e26ecd117b09accba5 after dependency lanes merged, and this closeout uses the active lease baseline."
   - "No schema edits were made to schemas/controller-state.schema.yaml or schemas/session-ledger.schema.yaml; those coordination_required_paths remained read-only."
   - "MANIFEST.sha256 was not edited per lane instruction."
-  - "The closeout head_sha records the implementation commit before this closeout-only metadata commit; PR #57 records the current branch head after closeout is pushed."
+  - "The closeout implementation_head_sha records the implementation commit before this closeout-only metadata commit; PR #57 records the current branch head after closeout is pushed."

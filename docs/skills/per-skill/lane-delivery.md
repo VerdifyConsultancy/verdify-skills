@@ -7,9 +7,10 @@
 ## Purpose
 
 The **bounded worker**. Given one approved lane (issue, contract, branch, worktree,
-lease), it implements only that lane, runs required validation, updates the linked PR,
-and writes a worker closeout for fresh criticism — in the same session. Its output is
-a candidate for review, never a self-certified completion.
+lease), it implements only that lane, runs required validation at implementation
+head **I**, updates the linked PR, and then creates closeout-only evidence head
+**E** in the same session. Its output is a candidate for review, never a
+self-certified completion.
 
 ## When to use / when not
 
@@ -28,7 +29,7 @@ The hands of **EXECUTE**. Dispatched by `sprint-orchestrator`; hands closeout to
 | Mode | What it does |
 |---|---|
 | `implementation` | Work only inside the leased worktree and owned paths; incremental validation; one PR. |
-| `closeout` | Final worker action: capture validation results, map evidence to acceptance criteria, write closeout `ready_for_critic`. |
+| `closeout` | Final worker action: capture validation results for I, map evidence to acceptance criteria, and commit only closeout `ready_for_critic` as E. |
 | `fix-forward` | After critic findings, take a new sequential lease for the same worktree and address only cited findings. |
 
 ## Inputs (consumed)
@@ -44,8 +45,9 @@ The hands of **EXECUTE**. Dispatched by `sprint-orchestrator`; hands closeout to
 
 | Output | Schema | Consumed by |
 |---|---|---|
-| Commits on the lane branch + one linked PR | GitHub | `independent-critic`, integration |
-| `…/lanes/closeout/<lane-id>.closeout.yaml` (`status: ready_for_critic`) | `lane-closeout.schema.yaml` | `independent-critic`, `project-router` |
+| Verified dispatch-only commit D containing the approved plan/wave/contract transaction | Git | `lane-delivery`, `independent-critic` |
+| Substantive implementation commit I on the lane branch + one linked PR | GitHub | `independent-critic`, integration |
+| Closeout-only evidence commit E containing `…/lanes/closeout/<lane-id>.closeout.yaml` (`status: ready_for_critic`) | `lane-closeout.schema.yaml` | `independent-critic`, `project-router` |
 | Proposed GitHub issue for discovered work | issue template | backlog |
 
 ## Sequence
@@ -58,12 +60,13 @@ sequenceDiagram
     participant GH as GitHub PR
     participant IC as independent-critic
     SO-->>LD: lane assignment + lease-id
-    LD->>WT: lane inspect (confirm ownership) + reconstruct code/tests
-    LD->>WT: implement owned paths only, validate incrementally
-    LD->>GH: create/update PR linked to issue + contract
-    LD->>LD: closeout — map evidence to each acceptance criterion
-    LD->>GH: push; write closeout (status ready_for_critic)
-    LD-->>IC: hand off contract, PR, head SHA, closeout, evidence
+    LD->>WT: lane inspect + verify dispatch-only D
+    LD->>WT: reconstruct code/tests; keep plan/wave/contract immutable
+    LD->>WT: implement owned paths only; validate and commit I
+    LD->>GH: create/update PR with I and Evidence head pending
+    LD->>LD: write closeout with worker agent/session + I evidence
+    LD->>GH: commit only closeout as E; push and stop writing
+    LD-->>IC: hand off contract, PR, I, E, closeout, evidence
 ```
 
 ## Gates & stop conditions
@@ -71,21 +74,26 @@ sequenceDiagram
 Stop and open a gate for missing upstream contracts, public API/schema changes,
 migrations, security-boundary changes, destructive operations, new privileged
 dependencies, ownership conflicts, or acceptance criteria that cannot be met as
-written. Stop if the lease is not owned by this session or the contract is
-stale/unapproved. Worker lanes never inherit or request production credentials.
+written. Stop if D is missing, combines implementation, or its approved
+plan/wave/contract bytes changed; also stop if the lease is not owned by this
+session or the contract is stale/unapproved. Worker lanes never inherit or request production credentials.
+After E, the worker must stop writing to the branch. Any substantive fix requires
+a new sequential worker lease, a newly validated I, and a replacement E.
 
 ## Tools used
 
 - **CLI:** `bin/verdify lane inspect`; `bin/verdify lane release --keep-worktree`
   (fix-forward hand-back).
-- **Git/GitHub:** lane branch commits, one linked PR.
+- **Git/GitHub:** lane branch implementation commit I, closeout-only commit E,
+  one linked PR, and exact Implementation/Evidence/Current head metadata.
 - **Build tools:** the contract's required validation commands, run in the lease's
   isolated namespace (db/container/cache/port).
 
 ## Handoffs
 
 - **Upstream:** `sprint-orchestrator` (assignment + lease).
-- **Downstream:** `independent-critic` (fresh review) + `controller-loop`
+- **Downstream:** `independent-critic` (fresh review at E by a different agent
+  and session) + `controller-loop`
   (session-ledger events). Fix-forward returns to fresh criticism.
 
 ## References

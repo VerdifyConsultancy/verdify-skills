@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-eval-strategy
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 25
 pull_request: 39
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "e73709e46c1a489a22d3e26f4b0b6cd192bcfb40"
+implementation_head_sha: "e73709e46c1a489a22d3e26f4b0b6cd192bcfb40"
+validated_head_sha: "e73709e46c1a489a22d3e26f4b0b6cd192bcfb40"
 contract_hash: "e343816f3dbf42ce90ec7c1c5c6cc00d920c827f1df19f53262073e0c98ff8bb"
 changed_paths:
   - "docs/decisions/ADR-0015-eval-runner-strategy.md"
@@ -64,6 +65,7 @@ discovered_issues: []
 residual_risks:
   - "Fresh critic approval is required before integration."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-evalstrategy"
 completed_at: "2026-06-24T16:56:13Z"
 limitations:

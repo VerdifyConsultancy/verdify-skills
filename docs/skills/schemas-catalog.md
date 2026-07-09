@@ -80,14 +80,14 @@ owner **CLI/validator** are produced by `bin/verdify` or consumed cross-skill.
 | `wave-release-plan` | sprint-planning | planning → orchestrator/release | Branch/merge model, CI, environments, rollback. |
 | `lane-lease` | CLI/validator | `lane create`/`review` → worker/critic | Durable lane identity + worktree lease. |
 | `sprint-execution-runbook` | sprint-orchestrator | orchestrator → dispatch/recovery | Dispatch plan, cadence, session identities. |
-| `lane-closeout` | lane-delivery | worker → critic | Worker closeout evidence (`ready_for_critic`). |
-| `critic-report` | independent-critic | critic → orchestrator/release | Evidence-backed critic decision. |
+| `lane-closeout` | lane-delivery | worker → critic | Version-2 worker identity and validation evidence for implementation I, committed alone at E (`ready_for_critic`). |
+| `critic-report` | independent-critic | critic → orchestrator/release | Version-2 worker/critic backlinks, closeout digest, and evidence-backed decision committed alone at S. |
 
 ## Review, release & operations
 
 | Schema | Owner | Produced → consumed | Purpose |
 |---|---|---|---|
-| `review-inbox-packet` | release-verification | release → human reviewer | Aggregated review-ready evidence bundle. |
+| `review-inbox-packet` | release-verification | release → human reviewer | Per-lane approved S submissions, committed alone as P on the controller evidence branch. |
 | `observability-diagnostic-packet` | release-verification / platform-readiness | release → reviewer | Correlated telemetry + signal assessment. |
 | `release-verification` | release-verification | release → outcome | Integration + deployment verification record. |
 | `outcome-review` | release-verification | release → router | Human outcome acceptance, separate from merge. |

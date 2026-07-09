@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-prompt-injection-guidance
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 21
 pull_request: 56
 baseline_sha: "b5b6e05d08233a7ab28667e26ecd117b09accba5"
-head_sha: "d761382060eeee2b518676eef48ee538c527b19d"
+implementation_head_sha: "d761382060eeee2b518676eef48ee538c527b19d"
+validated_head_sha: "d761382060eeee2b518676eef48ee538c527b19d"
 contract_hash: "806ad0d4f892e7759cfa6d11eed81b930ccd9d1b8a258dc8471e728f1b64c140"
 changed_paths:
   - "COMMON_OPERATING_CONTRACT.md"
@@ -64,6 +65,7 @@ discovered_issues: []
 residual_risks:
   - "Fresh independent critic review is required before integration."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-promptinj"
 completed_at: "2026-06-24T17:58:28Z"
 limitations:

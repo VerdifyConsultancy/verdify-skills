@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-route-decision-enum
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 13
 pull_request: 45
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "8129ff2e91fff1f1303b897ccd1a8e6c5fe0fba4"
+implementation_head_sha: "8129ff2e91fff1f1303b897ccd1a8e6c5fe0fba4"
+validated_head_sha: "8129ff2e91fff1f1303b897ccd1a8e6c5fe0fba4"
 contract_hash: "a981ba09f5fa3c44df1a0ae54f102f4c8bddabf0d59098e0c9919abb7cfa41cd"
 changed_paths:
   - "schemas/route-decision.schema.yaml"
@@ -64,9 +65,10 @@ residual_risks:
   - "Fresh critic or reviewer approval is still required before integration."
   - "Worker authority stops at the pushed pull request; self-merge is not allowed."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-route"
 completed_at: "2026-06-24T17:26:44Z"
 limitations:
   - "Controller resolution narrowed this lane to the owned schema enum fix only; scripts/validate-repo.rb was treated as read-only and left for lane-validator-engine."
   - "The optional contract command `ruby bin/verdify artifact validate --file schemas/route-decision.schema.yaml` is not applicable to a schema file because schemas do not carry schema_ref; repository validation covered schema parsing and consistency."
-  - "The closeout head_sha records the schema implementation commit before this closeout-only metadata commit; the pull request body is updated after the final branch head is pushed."
+  - "The closeout implementation_head_sha records the schema implementation commit before this closeout-only metadata commit; the pull request body is updated after the final branch head is pushed."

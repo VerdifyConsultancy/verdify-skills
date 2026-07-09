@@ -1,6 +1,6 @@
 schema_ref: review-inbox-packet.schema.yaml
 kind: ReviewInboxPacket
-schema_version: "1.0"
+schema_version: "2.0"
 packet_id: review-replace-me
 status: draft
 scope:
@@ -13,8 +13,12 @@ scope:
 traceability:
   repository: owner/repo
   base_ref: main
-  head_ref: feature/replace-me
-  reviewed_head_sha: abcdef1
+  head_ref: controller/replace-me
+  review_submissions:
+    - pull_request: 1
+      review_submission_head_sha: abcdef1234567890abcdef1234567890abcdef12
+      reviewer_login: authorized-reviewer
+      reviewer_id: 1
   artifact_paths: []
   source_refs: []
 pull_requests:
