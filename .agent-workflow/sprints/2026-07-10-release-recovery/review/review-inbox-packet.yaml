@@ -1,0 +1,147 @@
+---
+schema_ref: review-inbox-packet.schema.yaml
+kind: ReviewInboxPacket
+schema_version: '2.0'
+packet_id: review-2026-07-10-release-recovery-recovery
+status: approved
+scope:
+  review_unit: lane
+  sprint_id: 2026-07-10-release-recovery
+  lane_ids:
+  - issue-200-relative-tarball
+  issue_ids:
+  - 200
+  northstar_ids: []
+  summary: Post-merge recovery packet for the exact reviewed lane and protected dev
+    integration.
+traceability:
+  repository: VerdifyConsultancy/verdify-skills
+  base_ref: dev
+  head_ref: controller/2026-07-10-release-recovery
+  review_submissions:
+  - pull_request: 201
+    review_submission_head_sha: ec8c8e50e66cbdea7ef59e8f43932ecd2bc27998
+    reviewer_login: github-actions
+    reviewer_id: 15368
+  artifact_paths:
+  - ".agent-workflow/sprints/2026-07-10-release-recovery/lanes/contracts/issue-200-relative-tarball.contract.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-recovery/lanes/closeout/issue-200-relative-tarball.closeout.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-recovery/critic/issue-200-relative-tarball.critic.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-recovery/release/wave-release-plan.yaml"
+  source_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/201
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/200
+pull_requests:
+- provider: github
+  identifier: "#201"
+  url: https://github.com/VerdifyConsultancy/verdify-skills/pull/201
+  state: merged
+  author: jvallery
+  requested_reviewers: []
+  latest_review_state: not_applicable
+checks:
+- name: validate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090424540/job/86354168847
+  observed_at: '2026-07-10T11:47:57Z'
+- name: pull-request-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489275/job/86354375893
+  observed_at: '2026-07-10T11:47:05Z'
+- name: compliance / compliance
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090424924/job/86354170056
+  observed_at: '2026-07-10T11:45:47Z'
+- name: delivery-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489192/job/86354375801
+  observed_at: '2026-07-10T11:47:08Z'
+- name: critic-gate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489192/job/86354375835
+  observed_at: '2026-07-10T11:47:09Z'
+deployments:
+- environment: repository-only
+  environment_type: none
+  required: false
+  state: not_applicable
+  url: 
+  deployment_id: 
+  observed_revision: 2f6843dd24e7d955c8328963aeb4086b3fad1688
+  desired_state_ref: dev
+  reconciliation_evidence:
+  - 'PR #201 merged as 2f6843dd24e7d955c8328963aeb4086b3fad1688 on protected dev.'
+  log_url: 
+  observed_at: '2026-07-10T11:48:42Z'
+reviewer_guidance:
+  human_test_steps:
+  - Confirm exact D/I/E/S, merged PR identity, trusted checks, and protected-dev ancestry.
+  review_urls:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/201/files
+  route_maps: []
+telemetry:
+  dashboards: []
+  logs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090424540/job/86354168847
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489275/job/86354375893
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090424924/job/86354170056
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489192/job/86354375801
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29090489192/job/86354375835
+  metrics: []
+  traces: []
+  runtime_checks:
+  - name: exact-head protected delivery checks
+    result: passed
+    evidence: All required trusted checks succeeded at ec8c8e50e66cbdea7ef59e8f43932ecd2bc27998.
+  missing_telemetry:
+  - No application deployment is part of this repository-only recovery receipt.
+security:
+  privileged_access_required: false
+  secret_exposure_reviewed: true
+  preview_generator_controls:
+  - The recovery changes controller evidence and terminal receipt artifacts only.
+  unresolved_findings: []
+rollback:
+  ready: true
+  known_good_revision: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+  procedure: 'Revert PR #201 on dev and regenerate controller evidence from the corrected
+    reviewed lane.'
+  evidence:
+  - The exact merge commit and prior baseline are recorded.
+risks:
+- id: RISK-01
+  severity: medium
+  statement: GitHub evidence is point-in-time until the protected receipt merge.
+  disposition: Revalidate live PR, checks, controller head, and ancestry in the receipt
+    gate.
+questions: []
+evidence_completeness:
+  verdict: complete
+  satisfied_required:
+  - Exact reviewed head, merged pull request, trusted checks, and protected-dev ancestry
+    are verified.
+  missing_required: []
+  blockers: []
+recommendation:
+  outcome: approve
+  rationale: The reviewed lane is merged and its deterministic terminal receipt prerequisites
+    are complete.
+feedback_route:
+  route: release_verification
+  instructions: Commit R and O on the exact controller branch, then generate the bounded
+    receipt transaction.
+  target_refs:
+  - controller/2026-07-10-release-recovery
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/201
+prepared_at: '2026-07-10T20:54:30Z'
+preparer: codex-root-recovery-controller
