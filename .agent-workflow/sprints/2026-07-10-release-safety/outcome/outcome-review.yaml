@@ -1,0 +1,42 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-safety
+decision: accepted_with_risks
+reviewed_at: "2026-07-10T09:22:21Z"
+reviewer: "Jason Vallery (user-authorized administrator merge recorded by ROOT)"
+intended_outcome: >-
+  Build and validate one exact version 1.3.0 npm candidate transaction so the
+  final main revision can test, retain, recover, and publish the same source-bound
+  bytes without repacking or duplicating authority.
+delivered_outcomes:
+  - "PR #184 integrated version 1.3.0 and exact-artifact release safety into dev at 5d3393e61db46b01a813b7bc9a687a6a262ed23c."
+  - "The workflow builds once at final main, runs the complete install/upgrade/Node 18/rollback/archive/recovery matrix against that exact tarball, retains it by source SHA, and publishes only the verified path."
+  - "Release transactions bind candidate and separate non-recursive binding artifacts to raw API archive digests, provenance identity, repository/workflow/route/source/run/attempt, npm, tag, GitHub release, archive, checksum, and completed ledger state."
+  - "Fresh criticism approved the final D/I3/E4/S3 chain with zero findings after 90 tests and 533 assertions, focused release/package/npm suites, actionlint, gitleaks, and all exact-head GitHub checks passed."
+  - "The corrected generator created James-authored 1.3.0 issue #188 and dev-to-main PR #189; no npm publication, tag, GitHub release, main promotion, runtime mutation, or rescue cleanup occurred."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/184"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/189"
+  - ".agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-safety/critic/issue-120-release-safety.critic.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-safety/gates/pr-184-admin-merge-override.yaml"
+  - ".agent-workflow/sprints/2026-07-10-release-safety/release/release-verification.yaml"
+incomplete_items: []
+residual_risks:
+  - "Issue #121 still gates transport-neutral critic status, effective CODEOWNERS, dev/main route enforcement, and live branch protection before final promotion."
+  - "PR #189 still needs a genuine current-head approval from a non-author release owner plus independent main/npm/tag/GitHub-release/ledger verification."
+  - "Rescue refs and the shared Agent Platform recovery checkout remain retained until the final main release and cleanup audit."
+  - "The exact final tarball is intentionally source-bound, so later authorized #121 and controller commits change gitHead; the final main workflow must build and test those exact final bytes once before publication."
+  - "PR #184 used a user-authorized administrator exception because its author cannot self-approve; #121 replaces that impossible transport with a machine-enforced critic gate on dev."
+  - "npm versions are immutable, and npm/GitHub authority failures after a partial release require resumable operator recovery from retained artifacts rather than repacking."
+follow_up_issues: [121, 174]
+lessons_learned:
+  - "Exact artifact identity must include final source SHA; local implementation evidence proves the mechanism but does not pretend later authorized metadata commits preserve the same tarball digest."
+  - "Release candidate identity must be exact across repository, route, version, issue/PR state, artifact archive, provenance, and workflow run authority before any mutation."
+  - "A release workflow must fail closed on stale candidate conflicts and remain explicitly rerunnable after the conflicting record is safely closed."
+rationale: >-
+  The bounded sprint outcome is integrated and independently verified on dev,
+  with the valid 1.3.0 release candidate open and all privileged publication
+  actions still deferred. The remaining risks are explicit, issue-backed, and
+  owned by delivery controls plus final release verification.
