@@ -4,7 +4,7 @@ schema_version: "1.0"
 sync_id: gbs-verdify-skills-20260710-recovery
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: "2026-07-10T02:32:25Z"
+captured_at: "2026-07-10T02:47:25Z"
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -16,7 +16,7 @@ source_authority:
     - Deployment records cover npm publication only; this repository has no long-running application runtime.
 snapshot:
   snapshot_ref: null
-  captured_at: "2026-07-10T02:32:25Z"
+  captured_at: "2026-07-10T02:47:25Z"
   freshness: live_only
   api_sources:
     - surface: issues
@@ -78,18 +78,18 @@ snapshot:
 issue_findings:
   - issue: 143
     title: Accept an artifact-only state-of-union commit over its assessed baseline
-    state: OPEN
-    classification: candidate
+    state: CLOSED
+    classification: done
     labels: [bug, type:problem]
     assignees: []
     milestone: null
     dependencies: []
     sub_issues: []
-    linked_prs: []
+    linked_prs: ["#147"]
     project_refs: []
-    evidence_refs: ["lib/verdify/cli.rb route_for_strategy", "strategy baseline 45150ee76b770c2e97345dfdfa9196b4acebcc3b"]
+    evidence_refs: ["PR #147", "dev@ce912de11605879188d32675293fb1a49a25a56d"]
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/143"]
-    required_action: Apply the artifact-only suffix fix before normal sprint routing.
+    required_action: No action after the refreshed strategy route is verified.
   - issue: 130
     title: Ignore host-local and untracked files in manifests and archives
     state: OPEN
@@ -245,6 +245,17 @@ issue_findings:
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
     required_action: Merge and close the strategy transaction.
 pr_findings:
+  - pr: 147
+    branch: fix/143-strategy-baseline-routing
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [143]
+    head_sha: "929b361bbc97be2e9b971e39d798056977c63ec5"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Integrated the bounded strategy-baseline suffix rule; the refreshed strategy is assessed at its merge head.
+    evidence_refs: ["dev@ce912de11605879188d32675293fb1a49a25a56d", "issue #143"]
   - pr: 139
     branch: fix/135-sprint-terminal-routing
     base_branch: dev
@@ -396,4 +407,4 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: issue-readiness
-  reason: Issue #143 must restore committed-strategy routing, then issues #130 and #126 are ready and dependency ordered; #120 and #121 remain the required post-recovery release sequence.
+  reason: Issues #130 and #126 are ready and dependency ordered after the completed #143 router repair; #120 and #121 remain the required post-recovery release sequence.
