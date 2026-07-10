@@ -3,472 +3,908 @@ schema_ref: project-definition.schema.yaml
 kind: ProjectDefinition
 schema_version: '1.0'
 project_id: verdify-skills
-status: draft
+status: approved
 stage_status:
-  discovery: draft
-  requirements: pending
-  product: pending
-  design_surface: pending
+  discovery: approved
+  requirements: approved
+  product: approved
+  design_surface: approved
 sources:
 - id: SRC-001
   type: repository_doc
   location: README.md
-  summary: Describes Verdify as an end-to-end GitHub-native lifecycle skills package with routing, definition, architecture, strategy, planning, orchestration, delivery, criticism, release verification, and new readiness loops.
+  summary: Describes the installed Verdify lifecycle package, CLI, host links, repository workflow, validation, and consumer entry points.
   evidence_status: observed
 - id: SRC-002
-  type: repository_doc
+  type: operating_contract
   location: COMMON_OPERATING_CONTRACT.md
-  summary: Defines universal Verdify rules for evidence, typed authority, GitHub backlog truth, one issue per lane by default, worktree leases, role purity, production protection, and completion evidence.
-  evidence_status: observed
+  summary: Defines GitHub authority, evidence discipline, issue/lane/worktree ownership, role separation, review, release, and completion rules.
+  evidence_status: verified
 - id: SRC-003
-  type: northstar_evidence
-  location: docs/northstar/evidence/2026-06-23-walk-transcript-agent-platform-gravity-skills.md
-  summary: Reported walk transcript extraction establishes Gravity readiness gate, North Star governance, transcript-to-replan, repo hygiene, controller, platform readiness, observability, and deployed-review requirements.
-  evidence_status: reported
+  type: authority_contract
+  location: config/authority-matrix.yaml
+  summary: Assigns one authoritative owner to backlog, planning, proposed code, accepted code, review, release, deployment, and runtime outcome state.
+  evidence_status: verified
 - id: SRC-004
-  type: lifecycle_artifact
-  location: .agent-workflow/intake/transcript-replan.yaml
-  summary: Routes transcript evidence into proposed lifecycle changes, conflicts, issue recommendations, and gates.
-  evidence_status: observed
+  type: lifecycle_contract
+  location: config/lifecycle.yaml
+  summary: Defines canonical lifecycle skills, modes, transitions, standalone skills, and routing order.
+  evidence_status: verified
 - id: SRC-005
-  type: architecture_decision
-  location: docs/decisions/ADR-0004-readiness-loop-skills.md
-  summary: Adds first-class transcript-replan, repo-hygiene, controller-loop, platform-readiness, and gravity-readiness skills as readiness loops around the original delivery lifecycle.
-  evidence_status: observed
+  type: northstar_product
+  location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  summary: Approved iteration-25 product authority for an internal-first method layer binding Verdify Skills, Agent Platform, Orbit, and Gravity through one root-planner outer loop.
+  evidence_status: verified
 - id: SRC-006
-  type: lifecycle_artifact
-  location: .agent-workflow/northstar/northstar-plan.yaml
-  summary: Draft North Star planning artifact that synthesizes routed transcript evidence into goals, requirements, user stories, architecture principles, milestones, risks, open questions, conflicts, issues, gates, and handoff.
-  evidence_status: observed
+  type: northstar_architecture
+  location: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  summary: Approved iteration-25 architecture authority for the four-project ownership model, provider interfaces, governed connectors, exact-artifact release transaction, and no-compatibility policy.
+  evidence_status: verified
 - id: SRC-007
-  type: architecture_decision
-  location: docs/decisions/ADR-0006-northstar-evidence-registry.md
-  summary: Adds a CLI-backed North Star evidence registry so research is copied, hashed, tagged, referenced, and queryable before planning synthesis.
-  evidence_status: observed
+  type: northstar_signoff
+  location: .agent-workflow/northstar/northstar-artifacts.yaml
+  summary: Records iteration 25 as approved, links the product and architecture sources, preserves nonblocking research questions, and authorizes downstream project definition.
+  evidence_status: verified
 - id: SRC-008
-  type: architecture_decision
-  location: docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md
-  summary: Splits the North Star into iterative product and architecture markdown artifacts with a machine-readable questions/review/signoff record.
+  type: northstar_plan
+  location: .agent-workflow/northstar/northstar-plan.yaml
+  summary: Provides approved goals, requirements, stories, milestones, risks, issue routing, and cross-project traceability for iteration 25.
+  evidence_status: verified
+- id: SRC-009
+  type: delivery_model
+  location: docs/github-operating-model.md
+  summary: Defines dev-first integration, generated release promotion, GitHub issue/PR ownership, checks, and review expectations.
   evidence_status: observed
+- id: SRC-010
+  type: distribution_contract
+  location: docs/vendoring-standard.md
+  summary: Defines the supported vendored package shape, consumer validation boundary, and repository integration expectations.
+  evidence_status: observed
+- id: SRC-011
+  type: github_issue
+  location: https://github.com/VerdifyConsultancy/verdify-skills/issues/120
+  summary: Owns exact packed-artifact testing, immutable publication identity, provenance, and recoverable release transaction work.
+  evidence_status: verified
+- id: SRC-012
+  type: github_issue
+  location: https://github.com/VerdifyConsultancy/verdify-skills/issues/121
+  summary: Owns protected dev integration, release-only main promotion, effective reviewers, and enforceable delivery controls.
+  evidence_status: verified
+- id: SRC-013
+  type: github_issue
+  location: https://github.com/VerdifyConsultancy/verdify-skills/issues/126
+  summary: Owns selective recovery of unpublished historian work, missing registered evidence, branch disposition, and final repository cleanup.
+  evidence_status: verified
+- id: SRC-014
+  type: github_issue
+  location: https://github.com/VerdifyConsultancy/verdify-skills/issues/129
+  summary: Owns reconciliation and approval of this derivative iteration-25 project-definition packet.
+  evidence_status: verified
+- id: SRC-015
+  type: github_issue
+  location: https://github.com/VerdifyConsultancy/verdify-skills/issues/130
+  summary: Owns manifest and package file-set contamination by ignored or untracked host-local state.
+  evidence_status: verified
 decisions:
 - id: DEC-001
-  statement: GitHub Issues, pull requests, checks, reviews, releases, and deployments remain the delivery control plane.
+  statement: GitHub Issues are backlog truth, pull requests and checks are delivery truth, the default branch is accepted code truth, and deployment evidence separately owns runtime truth.
   status: approved
-  rationale: Existing operating model and ADRs assign typed authority to GitHub primitives for backlog and delivery evidence.
-  source_ids: [SRC-001, SRC-002]
+  rationale: The operating contract and authority matrix assign these responsibilities explicitly.
+  source_ids: [SRC-002, SRC-003, SRC-009]
 - id: DEC-002
-  statement: The skills package now includes North Star research ingestion, North Star planning, and five readiness-loop skills in addition to the original delivery skills.
-  status: proposed
-  rationale: North Star evidence requires a research registry, planning synthesis loop, transcript intake, repo hygiene, durable controller state, platform readiness, and Gravity readiness before autonomous feature execution.
-  source_ids: [SRC-003, SRC-004, SRC-005, SRC-006, SRC-007]
+  statement: Verdify Skills is an internal-first, minimal lifecycle and agent-method layer that drives the outer planning loop across four co-equal active projects.
+  status: approved
+  rationale: Iteration 25 replaces the earlier package-only framing with the approved four-project self-building platform outcome.
+  source_ids: [SRC-005, SRC-007, SRC-008]
 - id: DEC-003
-  statement: Gravity implementation remains blocked until platform and readiness gates are approved by Jason and James.
-  status: proposed
-  rationale: The transcript states an immediate Gravity gate and positions Gravity as a gated pilot rather than the first implementation target.
-  source_ids: [SRC-003, SRC-004]
+  statement: Verdify Skills owns method and planning contracts; Agent Platform owns runtime execution; Orbit owns governed personal and engineering context; Gravity owns cited evidence processing and access.
+  status: approved
+  rationale: Explicit ownership prevents the method repository from absorbing runtime, connector, or evidence-service responsibilities.
+  source_ids: [SRC-005, SRC-006, SRC-008]
+- id: DEC-004
+  statement: One issue, lane, branch, worktree, worker session, and pull request remains the default implementation unit; normal work integrates to dev and main receives generated release promotions.
+  status: approved
+  rationale: This preserves attributable execution and makes release identity distinct from implementation integration.
+  source_ids: [SRC-002, SRC-004, SRC-009]
+- id: DEC-005
+  statement: Jason owns North Star lock authority; Jason or James may approve releases; workers do not self-certify and current-head criticism/review evidence is required before integration.
+  status: approved
+  rationale: Iteration 25 distinguishes product authority from release authority and retains independent review.
+  source_ids: [SRC-002, SRC-005, SRC-006, SRC-007]
+- id: DEC-006
+  statement: Accepted replacements have no backward-compatibility obligation; deprecated capabilities are removed rather than retained as shims unless a later decision says otherwise.
+  status: approved
+  rationale: Internal-first distribution and the approved fastest-safe-path policy favor one current contract over parallel legacy behavior.
+  source_ids: [SRC-005, SRC-006]
+- id: DEC-007
+  statement: Package publication must operate on one exact tested artifact and reconcile source, package, integrity, provenance, tag, release, and recovery state as one transaction.
+  status: approved
+  rationale: Source-only tests and non-resumable publication are insufficient for the trusted package boundary.
+  source_ids: [SRC-005, SRC-006, SRC-011]
+- id: DEC-008
+  statement: Unpublished historical work is recovered selectively from exact Git refs, with accepted content ported forward and obsolete alternatives retained only as historical evidence.
+  status: approved
+  rationale: Whole-tree replay would regress newer authority and delivery work while deletion without disposition would lose knowledge.
+  source_ids: [SRC-003, SRC-013]
+- id: DEC-009
+  statement: The prior draft project-definition claims about sixteen skills, joint North Star approval, one branch per wave, Onyx uncertainty, and package-only scope are superseded by iteration 25.
+  status: superseded
+  rationale: The locked North Star and current repository state provide newer explicit authority.
+  source_ids: [SRC-005, SRC-006, SRC-007, SRC-008]
 assumptions:
 - id: ASM-001
-  statement: The canonical skills repository for this work is VerdifyConsultancy/verdify-skills.
+  statement: VerdifyConsultancy/verdify-skills is the canonical source repository for the method package and its protected lifecycle artifacts.
   status: validated
 - id: ASM-002
-  statement: Agent Platform API and MCP contracts will be supplied by or reconciled with jvallery/agents rather than invented in this repository alone.
+  statement: Agent Platform capabilities are negotiated through supported APIs or MCP surfaces and owning-repository issues rather than invented locally.
+  status: validated
+- id: ASM-003
+  statement: Orbit and Gravity implementation details may evolve independently while preserving the PilotProject and evidence-interface contracts approved by the North Star.
   status: open
+- id: ASM-004
+  statement: GitHub and npm remain the current source and package control planes until an approved migration changes them.
+  status: validated
 contradictions:
 - id: CON-001
-  statement: The transcript explores one branch per wave, while current Verdify policy defaults to one issue, lane, branch, worktree, session, pull request, and preview.
-  source_ids: [SRC-002, SRC-003, SRC-004]
-  status: open
+  statement: The old draft proposed one branch per wave, while the operating contract and locked North Star require per-issue delivery units with wave-level coordination.
+  source_ids: [SRC-002, SRC-005, SRC-009]
+  status: resolved
+- id: CON-002
+  statement: The old draft required Jason and James jointly for North Star changes, while iteration 25 assigns North Star lock to Jason and release approval to Jason or James.
+  source_ids: [SRC-005, SRC-007, SRC-008]
+  status: resolved
+- id: CON-003
+  statement: The old draft treated Gravity and Onyx status as unresolved, while iteration 25 identifies current Gravity as authoritative and the retired deployment as history.
+  source_ids: [SRC-005, SRC-006]
+  status: resolved
+- id: CON-004
+  statement: Generated release PRs repeatedly attempted to republish version 1.2.1, while the exact-artifact policy requires a new, unpublished version.
+  source_ids: [SRC-007, SRC-011, SRC-013]
+  status: resolved
 requirements:
   functional:
   - id: FR-001
-    statement: The package must provide triggerable lifecycle skills from transcript intake through verified release.
-    source_ids: [SRC-001, SRC-003, SRC-005]
-    acceptance_ids: [AC-001, AC-002]
+    statement: The package must deterministically route a repository to the earliest incomplete lifecycle skill and mode from validated GitHub and artifact state.
+    source_ids: [SRC-001, SRC-004, SRC-005]
+    acceptance_ids: [AC-001]
   - id: FR-002
-    statement: New transcript or walk evidence must be routed into proposed changes, conflicts, issue recommendations, and gates before protected artifacts are edited.
-    source_ids: [SRC-003, SRC-004]
-    acceptance_ids: [AC-003]
-  - id: FR-006
-    statement: Registered research, ideation, transcript evidence, and rough requirements must be synthesized into a North Star planning artifact before project definition or architecture consume them.
-    source_ids: [SRC-003, SRC-004, SRC-006, SRC-007]
-    acceptance_ids: [AC-010]
-  - id: FR-007
-    statement: Research files must be ingestible into North Star collateral with stable evidence references and queryable registry entries.
-    source_ids: [SRC-007]
-    acceptance_ids: [AC-011]
-  - id: FR-008
-    statement: North Star planning must produce separate product and architecture artifacts plus a loop/signoff record before downstream skills treat them as planning authority.
-    source_ids: [SRC-008]
-    acceptance_ids: [AC-012]
+    statement: Transcript, research, review, and planning evidence must be copied, hashed, registered, queryable, and synthesized before protected downstream artifacts consume it.
+    source_ids: [SRC-005, SRC-007, SRC-008]
+    acceptance_ids: [AC-002]
   - id: FR-003
-    statement: Repositories must pass Wave 0 hygiene or record explicit blockers before feature execution.
-    source_ids: [SRC-003, SRC-005]
-    acceptance_ids: [AC-004]
+    statement: Approved product and architecture North Stars must flow through project definition, architecture contracts, strategy, sprint planning, execution, review, release verification, and outcome acceptance.
+    source_ids: [SRC-004, SRC-005, SRC-006]
+    acceptance_ids: [AC-003]
   - id: FR-004
-    statement: The lifecycle must support a persistent controller loop with durable state, child session records, gates, waves, and handoffs.
-    source_ids: [SRC-003, SRC-005]
-    acceptance_ids: [AC-005]
+    statement: Every implementation outcome must normally map to one GitHub issue, executable lane contract, branch, leased worktree, worker session, and pull request.
+    source_ids: [SRC-002, SRC-003, SRC-009]
+    acceptance_ids: [AC-004]
   - id: FR-005
-    statement: Platform and Gravity readiness must be represented as triggerable skills and machine-checkable artifacts before Gravity feature work.
-    source_ids: [SRC-003, SRC-004, SRC-005]
+    statement: Controller and orchestrator workflows must persist lifecycle state, child sessions, gates, events, dependencies, waves, and resumable handoffs outside model conversation history.
+    source_ids: [SRC-004, SRC-005, SRC-006]
+    acceptance_ids: [AC-005]
+  - id: FR-006
+    statement: Worker closeout, fresh criticism, current-head review evidence, checks, issue state, and PR state must reconcile before integration.
+    source_ids: [SRC-002, SRC-003, SRC-006]
     acceptance_ids: [AC-006]
+  - id: FR-007
+    statement: Release automation must build and test one exact package artifact, promote only a new version from dev to main, and reconcile provenance, tag, release, and resumable transaction state.
+    source_ids: [SRC-006, SRC-009, SRC-011, SRC-012]
+    acceptance_ids: [AC-007]
+  - id: FR-008
+    statement: Verdify Skills must consume Agent Platform execution through capability-negotiated provider contracts and preserve platform-owned runtime and session authority.
+    source_ids: [SRC-005, SRC-006]
+    acceptance_ids: [AC-008]
+  - id: FR-009
+    statement: Gravity must expose cited, tenant-scoped evidence through a versioned read-only HTTP API with an MCP adapter and explicit readiness gates.
+    source_ids: [SRC-005, SRC-006]
+    acceptance_ids: [AC-009]
+  - id: FR-010
+    statement: Orbit must support governed personal-assistant and engineering-chief-of-staff workflows through least-privilege connectors, classification, audit, privacy, retention, and human controls.
+    source_ids: [SRC-005, SRC-006]
+    acceptance_ids: [AC-010]
+  - id: FR-011
+    statement: Repository recovery must inventory every local and remote work ref, preserve authoritative content, record a durable disposition, and remove only proven redundant residue.
+    source_ids: [SRC-003, SRC-013]
+    acceptance_ids: [AC-011]
+  - id: FR-012
+    statement: Consumers must be able to install or vendor the package, validate the installed shape, invoke documented skills and CLI commands, and identify the exact package version and source revision.
+    source_ids: [SRC-001, SRC-010, SRC-011]
+    acceptance_ids: [AC-012]
   non_functional:
   - id: NFR-001
     category: traceability
-    statement: Requirements, decisions, stories, gates, issues, PRs, tests, deployments, and reviews must trace back to source evidence or approved decisions.
-    source_ids: [SRC-002, SRC-003]
-    acceptance_ids: [AC-007]
+    statement: Sources, decisions, requirements, issues, contracts, commits, reviews, releases, deployments, and outcomes must remain linked by stable identifiers.
+    source_ids: [SRC-002, SRC-003, SRC-005]
+    acceptance_ids: [AC-003, AC-006]
   - id: NFR-002
     category: governance
-    statement: Human gates must prevent protected design drift, premature Gravity implementation, production changes, and unreviewed wave progression.
-    source_ids: [SRC-002, SRC-003]
-    acceptance_ids: [AC-008]
+    statement: Typed authority and human gates must fail closed for protected intent, security, production, publication, destructive operations, and unresolved material decisions.
+    source_ids: [SRC-002, SRC-003, SRC-005]
+    acceptance_ids: [AC-004, AC-006, AC-007]
   - id: NFR-003
+    category: security
+    statement: Worker execution must be least-privilege, secret-safe, namespace-isolated, auditable, and resistant to instruction-bearing untrusted content.
+    source_ids: [SRC-002, SRC-006]
+    acceptance_ids: [AC-004, AC-008]
+  - id: NFR-004
+    category: privacy
+    statement: Orbit and cross-project evidence access must enforce identity, classification, minimization, retention, deletion, and human approval boundaries.
+    source_ids: [SRC-005, SRC-006]
+    acceptance_ids: [AC-010]
+  - id: NFR-005
     category: operability
-    statement: Review-ready work must include CI evidence, a deployed environment where relevant, exact human test steps, observability evidence, and rollback information.
-    source_ids: [SRC-003]
-    acceptance_ids: [AC-009]
+    statement: Every delivery and deployment phase must provide deterministic checks, observable state, rollback or recovery instructions, support ownership, and exact stop conditions.
+    source_ids: [SRC-002, SRC-006, SRC-011]
+    acceptance_ids: [AC-005, AC-006, AC-007]
+  - id: NFR-006
+    category: portability
+    statement: Skills, schemas, templates, and CLI behavior must work from source, installed package, and supported vendored consumer repositories without hidden local paths.
+    source_ids: [SRC-001, SRC-010]
+    acceptance_ids: [AC-012]
+  - id: NFR-007
+    category: reproducibility
+    statement: Exact inputs, baseline and head SHAs, hashes, commands, environments, and outputs must be sufficient to reproduce validation and review evidence.
+    source_ids: [SRC-002, SRC-006, SRC-011]
+    acceptance_ids: [AC-002, AC-006, AC-007]
+  - id: NFR-008
+    category: maintainability
+    statement: One canonical lifecycle model and generated or validated derivative views must prevent skill, schema, documentation, and artifact drift.
+    source_ids: [SRC-001, SRC-004, SRC-005]
+    acceptance_ids: [AC-001, AC-003]
+  - id: NFR-009
+    category: resilience
+    statement: Controller and release transactions must resume safely after interruption without duplicate work, ambiguous ownership, or corrupted accepted state.
+    source_ids: [SRC-005, SRC-006, SRC-011]
+    acceptance_ids: [AC-005, AC-007]
+  - id: NFR-010
+    category: cost
+    statement: New paid services, privileged dependencies, quotas, and vendor commitments require issue-backed justification and explicit approval.
+    source_ids: [SRC-002, SRC-005]
+    acceptance_ids: [AC-008]
   constraints:
   - id: CST-001
-    statement: GitHub remains the backlog and delivery control plane until an approved migration changes that authority.
-    source_ids: [SRC-001, SRC-002]
+    statement: GitHub remains the backlog and delivery control plane; private chat is not authoritative project state.
+    source_ids: [SRC-002, SRC-003]
   - id: CST-002
-    statement: One issue equals one lane, branch, worktree, worker session, pull request, and preview by default until the wave-branch conflict is resolved.
-    source_ids: [SRC-002, SRC-004]
+    statement: Accepted implementation reaches dev through issue-linked PRs; main receives only reviewed release promotion.
+    source_ids: [SRC-009, SRC-012]
   - id: CST-003
-    statement: Gravity feature implementation cannot begin from this repository until the Gravity readiness gate is approved.
-    source_ids: [SRC-003, SRC-004]
+    statement: One issue/lane/branch/worktree/session/PR is the default unit, and active coding worktrees are never shared.
+    source_ids: [SRC-002]
+  - id: CST-004
+    statement: Workers cannot self-certify, and merge success cannot substitute for deployment or outcome verification.
+    source_ids: [SRC-002, SRC-003]
+  - id: CST-005
+    statement: Raw credentials, private keys, tokens, and sensitive reproduction detail must not enter Git, issues, PRs, logs, or chat.
+    source_ids: [SRC-002, SRC-006]
+  - id: CST-006
+    statement: Gravity and Agent Platform implementation remain subject to their owning readiness and repository gates.
+    source_ids: [SRC-005, SRC-006]
+  - id: CST-007
+    statement: Deprecated behavior has no compatibility guarantee after an approved replacement.
+    source_ids: [SRC-005, SRC-006]
+  - id: CST-008
+    statement: Historical recovery refs are not accepted code until selectively reconciled through reviewed delivery.
+    source_ids: [SRC-003, SRC-013]
   acceptance_criteria:
   - id: AC-001
-    statement: Repository validation recognizes every canonical skill, host link, schema, workflow transition, and evaluation pack.
-    evidence_expected: [ruby scripts/validate-repo.rb]
+    statement: The router selects exactly the earliest incomplete validated lifecycle state and committed route records agree with a fresh route run.
+    evidence_expected: [tests/test_cli.sh, bin/verdify route --repo ., schema-valid route-decision.yaml]
   - id: AC-002
-    statement: Full package tests pass after lifecycle-skill changes.
-    evidence_expected: [make test]
+    statement: Evidence ingestion produces hashed collateral, a schema-valid registry entry, and queryable results before planning synthesis.
+    evidence_expected: [bin/verdify northstar ingest-research, bin/verdify northstar evidence list, evidence registry validation]
   - id: AC-003
-    statement: '`bin/verdify route` sends repositories with unprocessed North Star evidence to `transcript-replan`.'
-    evidence_expected: [tests/test_cli.sh]
-  - id: AC-010
-    statement: '`northstar-planning` defines a planning artifact with goals, requirements, user stories, architecture principles, milestones, risks, conflicts, traceability, issues, gates, and handoff.'
-    evidence_expected: [skills/northstar-planning/SKILL.md, schemas/northstar-plan.schema.yaml, .agent-workflow/northstar/northstar-plan.yaml]
-  - id: AC-011
-    statement: '`northstar-research-ingest` registers research through `bin/verdify northstar ingest-research` and makes it discoverable through `bin/verdify northstar evidence list`.'
-    evidence_expected: [skills/northstar-research-ingest/SKILL.md, schemas/northstar-evidence-item.schema.yaml, schemas/northstar-evidence-registry.schema.yaml, tests/test_cli.sh]
-  - id: AC-012
-    statement: '`northstar-planning` maintains `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md`, and `northstar-artifacts.yaml` through questions, review, and signoff.'
-    evidence_expected: [skills/northstar-planning/SKILL.md, schemas/northstar-artifacts.schema.yaml, .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml]
+    statement: Approved lifecycle artifacts validate, derivative views agree with their canonical YAML, and the next role receives a complete traceable handoff.
+    evidence_expected: [ruby scripts/validate-repo.rb, bin/verdify artifact validate, traceability audit]
   - id: AC-004
-    statement: '`repo-hygiene` defines pass/warn/fail/blocked areas and completion criteria before sprint planning.'
-    evidence_expected: [schemas/repo-hygiene.schema.yaml, skills/repo-hygiene/SKILL.md]
+    statement: Lane creation rejects missing or stale contracts, duplicate leases, ambiguous worktrees, prohibited paths, and unsafe runtime namespaces.
+    evidence_expected: [tests/test_cli.sh, lane inspect output, contract and lease validation]
   - id: AC-005
-    statement: '`controller-loop` defines durable state, session records, events, gates, next actions, and handoff.'
-    evidence_expected: [schemas/controller-state.schema.yaml, skills/controller-loop/SKILL.md]
+    statement: Controller state and release ledgers recover deterministically after interruption and identify exactly one next action.
+    evidence_expected: [controller recovery tests, session ledger, status events, release transaction tests]
   - id: AC-006
-    statement: '`platform-readiness` and `gravity-readiness` produce machine-checkable readiness artifacts and stop before Gravity implementation.'
-    evidence_expected: [schemas/platform-readiness.schema.yaml, schemas/gravity-readiness.schema.yaml]
+    statement: Integration is blocked unless the exact implementation/evidence/review chain, required checks, critic decision, GitHub review state, and PR head reconcile.
+    evidence_expected: [tests/test_lane_review_validator.rb, tests/test_pr_policy.sh, critic report, GitHub checks and review]
   - id: AC-007
-    statement: Project artifacts include source IDs and traceability records linking requirements to evidence.
-    evidence_expected: [.agent-workflow/project/project-definition.yaml]
+    statement: CI installs, upgrades, corrupts, verifies, and publishes the one exact packed artifact only when version, source, integrity, provenance, tag, release, and ledger state agree.
+    evidence_expected: [release preflight tests, packed-artifact tests, publish workflow, release ledger, npm and GitHub release probes]
   - id: AC-008
-    statement: Gate types cover repo hygiene, platform readiness, and Gravity readiness.
-    evidence_expected: [verdify.workflow.yaml, lib/verdify/cli.rb]
+    statement: Platform execution uses declared capabilities, scoped credentials and namespaces, persistent session identity, and explicit unsupported-capability errors.
+    evidence_expected: [platform readiness artifact, provider contract tests, session and authorization probes]
   - id: AC-009
-    statement: Release and readiness skills preserve deployed-review, observability, human test, and rollback expectations.
-    evidence_expected: [skills/release-verification/SKILL.md, skills/platform-readiness/SKILL.md, skills/gravity-readiness/SKILL.md]
+    statement: Gravity API and MCP responses are versioned, tenant-scoped, read-only, citation-bearing, permission-checked, and readiness-approved.
+    evidence_expected: [Gravity contract tests, platform/gravity readiness artifacts, citation and authorization probes]
+  - id: AC-010
+    statement: Orbit connector workflows prove identity, least privilege, classification, audit, retention, privacy, and human-control behavior before activation.
+    evidence_expected: [Orbit connector contracts, permission tests, audit evidence, privacy and retention review]
+  - id: AC-011
+    statement: Every divergent work ref has a checked-in disposition and useful unpublished content is present on the accepted branch before redundant refs are removed.
+    evidence_expected: [recovery ledger, Git ref audit, accepted-tree path and hash comparison, clean worktree audit]
+  - id: AC-012
+    statement: Source, packed, installed, upgraded, and vendored package shapes expose only documented commands and pass their declared validation surface.
+    evidence_expected: [make test, tests/test_npm_install.sh, package verifier, consumer repository validation]
 product:
   primary_users:
   - id: USR-001
     name: Jason
     needs:
-    - Speak planning intent naturally and have agents preserve, route, and operationalize it without losing governance.
-    - Review deployed, evidence-backed work instead of supervising every agent step.
+    - Convert spoken and written intent into approved, durable, traceable project authority.
+    - Delegate broad execution while retaining material product, security, production, and North Star control.
+    - Review concrete outcomes and evidence rather than reconstruct hidden session context.
   - id: USR-002
     name: James
     needs:
-    - Co-approve protected North Star and Gravity readiness decisions with clear evidence and unresolved questions.
+    - Review exact current heads, release evidence, and customer-facing implications with clear authority boundaries.
+    - Publish and support trusted package releases without ambiguous source or recovery state.
   - id: USR-003
-    name: Worktree agent
+    name: Repository controller
     needs:
-    - Receive bounded lane contracts, ownership rules, environment permissions, and stop conditions.
-  problem_statement: Verdify needs to become a self-building SDLC skill system that can turn transcript evidence into governed requirements, skills, loops, gates, and delivery artifacts, then use those artifacts to drive Gravity to completion without bypassing human or platform readiness controls.
+    - Resume from GitHub and versioned artifacts, select one next lifecycle action, and coordinate bounded lanes without chat memory.
+  - id: USR-004
+    name: Lane worker or critic
+    needs:
+    - Receive immutable scope, owned paths, isolated resources, validation obligations, and unambiguous stop conditions.
+    - Produce or assess evidence without inheriting controller, production, or approval authority.
+  - id: USR-005
+    name: Verdify consultant or internal consumer
+    needs:
+    - Install or vendor a versioned method package and apply the same governed lifecycle to a customer-scoped repository.
+  problem_statement: Verdify needs one durable method layer that converts incomplete human intent and distributed project evidence into approved, executable, independently reviewed, releasable, and verifiable work across Skills, Agent Platform, Orbit, and Gravity without collapsing product authority, runtime authority, data authority, and delivery state into one opaque agent session.
   jobs_to_be_done:
-  - Ingest and route planning transcripts across repositories.
-  - Define project intent, architecture, and execution strategy from durable evidence.
-  - Gate repositories through hygiene, platform readiness, and Gravity readiness.
-  - Dispatch, monitor, review, verify, and accept implementation waves through durable artifacts.
+  - Ingest transcripts, research, reviews, and live-state evidence into a queryable planning record.
+  - Lock product and architecture intent, define the project end to end, and route one next lifecycle action.
+  - Turn GitHub backlog problems into bounded contracts, isolated worktrees, supervised sessions, and reviewable pull requests.
+  - Criticize exact heads, reconcile reviews and checks, publish exact artifacts, verify deployment separately, and capture outcome acceptance.
+  - Coordinate Agent Platform execution, Orbit context, and Gravity evidence through owned interfaces rather than repository leakage.
+  - Recover interrupted or unpublished work without losing knowledge or regressing accepted state.
   scope:
-  - Lifecycle skills and trigger rules.
-  - Machine-checkable schemas and templates.
-  - CLI routing and validation support.
-  - Host discovery links for Codex and Claude.
-  - Evidence-backed project definition and readiness records.
+  - Lifecycle and standalone skills, their trigger rules, references, assets, and evaluation packs.
+  - CLI routing, validation, evidence ingestion, sprint and lane coordination, leases, prompts, and compliance assessment.
+  - Canonical .agent-workflow schemas and approved project/delivery artifacts.
+  - GitHub-native issue, PR, check, review, release, deployment, and reconciliation conventions.
+  - Package build, install, vendoring, release identity, provenance, rollback, and recovery contracts.
+  - Cross-project PilotProject ownership and interfaces for Agent Platform, Orbit, and Gravity.
+  - Internal-first use with later customer-consulting reuse under the same typed authority model.
   non_goals:
-  - Implementing Gravity product features before readiness approval.
-  - Applying production infrastructure changes from planning skills.
-  - Replacing GitHub with a local Git service in this phase.
+  - Owning Agent Platform runtime implementation, Orbit connector implementation, or Gravity evidence-service implementation in this repository.
+  - Replacing GitHub, npm, target-repository GitOps, or owning-project data stores without a later approved migration.
+  - Maintaining deprecated compatibility shims after an approved replacement.
+  - Granting autonomous agents unbounded credentials, production authority, product authority, or approval authority.
+  - Treating merge, local tests, or narrative confidence as proof of deployment or user outcome.
   success_metrics:
   - id: MET-001
-    measure: Canonical skills recognized by validator
-    target: Validator reports sixteen skills and all required schemas.
+    measure: Canonical package integrity
+    target: Repository validation, manifest verification, full tests, packed install tests, and declared skill/schema counts agree on every accepted head.
   - id: MET-002
-    measure: Transcript evidence routing
-    target: Route command selects `transcript-replan` when North Star evidence is unrouted.
+    measure: Lifecycle determinism
+    target: Every validated repository state produces one earliest next skill/mode and no protected stage is skipped without an authorized recorded gate.
   - id: MET-003
-    measure: Gravity gate preservation
-    target: Gravity readiness skill and intake artifact both prohibit feature implementation before approval.
+    measure: Delivery traceability
+    target: Every integrated implementation change links an issue, approved contract, lease/session, exact head, closeout, critic decision, checks, and PR outcome.
+  - id: MET-004
+    measure: Release trust
+    target: Every published version maps one-to-one to a tested tarball, source commit, integrity record, provenance statement, tag, GitHub release, and completed release ledger.
+  - id: MET-005
+    measure: Recovery safety
+    target: Interrupted controller and publication transactions resume without duplicate release records, ambiguous ownership, or lost accepted work.
+  - id: MET-006
+    measure: Review quality
+    target: Required exact-head criticism and GitHub review evidence are current, nonempty, identity-valid, and resolved before integration.
+  - id: MET-007
+    measure: Cross-project contract compliance
+    target: Agent Platform, Orbit, and Gravity exchanges use versioned owned interfaces with scoped identity, citations where applicable, and readiness evidence.
+  - id: MET-008
+    measure: Cleanup completeness
+    target: All divergent local and remote work refs have checked-in dispositions; accepted content is on main; surviving worktrees are clean and intentional.
   risks:
-  - The platform surface may expand faster than readiness evidence can be validated.
-  - Branch/wave identity remains unresolved and could break automation if encoded prematurely.
-  - Approval semantics for Jason and James are still open.
+  - Lifecycle rigor can become ceremonial if artifacts are accepted without current evidence or if emergency bypasses are normalized.
+  - Exact-head review can deadlock when only the PR author is available; delivery-control work must provide effective authorized reviewers without weakening independence.
+  - Release automation can create duplicate invalid promotions until version and transaction state become first-class inputs.
+  - Cross-project scope can drift unless every gap remains in its owning repository and interface contracts remain versioned.
+  - Governed personal context creates significant privacy and retention risk if connector identity or classification boundaries are vague.
+  - Historical recovery can reintroduce obsolete architecture if exact refs are merged wholesale rather than selectively reconciled.
 design:
   surfaces:
   - id: SURF-001
     type: skill
-    actor: Codex or Claude session
-    purpose: Trigger bounded lifecycle procedures with progressive disclosure.
-    inputs: [user request, repository state, .agent-workflow artifacts]
-    outputs: [validated artifacts, handoff, proposed issues, gates]
-    requirement_ids: [FR-001, FR-002, FR-003, FR-004, FR-005]
+    actor: Human-triggered or routed agent session
+    purpose: Execute one bounded lifecycle or standalone workflow with progressive disclosure and explicit stop conditions.
+    inputs: [user intent, repository state, GitHub state, approved artifacts, evidence]
+    outputs: [canonical artifacts, issue or PR actions, validation evidence, handoff]
+    requirement_ids: [FR-001, FR-002, FR-003]
   - id: SURF-002
     type: cli
-    actor: Router or operator
-    purpose: Validate artifacts, route lifecycle state, ingest research, initialize workflows, manage lanes, and compile prompts.
-    inputs: [repository path, artifacts, research files, Git state]
-    outputs: [route decision, validation result, evidence registry entry, lease, prompt manifest]
-    requirement_ids: [FR-001, FR-002, FR-007]
+    actor: Controller, planner, worker, critic, or operator
+    purpose: Route, validate, ingest evidence, assess compliance, manage sprints and leases, and compile immutable prompts.
+    inputs: [repository path, command arguments, Git refs, artifact files]
+    outputs: [structured decisions, validations, leases, worktrees, prompt manifests, errors]
+    requirement_ids: [FR-001, FR-002, FR-004, FR-005]
   - id: SURF-003
     type: artifact
-    actor: Lifecycle skills and controller
-    purpose: Persist intent, requirements, readiness, gates, sessions, and evidence independently of chat history.
-    inputs: [source evidence, decisions, runtime evidence]
-    outputs: [.agent-workflow YAML and Markdown views]
-    requirement_ids: [FR-002, FR-003, FR-004, FR-005, NFR-001]
-  - id: SURF-005
-    type: planning_artifact
-    actor: North Star planning agent
-    purpose: Convert registered research, ideation, requirements, and routed transcript evidence into product and architecture North Star artifacts with a structured signoff record.
-    inputs: [routed transcript intake, evidence registry, registered collateral, requirements, ideation, current artifacts]
-    outputs: [.agent-workflow/northstar/NORTHSTAR_PRODUCT.md, .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md, .agent-workflow/northstar/northstar-artifacts.yaml, .agent-workflow/northstar/northstar-plan.yaml]
-    requirement_ids: [FR-006, FR-007, FR-008, NFR-001]
+    actor: Lifecycle roles and reviewers
+    purpose: Persist approved intent, scope, decisions, state, evidence, gaps, and handoffs outside conversation history.
+    inputs: [evidence IDs, decisions, GitHub links, exact SHAs, validation results]
+    outputs: [schema-valid YAML and aligned Markdown views]
+    requirement_ids: [FR-002, FR-003, FR-005, NFR-001]
   - id: SURF-004
-    type: human_gate
-    actor: Jason and James
-    purpose: Approve protected changes, readiness gates, and Gravity pilot execution.
-    inputs: [readiness checklist, conflicts, risks, proposed decisions]
-    outputs: [approved, rejected, changes requested]
-    requirement_ids: [FR-005, NFR-002]
+    type: github_control_plane
+    actor: Maintainer, controller, worker, critic, release operator
+    purpose: Own backlog, proposed code, checks, current-head reviews, accepted merges, releases, and durable coordination.
+    inputs: [issues, branches, commits, PR metadata, reviews, checks, releases]
+    outputs: [authoritative delivery state and immutable links]
+    requirement_ids: [FR-004, FR-006, FR-007, NFR-002]
+  - id: SURF-005
+    type: agent_platform_provider
+    actor: Verdify controller or orchestrator
+    purpose: Negotiate worker/session capabilities and dispatch isolated execution without assuming a specific runtime adapter.
+    inputs: [capability request, scoped prompt, repo/worktree identity, resource policy]
+    outputs: [session ID, status events, terminal or MCP handles, evidence references, unsupported-capability error]
+    requirement_ids: [FR-005, FR-008, NFR-003]
+  - id: SURF-006
+    type: gravity_api_mcp
+    actor: Orbit, Verdify, or an authorized evidence consumer
+    purpose: Query versioned tenant-scoped evidence and citations without granting write access to Gravity internals.
+    inputs: [tenant identity, query, filters, pagination, citation request]
+    outputs: [versioned result, citations, provenance, authorization or availability error]
+    requirement_ids: [FR-009, NFR-003]
+  - id: SURF-007
+    type: orbit_connector_plane
+    actor: Jason or an authorized assistant workflow
+    purpose: Read and synthesize governed personal and engineering context under least-privilege human controls.
+    inputs: [connector identity, authorized scope, query or scheduled workflow, classification policy]
+    outputs: [cited brief or action proposal, audit event, approval request, denied-scope error]
+    requirement_ids: [FR-010, NFR-004]
+  - id: SURF-008
+    type: package_release
+    actor: Release automation and authorized release approver
+    purpose: Build, test, publish, tag, release, recover, and verify one exact package artifact.
+    inputs: [dev revision, new version, exact tarball, checks, approval, release ledger]
+    outputs: [npm package, provenance, tag, GitHub release, completed or resumable transaction]
+    requirement_ids: [FR-007, FR-012, NFR-009]
+  - id: SURF-009
+    type: review_inbox
+    actor: Human reviewer or outcome owner
+    purpose: Present exact user stories, environments, human test steps, risks, evidence, and approval actions without hidden chat context.
+    inputs: [critic report, checks, deployment evidence, review packet]
+    outputs: [approval, changes requested, rejected outcome, accepted outcome]
+    requirement_ids: [FR-006, NFR-001, NFR-005]
+  - id: SURF-010
+    type: observability_support
+    actor: Operator, controller, or deployment verifier
+    purpose: Distinguish repository, CI, deployment, runtime, and outcome state and provide actionable diagnostics.
+    inputs: [logs, metrics, traces, events, revisions, health probes, support request]
+    outputs: [diagnostic packet, status event, incident gate, rollback or remediation action]
+    requirement_ids: [FR-005, NFR-005, NFR-009]
   flows:
   - id: FLOW-001
-    name: Transcript to routed project work
+    name: Evidence to approved delivery authority
     steps:
-    - Pin transcript as North Star evidence.
-    - Run `transcript-replan`.
-    - Run `northstar-research-ingest` for research files that need stable references.
-    - Run `northstar-planning`.
-    - Convert routed items and planning synthesis into project definition, architecture inputs, issues, or gates.
-    - Route to the earliest incomplete lifecycle skill.
-    acceptance_ids: [AC-003, AC-007, AC-010, AC-011]
+    - Register transcript, research, review, and live-state sources with hashes and trust labels.
+    - Synthesize and lock product and architecture North Stars under Jason's authority.
+    - Complete project definition and architecture contracts without inventing unresolved intent.
+    - Reconcile backlog and strategy, then select an approved sprint transaction.
+    acceptance_ids: [AC-001, AC-002, AC-003]
   - id: FLOW-002
-    name: Readiness before Gravity
+    name: Issue to integrated lane outcome
     steps:
-    - Run repo hygiene.
-    - Run platform readiness and non-Gravity pilot planning.
-    - Run Gravity readiness inventory and checklist.
-    - Require Jason and James sign-off before Gravity implementation lanes.
-    acceptance_ids: [AC-004, AC-006, AC-008]
+    - Select one ready GitHub issue and approve one executable lane contract.
+    - Create one leased worktree and dispatch one scoped worker session.
+    - Commit implementation, then evidence-only closeout, then obtain fresh exact-head criticism.
+    - Reconcile checks, review state, issue state, and PR head before integration to dev.
+    acceptance_ids: [AC-004, AC-005, AC-006]
+  - id: FLOW-003
+    name: Dev to trusted package release
+    steps:
+    - Build one exact tarball from a new-version dev revision.
+    - Exercise install, reinstall, upgrade, corruption, rollback, and declared commands against that artifact.
+    - Obtain release approval and merge only the generated dev-to-main promotion.
+    - Resume or complete npm publication, provenance, tag, release, and ledger reconciliation.
+    acceptance_ids: [AC-007, AC-012]
+  - id: FLOW-004
+    name: Four-project pilot coordination
+    steps:
+    - Verdify Skills produces method and planning contracts.
+    - Agent Platform provides capability-negotiated execution and durable session evidence.
+    - Orbit provides governed context and consumes cited Gravity evidence.
+    - Gravity exposes versioned cited evidence through read-only HTTP and MCP contracts.
+    - Readiness, security, deployment, and outcome owners approve their respective boundaries.
+    acceptance_ids: [AC-008, AC-009, AC-010]
+  - id: FLOW-005
+    name: Interrupted and unpublished work recovery
+    steps:
+    - Inventory worktrees, branches, commits, PRs, issues, and remote refs from live authority.
+    - Classify every ref as accepted, superseded, archived, recoverable, blocked, or redundant.
+    - Port useful content to the current baseline through issue-linked reviewed delivery.
+    - Record a checked-in disposition and remove redundant refs only after accepted-tree verification.
+    acceptance_ids: [AC-011]
   human_gates:
-  - Jason and James approval semantics for protected North Star changes.
-  - Repo hygiene exception approval.
-  - Platform readiness approval.
-  - Gravity readiness and pilot approval.
+  - Jason approves North Star lock and material project intent.
+  - An authorized non-worker reviewer or deterministic equivalent approves current-head integration evidence.
+  - Jason or James approves a release promotion after exact-artifact checks pass.
+  - Security, production, destructive, privileged-dependency, scope-change, and readiness decisions require their typed owners.
+  - Outcome owners accept deployed user outcomes separately from merge and deployment success.
   error_states:
-  - Transcript claim conflicts with existing authority.
-  - Required readiness evidence is missing.
-  - Agent attempts Gravity implementation before readiness approval.
-  - Session or branch identity is ambiguous.
+  - Repository, GitHub, artifact, or deployment authorities contradict each other.
+  - A route input or protected artifact is missing, stale, schema-invalid, or falsely self-approved.
+  - A worker lacks a valid lease, owns the wrong worktree, touches prohibited paths, or requests privileged credentials.
+  - Review evidence is empty, stale, unresolved, authored by the worker, or bound to another head.
+  - A release version already exists, the packed artifact differs from the tested artifact, or publication is partially complete without a resumable ledger.
+  - A provider, connector, or evidence service lacks a required capability, identity, tenant boundary, citation, or readiness approval.
+  - Recovery would overwrite newer accepted state or delete the last retrievable copy of useful work.
 lifecycle:
   coverage:
   - id: COV-001
     area: product_outcome
     status: covered
-    summary: Product outcome is a governed SDLC skill package capable of driving future Gravity work through evidence-backed loops.
-    source_ids: [SRC-001, SRC-003, SRC-004]
-    requirement_ids: [FR-001, FR-005]
+    summary: The approved outcome is an internal-first method layer that makes the four-project pilot self-building, reviewable, releasable, and reusable for consulting.
+    source_ids: [SRC-005, SRC-007, SRC-008]
+    requirement_ids: [FR-003, FR-008, FR-009, FR-010]
     decision_ids: [DEC-002, DEC-003]
   - id: COV-002
+    area: users_stakeholders_relationships
+    status: covered
+    summary: Jason, James, controllers, workers, critics, consumers, and the four project owners have explicit needs, authority, and relationship boundaries.
+    source_ids: [SRC-002, SRC-005, SRC-006]
+    requirement_ids: [FR-004, FR-006, FR-008, FR-009, FR-010]
+    decision_ids: [DEC-003, DEC-005]
+  - id: COV-003
+    area: domain_data_model
+    status: covered
+    summary: Stable domain identities include project, evidence, source, issue, sprint, lane, contract, lease, session, event, review, artifact, release, deployment, tenant, citation, and outcome; owning repositories retain their data.
+    source_ids: [SRC-003, SRC-004, SRC-006]
+    requirement_ids: [FR-002, FR-004, FR-005, FR-009]
+    decision_ids: [DEC-001, DEC-003]
+  - id: COV-004
+    area: scope_non_goals
+    status: covered
+    summary: Method/package scope, cross-project interfaces, internal-first distribution, non-goals, no-compatibility policy, and repository ownership boundaries are explicit.
+    source_ids: [SRC-005, SRC-006]
+    requirement_ids: [FR-003, FR-008, FR-009, FR-010, FR-012]
+    decision_ids: [DEC-002, DEC-003, DEC-006]
+  - id: COV-005
     area: design_surfaces
     status: covered
-    summary: Skill, CLI, artifact, research registry, North Star planning, and human-gate surfaces are identified for the current draft.
-    source_ids: [SRC-001, SRC-004, SRC-006, SRC-007]
-    requirement_ids: [FR-001, FR-002, FR-004, FR-006, FR-007, FR-008]
-    decision_ids: [DEC-002]
-  - id: COV-003
-    area: governance_ownership_approvals
-    status: unknown
-    summary: Jason and James approval semantics are known to be required but not yet defined.
-    source_ids: [SRC-003, SRC-004]
-    requirement_ids: [NFR-002]
-    decision_ids: []
-  - id: COV-004
-    area: infrastructure_hosting
-    status: deferred
-    summary: Agent Platform and Kubernetes readiness must be reconciled through `platform-readiness`.
-    source_ids: [SRC-003, SRC-004]
-    requirement_ids: [FR-005, NFR-003]
-    decision_ids: []
-  - id: COV-005
-    area: deployment_release_rollback
-    status: deferred
-    summary: Existing release-verification covers deployment proof, but rollback and deployed-review expectations need reconciliation against the new evidence.
-    source_ids: [SRC-001, SRC-003]
-    requirement_ids: [NFR-003]
-    decision_ids: []
+    summary: Skill, CLI, artifact, GitHub, provider, API/MCP, connector, release, review, and observability surfaces define actors, inputs, outputs, permissions, errors, and gates.
+    source_ids: [SRC-004, SRC-005, SRC-006]
+    requirement_ids: [FR-001, FR-005, FR-007, FR-008, FR-009, FR-010]
+    decision_ids: [DEC-003, DEC-004]
   - id: COV-006
+    area: security_privacy_compliance
+    status: covered
+    summary: Least privilege, scoped credentials, namespace isolation, untrusted-content handling, tenant identity, connector classification, audit, retention, and human controls are required; detailed implementation remains with owning projects.
+    source_ids: [SRC-002, SRC-005, SRC-006]
+    requirement_ids: [NFR-002, NFR-003, NFR-004]
+    decision_ids: [DEC-003, DEC-005]
+  - id: COV-007
+    area: infrastructure_hosting
+    status: covered
+    summary: Skills source and releases are hosted through GitHub and npm; worker/runtime hosting belongs to Agent Platform; Gravity and Orbit infrastructure stay in their owning repositories and readiness artifacts.
+    source_ids: [SRC-005, SRC-006, SRC-009]
+    requirement_ids: [FR-007, FR-008, FR-009, FR-010]
+    decision_ids: [DEC-001, DEC-003]
+  - id: COV-008
+    area: environments_configuration
+    status: covered
+    summary: Local/source, isolated test, dev integration, main release, installed/vendored consumer, and project runtime environments have distinct authority; secrets and mutable resources are scoped per role and lane.
+    source_ids: [SRC-002, SRC-006, SRC-009, SRC-010]
+    requirement_ids: [FR-004, FR-007, FR-012, NFR-003]
+    decision_ids: [DEC-004, DEC-007]
+  - id: COV-009
+    area: integrations_dependencies
+    status: covered
+    summary: GitHub, npm, Agent Platform provider contracts, Orbit connectors, Gravity HTTP/MCP, and consumer repositories are explicit integrations with failure isolation and owning authorities.
+    source_ids: [SRC-003, SRC-005, SRC-006]
+    requirement_ids: [FR-007, FR-008, FR-009, FR-010, FR-012]
+    decision_ids: [DEC-001, DEC-003, DEC-007]
+  - id: COV-010
+    area: deployment_release_rollback
+    status: covered
+    summary: Dev integration, generated main promotion, exact-artifact publication, immutable versioning, resumable release state, rollback by newer version, deployment proof, and separate outcome acceptance are required.
+    source_ids: [SRC-006, SRC-009, SRC-011, SRC-012]
+    requirement_ids: [FR-006, FR-007, NFR-005, NFR-009]
+    decision_ids: [DEC-004, DEC-007]
+  - id: COV-011
     area: operations_observability_support
-    status: deferred
-    summary: Observability is a core requirement and is initially represented in platform readiness; project-specific telemetry contracts remain to be defined.
-    source_ids: [SRC-003]
-    requirement_ids: [NFR-003]
-    decision_ids: []
+    status: covered
+    summary: Status events, logs, metrics, traces, revision markers, diagnostic packets, runbooks, incidents, support ownership, and recovery instructions are contract inputs for runtime-owning projects and release verification.
+    source_ids: [SRC-002, SRC-005, SRC-006]
+    requirement_ids: [FR-005, NFR-005, NFR-009]
+    decision_ids: [DEC-003]
+  - id: COV-012
+    area: quality_testing_evidence
+    status: covered
+    summary: Repository/schema tests, package/install tests, contract checks, exact-head critics, GitHub reviews, artifact provenance, runtime probes, and outcome evidence form distinct required quality layers.
+    source_ids: [SRC-002, SRC-006, SRC-011]
+    requirement_ids: [FR-006, FR-007, FR-012, NFR-007]
+    decision_ids: [DEC-005, DEC-007]
+  - id: COV-013
+    area: governance_ownership_approvals
+    status: covered
+    summary: Typed authority, Jason's North Star lock, Jason-or-James release approval, fresh criticism, issue ownership, readiness owners, and separate deployment/outcome acceptance are explicit.
+    source_ids: [SRC-002, SRC-003, SRC-005, SRC-007]
+    requirement_ids: [FR-004, FR-006, NFR-002]
+    decision_ids: [DEC-001, DEC-005]
+  - id: COV-014
+    area: documentation_enablement
+    status: covered
+    summary: README, workflow, lifecycle, per-skill docs, schemas, templates, changelog, vendoring guide, runbooks, review packets, and generated human views are required enablement surfaces.
+    source_ids: [SRC-001, SRC-004, SRC-010]
+    requirement_ids: [FR-003, FR-012, NFR-006, NFR-008]
+    decision_ids: [DEC-002]
+  - id: COV-015
+    area: cost_procurement_risk
+    status: covered
+    summary: Current GitHub/npm and owned infrastructure assumptions are explicit; any new paid service, privileged dependency, quota, or vendor commitment requires issue-backed approval.
+    source_ids: [SRC-002, SRC-005]
+    requirement_ids: [NFR-010]
+    decision_ids: [DEC-001]
+  - id: COV-016
+    area: migration_legacy
+    status: covered
+    summary: Deprecated behavior is removed without compatibility shims; package upgrades are tested; historical refs are selectively recovered; runtime migrations and decommissions remain owned by their project plans.
+    source_ids: [SRC-005, SRC-006, SRC-010, SRC-013]
+    requirement_ids: [FR-011, FR-012, NFR-009]
+    decision_ids: [DEC-006, DEC-008]
+  - id: COV-017
+    area: accessibility_localization
+    status: covered
+    summary: The method package is primarily text, CLI, artifact, and API based; outputs must remain machine-readable and screen-reader compatible, times use explicit zones, and any future UI or localized customer surface must define its own accessibility and locale acceptance.
+    source_ids: [SRC-001, SRC-005]
+    requirement_ids: [FR-001, FR-012, NFR-006]
+    decision_ids: [DEC-002]
   relationships:
   - id: REL-001
-    type: approver
-    parties: [Jason, James]
-    nature: Human governance boundary for protected North Star and Gravity readiness decisions.
-    owner: Jason and James
-    source_ids: [SRC-003, SRC-004]
+    type: product_authority
+    parties: [Jason, Verdify Skills]
+    nature: Jason locks North Star and material product intent; the repository preserves that authority in protected evidence and artifacts.
+    owner: Jason
+    source_ids: [SRC-005, SRC-007]
   - id: REL-002
-    type: dependency
-    parties: [VerdifyConsultancy/verdify-skills, jvallery/agents]
-    nature: Skills define lifecycle contracts; Agent Platform is expected to provide control-plane/session/environment capabilities.
-    owner: Multi-repo planning
-    source_ids: [SRC-003]
+    type: release_authority
+    parties: [Jason, James, Verdify Skills]
+    nature: Jason or James may approve a release after independent exact-head evidence and required checks; npm publication remains a separate transaction.
+    owner: Verdify Skills maintainers
+    source_ids: [SRC-005, SRC-006, SRC-011]
   - id: REL-003
-    type: pilot_customer
-    parties: [VerdifyConsultancy/verdify-skills, VerdifyConsultancy/gravity]
-    nature: Gravity is the gated proving ground for the complete lifecycle.
-    owner: Gravity readiness owner
-    source_ids: [SRC-003, SRC-004]
+    type: runtime_provider
+    parties: [Verdify Skills, Agent Platform]
+    nature: Skills defines capability and execution contracts; Agent Platform owns workers, sessions, runtime resources, and operational state.
+    owner: Agent Platform
+    source_ids: [SRC-005, SRC-006]
+  - id: REL-004
+    type: governed_context
+    parties: [Verdify Skills, Orbit]
+    nature: Skills defines planning and review methods; Orbit owns authorized personal and engineering context and connector governance.
+    owner: Orbit
+    source_ids: [SRC-005, SRC-006]
+  - id: REL-005
+    type: evidence_service
+    parties: [Verdify Skills, Gravity]
+    nature: Skills defines evidence expectations; Gravity owns versioned cited evidence processing and read-only API/MCP access.
+    owner: Gravity
+    source_ids: [SRC-005, SRC-006]
+  - id: REL-006
+    type: delivery_control
+    parties: [Verdify Skills, GitHub]
+    nature: GitHub owns backlog, proposed code, reviews, checks, releases, and durable delivery coordination; versioned artifacts remain the planning authority.
+    owner: Verdify Skills maintainers
+    source_ids: [SRC-002, SRC-003, SRC-009]
+  - id: REL-007
+    type: package_distribution
+    parties: [Verdify Skills, npm, consumer repositories]
+    nature: npm distributes immutable packages and consumers install or vendor an exact version subject to package-shape validation.
+    owner: Release maintainers and consumer owners
+    source_ids: [SRC-010, SRC-011]
   architecture_inputs:
     system_context:
-    - Verdify skills coordinate GitHub, .agent-workflow artifacts, worktrees, Agent Platform sessions, CI/CD, and human review.
+    - Verdify Skills is the method and planning layer between human intent, GitHub delivery state, Agent Platform execution, Orbit context, Gravity evidence, package distribution, and target-repository runtime verification.
+    - Each owning project remains authoritative for its source, runtime, data, security, and operational state; cross-project behavior flows through versioned contracts and evidence.
     architecture_decision_areas:
-    - North Star planning artifact authority and protected handoff.
-    - Branch/wave identity model.
-    - Controller persistence and session ledger storage.
-    - Agent Platform API or MCP contract.
-    - Repo/application/environment/namespace cardinality.
-    - RBAC and secret injection.
-    - Observability contract and review inbox integration.
+    - Canonical lifecycle graph, artifact authority, route validation, and derivative-view generation.
+    - Durable controller versus sprint-orchestrator ownership and resumable event/session storage.
+    - Agent Platform provider capability discovery, session identity, isolation, and failure contracts.
+    - Gravity API/MCP versioning, tenancy, citation, authorization, pagination, and availability contracts.
+    - Orbit connector identity, classification, audit, retention, privacy, and human-control contracts.
+    - Exact-artifact package build, integrity, provenance, release ledger, rollback, and recovery.
+    - GitHub branch protection, reviewer identity, current-head review mapping, and generated release promotion.
     quality_attributes:
-    - Traceability.
-    - Human-governed autonomy.
-    - Reproducibility.
-    - Least privilege.
-    - Runtime verifiability.
+    - Traceability and provenance.
+    - Determinism and reproducibility.
+    - Least privilege, privacy, and auditability.
+    - Resumability and failure isolation.
+    - Portability and maintainability.
+    - Operability and runtime verifiability.
+    - Fast safe progress without legacy compatibility drag.
     constraints:
-    - GitHub remains the current delivery control plane.
-    - Gravity implementation is blocked by readiness gates.
-    - Workers do not self-certify.
+    - GitHub and versioned repository artifacts retain typed authority.
+    - One issue/lane/branch/worktree/session/PR remains the default delivery unit.
+    - Workers do not self-certify and do not receive unbounded production credentials.
+    - Main receives reviewed release promotion, not ordinary implementation work.
+    - Approved replacements need not preserve deprecated compatibility.
     assumptions:
-    - Existing Agent Platform work can provide or evolve the required controller/session/runtime APIs.
+    - Owning projects will publish the provider, connector, and evidence contracts required by the four-project pilot.
+    - GitHub and npm continue to support the current internal distribution path during this milestone.
   delivery_operations:
     environments:
-    - Dev-write, stage/prod promotion-only policy is required but not yet fully encoded.
+    - Source/local validation uses isolated worktrees and lane-scoped resources.
+    - Dev is the accepted integration branch; main is the release branch; installed and vendored consumers are distinct validation environments.
+    - Runtime dev/stage/prod environments remain owned and verified by their target repositories and deployment controllers.
     infrastructure:
-    - Platform readiness must inventory Kubernetes, namespaces, quotas, PVCs, ingress, DNS, registry/cache, and GitOps.
+    - GitHub hosts source and delivery control; npm hosts immutable packages; Agent Platform hosts execution; project-specific GitOps owns runtime infrastructure.
     configuration:
-    - Skills expose schemas and templates; target repos hold project-specific configuration.
+    - Repository configuration, schemas, templates, provider capabilities, consumer vendoring config, and secret references are versioned; raw secrets are external.
     deployment:
-    - Release verification must prove the intended revision in the target environment.
+    - Integration, release publication, target deployment, runtime health, and outcome acceptance are separate transitions with separate evidence.
     rollback:
-    - Rollback criteria remain an open platform readiness decision.
-    migrations: []
+    - Source changes are reverted through Git; immutable packages roll forward with a newer version; runtime rollback follows the owning release plan; partial publication resumes from a ledger.
+    migrations:
+    - Package upgrades test supported source/install/vendor transitions; deprecated contracts are removed after approval; project data migrations remain in owning repos.
     observability:
-    - Platform readiness must include metrics, logs, traces, dashboards, SLOs, endpoint health, storage, network, and deployment markers.
+    - Controllers emit status events and session identity; release and deployment evidence names exact revisions; owning runtimes expose required logs, metrics, traces, health, and diagnostics.
     support:
-    - Human review workflow and combined review inbox remain future platform work.
+    - Maintainers own package and workflow support; project owners support their runtime/data surfaces; review packets and runbooks provide reproduction and escalation handles.
     incident_response:
-    - Incident routing remains release-verification or platform-specific policy.
+    - Incident bypass requires an authorized recorded gate; affected issues and delivery/deployment state remain open until identical re-probes prove durability.
     documentation:
-    - README, WORKFLOW, lifecycle docs, ADRs, skill docs, schemas, and .agent-workflow artifacts must stay aligned.
+    - Canonical artifacts, generated views, README/workflow/lifecycle docs, per-skill guidance, schemas, changelog, release notes, and recovery ledgers must agree.
   open_gaps:
   - id: GAP-001
-    area: governance
-    question: 'What approval rule applies to protected North Star changes: Jason, James, either, both, or change-class-specific?'
-    impact: Blocks DESIGN_COMMITTED and protected-file enforcement.
-    owner: Jason and James
-    blocking: true
+    area: release_safety
+    question: When will exact packed-artifact testing and the resumable publication ledger be implemented?
+    impact: Blocks the next trusted npm promotion but does not block project-definition or architecture handoff.
+    owner: GitHub issue #120
+    blocking: false
     status: open
   - id: GAP-002
-    area: branch_model
-    question: Should automation retain one issue/lane/branch/worktree/session/PR or introduce one branch per wave?
-    impact: Blocks wave automation and branch policy changes.
-    owner: Release and skills owners
-    blocking: true
+    area: delivery_control
+    question: When will dev protection, effective reviewers, release-only main policy, and current-head review submission be enforced live?
+    impact: Raises integration deadlock and bypass risk; owned by delivery-control implementation.
+    owner: GitHub issue #121
+    blocking: false
     status: open
   - id: GAP-003
-    area: platform
-    question: What is the canonical repo/application/environment/namespace cardinality and RBAC boundary?
-    impact: Blocks platform readiness and Gravity pilot approval.
-    owner: Platform and security owners
-    blocking: true
+    area: recovery
+    question: Which exact historian, evidence, and historical-control artifacts from fe1f94e and f425515 remain authoritative on the current baseline?
+    impact: Blocks final repository cleanup and default-branch completeness, not project-definition approval.
+    owner: GitHub issue #126
+    blocking: false
     status: open
   - id: GAP-004
+    area: agent_platform
+    question: Which supported provider capabilities and runtime readiness evidence satisfy the four-project pilot?
+    impact: Blocks Agent Platform dispatch readiness and dependent pilot execution.
+    owner: Agent Platform owning issues and platform-readiness
+    blocking: false
+    status: open
+  - id: GAP-005
     area: gravity
-    question: Does Gravity still depend on Onyx?
-    impact: Blocks Gravity readiness approval.
-    owner: Jason and Gravity readiness owner
-    blocking: true
+    question: Which API/MCP implementation and readiness evidence satisfy the approved versioned cited-evidence contract?
+    impact: Blocks Gravity integration and pilot readiness, not Skills architecture work.
+    owner: Gravity owning issue and gravity-readiness
+    blocking: false
+    status: open
+  - id: GAP-006
+    area: orbit
+    question: Which connector identities, classification rules, retention policies, and human controls authorize the approved Orbit scope?
+    impact: Blocks governed Orbit connector activation, not Skills architecture work.
+    owner: Orbit owning issue and product/security owners
+    blocking: false
+    status: open
+  - id: GAP-007
+    area: package_integrity
+    question: How will manifest and archive generation select one reproducible shipped-file set independent of ignored or untracked host state?
+    impact: Blocks trusted local package generation on contaminated worktrees and is owned by issue #130; it does not block project-definition approval.
+    owner: GitHub issue #130
+    blocking: false
     status: open
   handoff_readiness:
     architecture_contracts:
-    - Project definition is draft; architecture should wait until discovery, requirements, product, and design surface are approved or explicit gates are accepted.
+    - "Ready: approved North Star and project definition provide system context, ownership, interfaces, decision areas, quality attributes, constraints, and owner-routed gaps with no blocking unknown."
+    - Architecture must not absorb Agent Platform, Orbit, or Gravity implementation ownership and must retain exact-artifact and current-head review constraints.
     sprint_planning:
-    - Sprint planning is blocked by missing approved project definition, architecture, state-of-union, and repo hygiene.
+    - "Not yet ready: architecture/module contracts, current state-of-union strategy, and required repo-hygiene evidence remain downstream prerequisites."
+    - Issue #126 remains a candidate recovery outcome after those prerequisites or an explicitly authorized hygiene handoff.
     release_verification:
-    - Release verification is not applicable until an approved sprint produces integrated work.
+    - "Not ready: issue #120 release-safety implementation, a genuinely new version, required checks, independent release approval, and exact-artifact evidence are required before main promotion."
 traceability:
-- from: SRC-003
-  to: FR-002
-  relationship: supports transcript-to-replan requirement
-- from: SRC-003
-  to: FR-005
-  relationship: supports platform and Gravity readiness requirement
-- from: SRC-004
-  to: CON-001
-  relationship: records branch/wave conflict
-- from: FR-005
-  to: SURF-004
-  relationship: requires human-gate surface
-- from: FR-004
-  to: SURF-003
-  relationship: requires durable controller artifacts
+- from: SRC-005
+  to: DEC-002
+  relationship: approves internal-first four-project product outcome
 - from: SRC-006
-  to: FR-006
-  relationship: supports North Star planning requirement
-- from: FR-006
-  to: SURF-005
-  relationship: requires planning artifact surface
+  to: DEC-003
+  relationship: assigns cross-project architecture ownership
 - from: SRC-007
-  to: FR-007
-  relationship: supports research evidence registry requirement
-- from: FR-007
-  to: SURF-002
-  relationship: requires CLI ingest and query command
-- from: FR-007
-  to: SURF-005
-  relationship: supplies registered evidence for planning synthesis
-- from: SRC-008
+  to: DEC-005
+  relationship: records product and release approval authority
+- from: SRC-011
+  to: DEC-007
+  relationship: requires exact-artifact recoverable publication
+- from: SRC-013
+  to: DEC-008
+  relationship: requires selective recovery and disposition
+- from: DEC-002
+  to: FR-003
+  relationship: requires end-to-end lifecycle realization
+- from: DEC-003
   to: FR-008
-  relationship: supports split product/architecture North Star artifact requirement
-- from: FR-008
+  relationship: requires Agent Platform provider boundary
+- from: DEC-003
+  to: FR-009
+  relationship: requires Gravity evidence interface
+- from: DEC-003
+  to: FR-010
+  relationship: requires governed Orbit context interface
+- from: DEC-004
+  to: FR-004
+  relationship: defines issue and lane delivery unit
+- from: DEC-005
+  to: FR-006
+  relationship: requires independent current-head review
+- from: DEC-007
+  to: FR-007
+  relationship: requires trusted package transaction
+- from: DEC-008
+  to: FR-011
+  relationship: requires checked-in work-ref recovery
+- from: FR-001
+  to: SURF-002
+  relationship: implemented through deterministic CLI routing
+- from: FR-002
+  to: SURF-003
+  relationship: persists evidence and synthesis as artifacts
+- from: FR-004
+  to: SURF-004
+  relationship: uses GitHub as delivery control plane
+- from: FR-005
   to: SURF-005
-  relationship: requires product and architecture artifacts plus signoff record
+  relationship: consumes persistent platform session capabilities
+- from: FR-006
+  to: SURF-009
+  relationship: presents review evidence and decisions
+- from: FR-007
+  to: SURF-008
+  relationship: exposes exact package release transaction
+- from: FR-008
+  to: REL-003
+  relationship: preserves Agent Platform runtime ownership
+- from: FR-009
+  to: REL-005
+  relationship: preserves Gravity evidence ownership
+- from: FR-010
+  to: REL-004
+  relationship: preserves Orbit context ownership
+- from: FR-011
+  to: FLOW-005
+  relationship: defines recovery workflow
+- from: FR-012
+  to: SURF-008
+  relationship: validates package distribution shape
 - from: NFR-002
+  to: COV-013
+  relationship: defines governance lifecycle coverage
+- from: NFR-003
+  to: COV-006
+  relationship: defines security lifecycle coverage
+- from: NFR-005
+  to: COV-011
+  relationship: defines operations lifecycle coverage
+- from: NFR-007
+  to: COV-012
+  relationship: defines testing and evidence lifecycle coverage
+- from: NFR-009
   to: GAP-001
-  relationship: approval semantics gap blocks governance completion
+  relationship: leaves release recovery implementation with issue owner
+- from: AC-003
+  to: COV-014
+  relationship: requires aligned canonical and human-readable documentation
+- from: AC-011
+  to: GAP-003
+  relationship: leaves repository cleanup execution with issue #126
+- from: SRC-015
+  to: GAP-007
+  relationship: routes host-local package contamination to issue #130
 approval:
-  status: pending
-  approver: null
-  approved_at: null
+  status: approved
+  approver: Jason (via approved iteration-25 North Star lock)
+  approved_at: '2026-07-10T01:56:25Z'
