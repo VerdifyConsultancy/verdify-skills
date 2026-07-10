@@ -1,0 +1,154 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+pull_request: 184
+worker_agent: codex
+worker_session_id: worker-120-release-safety-20260710t0611z-v2
+critic_agent: codex-critic
+implementation_head_sha: "a6e886046886108d3f38f5728a39edb849172fdc"
+evidence_head_sha: "84360737d1ba142c4f895e08a0ec0db122101c40"
+reviewed_head_sha: "84360737d1ba142c4f895e08a0ec0db122101c40"
+closeout_path: .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
+closeout_sha256: "d5d020b0d82a9fae7c0f92fb453e69a37dd68d305cc4aa5625a3409151572b72"
+critic_session_id: critic-120-release-safety-20260710t0700z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-release-safety/critic-issue-120-release-safety
+outcome: request_fixes
+findings:
+  - id: FIND-001
+    severity: high
+    statement: >-
+      The publication transaction does not retain the built and consumer-tested
+      candidate across workflow attempts. Every publish run packs again, and the
+      release ZIP is nondeterministic, so a retry after npm or GitHub release
+      mutation can no longer prove or reuse the original release asset set.
+    evidence:
+      - ".github/workflows/publish-npm.yml:43-54 always runs build-release-candidate before reconciliation, and lines 84-130 publish or upload only the newly rebuilt paths; there is no pinned upload/download-artifact step, prior-run lookup, or explicit artifact retention."
+      - "scripts/build-release-candidate.sh:34-43 rewrites package.json gitHead to the current source SHA before npm pack; the worker's I tarball SHA-256 was d618f6f8c0144aef8f08fb387d0d54790ab8edf166cd49521908bc240ad14db1, while the independently built E tarball SHA-256 was 24825b00debebb967784867455e7117823fa711bc3b8e042d8e0bcdc1a600a82. The eventual main head will therefore produce different bytes from the I artifact that supplied worker evidence."
+      - "A controlled pair of clean E builds produced the same tarball digest 24825b00debebb967784867455e7117823fa711bc3b8e042d8e0bcdc1a600a82 but different ZIP digests 59df652e370485bd9f4ae1acf388d770aae3f768638a13d83d623a3d3b78712f and b57e2d119946d67735727b497dee16b3020df3fa4d0a2af7a09493bc38424131. scripts/package.sh:19-27 stages files with current timestamps and archives them without timestamp normalization."
+      - ".github/workflows/publish-npm.yml runs structural candidate verification but never invokes the exact-tarball install, reinstall, public-1.2.1 upgrade, Node 18, collision, or rollback matrix on the tarball passed to npm publish. A failed-job recovery therefore cannot satisfy the one-pack proof or exact-published-bytes consumer evidence."
+    requested_action: >-
+      Split candidate construction/testing from privileged publication, persist one
+      digest-bound candidate bundle with explicit retention, and make every resume
+      retrieve that bundle rather than repack. Make the ZIP reproducible, run the
+      complete consumer matrix on the exact tarball later passed to npm publish, and
+      add a cross-attempt fixture covering failures after npm publication and after
+      partial GitHub release asset upload.
+  - id: FIND-002
+    severity: high
+    statement: >-
+      Pack rollback deletes operator-owned targets when backup fails before every
+      target has been moved, because cleanup removes the entire changed-target set
+      but restores only the subset already recorded in backups.
+    evidence:
+      - "lib/verdify/cli.rb:2492-2500 records a backup only after FileUtils.mv succeeds; lines 2525-2533 then remove every changed target on any exception and restore only recorded backups."
+      - "An independent fault-injection probe failed the second FileUtils.mv. The first operator target was restored, but the not-yet-backed-up second target and the pre-existing operator manifest were both deleted: first_restored=true, second_preserved=false, manifest_preserved=false."
+      - "tests/test_cli.sh and tests/test_npm_install.sh exercise conflict preflight and a failure after backups and link creation, but do not inject first, middle, or last backup/write failures that occur before rollback ownership is fully recorded."
+    requested_action: >-
+      Never remove an existing target unless its backup is durably recorded. Stage
+      and validate the complete backup plan before target mutation, track created and
+      replaced paths separately, make rollback itself fail safely, and add injected
+      first, middle, last, manifest, and restore failure tests that assert all
+      operator bytes and types remain intact.
+  - id: FIND-003
+    severity: high
+    statement: >-
+      Release reconciliation accepts a sidecar whose recorded archive identity does
+      not match the exact archive, then writes the false identity into a schema-valid
+      ledger and authorizes npm publication.
+    evidence:
+      - "scripts/release-transaction.rb:79-89 verifies the archive and checksum against the actual ZIP but never compares the ZIP size or SHA-256 to sidecar.archive; lines 220-222 copy the unverified sidecar values into the ledger."
+      - "An independent live-read-only probe changed sidecar.archive.sha256 to 64 zeroes and sidecar.archive.size to 1 while leaving the valid ZIP in place. Reconciliation returned state=artifact_verified, next_action=publish_npm, errors=[], and recorded the all-zero archive digest instead of the actual a91f996f9ce3ecd5076d4e6258c83d7eaf27014e5187304c619366484f152527."
+      - "scripts/verify-npm-tarball.rb:75-89 similarly validates only the format of package_file_list_blob and does not compare the sidecar npm_shasum with the exact tarball, leaving other recorded candidate identities self-asserted."
+    requested_action: >-
+      Validate every sidecar identity against exact local bytes and the clean source
+      before querying authorities: archive size/SHA-256/checksum filename and digest,
+      tarball SHA-1 shasum, package-file-list blob at the source commit, package
+      identity, and source commit. Add one mismatch fixture for every ledger field and
+      require each to fail closed with no publish action.
+  - id: FIND-004
+    severity: medium
+    statement: >-
+      Release-PR automation prevents published or unbumped versions but can create a
+      duplicate issue and PR for an unpublished version whose prior candidate issue
+      or dev-to-main PR was closed.
+    evidence:
+      - ".github/workflows/release-pr.yml:70-77 searches only open issues and only the first 100 results; lines 122-129 search only open dev-to-main PRs. Neither query reconciles a closed candidate before lines 79-86 and 131-135 create new objects."
+      - "tests/test_release_preflight.sh:104-110 checks that npm preflight precedes mutation but has no open/closed issue or PR state matrix."
+      - "Live read-only GitHub evidence shows repeated closed dev-to-main candidates for the same 1.2.1 version, including PRs 177, 180, and 183, demonstrating that closed-candidate duplication is an active repository failure mode."
+    requested_action: >-
+      Reconcile open, closed, and merged candidate issues and PRs by durable version
+      identity before mutation. Reuse or deterministically stop on the existing
+      candidate, avoid bounded top-100 title scans as identity authority, and add a
+      mocked workflow matrix for open, closed-unmerged, merged, and conflicting
+      candidate states.
+  - id: FIND-005
+    severity: medium
+    statement: >-
+      The checked-in upgrade and minimum-runtime regressions are too shallow to prove
+      the claimed real 1.2.1 upgrade and Node 18 command compatibility on future
+      changes.
+    evidence:
+      - "tests/test_npm_install.sh:65-79 constructs a one-skill local directory with only package.json and one SKILL.md instead of installing and initializing the published 1.2.1 artifact."
+      - "tests/test_npm_install.sh:148-155 exercises only --version under Node 18; all installed package verification, init, pack, collision, and rollback commands run under the host Node version."
+      - "Independent critic probes did pass an actual npm @verdify-cli/cli@1.2.1 init followed by the E tarball's forced 1.3.0 upgrade, and passed Node 18 init plus pack list against the E tarball. Those observations establish current behavior but do not provide the required durable regression coverage."
+    requested_action: >-
+      Replace the synthetic upgrade tree with a digest-pinned faithful 1.2.1 package
+      fixture or controlled public-tarball install and run its real init before
+      upgrade. Run installed verification plus substantive init/pack commands and at
+      least one failure/rollback case under Node 18.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: not_satisfied
+    evidence:
+      - "One npm pack invocation is enforced per local build and one verified path reaches npm publish, but I, E, S, and eventual main produce different tarball bytes because gitHead is rebound; the publish workflow does not consume a persisted consumer-tested candidate."
+      - "The 28 normalized skill comparisons independently confirmed that every SKILL.md changed only metadata.version from 1.2.1 to 1.3.0, and VERSION, package.json, and CHANGELOG agree on 1.3.0."
+  - criterion_id: LANE-AC-02
+    assessment: not_satisfied
+    evidence:
+      - "The E tarball passed the bundled fresh install, reinstall, collision, corruption, rollback, installed-command, and Node-version fixtures; independent real-1.2.1 upgrade and Node 18 init/pack probes also passed."
+      - "The durable suite uses a one-skill synthetic upgrade tree and only --version on Node 18, and the eventual main tarball is not the exact artifact exercised by this matrix."
+  - criterion_id: LANE-AC-03
+    assessment: not_satisfied
+    evidence:
+      - "First, middle, last, manifest collision, and post-link injected rollback fixtures pass, but an independent second-backup failure deletes not-yet-backed-up operator state and the existing manifest."
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - "The package file-set suite independently rejected missing, changed, extra, duplicate, unsafe, and symlink/wrong-type members; static review confirms exact member/type comparison, one-root enforcement, regular manifest files, and fixed discovery-link targets."
+      - "scripts/package-file-list.rb remains blob 23dadc1d138fdd5b8269ffc76d11d691f2faed9b at baseline, D, I, and E, and the issue 130 immutable-index regression passed."
+  - criterion_id: LANE-AC-05
+    assessment: not_satisfied
+    evidence:
+      - "State reconstruction ignores partial ledgers and the prepared through completed, partial, mismatch, unknown-authority, corrupt-ledger, and finalization fixtures pass."
+      - "Cross-attempt recovery repacks instead of retrieving one candidate, repeated ZIPs are nondeterministic, and a false sidecar archive digest is accepted and copied to the ledger with publish_npm as the next action."
+  - criterion_id: LANE-AC-06
+    assessment: not_satisfied
+    evidence:
+      - "Both workflows use official full commit SHAs for checkout/setup-node/setup-ruby, npm is pinned to 11.4.2, and OIDC plus --provenance are preserved."
+      - "There is no explicitly retained candidate upload, and release-PR reconciliation ignores closed candidate issues and PRs, allowing duplicate objects for the same unpublished version."
+  - criterion_id: LANE-AC-07
+    assessment: not_satisfied
+    evidence:
+      - "All required local suites and gitleaks passed independently at E, and current E validate, pull-request-policy, and compliance checks pass."
+      - "The high artifact-identity/recovery and operator-state-loss findings block an exact-head approval despite green deterministic checks."
+evidence_assessment:
+  - "The active detached critic lease, worktree, remote lane ref, and live PR head matched E 84360737d1ba142c4f895e08a0ec0db122101c40 before report creation. critic agent codex-critic and session critic-120-release-safety-20260710t0700z differ from worker agent codex and session worker-120-release-safety-20260710t0611z-v2."
+  - "D 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3 is the first child of baseline da2f43392e768c7554fd35d750507eea64ca0fb3 and adds only the sprint plan, wave release plan, and corrected lane contract; all three are byte-identical through E."
+  - "I a6e886046886108d3f38f5728a39edb849172fdc changes 52 contract-owned substantive paths after D, no coordination-required or prohibited paths, and E adds only the canonical closeout in a linear history. The package-file-list blob is unchanged."
+  - "The independently computed closeout SHA-256 is d5d020b0d82a9fae7c0f92fb453e69a37dd68d305cc4aa5625a3409151572b72 and its contract hash equals a59c8c57bc52606de707e812fd87bb8b8d446f7754f3c0109e26d001bcf405ef."
+  - "At E, repository validation passed for 28 skills and 48 schemas; focused packed-artifact, release-transaction, release-preflight, package-file-set, CLI, and npm-install suites passed; make test passed with 90 runs and 533 assertions; gitleaks scanned four lane commits with no findings."
+  - "The exact E tarball was verdify-cli-cli-1.3.0.tgz, size 418135, SHA-256 24825b00debebb967784867455e7117823fa711bc3b8e042d8e0bcdc1a600a82, SHA-512 ce5658c3982ef2d58253e291b0ebbb1e54f3aed3041650c8300711bcf751a70079be05fb537d5fc42a47ccb674abe34e0131440585679409bbb261fe13a3d99d, and npm integrity sha512-zlZYw5gu8tWCU+KRsOu7HlTzrtMEFlDIMAcRvPdRpwB5vgX7U31fxCpHzLZ0q+NOATFEBYVnlAm7smH+E6PZnQ==."
+  - "Live public facts remain safe for a future authorized 1.3.0 release: main/tag/npm/GitHub release 1.2.1 resolve to 898d7c78845f11a4cec29556e698ebd27aa58ef1, while npm 1.3.0, tag v1.3.0, and GitHub release v1.3.0 are absent. Read-only reconciliation at E returned artifact_verified/publish_npm with zero errors for the untampered candidate."
+  - "The superseded I1 validate failure at 8a23df5c1917837ff7323273307f3dd0d2e8d8e5 was solely tests/test_packed_artifact.sh invoking unavailable rg. I a6e886046886108d3f38f5728a39edb849172fdc replaced that test dependency; all I and E checks passed, so the I1 result is not current evidence."
+integration_risks:
+  - "The request_fixes outcome blocks integration and must not receive an advancing GitHub approval. Fixes must return through lane delivery with new I/E/report heads and fresh independent criticism."
+  - "The dev branch advanced to 52225d0dc6cba9a7157ba3b43803dd6f674c2102 after dispatch. A later controller must reconcile current dev without rewriting the immutable D history."
+  - "Issue 121 delivery controls and the required James-authored dev-to-main PR with Jason's non-author approval remain separate final-promotion gates even after these findings are repaired."
+  - "No npm publication, tag, GitHub release, main promotion, GitHub review, merge, deployment, credential use, private-advisory disclosure, or protected-path mutation is authorized or performed by this critic."
+residual_risks:
+  - "Privileged npm publication and GitHub release mutation were intentionally not exercised. Current authority reads and workflow static review cannot replace a later authorized release-verification run."
+  - "npm and GitHub availability remain external recovery dependencies; unknown authority responses currently fail closed to manual reconciliation."
+  - "Any commit after the report-only S head invalidates its exact-head checks and requires a rebuilt evidence/review chain."
+reviewed_at: "2026-07-10T07:16:46Z"
