@@ -361,7 +361,7 @@ module Verdify
         raise CommandError, "review packet is not approved and complete"
       end
       completeness = packet["evidence_completeness"] || {}
-      blocking_questions = Array(packet["questions"]).select { |question| question["blocking"] == true && question["status"] == "open" }
+      blocking_questions = Array(packet["questions"]).select { |question| question["blocking"] == true && question["status"] != "answered" }
       unless Array(completeness["missing_required"]).empty? &&
              Array(completeness["blockers"]).empty? &&
              Array(packet.dig("security", "unresolved_findings")).empty? &&

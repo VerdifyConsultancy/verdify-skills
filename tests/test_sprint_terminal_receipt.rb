@@ -218,6 +218,15 @@ class SprintTerminalReceiptTest < Minitest::Test
     assert_includes error.message, "retains missing evidence, blockers"
   end
 
+  def test_generator_rejects_complete_packet_with_escalated_blocking_question
+    fixture = build_fixture(packet_blocking_question: true)
+    validator = receipt_validator(fixture)
+    error = assert_raises(Verdify::CommandError) do
+      validator.write!(sprint_id: SPRINT, controller_ref: "controller/#{SPRINT}", receipt_base_sha: fixture[:base])
+    end
+    assert_includes error.message, "open blocking questions"
+  end
+
   def test_generator_rejects_failed_migration_and_unready_rollback
     fixture = build_fixture(release_failed: true)
     validator = receipt_validator(fixture)
@@ -316,7 +325,7 @@ class SprintTerminalReceiptTest < Minitest::Test
 
   private
 
-  def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil, packet_blocked: false, release_failed: false)
+  def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil, packet_blocked: false, packet_blocking_question: false, release_failed: false)
     @root = Dir.mktmpdir("verdify-terminal-receipt-")
     git("init", "-q", "-b", "main")
     git("config", "user.name", "Verdify Test")
@@ -379,7 +388,13 @@ class SprintTerminalReceiptTest < Minitest::Test
     end
     git("add", ".agent-workflow")
     git("commit", "-qm", "assemble controller evidence")
-    write_packet(report, base_ref: packet_base_ref, issue_ids: controller_issue_ids || [123], blocked: packet_blocked)
+    write_packet(
+      report,
+      base_ref: packet_base_ref,
+      issue_ids: controller_issue_ids || [123],
+      blocked: packet_blocked,
+      blocking_question: packet_blocking_question
+    )
     git("add", relative_packet_path)
     git("commit", "-qm", "packet P")
     packet = sha
@@ -456,7 +471,7 @@ class SprintTerminalReceiptTest < Minitest::Test
     write_relative(relative_critic_path, YAML.dump(critic))
   end
 
-  def write_packet(report, base_ref: "dev", issue_ids: [123], blocked: false)
+  def write_packet(report, base_ref: "dev", issue_ids: [123], blocked: false, blocking_question: false)
     packet = Verdify::SchemaValidator.load_document(
       Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/#{SPRINT}/review/review-inbox-packet.yaml")
     )
@@ -473,6 +488,10 @@ class SprintTerminalReceiptTest < Minitest::Test
     packet["evidence_completeness"]["missing_required"] = []
     packet["evidence_completeness"]["blockers"] = blocked ? ["critical blocker"] : []
     packet["security"]["unresolved_findings"] = blocked ? ["critical authorization defect"] : []
+    if blocking_question
+      packet.fetch("questions").first["blocking"] = true
+      packet.fetch("questions").first["status"] = "escalated"
+    end
     packet["recommendation"]["outcome"] = "approve"
     write_relative(relative_packet_path, YAML.dump(packet))
   end
