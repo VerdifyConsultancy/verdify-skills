@@ -1,0 +1,22 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: pr-173-admin-merge-override
+sprint_id: 2026-07-10-recovery-publication
+lane_id: issue-126-recovery-publication
+type: policy_exception
+status: approved
+question: "May PR #173 use administrator bypass after fresh critic approval when GitHub forbids the author from submitting the required non-author review?"
+owner: Jason Vallery
+evidence_required:
+  - "PR #173 exact D/I/E/S chain: b4ea69b, b13f17b, abdc6be, dcefe45."
+  - "Fresh critic outcome approve_with_risks at S with distinct worker and critic agents, sessions, and worktrees."
+  - "Validate, pull-request-policy, and compliance checks pass on exact S."
+  - "Low findings are durably routed to issue #174 and issue #120; no material or blocking finding remains."
+  - "The user explicitly authorized autonomous PR administration and override of GitHub approval restrictions."
+allowed_decisions: [admin_merge, wait_for_non_author_review, request_fixes, stop]
+decision: admin_merge
+rationale: "GitHub correctly rejects an author self-approval, so no approval will be fabricated. Administrator bypass accepts the two recorded low risks after independent criticism and current exact-head checks; it grants no release, publication, destructive cleanup, or runtime authority."
+opened_at: "2026-07-10T05:49:57Z"
+resolved_at: "2026-07-10T05:49:57Z"
+resume_state: READY_FOR_INTEGRATION
