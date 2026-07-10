@@ -1,0 +1,118 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-autonomous-platform-strategy
+lane_id: issue-211-autonomous-platform-strategy
+status: ready_for_critic
+issue_ids: [211]
+pull_request: 212
+baseline_sha: "314516e1ba110fa981a235b21f09750bcbc42500"
+implementation_head_sha: "754d1369062cbd66283a05b4f1c66fab3d788182"
+validated_head_sha: "754d1369062cbd66283a05b4f1c66fab3d788182"
+contract_hash: "946b8e72bc59ba4b067203dcbbb881a359ca00f51c8dc99f538ee0856b3a0a60"
+changed_paths:
+  - .agent-workflow/intake/transcript-replan.md
+  - .agent-workflow/intake/transcript-replan.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260710-autonomous-development-platform-best-practices.yaml
+  - .agent-workflow/northstar/collateral/sources/NSE-20260710-autonomous-development-platform-best-practices-2026-07-10-autonomous-development-platform-best
+  - .agent-workflow/northstar/evidence-registry.yaml
+  - .agent-workflow/northstar/research-inbox/2026-07-10-autonomous-development-platform-best-practices.md
+  - .agent-workflow/router/route-decision.md
+  - .agent-workflow/router/route-decision.yaml
+  - .agent-workflow/strategy/state-of-union.md
+  - .agent-workflow/strategy/state-of-union.yaml
+  - MANIFEST.sha256
+  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
+validation_results:
+  - id: transcript-validation
+    command: bin/verdify artifact validate --file .agent-workflow/intake/transcript-replan.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: strategy-validation
+    command: bin/verdify artifact validate --file .agent-workflow/strategy/state-of-union.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: evidence-validation
+    command: bin/verdify artifact validate for the North Star evidence item and registry
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: evidence-query
+    command: bin/verdify northstar evidence list --repo . --query autonomous-development --json
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: research-claim-consistency
+    command: compare inbox/copied bytes and SHA-256, then compare item/registry claims, summary, and planning_relevance
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:19:30Z"
+    artifact: .agent-workflow/northstar/collateral/NSE-20260710-autonomous-development-platform-best-practices.yaml
+  - id: audit-provenance
+    command: read-only git, gh, Argo, Kubernetes, dashboard API, Gravity HTTP/SQL/Job, pod image, and in-pod revision probes recorded in the committed audit ledger
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:06:56Z"
+    artifact: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#fresh-current-state-audit-ledger
+  - id: security-backlog-reconciliation
+    command: verify jvallery/agents#2906 and VerdifyConsultancy/verdify-skills#116 are open and linked through the strategy
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:23:21Z"
+    artifact: https://github.com/jvallery/agents/issues/2906
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: diff-check
+    command: git diff --check 314516e1ba110fa981a235b21f09750bcbc42500..754d1369062cbd66283a05b4f1c66fab3d788182
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="314516e1ba110fa981a235b21f09750bcbc42500..754d1369062cbd66283a05b4f1c66fab3d788182"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:20:00Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T14:22:30Z"
+    artifact: /tmp/issue-211-autonomous-platform-strategy-evidence/fix1-final-I-validation.log
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [transcript-validation, evidence-validation, evidence-query, research-claim-consistency]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [strategy-validation, audit-provenance, security-backlog-reconciliation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [strategy-validation, audit-provenance, security-backlog-reconciliation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [repository-validation, diff-check, secret-scan, full-suite]
+    assessment: satisfied
+discovered_issues: [135]
+residual_risks:
+  - Fresh independent criticism and exact-head GitHub checks remain pending by design at evidence head E.
+  - The committed runtime ledger is point-in-time evidence; the strategy defines but does not itself prove the four-project vertical slice, typed stop implementation, or unattended durability window.
+  - Agent Platform issues 2884, 2887, and 2906 remain pre-dispatch P0 stop gates until separately contained and live-verified.
+worktree_clean: true
+worker_agent: root-strategy-worker
+worker_session_id: worker-211-autonomous-platform-strategy-20260710t1340z
+completed_at: "2026-07-10T14:23:30Z"
+limitations:
+  - No North Star lock, feature implementation, credential use, runtime mutation, branch protection, or release mutation was performed.
+  - Runtime probes were read-only and sanitized; raw response bodies and credential values are not committed.
+  - Cross-repository issue jvallery/agents#2906 is recorded in strategy and GitHub evidence but cannot appear in the same-repository integer discovered_issues field.
