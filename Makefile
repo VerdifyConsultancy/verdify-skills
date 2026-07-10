@@ -5,6 +5,7 @@ validate:
 	ruby scripts/validate-repo.rb
 
 test: validate manifest-check
+	bash tests/test_package_file_set.sh
 	ruby tests/test_schema_validator.rb
 	bash tests/test_cli.sh
 	bash tests/test_pr_policy.sh
