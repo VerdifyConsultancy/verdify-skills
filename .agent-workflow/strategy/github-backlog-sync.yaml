@@ -1,340 +1,435 @@
+---
 schema_ref: github-backlog-sync.schema.yaml
 kind: GitHubBacklogSync
-schema_version: "1.0"
-sync_id: gbs-2026-07-10-delivery-controls
+schema_version: '1.0'
+sync_id: gbs-post-135-autonomous-platform-2026-07-10
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: "2026-07-10T09:28:20Z"
+captured_at: '2026-07-10T21:15:06Z'
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
   live_access: live
   snapshot_ref: null
   limitations:
-    - No GitHub Project or milestone is configured; Issues remain backlog authority.
-    - Package runtime logs, metrics, traces, and alerts are not applicable.
+  - Scope is the user-authorized issue sequence and its direct dependencies, not every issue in four repositories.
+  - Runtime health was not re-probed because it does not affect selection of the next Verdify CI lane.
 snapshot:
   snapshot_ref: null
-  captured_at: "2026-07-10T09:28:20Z"
+  captured_at: '2026-07-10T21:15:06Z'
   freshness: live_only
   api_sources:
-    - surface: issues
-      source_ref: live issue API
-      captured: true
-      limitation: None for relevant open and recently completed issues.
-    - surface: pulls
-      source_ref: "live pull request API through PR #192"
-      captured: true
-      limitation: Closed invalid release candidates remain historical evidence.
-    - surface: checks
-      source_ref: live PR check rollups
-      captured: true
-      limitation: "PR #189 includes repeated checks from each dev advance."
-    - surface: workflow_runs
-      source_ref: live Actions runs through dev e702911
-      captured: true
-      limitation: Failed earlier runs are retained alongside later success.
-    - surface: deployments
-      source_ref: npm deployment and GitHub release API
-      captured: true
-      limitation: Latest deployed package is still 1.2.1.
-    - surface: environments
-      source_ref: npm GitHub environment
-      captured: true
-      limitation: The environment has no protection rules.
-    - surface: projects
-      source_ref: repository planning surfaces
-      captured: false
-      limitation: No Project or milestone is configured.
-    - surface: git
-      source_ref: origin/dev e702911 and origin/main 898d7c7
-      captured: true
-      limitation: Rescue refs remain intentionally local or retained remote handles.
+  - surface: issues
+    source_ref: live GitHub issue API for Verdify Skills, Agents, Gravity, and Orbit
+    captured: true
+    limitation: Cross-project findings are bounded to the named program issues.
+  - surface: pulls
+    source_ref: live linked pull request searches for sequenced issues
+    captured: true
+    limitation: No requested implementation issue has an open linked pull request.
+  - surface: checks
+    source_ref: exact-head check runs for Verdify Skills pull requests 213 and 214
+    captured: true
+    limitation: Pull request 214 policy jobs hit anonymous API exhaustion; authenticated full validation passed.
+  - surface: workflow_runs
+    source_ref: Verdify Skills Actions runs 29123314829 and 29123314875
+    captured: true
+    limitation: Issue 215 owns the workflow authentication repair.
+  - surface: deployments
+    source_ref: existing cross-project diagnostic ledgers
+    captured: false
+    limitation: No runtime-changing work is selected by this strategy refresh.
+  - surface: projects
+    source_ref: repository issue authority
+    captured: false
+    limitation: GitHub Issues, not project boards, are authoritative for this sequence.
+  - surface: dependencies
+    source_ref: issue bodies, comments, and user-authorized sequence
+    captured: true
+    limitation: Some cross-repository dependencies are recorded textually because GitHub does not expose one shared dependency graph.
+  - surface: local_artifacts
+    source_ref: .agent-workflow strategy, sprint, lane, critic, release, outcome, and terminal receipt artifacts
+    captured: true
+    limitation: Candidate strategy changes are not authoritative until merged to protected dev.
+  - surface: git
+    source_ref: protected dev at 1c142c75b10629ec9aa1b3048e7db060c1cbd212
+    captured: true
+    limitation: No source changes are included in this planning-only reconciliation.
 issue_findings:
-  - issue: 121
-    title: Enforce protected dev integration and release-only main promotion
-    state: OPEN
-    classification: candidate
-    labels: [type:problem, risk:high]
-    assignees: []
-    milestone: null
-    dependencies: ["terminal #120 dev outcome", "open PR #189"]
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["live branch protection", ".github/CODEOWNERS", "PR #189 policy run 29083094613"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/121"]
-    required_action: Plan and execute as the sole next lane, then apply and verify live controls.
-  - issue: 188
-    title: Release @verdify-cli/cli@1.3.0
-    state: OPEN
-    classification: in_progress
-    labels: []
-    assignees: []
-    milestone: null
-    dependencies: ["#121", "current-head Jason approval"]
-    sub_issues: []
-    linked_prs: ["#189"]
-    project_refs: []
-    evidence_refs: ["dev version 1.3.0", "James-authored dev-to-main PR"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/188"]
-    required_action: "Keep open and unmerged until issue #121 and live verification complete."
-  - issue: 120
-    title: Test and publish the exact packed artifact as an atomic recoverable transaction
-    state: OPEN
-    classification: in_progress
-    labels: [type:problem, risk:high]
-    assignees: []
-    milestone: null
-    dependencies: ["#121", "#188"]
-    sub_issues: []
-    linked_prs: ["#184", "#189"]
-    project_refs: []
-    evidence_refs: ["terminal sprint 2026-07-10-release-safety", "dev@5d3393e"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/120"]
-    required_action: Close after final main/npm/tag/release/ledger verification.
-  - issue: 130
-    title: Ignore host-local and untracked files in manifests and archives
-    state: OPEN
-    classification: in_progress
-    labels: [type:problem]
-    assignees: []
-    milestone: null
-    dependencies: ["#188"]
-    sub_issues: []
-    linked_prs: ["#166"]
-    project_refs: []
-    evidence_refs: ["dev@17b3762", "terminal package-file-set outcome"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/130"]
-    required_action: Close after final released artifact proves the accepted file set.
-  - issue: 126
-    title: Publish timeline-historian and reconcile local delivery residue
-    state: OPEN
-    classification: in_progress
-    labels: [type:problem]
-    assignees: []
-    milestone: null
-    dependencies: ["#188", "post-release cleanup"]
-    sub_issues: []
-    linked_prs: ["#173"]
-    project_refs: []
-    evidence_refs: ["dev@da2f433", "docs/recovery-ledger-2026-07-10.md"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/126"]
-    required_action: Close after main inclusion and safe rescue cleanup.
-  - issue: 190
-    title: Backfill missing release verification for completed package sprints
-    state: CLOSED
-    classification: done
-    labels: [type:problem]
-    assignees: []
-    milestone: null
-    dependencies: []
-    sub_issues: []
-    linked_prs: ["#191"]
-    project_refs: []
-    evidence_refs: ["dev@a9c2669", "restored project-router validation"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/190"]
-    required_action: No action.
-  - issue: 174
-    title: Reject malformed historian content digests and mismatched asset IDs
-    state: OPEN
-    classification: deferred
-    labels: [type:problem]
-    assignees: []
-    milestone: null
-    dependencies: []
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["issue #126 critic low finding"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/174"]
-    required_action: Keep for the post-release quality wave.
-  - issue: 71
-    title: Validate route status strings and transitions
-    state: OPEN
-    classification: deferred
-    labels: []
-    assignees: []
-    milestone: null
-    dependencies: []
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["quality backlog"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/71"]
-    required_action: Keep for the post-release quality wave.
-  - issue: 73
-    title: Reject vacuous approval evidence
-    state: OPEN
-    classification: deferred
-    labels: []
-    assignees: []
-    milestone: null
-    dependencies: []
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["quality backlog"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/73"]
-    required_action: Keep for the post-release quality wave.
-  - issue: 12
-    title: Negotiate Agent Platform capabilities and supported worker adapters
-    state: OPEN
-    classification: blocked
-    labels: [bug, type:problem, risk:critical]
-    assignees: []
-    milestone: null
-    dependencies: ["Agent Platform readiness"]
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["external provider boundary"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/12"]
-    required_action: Keep blocked on owning platform evidence.
-  - issue: 116
-    title: Codify the platform loop-native operating convention
-    state: OPEN
-    classification: blocked
-    labels: [enhancement]
-    assignees: []
-    milestone: null
-    dependencies: ["#12", "#121", "verified 1.3.0 release"]
-    sub_issues: []
-    linked_prs: []
-    project_refs: []
-    evidence_refs: ["iteration-25 North Star"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/116"]
-    required_action: Resume after package trust and Agent Platform gates.
-  - issue: 142
-    title: Sequence repository recovery and trusted main promotion
-    state: OPEN
-    classification: in_progress
-    labels: [type:problem]
-    assignees: []
-    milestone: null
-    dependencies: ["#121", "#188"]
-    sub_issues: []
-    linked_prs: ["#144"]
-    project_refs: []
-    evidence_refs: ["this state-of-union refresh"]
-    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
-    required_action: "Close after #121, final release, and cleanup reconciliation."
+- issue: 12
+  title: Negotiate Agent Platform capabilities and dispatch lanes through supported worker adapters
+  state: OPEN
+  classification: blocked
+  labels: [bug, 'type:problem', 'risk:critical']
+  assignees: []
+  milestone: null
+  dependencies:
+  - Agents Stage 0 security closure
+  - Agents #2497 and #655 ownership reconciliation
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - current issue body and 2026-07-09 capability-contract comment
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/12
+  required_action: Reconcile adapter ownership, then plan the versioned capability contract.
+- issue: 43
+  title: Lifecycle skills need a shared bounded agentic-loop control contract
+  state: OPEN
+  classification: underspecified
+  labels: ['type:problem', 'risk:high']
+  assignees: []
+  milestone: null
+  dependencies:
+  - issues 71, 73, 75, and 74
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - current issue body
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/43
+  required_action: Refresh the stale skill-count scope and choose one common contract home before dispatch.
+- issue: 70
+  title: Route engine has no change_class and trivial changes traverse the full lifecycle
+  state: OPEN
+  classification: candidate
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 43 common bounded-loop contract
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - current issue body and 2026-07-10 authority-envelope comment
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/70
+  required_action: Compile the comment into a bounded risk-policy lane after issue 43.
+- issue: 71
+  title: Route engine routes on unvalidated status strings
+  state: OPEN
+  classification: stale
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 215 reliable receipt CI
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - current route implementation and lane-review validator regressions
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+  required_action: Reconcile acceptance against current code and close or narrow before adding implementation.
+- issue: 73
+  title: Empty evidence arrays can satisfy approval
+  state: OPEN
+  classification: candidate
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 71 reconciliation
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - critic acceptance_assessment schema
+  - release integration_results schema
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/73
+  required_action: Narrow to non-empty, criterion-complete critic evidence.
+- issue: 74
+  title: Semantic validator and eval runner are not merge-blocking in consumer CI
+  state: OPEN
+  classification: blocked
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 73
+  - issue 75
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - current issue body
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/74
+  required_action: Plan after stable validator and eval-runner commands exist.
+- issue: 75
+  title: Build an executable eval runner
+  state: OPEN
+  classification: underspecified
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 73 trusted evidence contract
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - 28 current eval packs with zero fixture-file references
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/75
+  required_action: Define fixture, oracle, deterministic execution, and CI-budget contracts before dispatch.
+- issue: 116
+  title: One SDLC platform loop-native operating convention and fleet rollout
+  state: OPEN
+  classification: blocked
+  labels: [enhancement]
+  assignees: []
+  milestone: null
+  dependencies:
+  - Verdify issues 43, 70, and 12
+  - Agent Platform authority and security
+  - Gravity and Orbit readiness
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - approved four-project plan
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/116
+  required_action: Keep as rollout umbrella, not a single implementation lane.
+- issue: 135
+  title: Reconcile completed sprints left active and unblock global routing
+  state: CLOSED
+  classification: done
+  labels: ['type:problem']
+  assignees: []
+  milestone: null
+  dependencies: []
+  sub_issues: []
+  linked_prs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/213
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/214
+  project_refs: []
+  evidence_refs:
+  - protected dev at 1c142c75b10629ec9aa1b3048e7db060c1cbd212
+  - six valid terminal receipt artifacts
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/135
+  required_action: None; preserve terminal evidence.
+- issue: 211
+  title: Publish evidence-backed four-project autonomous platform plan
+  state: OPEN
+  classification: in_progress
+  labels: [documentation, enhancement]
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 135 complete
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - explicit delegated program authority
+  - this state-of-union refresh
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/211
+  required_action: Merge the approved refresh, verify routing, and close.
+- issue: 215
+  title: Authenticate GitHub evidence reads in receipt CI
+  state: OPEN
+  classification: candidate
+  labels: ['type:problem', 'verdify:discovered-work', 'risk:high']
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 135 terminal receipt contract
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - pull request 214 Actions runs
+  - authenticated production validator pass
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/215
+  required_action: Select as the sole next sprint candidate.
+- issue: null
+  title: Agent Platform Stage 0 security and authority sequence
+  state: OPEN
+  classification: blocked
+  labels: ['risk:critical']
+  assignees: []
+  milestone: null
+  dependencies:
+  - Agents #2884
+  - Agents #2887
+  - Agents #2906
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - live Agents issue API
+  github_refs:
+  - https://github.com/jvallery/agents/issues/2884
+  - https://github.com/jvallery/agents/issues/2887
+  - https://github.com/jvallery/agents/issues/2906
+  required_action: Keep the four-project slice blocked until all three close with runtime proof.
+- issue: null
+  title: Gravity citation and API/MCP readiness
+  state: OPEN
+  classification: blocked
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - Gravity #407
+  - Gravity #184
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - live Gravity issue API
+  github_refs:
+  - https://github.com/VerdifyConsultancy/gravity/issues/407
+  - https://github.com/VerdifyConsultancy/gravity/issues/184
+  required_action: Execute 407, then close 184 from live citation evidence.
+- issue: null
+  title: Orbit trust and lifecycle repair
+  state: OPEN
+  classification: blocked
+  labels: []
+  assignees: []
+  milestone: null
+  dependencies:
+  - Orbit #197
+  - Orbit #193 through #196
+  - Orbit #198
+  - Orbit #43
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - live Orbit issue API
+  github_refs:
+  - https://github.com/jvallery/orbit/issues/197
+  - https://github.com/jvallery/orbit/issues/193
+  - https://github.com/jvallery/orbit/issues/198
+  - https://github.com/jvallery/orbit/issues/43
+  required_action: Resolve authority and trust contracts before implementation fan-out.
 pr_findings:
-  - pr: 189
-    branch: dev
-    base_branch: main
-    state: OPEN
-    draft: false
-    linked_issues: [188]
-    head_sha: "e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
-    checks_status: fail
-    deployment_status: missing
-    finding: "Valid 1.3.0 route and James authorship; held because main's old policy fails and no real approval or #121 live controls exist."
-    evidence_refs: ["policy run 29083094613", "issue #121"]
-  - pr: 184
-    branch: lane/120-release-safety
-    base_branch: dev
-    state: MERGED
-    draft: false
-    linked_issues: [120]
-    head_sha: "d1e8cdc2e616443db90d11dc2ef39310e5b74339"
-    checks_status: pass
-    deployment_status: not_applicable
-    finding: Zero-finding critic-approved release safety integrated to dev at 5d3393e under the committed admin exception.
-    evidence_refs: ["terminal release-safety sprint", "PR #184"]
-  - pr: 191
-    branch: controller/2026-07-10-terminal-verification-repair
-    base_branch: dev
-    state: MERGED
-    draft: false
-    linked_issues: [190]
-    head_sha: "4404991e6bb438ae1e453cd08de632eb986a196a"
-    checks_status: pass
-    deployment_status: not_applicable
-    finding: Backfilled historical terminal verification and restored valid global routing.
-    evidence_refs: ["dev@a9c2669"]
-  - pr: 192
-    branch: controller/2026-07-10-release-safety-terminal
-    base_branch: dev
-    state: MERGED
-    draft: false
-    linked_issues: [120]
-    head_sha: "6ee649aed51481b06f71c72c584a9c5b4752365f"
-    checks_status: pass
-    deployment_status: not_applicable
-    finding: "Terminalized the bounded #120 dev outcome and routed to this strategy refresh."
-    evidence_refs: ["dev@e702911"]
+- pr: 213
+  branch: lane/135-terminal-sprint-authority
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [135]
+  head_sha: 4073b6748c608021681212e0602729ad72f8a08f
+  checks_status: pass
+  deployment_status: not_applicable
+  finding: Exact-head validation, policy, compliance, delivery, and fresh critic checks passed before protected-dev integration.
+  evidence_refs:
+  - merge commit 27c33f178c747cf239cbf988cd9ffe95039dd732
+- pr: 214
+  branch: controller/2026-07-10-six-sprint-recovery-receipt
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [135]
+  head_sha: 5b2ecf456852901a2d613b0627c670fbe5fcb015
+  checks_status: fail
+  deployment_status: not_applicable
+  finding: Authenticated production validation passed all six receipts, while three Actions policy jobs failed from anonymous API exhaustion now owned by issue 215.
+  evidence_refs:
+  - merge commit 1c142c75b10629ec9aa1b3048e7db060c1cbd212
+  - issue 215
 lane_findings:
-  - lane_id: issue-120-release-safety
-    contract_ref: .agent-workflow/sprints/2026-07-10-release-safety/lanes/contracts/issue-120-release-safety.contract.yaml
-    issue_ids: [120]
-    branch: lane/120-release-safety
-    pr_refs: ["#184"]
-    status: aligned
-    findings: ["D/I3/E4/S3 is terminal and verified on dev; final package release remains a separate release-verification action."]
-  - lane_id: issue-121-delivery-controls
-    contract_ref: null
-    issue_ids: [121]
-    branch: null
-    pr_refs: []
-    status: not_started
-    findings: ["Issue is ready for one sprint lane; no branch, contract, lease, or PR exists yet."]
+- lane_id: issue-135-terminal-authority
+  contract_ref: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/lanes/issue-135-terminal-authority/contract.yaml
+  issue_ids: [135]
+  branch: lane/135-terminal-sprint-authority
+  pr_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/213
+  status: aligned
+  findings:
+  - D/I/E/S evidence and a fresh independent critic are integrated.
+  - The sprint and all recovered historical transactions have canonical terminal receipts.
+- lane_id: issue-215-receipt-ci-auth
+  contract_ref: null
+  issue_ids: [215]
+  branch: null
+  pr_refs: []
+  status: not_started
+  findings:
+  - The issue is bounded and ready for sprint planning.
+  - No lane, branch, worktree, worker session, or pull request exists yet.
 delivery_findings:
-  - ref: main branch protection
-    type: branch_rule
-    status: fail
-    evidence_refs: ["live branches/main/protection", "issue #121"]
-    finding: Main requires validate, pull-request-policy, compliance, admin enforcement, and conversation resolution, but no PR review.
-  - ref: dev branch protection
-    type: branch_rule
-    status: missing
-    evidence_refs: ["live branches/dev/protection", "issue #121"]
-    finding: Dev is unprotected.
-  - ref: PR #189 candidate policy
-    type: check
-    status: fail
-    evidence_refs: ["policy run 29083094613", "main@898d7c7"]
-    finding: "Main's 1.2.1 trusted policy expects version 1.2.1 and rejects the 1.3.0 marker; issue #121 needs a bootstrap candidate-side delivery policy."
-  - ref: npm release 1.2.1
-    type: release
-    status: pass
-    evidence_refs: ["npm:@verdify-cli/cli@1.2.1", "GitHub release v1.2.1", "main@898d7c7"]
-    finding: Current accepted release authorities agree on 1.2.1.
-  - ref: workflow review permissions
-    type: other
-    status: fail
-    evidence_refs: ["actions/permissions/workflow"]
-    finding: Default workflow permissions are read and can_approve_pull_request_reviews is false; no workflow may substitute a fake release approval.
+- ref: protected-dev
+  type: branch_rule
+  status: pass
+  evidence_refs:
+  - live branch protection after pull requests 213 and 214
+  finding: Required checks, CODEOWNERS review, admin enforcement, and force/deletion protections were restored after both bounded merge exceptions.
+- ref: sprint-terminal-authority
+  type: check
+  status: pass
+  evidence_refs:
+  - six authenticated SprintTerminalReceipt validate_full passes
+  finding: integrated_unterminated is zero and terminal sprint authority is deterministic.
+- ref: receipt-ci-authentication
+  type: workflow_run
+  status: fail
+  evidence_refs:
+  - Actions run 29123314829
+  - Actions run 29123314875
+  - issue 215
+  finding: Valid recovery evidence exceeded anonymous GitHub API capacity because the policy steps lacked GH_TOKEN.
+- ref: post-135-project-router
+  type: other
+  status: pass
+  evidence_refs:
+  - .agent-workflow/router/route-decision.yaml
+  finding: The router truthfully selects state-of-union while the canonical strategy remains unapproved.
 actions:
-  - id: GBSA-001
-    type: route
-    target: "issue #121"
-    owner: sprint-planning
-    status: proposed
-    apply_through: state_of_union
-    evidence_refs: ["live branch rules", "PR #189", "terminal #120 sprint"]
-  - id: GBSA-002
-    type: route
-    target: "PR #189 after #121"
-    owner: release-verification
-    status: proposed
-    apply_through: release_verification
-    evidence_refs: ["issue #188", "James authorship", "no current review"]
-  - id: GBSA-003
-    type: update_issue
-    target: "issue #190"
-    owner: state-of-union
-    status: applied
-    apply_through: github_issue
-    evidence_refs: ["PR #191", "issue closed 2026-07-10T09:28:21Z"]
-  - id: GBSA-004
-    type: no_op
-    target: "deferred quality issues #71, #73, and #174"
-    owner: state-of-union
-    status: not_applicable
-    apply_through: none
-    evidence_refs: ["live open issue inventory"]
+- id: GBSA-001
+  type: update_issue
+  target: Verdify Skills issue 211
+  owner: ROOT controller
+  status: applied
+  apply_through: github_issue
+  evidence_refs:
+  - issue 211 reopening comment
+- id: GBSA-002
+  type: create_issue
+  target: Verdify Skills issue 215
+  owner: ROOT controller
+  status: applied
+  apply_through: github_issue
+  evidence_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/215
+- id: GBSA-003
+  type: reconcile_lane
+  target: issue 71 current validator coverage
+  owner: ROOT controller
+  status: proposed
+  apply_through: github_issue
+  evidence_refs:
+  - current router and LaneReviewValidator tests
+- id: GBSA-004
+  type: route
+  target: sprint-planning for issue 215
+  owner: project-router
+  status: proposed
+  apply_through: state_of_union
+  evidence_refs:
+  - .agent-workflow/strategy/state-of-union.yaml
+- id: GBSA-005
+  type: set_dependency
+  target: four-project slice blocked by Agents 2884, 2887, and 2906
+  owner: ROOT controller
+  status: applied
+  apply_through: state_of_union
+  evidence_refs:
+  - live Agents issue API
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: "Issue #121 is the sole ready candidate; terminal #120 evidence, live branch rules, and held PR #189 define its complete scope."
+  reason: Issue 215 is the sole ready candidate after terminal issue 135, and all broader fan-out remains explicitly sequenced or blocked.
