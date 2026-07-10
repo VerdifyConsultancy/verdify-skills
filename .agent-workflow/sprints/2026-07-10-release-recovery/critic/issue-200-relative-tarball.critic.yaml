@@ -1,0 +1,124 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-release-recovery
+lane_id: issue-200-relative-tarball
+pull_request: 201
+worker_agent: codex-release-recovery
+worker_session_id: worker-200-relative-tarball-20260710t1125z
+critic_agent: codex-release-recovery-critic
+implementation_head_sha: "97b102a78ac8e675300791c8e759136432a1be2c"
+evidence_head_sha: "4f0dd1775cdc03b198cafa2fce4c9eace24fc9ea"
+reviewed_head_sha: "4f0dd1775cdc03b198cafa2fce4c9eace24fc9ea"
+closeout_path: .agent-workflow/sprints/2026-07-10-release-recovery/lanes/closeout/issue-200-relative-tarball.closeout.yaml
+closeout_sha256: "ec0019b8a75af74ae4019b6cc5f54fd0231ff3a2b9a876979774b5402c3781cc"
+critic_session_id: critic-200-relative-tarball-20260710t1135z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-release-recovery/critic-issue-200-relative-tarball
+outcome: approve
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        Live run 29089103216 failed in candidate job 86349875527 with exit 128
+        because npm invoked git ls-remote for
+        ssh://git@github.com/dist/verdify-cli-cli-1.3.0.tgz.git; its publish job
+        86349944298 was skipped.
+      - >-
+        An independent direct npm probe against the existing repository-relative
+        dist/verdify-cli-cli-1.3.0.tgz reproduced exit 128 and the same GitHub SSH
+        shorthand before the fixed script was involved.
+      - >-
+        An independent xtrace of the default npm install suite proved that its
+        locally built absolute tarball and sidecar are deliberately converted to
+        relative paths, then resolved with File.realpath before npm; the suite
+        passed and installed exact version 1.3.0.
+      - >-
+        An explicit repository-relative supplied tarball and sidecar passed the
+        full npm consumer matrix, reached npm as the candidate's canonical
+        absolute path, installed exact version 1.3.0, and emitted no dist Git
+        transport trace.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        Explicit relative and absolute supplied paths resolved to the same
+        canonical local tarball and SHA-256 bytes, and both full npm consumer
+        matrices passed with exact installed version 1.3.0.
+      - >-
+        A missing supplied tarball exited 1 with the exact missing-file rejection
+        before a PATH-injected npm shim could run.
+      - >-
+        A same-basename corrupt tarball resolved through File.realpath but exited
+        1 on the existing sidecar SHA-256 comparison before the npm shim could
+        run, proving path canonicalization does not weaken exact-byte verification.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        ruby scripts/validate-repo.rb independently passed at E with 28 skills and
+        48 schemas; actionlint .github/workflows/publish-npm.yml and the exact
+        workflow-relative packed artifact suite also passed.
+      - >-
+        bash tests/test_npm_install.sh independently passed in default, explicit
+        relative, and explicit absolute modes; the packed artifact suite repeated
+        the relative candidate path and reported the exact candidate digest.
+      - >-
+        The worker's complete make test log is revision-bound to I and ends with
+        validated_head=97b102a78ac8e675300791c8e759136432a1be2c after the
+        repository, package, delivery, release transaction, npm install, and
+        packed artifact regressions passed.
+      - >-
+        gitleaks independently scanned the three commits from baseline through E
+        with redaction and found no leaks; live E validate, compliance,
+        pull-request-policy, and delivery-policy checks are successful.
+evidence_assessment:
+  - >-
+    The detached review worktree and live PR head matched E
+    4f0dd1775cdc03b198cafa2fce4c9eace24fc9ea before report creation;
+    critic agent codex-release-recovery-critic and session
+    critic-200-relative-tarball-20260710t1135z both differ from the committed
+    worker identity and session.
+  - >-
+    D 98cdc993561d6288142daf10ca9eeb53f1416857 is the first post-baseline
+    commit and adds only the approved sprint plan, wave release plan, and lane
+    contract; all three remain byte-identical through E.
+  - >-
+    I 97b102a78ac8e675300791c8e759136432a1be2c changes only the
+    contract-owned MANIFEST.sha256 and tests/test_npm_install.sh paths, and E
+    4f0dd1775cdc03b198cafa2fce4c9eace24fc9ea adds only the canonical
+    closeout in a linear D-I-E history.
+  - >-
+    The independently computed contract SHA-256 is
+    16f8eb5fc4137d4ab4b1d476da93053b61d340fa95cb13dbd9a3412aefb454d9
+    and closeout SHA-256 is
+    ec0019b8a75af74ae4019b6cc5f54fd0231ff3a2b9a876979774b5402c3781cc,
+    exactly matching the sealed prompt and closeout backlinks.
+  - >-
+    Static review confirms the six-line implementation preserves the existing
+    ordering: file existence, realpath resolution, exact sidecar verification,
+    then npm installation. No workflow, package, version, provenance, release
+    transaction, schema, skill, or other authority path changed.
+  - >-
+    Live authority checks confirm @verdify-cli/cli@1.3.0, tag v1.3.0, GitHub
+    release v1.3.0, and the failed main SHA's retained candidate artifact remain
+    absent; run 29089103216's publish job remains skipped.
+integration_risks:
+  - >-
+    This report-only S commit must become the exact live PR head and pass the
+    transport-neutral critic-gate plus protected dev checks before integration;
+    no post-S GitHub validation result is claimed in this report.
+  - >-
+    PR 201 remains a dev-targeted release-recovery lane. Integration does not
+    authorize npm publication, a tag, a GitHub release, main promotion, or release
+    ledger mutation; ROOT retains those recovery and verification authorities.
+residual_risks:
+  - >-
+    The recovered dev-to-main promotion still requires a current commit-bound
+    APPROVED review from an allowed repository owner other than the PR author
+    before the separately authorized publish transaction.
+  - >-
+    Any commit after the report-only S head invalidates exact-head critic status
+    and requires rebuilding the review chain.
+reviewed_at: "2026-07-10T11:44:01Z"
