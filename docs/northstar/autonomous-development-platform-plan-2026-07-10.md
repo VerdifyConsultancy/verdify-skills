@@ -27,30 +27,109 @@ The plan forward is not to add more parallel agents. It is to make one complete
 four-project cycle work, survive failure, and become the regression test for
 every later fleet or customer rollout.
 
-## Maturity Model
+## Five-State Delivery Matrix
 
-This report uses evidence levels instead of one misleading numeric score:
+The five axes are independent and non-transitive. `Proven` in planning or merge
+does not imply deployment or a live outcome. `Partial` means some evidence
+exists but the axis is incomplete or internally inconsistent; `Unknown` means
+revision identity was not established; `Not demonstrated` means the required
+outcome has not occurred.
 
-| Level | Meaning |
-| --- | --- |
-| M0 | Absent or only discussed |
-| M1 | Product/architecture defined |
-| M2 | Implemented and locally validated |
-| M3 | Deployed and live-observed |
-| M4 | Integrated with consumers and release/outcome verified |
-| M5 | Autonomously reliable across a durability window and failure drills |
+| Project or surface | Planning | Implemented | Merged | Deployed revision | Live verified |
+| --- | --- | --- | --- | --- | --- |
+| Verdify method and release | Proven: iteration 25 locked | Proven: 28 skills, 48 schemas, and release controls | Proven: `dev@314516e1` and release `main@416caf3f` | Proven: `v1.3.0` binds to release main | Proven for package and runner convergence only; not an integrated platform outcome |
+| Verdify autonomous transition and eval | Proven: #43/#70/#71/#73/#74/#75/#116/#135 own the work | Partial: schemas and tests exist; trusted transitions/evals remain open | Partial: current controls are merged, required additions are not | Not demonstrated as a complete autonomous controller release | Not demonstrated: #135 recurred and no unattended transaction passed |
+| Agent Platform repo-cell runtime | Partial: #2890 re-lock and readiness approval remain open | Proven: persistent cells, API, MCP, GitOps, telemetry, and loop code exist | Proven: `main@deae5f50` | Proven at follow-up: Argo synced exact main and 38 Ready repo pods used runtime digest `sha256:9936ffe0...` | Partial: 136/136 sessions Ready, but health, security, progress, and durability gates remain red |
+| Agent Platform unattended controller | Partial: durable-substrate and provider decisions remain open | Partial: loop rails and watchdog exist | Partial: current loop implementation is merged | Unknown as an isolated controller source/image identity | Not demonstrated: Gravity/Orbit retained six failures at cutoff and lifecycle reported 152/152 invalid records |
+| Gravity data plane | Partial: iteration 6 is unsigned and downstream definition is stale | Proven: acquisition, processing, packaging, indexing, and retrieval exist | Proven: `main@66cf5ccb` | Proven at follow-up: Argo synced exact main; running workload image IDs were observed separately | Partial: services and corpus are real, but conversion, work state, vector projection, and citations are degraded |
+| Gravity trusted consumer boundary | Partial: Gate B and citation parity are issue-backed | Partial: authenticated HTTP and in-process MCP tools exist | Partial: current implementation is merged | Not demonstrated for a callable network MCP/citation-complete release | Not demonstrated: hydrated citations and HTTP/MCP parity have not passed acceptance |
+| Orbit repo-cell and mission primitives | Partial: #197/#198 must reframe authority and stale sprint state | Partial: mission, dispatch, ledger, marker, reconcile, and tick primitives exist | Proven: `main@a5fbe68a` | Known mismatch: Ready pod checkout `3819f1d7` trailed main and was dirty at follow-up | Partial: pod is Ready and standalone OpenClaw is absent, but six failed loops and no behavioral CI remain |
+| Orbit governed Chief of Staff | Partial: product intent exists; trust/source decisions remain open | Partial: prototype surfaces exist | Partial: prototype code is merged | Not demonstrated as a current governed product revision | Not demonstrated: no accepted source-to-citation-to-brief transaction exists |
+| Integrated four-project transaction | Partial: locked target and issue-backed sequence exist | Not demonstrated | Not demonstrated | Not demonstrated | Not demonstrated: no correlated accepted cycle or durability window exists |
 
-| Project/surface | Current level | Evidence |
-| --- | --- | --- |
-| Verdify product and architecture | M4 | Iteration 25 locked; project definition and architecture approved; v1.3.0 release exact and verified |
-| Verdify autonomous transition/eval enforcement | M2 | Strong schemas/tests exist, but #71/#73/#74/#75 remain open and routing is blocked by #135 |
-| Agent Platform repo-cell runtime | M3 | 38/38 repo cells and 136/136 agent containers Ready; live API/MCP/GitOps exists |
-| Agent Platform unattended controller | M1-M2 | Three loops armed, Gravity/Orbit at six failures, provider mismatch, no durability window, lifecycle records invalid |
-| Gravity evidence data plane | M3 | Exact-main dev deployment, Ready services, real corpus and authenticated retrieval |
-| Gravity trusted consumer boundary | M1-M2 | Gate B open, citations not hydrated, no callable MCP service proof, readiness absent |
-| Orbit repo-cell and mission primitives | M2-M3 | Ready pod and useful scripts/ledger, but stale checkout and no protected CI |
-| Orbit governed Chief of Staff | M1 | Product intent exists; connector identity, source policy, trust split, citations, and reliable loop are unproved |
-| Integrated four-project platform | M1 | Locked architecture and issues exist; no accepted end-to-end portfolio transaction or correlated trace |
+## Fresh Current-State Audit Ledger
+
+Initial synthesis cutoff: `2026-07-10T13:23:11Z`. A critic-triggered read-only
+follow-up rechecked the exact source, GitHub, GitOps, Kubernetes, API, database,
+job, and in-pod revision claims at `2026-07-10T14:06:56Z`. The commands below
+used the existing authorized local operator context, printed no credential
+values, and made no runtime mutation. These are point-in-time observations, not
+proof of seven-day durability, mutation safety, rollback, or an accepted
+four-project outcome.
+
+### Verdify Skills probe VS-20260710
+
+- Source authority: `dev@314516e1ba110fa981a235b21f09750bcbc42500`;
+  release `main@416caf3ff005cdb78b58b7c991351edd627fd00b` and
+  [v1.3.0](https://github.com/VerdifyConsultancy/verdify-skills/releases/tag/v1.3.0).
+- Commands: `git rev-parse origin/dev origin/main`, GitHub issue/PR/check/release
+  reads, `bin/verdify route --repo . --write`, `ruby scripts/validate-repo.rb`,
+  and `make test`.
+- Result: release identity is verified; repository validation passes; the
+  committed route record returns `SPRINT_TRANSACTION_AMBIGUOUS` because four
+  completed transactions still appear active. Verdify #135 owns the recurrence.
+- Limitation: a verified package release and green repository do not establish
+  a working portfolio controller or runtime outcome.
+
+### Agent Platform probe AP-20260710
+
+- Source authority: [main `deae5f50848597fb90057b2914c105113a23e3c0`](https://github.com/jvallery/agents/commit/deae5f50848597fb90057b2914c105113a23e3c0),
+  `.agent-workflow/platform/platform-readiness.yaml`, the router record, and
+  `LOOP.md`.
+- Commands: `git -C /Users/jason/repos/agents rev-parse origin/main`; GitHub
+  issue/PR reads; `kubectl get applications.argoproj.io -A`; Kubernetes pod and
+  image-ID JSON rollups in `agent-fleet-runners`; and authorized in-pod reads of
+  dashboard `/api/live-agents`, `/api/lifecycle`, and `/api/good-morning`.
+- Follow-up result: 130 open issues and two open PRs; Argo
+  `argocd/Application agent-sessions-local-staging` was `Synced/Healthy` at the
+  exact main SHA; 38 Ready repo pods used runtime digest
+  `sha256:9936ffe09d2e5f10999bd63a45488739179c8a5feb71714ef4e72a8afea2e50b`;
+  `/api/live-agents` reported 34 repos and 136/136 Ready sessions;
+  `/api/lifecycle` reported 152/152 invalid controller records and no workers;
+  `/api/good-morning` had no populated sources/items. Initial loop/watchdog
+  probes recorded Gravity and Orbit at six failures.
+- Security result: #2884, #2887, and newly triaged #2906 are P0 stop gates.
+- Limitation: Argo follows mutable `main`; Ready sessions and a current digest
+  do not prove useful progress, safe credential handling, replay, or durability.
+
+### Gravity probe GRAV-20260710
+
+- Source authority: [main `66cf5ccb78bb3e5332da6539db669a73bb37fe46`](https://github.com/VerdifyConsultancy/gravity/commit/66cf5ccb78bb3e5332da6539db669a73bb37fe46),
+  iteration-6 North Star review state, and Gate B issues #184/#407.
+- Commands: `git -C /Users/jason/repos/gravity rev-parse origin/main`; GitHub
+  issue/PR reads; Argo Application, Deployment, pod image-ID, and Job JSON
+  reads in `gravity-dev`; aggregate read-only PostgreSQL counts; and in-cluster
+  HTTP probes of `/healthz` and `/readyz` from the Orbit cell.
+- Follow-up result: 21 open issues and two open PRs; Argo
+  `gravity-dev/Application gravity-dev` was `Synced/Healthy` at exact main; nine
+  enabled Deployments were Ready; API health/readiness returned 200. The corpus
+  held 66,452 sources, 30,403 artifacts, 5,846 generations/packages, 5,844
+  manifests, and 74,685 chunks/evidence/lexical projections, with zero vector
+  projections. Work state was 143,103 completed, 24,195 queued, 7,211 dead
+  lettered, and one retry scheduled; 66,452 outbox records were pending. The
+  conversion Job remained failed. Running image IDs were observed for every
+  Ready workload, but a callable network MCP service and hydrated citations
+  were not proven.
+- Limitation: aggregate counts and Ready workloads prove a deployed data plane,
+  not tenant-safe cited retrieval, conversion durability, rollback, or Gate B.
+
+### Orbit probe ORBIT-20260710
+
+- Source authority: [main `a5fbe68a8d5cf655f1540fdc2ef43e9418822be0`](https://github.com/jvallery/orbit/commit/a5fbe68a8d5cf655f1540fdc2ef43e9418822be0),
+  current state-of-union, and issues #193 through #198.
+- Commands: `git -C /Users/jason/repos/orbit rev-parse origin/main`; GitHub
+  issue/PR/workflow/ruleset reads; Kubernetes pod/image JSON for
+  `agent-fleet-runners/Pod repo-jvallery-orbit-0`; and an in-pod Git/status and
+  vendored-Verdify version read with `safe.directory` scoped to the checkout.
+- Follow-up result: 62 open issues and two conflicting PRs; no branch ruleset or
+  repository behavioral workflow was present. The repo pod was Ready with zero
+  restarts on Agent Platform digest `sha256:9936ffe0...`, but its checkout was
+  `3819f1d72a90e09ea902a622a10bd89f2ec4b9d5`, eight paths were dirty, and its
+  vendored Verdify was 1.1.2. Initial loop/watchdog probes recorded six failures;
+  the obsolete standalone OpenClaw deployment was absent.
+- Limitation: a Ready shared runtime and prototype scripts do not prove accepted
+  main is deployed, behavioral CI exists, connectors are governed, citations
+  resolve, or a Chief of Staff outcome is live.
 
 ## 1. What Is Working
 
@@ -302,8 +381,12 @@ mutation.
 ### Prerequisites
 
 - Verdify #135, #71, #73, #75, and #74 establish truthful control/eval state.
-- Agents #2884/#2887 are contained, #2890 is locked, #2905 is decided, and a
-  supported dispatch strategy is advertised.
+- Agents #2884/#2887/#2906 are contained and live-verified, #2890 is locked,
+  #2905 is decided, and a supported dispatch strategy is advertised. #2906
+  requires fixed provider destinations, an unknown-provider no-network result,
+  runtime egress containment, running-image refusal proof, and protected
+  prior-use/rotation disposition; issue closure or unit tests alone do not clear
+  the gate.
 - Gravity iteration 6 is signed off, Gate B dependencies are current, and one
   citation path is deployable with rollback.
 - Orbit #197/#198 align authority and lifecycle; #193-#195 establish the
@@ -346,16 +429,47 @@ mutation.
 - The outcome is accepted independently from merge and feeds one reviewed
   learning proposal into the next decision.
 
+### Typed stop contract
+
+This is a required implementation contract for Verdify #43/#116 and Agents
+#2905; it does not claim current controllers emit these outcomes.
+
+Every stop must write a recovery checkpoint, emit a `VerdifyStatusEvent` with
+the exact type below, append a `SessionLedger` `exception_recorded` event with
+`result: blocked` and an owner, and prevent the next phase transition.
+
+| Event type | Trigger | Remediation owner | Resume rule |
+| --- | --- | --- | --- |
+| `stop.stale_revision` | Accepted, base, PR-head, deployed, provider-policy, or evidence revision differs from recorded authority | Checkpoint controller and owning repository/release verifier | Refresh authority and rebuild the affected exact-head or deployment chain |
+| `stop.authorization_denied` | Policy, tenant, scope, gate, or subject-access review denies the operation | Policy/security owner | Never retry with broader authority; require a new explicit policy decision |
+| `stop.missing_citation` | Required evidence is absent, stale, unresolved, or denied | Gravity evidence owner and consuming-project owner | Resolve an authorized citation or remove/reclassify the unsupported claim |
+| `stop.provider_unavailable` | No advertised authorized provider satisfies the contract after bounded retry/failover | Agent Platform capability owner and checkpoint controller | Require fresh capability/health evidence; never force a hardcoded topology |
+| `stop.budget_expired` | Wall-clock, iteration, retry, tool-call, token, or cost budget is exhausted or lacks reserve | Controller budget-policy owner | Stop tool use and checkpoint; require a newly authorized budget |
+
+| Checkpoint | Required lifecycle result | Required evidence | Rollback or recovery trigger |
+| --- | --- | --- | --- |
+| Pre-dispatch | `SprintStatus.state: BLOCKED`; no worker launch | Route/authority snapshot, `AgentPlatformControlRequest`, diagnostic packet, status event, controller checkpoint, session ledger | Any stop cancels dispatch and releases an unstarted lease; no credential use or automatic retry |
+| Pre-merge | `CHANGES_REQUESTED` for stale revision/missing citation; otherwise `BLOCKED` | Closeout, exact-head critic, current PR/check/review refs, status event, session ledger | Any stop invalidates merge readiness; preserve code and rebuild the required I/E/S chain |
+| Pre-deploy | `BLOCKED`; `ReleaseVerification` remains non-ready | Environment/GitOps reconciliation, deployment gate, exact image/revision evidence, status event, session ledger | Hold deployment; if rollout began, restore known-good revision and record `deployment_failed` then `rolled_back` |
+| Next-loop selection | `BLOCKED`; `OutcomeReview` is incomplete/rejected; no new dispatch | Outcome review, live revisions/citations, diagnostic packet, learning proposal, status event, session ledger | Preserve the last accepted outcome and refresh every `PilotProject` before reselection |
+
+An expected authorization-refusal drill passes its negative test but does not
+satisfy the positive vertical slice.
+
 ## Delivery Sequence
 
 ### Stage 0: Truth and security floor
 
 - Verdify #135.
-- Agents #2884 and #2887.
+- Agents #2884, #2887, and #2906. Clear #2906 only with the fixed server-side
+  destination registry, no-network unknown result, runtime egress policy,
+  running-image refusal proof, sanitized audit event, and protected
+  prior-use/rotation disposition.
 - Reconcile stale/dirty target checkouts and runtime package versions.
 - Hold unattended mutation while these are red.
 
-Exit: truthful global route, contained P0s, clean exact target revisions.
+Exit: truthful global route, all three P0s contained and live-verified, clean
+exact target revisions.
 
 ### Stage 1: Trusted autonomous core
 
@@ -389,6 +503,10 @@ and no actuation authority.
 - Execute the flow above.
 - Run missed-tick, auth-expiry, quota, stale-marker, duplicate-wake,
   push-conflict, pod-restart, provider-unavailable, and citation-denial drills.
+- Exercise `stop.stale_revision`, `stop.authorization_denied`,
+  `stop.missing_citation`, `stop.provider_unavailable`, and
+  `stop.budget_expired` at their phase boundaries and verify no later transition
+  occurs.
 - Run seven scheduled days without hidden manual repair.
 
 Exit: accepted four-project outcome, correlated trace, recovery proof, stable
@@ -429,6 +547,8 @@ Exit: repeatable onboarding without a second lifecycle or manual hidden state.
 - Do not let Orbit become the global control plane or let personal context share
   fleet-actuation identity.
 - Do not accept uncited Gravity results as verified evidence.
+- Do not allow a model or caller to select where credential material is probed;
+  #2906 remains a pre-dispatch stop until the deployed refusal boundary passes.
 - Do not create another private backlog, session truth store, or second SDLC.
 - Do not add schemas/modes until a real run needs them; do not delete required
   boundaries merely because they have not yet been exercised.
@@ -440,10 +560,12 @@ Exit: repeatable onboarding without a second lifecycle or manual hidden state.
 1. Reopened Verdify Skills #135 with the verified 1.3.0 recurrence.
 2. Created Agent Platform #2905 for the durable-execution build-versus-adopt
    architecture spike.
-3. Registered this strategy and research under Verdify Skills #116.
-4. Reframed Verdify #76 around evidence-driven simplification after the vertical
+3. Created Agent Platform #2906 for the credential-probe destination P0 and made
+   it a Stage 0 stop gate.
+4. Registered this strategy and research under Verdify Skills #116.
+5. Reframed Verdify #76 around evidence-driven simplification after the vertical
    slice.
-5. Plan issue #135 as the next single-issue sprint after strategy review.
+6. Plan issue #135 as the next single-issue sprint after strategy review.
 
 ## Research Basis
 

@@ -41,22 +41,22 @@ inputs:
 - id: IN-007
   type: external_research
   location: northstar://evidence/NSE-20260710-autonomous-development-platform-best-practices
-  summary: Brave-discovered primary sources support a durable deterministic spine, bounded workers, incremental progress, outcome and trace evals, risk-tiered autonomy, least privilege, telemetry, and provenance.
+  summary: Brave-discovered primary sources support incremental reconstructable work, durable execution mechanics, outcome and trace evaluation, risk-sensitive oversight, least-privilege authorization, portable telemetry, and provenance; the Verdify architecture and sequence are separately labeled inferences.
   evidence_status: observed
 - id: IN-008
-  type: agent_platform_audit
-  location: jvallery/agents main@deae5f50848597fb90057b2914c105113a23e3c0 and current live platform surfaces
-  summary: Persistent repo cells, APIs, MCP, sessions, and GitOps are real, but security P0s, storage/Argo drift, dispatch mismatch, stale checkouts, invalid lifecycle records, and failed loops block unattended fan-out.
+  type: agent_platform_source_snapshot
+  location: https://github.com/jvallery/agents/commit/deae5f50848597fb90057b2914c105113a23e3c0 and docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
+  summary: At the snapshot cutoff, Agent Platform GitHub default-branch source authority was main@deae5f50848597fb90057b2914c105113a23e3c0.
   evidence_status: verified
 - id: IN-009
-  type: gravity_audit
-  location: VerdifyConsultancy/gravity main@66cf5ccb78bb3e5332da6539db669a73bb37fe46 and gravity-dev live state
-  summary: Gravity is a deployed data-rich alpha, but North Star signoff, platform and Gravity readiness, citations, callable MCP, conversion durability, CI, and Gate B remain incomplete.
+  type: gravity_source_snapshot
+  location: https://github.com/VerdifyConsultancy/gravity/commit/66cf5ccb78bb3e5332da6539db669a73bb37fe46 and docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  summary: At the snapshot cutoff, Gravity GitHub default-branch source authority was main@66cf5ccb78bb3e5332da6539db669a73bb37fe46.
   evidence_status: verified
 - id: IN-010
-  type: orbit_audit
-  location: jvallery/orbit main@a5fbe68a and repo-jvallery-orbit-0 live state
-  summary: Orbit has useful mission and loop primitives on a Ready cell, but stale lifecycle state, no CI/protection, failed loops, connector/trust gaps, stale Gravity integration, and version skew block a trusted Chief of Staff.
+  type: orbit_source_snapshot
+  location: https://github.com/jvallery/orbit/commit/a5fbe68a8d5cf655f1540fdc2ef43e9418822be0 and docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
+  summary: At the snapshot cutoff, Orbit GitHub default-branch source authority was main@a5fbe68a8d5cf655f1540fdc2ef43e9418822be0.
   evidence_status: verified
 - id: IN-011
   type: repository_validation
@@ -68,9 +68,39 @@ inputs:
   location: bin/verdify route --repo . --write
   summary: Global routing returns SPRINT_TRANSACTION_AMBIGUOUS because four completed 1.3.0 recovery transactions remain active; issue 135 was reopened with exact recurrence evidence.
   evidence_status: verified
+- id: IN-013
+  type: agent_platform_runtime_probe_snapshot
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
+  summary: Initial and follow-up read-only Argo, Kubernetes, API, lifecycle, loop, and image probes observed exact-main sync, 38 Ready repo cells, 136/136 Ready sessions, 152/152 invalid lifecycle records, no lifecycle workers, and Gravity/Orbit at six loop failures at the initial cutoff.
+  evidence_status: observed
+- id: IN-014
+  type: agent_platform_readiness_interpretation
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
+  summary: The snapshot proves point-in-time substrate readiness, not useful progress, safe credential probing, replay, recovery, or a seven-day unattended durability window.
+  evidence_status: inferred
+- id: IN-015
+  type: gravity_runtime_probe_snapshot
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  summary: Initial and follow-up read-only Argo, Kubernetes, API, database, Job, and image probes observed exact-main sync, nine Ready enabled Deployments, a populated corpus, and degraded conversion, work-state, vector, outbox, and citation paths.
+  evidence_status: observed
+- id: IN-016
+  type: gravity_readiness_interpretation
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  summary: The snapshot proves a point-in-time deployed data plane, not callable network MCP parity, hydrated citations, rollback, Gate B, or durability.
+  evidence_status: inferred
+- id: IN-017
+  type: orbit_runtime_probe_snapshot
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
+  summary: Initial and follow-up read-only Kubernetes, in-pod checkout/version, GitHub delivery-control, mission, and loop probes observed a Ready repo pod on the current platform digest but a stale dirty checkout, Verdify 1.1.2, no behavioral CI/ruleset, and six loop failures at the initial cutoff.
+  evidence_status: observed
+- id: IN-018
+  type: orbit_readiness_interpretation
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
+  summary: The snapshot does not prove accepted Orbit main is deployed, connectors are governed, citations resolve, or a Chief of Staff outcome is live.
+  evidence_status: inferred
 source_freshness:
 - surface: git
-  source_ref: origin/dev@314516e1ba110fa981a235b21f09750bcbc42500 and origin/main@416caf3ff005cdb78b58b7c991351edd627fd00b
+  source_ref: Verdify dev@314516e1ba110fa981a235b21f09750bcbc42500; Verdify release main@416caf3ff005cdb78b58b7c991351edd627fd00b; Agents main@deae5f50848597fb90057b2914c105113a23e3c0; Gravity main@66cf5ccb78bb3e5332da6539db669a73bb37fe46; Orbit main@a5fbe68a8d5cf655f1540fdc2ef43e9418822be0
   status: fresh
   captured_at: '2026-07-10T13:23:11Z'
   limitation: This strategy branch contains only the new planning work; accepted source remains on protected dev/main.
@@ -130,10 +160,20 @@ source_freshness:
   captured_at: '2026-07-10T13:23:11Z'
   limitation: Verdify is current; Gravity awaits North Star signoff, Agents awaits strategy approval/re-lock, and Orbit awaits reframe lock.
 - surface: deployment_runtime
-  source_ref: Kubernetes, Argo, API/MCP, pod, checkout, and service probes from the three current-state audits
+  source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
   status: fresh
-  captured_at: '2026-07-10T13:23:11Z'
-  limitation: This is a point-in-time snapshot and does not prove seven-day unattended reliability.
+  captured_at: '2026-07-10T14:06:56Z'
+  limitation: Exact source, Argo revision, runtime digest, Ready-session, and lifecycle counts are point-in-time; they do not prove safe mutation, useful progress, replay, or durability.
+- surface: deployment_runtime
+  source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  status: fresh
+  captured_at: '2026-07-10T14:06:56Z'
+  limitation: Exact source, Argo revision, workload image IDs, health, corpus, work-state, and Job results are point-in-time; they do not prove citations, callable MCP, rollback, Gate B, or durability.
+- surface: deployment_runtime
+  source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
+  status: fresh
+  captured_at: '2026-07-10T14:06:56Z'
+  limitation: Exact accepted main, pod image, in-pod checkout, dirty-path, and delivery-control results are point-in-time and prove a revision mismatch rather than a deployed accepted product.
 - surface: logs
   source_ref: Loop/watchdog, workload, conversion, API, and platform diagnostic logs
   status: fresh
@@ -201,10 +241,45 @@ planning_inventory:
   finding: Platform readiness is not ready, Gravity readiness is absent, and Orbit trust boundaries remain open.
   action: Close the named prerequisites before unattended or customer rollout.
 - artifact_type: diagnostic_packet
-  location: 2026-07-10 Agents, Gravity, and Orbit current-state audits
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
   status: current
-  finding: Fresh read-only audits separate repository, delivery, deployment, and live state for all three runtime-bearing projects.
+  finding: The Agent Platform ledger records exact source, GitOps revision, runtime digest, Ready sessions, lifecycle counts, command categories, result, and limitations.
+  action: Clear security, lifecycle, storage, and durability gates from live evidence rather than Ready status.
+- artifact_type: diagnostic_packet
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  status: current
+  finding: The Gravity ledger records exact source, GitOps revision, workload identity, health, corpus/work-state counts, failed conversion, command categories, result, and limitations.
+  action: Prove cited HTTP/MCP parity, bounded conversion, rollback, and Gate B separately from the deployed data plane.
+- artifact_type: diagnostic_packet
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
+  status: current
+  finding: The Orbit ledger records exact accepted source, pod runtime, stale in-pod checkout, dirty state, package skew, GitHub controls, command categories, result, and limitations.
   action: Convert the first vertical-slice run into one correlated diagnostic and outcome packet.
+- artifact_type: other
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#five-state-delivery-matrix
+  status: current
+  finding: Verdify method/release planning, implementation, merge, deployment, and package live verification are proven; autonomous transition/eval implementation and merge are partial, with autonomous deployment/live outcome not demonstrated.
+  action: Refresh all five axes independently; never infer one axis from another.
+- artifact_type: other
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#five-state-delivery-matrix
+  status: current
+  finding: Agent Platform repo-cell implementation/merge/deployment identity are proven and point-in-time live readiness is partial; controller planning/implementation/merge are partial, deployed identity is unknown, and unattended outcome is not demonstrated.
+  action: Refresh all five axes independently; never infer one axis from another.
+- artifact_type: other
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#five-state-delivery-matrix
+  status: current
+  finding: Gravity data-plane implementation/merge/deployment are proven with partial live behavior; planning and trusted-consumer work are partial, while citation-complete callable MCP deployment/live acceptance is not demonstrated.
+  action: Refresh all five axes independently; never infer one axis from another.
+- artifact_type: other
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#five-state-delivery-matrix
+  status: current
+  finding: Orbit main contains partial primitives, but the deployed checkout is a known stale mismatch and governed Chief of Staff deployment/live acceptance is not demonstrated.
+  action: Refresh all five axes independently; never infer one axis from another.
+- artifact_type: other
+  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md#five-state-delivery-matrix
+  status: current
+  finding: Integrated four-project planning is partial; implementation, merge, deployed revision, and live-accepted outcome are not demonstrated.
+  action: Refresh all five axes independently; never infer one axis from another.
 - artifact_type: release_verification
   location: v1.3.0 release, transaction ledger, npm, tag, assets, protections, and live runner
   status: current
@@ -223,13 +298,14 @@ current_state:
   active_sprint: null
   open_gates:
   - Verdify issue 135 truthful sprint terminalization
-  - Agent Platform P0 security issues 2884 and 2887
+  - Agent Platform P0 security issues 2884, 2887, and 2906
   - Agent Platform four-pilot North Star issue 2890 and platform-readiness approval
   - Agent Platform durable execution substrate decision issue 2905
   - Gravity iteration-6 signoff, Gate B issue 184, citation parity issue 407, and canonical readiness
   - Orbit reframe issue 197, stale sprint issue 198, and trust issues 193 through 195
   delivery_risks:
   - A fresh heartbeat can be mistaken for useful progress while headless iterations fail.
+  - A caller-selected credential-probe destination can cross the secret/egress trust boundary until Agent Platform issue 2906 is contained and live-verified.
   - Verdify and Agent Platform disagree on required dispatch topology, so autonomous lanes fail closed or bypass the intended provider.
   - Schema-valid status can still advance from unvalidated or empty evidence until issues 71 and 73 close.
   - Orbit personal context and fleet actuation share a trust domain and its current lifecycle can route to retired infrastructure.
@@ -238,22 +314,23 @@ current_state:
 delivery_health:
   status: degraded
   diagnostic_refs:
-  - 2026-07-10 Agent Platform current-state audit
-  - 2026-07-10 Gravity current-state audit
-  - 2026-07-10 Orbit current-state audit
+  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710
+  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710
+  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710
   - northstar://evidence/NSE-20260710-autonomous-development-platform-best-practices
   deployment_refs:
-  - agent-sessions-local-staging@deae5f50848597fb90057b2914c105113a23e3c0
-  - gravity-dev@66cf5ccb78bb3e5332da6539db669a73bb37fe46
+  - Argo CD argocd/Application agent-sessions-local-staging Synced/Healthy at deae5f50848597fb90057b2914c105113a23e3c0; 38 Ready repo pods at runtime digest sha256:9936ffe09d2e5f10999bd63a45488739179c8a5feb71714ef4e72a8afea2e50b
+  - Argo CD gravity-dev/Application gravity-dev Synced/Healthy at 66cf5ccb78bb3e5332da6539db669a73bb37fe46; Ready workload image IDs recorded in the Gravity audit ledger
+  - Kubernetes agent-fleet-runners/Pod repo-jvallery-orbit-0 Ready on platform digest sha256:9936ffe09d2e5f10999bd63a45488739179c8a5feb71714ef4e72a8afea2e50b with stale checkout 3819f1d72a90e09ea902a622a10bd89f2ec4b9d5
   - https://github.com/VerdifyConsultancy/verdify-skills/releases/tag/v1.3.0
   log_refs:
-  - Agent Platform loop/watchdog and alert-baseline records
-  - Gravity conversion Job and repo-agent watchdog records
-  - Orbit loop/watchdog and repo-cell records
+  - Agent Platform audit ledger plus loop/watchdog and alert-baseline records
+  - Gravity audit ledger plus failed conversion Job and repo-agent watchdog records
+  - Orbit audit ledger plus loop/watchdog and repo-cell records
   telemetry_refs:
-  - Agent Platform /api/live-agents, /api/lifecycle, /api/good-morning, Argo, Kubernetes, MCP, and Longhorn rollups
-  - Gravity API health, Argo, workload, corpus, work-state, and projection counts
-  - Orbit mission registry, loop state, pod checkout, and version probes
+  - Agent Platform ledger for /api/live-agents, /api/lifecycle, /api/good-morning, Argo, Kubernetes, image, MCP, and initial loop observations
+  - Gravity ledger for API health, Argo, workload images, corpus, work-state, projection, outbox, and Job counts
+  - Orbit ledger for GitHub controls, pod image, in-pod checkout, dirty state, version, mission, and initial loop observations
   discovered_health_issues:
   - id: HEALTH-001
     statement: Four completed Verdify transactions remain active and block deterministic global routing.
@@ -261,29 +338,29 @@ delivery_health:
     evidence_refs: [Verdify issue 135, fresh route decision]
     action: Reconcile status artifacts and enforce terminal closeout automatically or in required CI.
   - id: HEALTH-002
-    statement: Agent Platform has two open P0 security issues covering request desynchronization and candidate credentials in tracked archive content.
+    statement: Agent Platform has three open P0 security issues covering request desynchronization, candidate credentials in tracked archive content, and caller-controlled credential-probe destinations.
     severity: critical
-    evidence_refs: [jvallery/agents#2884, jvallery/agents#2887]
-    action: Contain and verify both P0s before expanding autonomous authority.
+    evidence_refs: [jvallery/agents#2884, jvallery/agents#2887, jvallery/agents#2906]
+    action: Contain and live-verify all three P0s before pilot dispatch; issue 2906 requires running-digest refusal and egress-policy evidence, not merge or unit-test evidence alone.
   - id: HEALTH-003
     statement: Agent Platform runtime cells are Ready but Argo, Longhorn, node placement, lifecycle validation, and alert baseline are materially degraded.
     severity: high
-    evidence_refs: [Agent Platform current-state audit]
+    evidence_refs: [docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710]
     action: Restore converged ownership, storage redundancy, lifecycle validity, and truthful health before a durability window.
   - id: HEALTH-004
     statement: Gravity and Orbit each retain six failed outer-loop iterations while heartbeat freshness can be maintained without a successful headless run.
     severity: high
-    evidence_refs: [Agent Platform, Gravity, and Orbit current-state audits]
+    evidence_refs: [docs/northstar/autonomous-development-platform-plan-2026-07-10.md#agent-platform-probe-ap-20260710, docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710, docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710]
     action: Separate liveness from progress and prove credential, quota, missed-tick, crash, and restart recovery.
   - id: HEALTH-005
     statement: Gravity has failed conversion, queued/dead-lettered work, pending outbox state, zero vector projection, and unhydrated search citations.
     severity: high
-    evidence_refs: [Verdify Gravity audit, 'Gravity issues 184, 326, 376, and 407']
+    evidence_refs: [docs/northstar/autonomous-development-platform-plan-2026-07-10.md#gravity-probe-grav-20260710, 'Gravity issues 184, 326, 376, and 407']
     action: Rebuild the dependency-backed Gate B slice and prove cited API/MCP parity with bounded conversion and rollback.
   - id: HEALTH-006
     statement: Orbit has no CI or protected review, stale vendored Verdify behavior, unsafe retired routes, failed loops, and unresolved personal-context trust boundaries.
     severity: high
-    evidence_refs: [Orbit current-state audit, Orbit issues 193 through 198]
+    evidence_refs: [docs/northstar/autonomous-development-platform-plan-2026-07-10.md#orbit-probe-orbit-20260710, Orbit issues 193 through 198]
     action: Re-lock the product boundary, supersede stale execution state, split trust domains, upgrade atomically, and add validation before connector expansion.
   - id: HEALTH-007
     statement: Verdify validates package structure but does not yet make semantic transitions and executable agent evals merge-blocking for consumers.
@@ -366,7 +443,7 @@ issue_inventory:
   state: OPEN
   classification: in_progress
   rationale: This issue is the correct umbrella for the present strategy and eventual fleet convergence.
-  dependencies: [issue 12, issue 43, issue 70, issue 71, issue 73, issue 74, issue 75, issue 135, jvallery/agents#2890, jvallery/agents#2905]
+  dependencies: [issue 12, issue 43, issue 70, issue 71, issue 73, issue 74, issue 75, issue 135, jvallery/agents#2890, jvallery/agents#2905, jvallery/agents#2906]
   action: Attach this plan and use its first vertical slice as the acceptance spine.
 - issue: 117
   title: Separate delegated North Star runner from lock authority
@@ -457,7 +534,23 @@ gaps:
   owner: Verdify issue 43 and Agent Platform observability owners
   blocking: false
   apply_through: github_issue
+- id: GAP-011
+  type: deployment
+  statement: Agent Platform credential-validity probes accept caller-selected network destinations; the four-project pilot must remain stopped until destinations are fixed by a versioned server-side provider registry, unknown providers make no network call, and runtime egress containment is live-verified.
+  owner: Agent Platform issue 2906
+  blocking: true
+  apply_through: release_verification
 recommended_sequence:
+- id: SEQ-000
+  outcome: Enforce and clear the Agent Platform Stage 0 pre-dispatch security floor with deployed and live evidence.
+  issue_ids: [116]
+  prerequisites:
+  - 'Issues jvallery/agents#2884, #2887, and #2906 have approved containment and deployed/live verification.'
+  - 'Any #2906 prior-use audit and credential-rotation decision is dispositioned through the protected process.'
+  risks:
+  - Merge or unit-test evidence alone could falsely clear a live credential boundary.
+  - Recording destination or credential details could create a new exposure.
+  depends_on: [jvallery/agents#2884, jvallery/agents#2887, jvallery/agents#2906]
 - id: SEQ-001
   outcome: Restore truthful lifecycle routing and prove future sprint closeout cannot leave terminal work active.
   issue_ids: [135]
@@ -479,9 +572,9 @@ recommended_sequence:
 - id: SEQ-004
   outcome: Negotiate Agent Platform capabilities and make one SDLC executable on supported fixed or isolated worker topology.
   issue_ids: [12, 116]
-  prerequisites: [Agent Platform security containment, four-pilot re-lock, issue 2905 substrate decision, provider contract]
+  prerequisites: [Agent Platform security containment including issue 2906 live refusal proof, four-pilot re-lock, issue 2905 substrate decision, provider contract]
   risks: [Restoring dynamic worktrees or forcing fixed cells without isolation evidence can recreate unsafe topology]
-  depends_on: [SEQ-003, jvallery/agents#2890, jvallery/agents#2905]
+  depends_on: [SEQ-000, SEQ-003, jvallery/agents#2890, jvallery/agents#2905, jvallery/agents#2906]
 - id: SEQ-005
   outcome: Prove a governed Gravity evidence and Orbit read-only Chief of Staff integration.
   issue_ids: [117, 98]
@@ -525,7 +618,7 @@ next_sprint_candidates:
   rationale: Requires Agent Platform security, four-pilot authority, durable-substrate, and worker-topology decisions.
   required_actions:
   - Close or explicitly waive Agent Platform P0s through authorized gates.
-  - Resolve agents 2890 and 2905.
+  - Resolve agents 2890 and 2905, and live-verify the #2906 destination-refusal and egress boundary.
   - Publish provider capability and PilotProject contracts with conformance fixtures.
 actions:
 - id: ACT-001
@@ -578,6 +671,26 @@ actions:
   target: VerdifyConsultancy/verdify-skills#211
   owner: Root planner
   status: applied
+- id: ACT-011
+  type: create_issue
+  target: jvallery/agents#2906
+  owner: Agent Platform security triage
+  status: applied
+- id: ACT-012
+  type: update_issue
+  target: 'VerdifyConsultancy/verdify-skills#116: add #2906 as a Stage 0 and pilot-dispatch dependency'
+  owner: Root planner
+  status: applied
+- id: ACT-013
+  type: open_gate
+  target: Agent Platform credential-probe destination P0 stop gate owned by jvallery/agents#2906
+  owner: Agent Platform security owner and release verifier
+  status: proposed
+- id: ACT-014
+  type: run_diagnostic
+  target: 'Sanitized #2906 running-digest refusal, egress-policy, audit-review, and rotation-disposition verification'
+  owner: Agent Platform release verifier
+  status: proposed
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction

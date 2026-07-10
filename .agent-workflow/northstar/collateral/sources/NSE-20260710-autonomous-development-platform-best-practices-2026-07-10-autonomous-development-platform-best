@@ -52,118 +52,107 @@ result and secondary summaries were excluded from decision support.
 | [SLSA v1.2](https://slsa.dev/spec/v1.2/) | approved industry specification | 2026-07-10 | Build and source provenance should let consumers trace an artifact to source and verify increasing supply-chain guarantees. |
 | [GitHub: Integrating agentic AI into the SDLC](https://docs.github.com/en/enterprise-cloud@latest/copilot/tutorials/roll-out-at-scale/enable-developers/integrate-ai-agents) | official platform guidance | 2026-07-10 | Asynchronous agent work should remain integrated with issues, shared context, tests, authorization, pull requests, review, security, and measurable rollout rather than becoming a parallel delivery system. |
 
-## Source-Backed Findings
+## Source-Backed Observations And Verdify Synthesis
 
-### 1. Use a deterministic workflow spine with agentic decision points
+Each numbered item separates an observation made by the cited primary sources
+from a Verdify-specific inference or proposal. Only the source-backed
+observations are eligible for evidence registration.
 
-The outer loop should not be one unconstrained model conversation. Deterministic
-code should own persisted state, scheduling, retries, budgets, authorization,
-timeouts, and transitions. Models should perform the parts that benefit from
-open-ended reasoning: evidence synthesis, decomposition, issue selection,
-implementation, criticism, and diagnosis. This matches Anthropic's distinction
-between predictable workflows and adaptive agents and Temporal's separation of
-durable workflow state from workers.
+### 1. Combine simple workflow and agent patterns deliberately
 
-Verdify implication: keep the typed lifecycle and GitHub control plane. Make
-`controller-loop` the durable portfolio/workflow state machine and use model
-sessions as replaceable workers. Do not make Orbit, Codex, Claude, OpenClaw, or
-Hermes the sole state holder.
+Source-backed observation: Anthropic distinguishes workflows that follow
+predefined code paths from agents that dynamically direct their own process,
+and recommends choosing the simplest pattern that fits the task. Temporal
+documents durable event history, replay, worker separation, timers, retries,
+and visibility as mechanisms for recovering long-lived workflows after failure.
 
-### 2. Make every long-running turn incremental, reconstructable, and clean
+Verdify inference/proposal: keep deterministic lifecycle state and GitHub as the
+durable spine, use bounded model sessions as replaceable workers, and compare
+the current controller loop with a proven workflow engine under the same
+recovery tests. The sources do not prescribe this Verdify architecture.
 
-Long-running agents fail when they attempt too much, inherit unclear partial
-state, or declare completion from superficial progress. A new session should
-begin by reading authoritative state, Git history, the failing acceptance set,
-and a baseline health check. It should select one bounded outcome, leave a clean
-commit or explicit failure record, and update durable progress for the next
-session.
+### 2. Make long-running work reconstructable
 
-Verdify implication: the one-issue/lane/worktree/PR unit is an asset. Add a
-portfolio resume-check and `PilotProject` refresh before ranking work; require
-each inner turn to leave GitHub, lane state, session ledger, and runtime evidence
-consistent. A fresh heartbeat is not progress.
+Source-backed observation: Anthropic's long-running-agent experiment observed
+oversized partial implementations and premature declarations of completion.
+Its tested harness used a durable requirement list, Git history and progress
+records, one-feature-at-a-time changes, clean descriptive commits, and a
+baseline end-to-end test to make sessions reconstructable.
 
-### 3. Grade environment outcomes, not agent declarations
+Verdify inference/proposal: preserve the issue/lane/worktree/PR unit, refresh
+`PilotProject` authority before ranking work, and require every turn to leave a
+clean checkpoint or explicit durable failure. A fresh heartbeat is not progress.
 
-Tests and state checks must prove the resulting repository, deployment, API,
-database, connector, or user-visible outcome. Trace grading explains how the
-agent got there, but a clean narrative or `status: complete` is not proof. Start
-with a small suite built from real failures, then grow separate capability and
-regression suites. Combine deterministic checks, rubric-based review, and
-periodic human calibration.
+### 3. Evaluate outcomes and traces
 
-Verdify implication: issues #71, #73, #74, and #75 are on the critical path.
-The first four-project slice needs a fixture-backed portfolio eval plus live
-runtime acceptance, not only schema validation. Every production failure should
-become a regression case when reproducible.
+Source-backed observation: Anthropic and OpenAI recommend evaluating
+environment outcomes and execution traces with deterministic, model, and human
+graders, repeatable datasets, pre-deployment evaluations, production
+monitoring, and calibrated human review.
 
-### 4. Scale autonomy by consequence, visibility, and reversibility
+Verdify inference/proposal: put issues #71, #73, #74, and #75 on the critical
+path, seed the evaluator with real failures, and require both fixture-backed
+portfolio evaluation and live runtime acceptance for the first integrated run.
 
-Human approval on every tool call creates friction and is not the same as
-effective oversight. Low-risk, reversible actions can run automatically when
-their scope, budget, verifier, rollback, monitoring, and interruption controls
-are explicit. Protected, privileged, personal-data, release, production,
-destructive, or irreversible actions should pause at durable typed gates with
-timeouts and audit trails.
+### 4. Scale oversight by risk
 
-Verdify implication: issue #70 should introduce a change/risk class fast path,
-while protected decisions retain the authority matrix. The platform needs an
-operator-visible interrupt/read-only control and stop-reason telemetry before
-long unattended runs are trustworthy.
+Source-backed observation: Anthropic's empirical autonomy research describes
+effective oversight as monitoring and intervention supported by trustworthy
+visibility, simple interruption, uncertainty-aware stops, and risk-sensitive
+autonomy. Temporal documents durable external approval signals, predictable
+timeouts, and audit trails for risky actions.
 
-### 5. Treat capability, identity, and policy as versioned contracts
+Verdify inference/proposal: use explicit Observe, Lightweight, Standard, and
+Protected classes. Low-risk reversible work may proceed automatically only
+with scope, budget, verifier, interruption, and rollback; protected work pauses
+at durable typed gates owned by the authority matrix.
 
-Interoperable agents require explicit operation versions, schemas, identities,
-scopes, authorization checks, idempotency, failure results, and audit. MCP
-guidance specifically rejects token passthrough and broad up-front scopes. The
-provider, not the prompt, must enforce authority.
+### 5. Enforce identity and authorization server-side
 
-Verdify implication: issue #12 is a P0 dependency. Agent Platform capabilities
-must advertise supported dispatch strategies and fail closed. Orbit connector
-identity must be separate from fleet actuation. Gravity authorization and
-citations must survive through its HTTP and consumer-side MCP interfaces.
+Source-backed observation: MCP security guidance forbids token passthrough,
+requires validation that tokens were issued to the MCP server, recommends
+progressive least-privilege scopes and server-side authorization, and calls for
+correlated authorization logs. NIST identifies trusted interoperability,
+identity, authorization, and security evaluation as agent-adoption concerns.
 
-### 6. Use one trace vocabulary across portfolio, workflow, and tool layers
+Verdify inference/proposal: issue #12 should define versioned capability and
+operation schemas, idempotency keys, typed results, and supported dispatch
+strategies. These interface details are local requirements derived from the
+broader guidance, not requirements stated by MCP or NIST.
 
-Autonomy cannot be managed from pod readiness and free-form logs. A useful trace
-links portfolio decision, issue, lane, session, model/runtime bundle, tool calls,
-policy decisions, Git commits, CI, deployment, evidence queries, human gates,
-cost, latency, errors, stop reason, and outcome. OpenTelemetry's GenAI/MCP work
-provides a portable base; GitHub and Kubernetes identities supply delivery and
-runtime joins.
+### 6. Use a portable trace vocabulary
 
-Verdify implication: implement correlation IDs that connect `PilotProject`,
-controller event, lane, PR, workflow run, deployment, Gravity query, Orbit brief,
-and outcome. Distinguish scheduler liveness, worker success, useful progress,
-blocked state, and intervention availability.
+Source-backed observation: OpenTelemetry's GenAI semantic conventions provide
+a shared vocabulary for GenAI clients, agents, model calls, events, metrics,
+and MCP operations.
 
-### 7. Make provenance and knowledge citations acceptance criteria
+Verdify inference/proposal: use one correlation ID across `PilotProject`,
+controller event, lane, session, PR, workflow, deployment, Gravity query, Orbit
+brief, human gate, and outcome. Pin the evolving convention version.
 
-The platform must know which source, prompt/skill/tool/model/runtime bundle, and
-artifact produced an outcome. SLSA-style provenance supports package trust;
-Gravity-style resolvable citations support knowledge trust. An evidence result
-without a resolvable source should be a typed degraded or denied outcome, not a
-successful verified answer.
+### 7. Preserve artifact provenance
 
-Verdify implication: extend the exact-artifact discipline proven by release
-1.3.0 to runtime bundles, agent-authored artifacts, and cross-project evidence.
-Orbit reports and root-planner decisions should retain source, freshness,
-tenant, ACL, and query identifiers.
+Source-backed observation: SLSA provenance links artifacts to source and build
+processes so consumers can verify software supply-chain guarantees.
 
-### 8. Prove one integrated slice before fleet-wide autonomy
+Verdify inference/proposal: extend the exact-artifact discipline from release
+1.3.0 to runtime bundles and agent-authored outputs. Gravity citation
+resolution and typed degraded or denied evidence are separate Verdify product
+requirements, not SLSA claims.
 
-The practices above favor a thin vertical slice over simultaneous broad
-implementation. The slice should exercise planning, dispatch, execution,
-criticism, CI/CD, deployment, cited knowledge, governed reporting, outcome
-acceptance, recovery, and learning feedback. Only then should the same contract
-fan out to more repositories or customer work.
+### 8. Expand incrementally
 
-Verdify implication: the first portfolio outcome is not "implement all open
-issues." It is "one platform improvement traverses all four pilots and the loop
-can reconstruct, verify, report, recover, and select the next action without
-private chat state."
+Source-backed observation: Anthropic recommends starting with simple composable
+patterns and adding complexity only when it demonstrably improves outcomes.
+GitHub guidance keeps asynchronous agent work integrated with issues, shared
+context, tests, authorization, pull requests, review, security, and measured
+rollout.
 
-## Options Considered
+Verdify inference/proposal: apply that guidance to the locked Verdify North Star
+by proving one four-project vertical slice before fleet or customer rollout.
+The sources do not identify Verdify's four projects or prescribe this sequence.
+
+## Verdify Options Considered
 
 | Option | Strength | Failure mode | Decision |
 | --- | --- | --- | --- |
@@ -175,7 +164,7 @@ private chat state."
 | Keep the custom loop substrate indefinitely | Avoids migration | Reimplements replay, retries, signals, timers, and visibility | Keep only through a time-boxed build-versus-adopt test. |
 | Adopt a durable workflow engine immediately | Proven execution semantics | Migration cost and premature framework commitment | Do not decide without a recovery spike and operator fit test. |
 
-## Recommended Default
+## Verdify Proposed Default
 
 Use a durable deterministic portfolio and lifecycle spine with bounded model
 workers. Preserve GitHub and project-owned artifacts as authority. Automate
@@ -200,18 +189,29 @@ engine are compared with the same failure/recovery test.
 
 ## Claims Ready For Evidence Registration
 
-- Reliable long-running agents need incremental tasks, durable progress,
-  authoritative reconstruction, clean checkpoints, and end-to-end verification.
-- A deterministic workflow spine plus bounded agent workers is a stronger fit
-  than either a free-running root model or a fully hardcoded workflow.
-- Agent quality requires outcome and trace evaluation, production monitoring,
-  and periodic human calibration; schema validity alone is insufficient.
-- Autonomy should be risk-proportional and intervention-ready rather than gated
-  by per-action approval or enabled by universal auto-approval.
-- Cross-project tools require versioned capability, identity, authorization,
-  least-privilege scope, telemetry, and typed failure contracts.
-- The first safe scale milestone is one fully verified four-project vertical
-  slice, followed by fleet and customer rollout through the same contract.
+- Anthropic distinguishes predefined workflows from model-directed agents and
+  recommends using the simplest agentic pattern that fits the task.
+- Long-running-agent harness guidance uses incremental tasks, durable
+  requirements and progress records, clean Git checkpoints, and end-to-end
+  verification across sessions.
+- Durable workflow execution uses persisted event history, replay, worker
+  separation, retries, timers, and visibility to recover after failures.
+- Agent evaluation guidance combines outcome grading, trace inspection,
+  repeatable datasets, pre-deployment evaluations, production monitoring, and
+  calibrated human review.
+- Effective autonomy oversight emphasizes risk-sensitive autonomy, trustworthy
+  visibility, uncertainty-aware stops, and simple human interruption.
+- Secure MCP integrations should reject token passthrough, validate token
+  audience, enforce server-side authorization, minimize scopes, preserve
+  identity boundaries, and correlate authorization events.
+- Portable GenAI telemetry conventions cover agents, model calls, events,
+  metrics, and MCP operations; SLSA provenance links artifacts to sources and
+  build processes.
+
+The deterministic-spine choice, Verdify operation-version/idempotency/typed-
+failure contract, and four-project vertical-slice sequence are Verdify
+inferences or proposals. They are intentionally excluded from evidence
+registration.
 
 ## Limitations
 
