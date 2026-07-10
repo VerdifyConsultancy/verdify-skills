@@ -1,0 +1,20 @@
+{
+  "schema_ref": "compiled-prompt-manifest.schema.yaml",
+  "kind": "CompiledPromptManifest",
+  "schema_version": "1.0",
+  "generated_at": "2026-07-10T23:55:38Z",
+  "role": "critic",
+  "sprint_id": "2026-07-10-issue-71-route-authority",
+  "lane_id": "issue-71-route-authority-validation",
+  "output": "/Users/jason/repos/verdify-worktrees/2026-07-10-issue-71-route-authority-plan/.agent-workflow/sprints/2026-07-10-issue-71-route-authority/prompts/issue-71-route-authority-validation.critic.md",
+  "inputs": {
+    "common_operating_contract": "/Users/jason/repos/verdify-worktrees/2026-07-10-issue-71-route-authority-plan/COMMON_OPERATING_CONTRACT.md",
+    "role_skill": "/Users/jason/repos/verdify-worktrees/2026-07-10-issue-71-route-authority-plan/skills/independent-critic/SKILL.md",
+    "lane_contract": "/Users/jason/repos/verdify-worktrees/2026-07-10-issue-71-route-authority-plan/.agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml"
+  },
+  "sha256": {
+    "common_operating_contract": "9a6a84153926aab084afe90f0984a2b39111ec5c942ed6898cd3f95dd1a047ad",
+    "role_skill": "e161d891309d502aba12fd83e60971e0f854c1cc8fbe2f625fbced636c20fc10",
+    "lane_contract": "712b88c45db87e0ce3c16561925c0bd4c3fd318bd6e1d9cd932d5c670a80d27a"
+  }
+}
