@@ -1,520 +1,392 @@
 schema_ref: state-of-union.schema.yaml
 kind: StateOfUnion
 schema_version: "1.0"
-strategy_id: iteration-25-recovery-and-trusted-release
+strategy_id: iteration-25-delivery-controls-and-release
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: "af44997ea79ae4f919fa29cf951334c4f291d5ff"
-assessed_at: "2026-07-10T03:02:57Z"
+baseline_sha: "e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
+assessed_at: "2026-07-10T09:29:52Z"
 inputs:
   - id: IN-001
     type: north-star
     location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
-    summary: Approved iteration-25 internal-first four-project product authority.
+    summary: Approved iteration-25 product authority requires trusted package safety, human-governed delivery, and exact release evidence.
     evidence_status: verified
   - id: IN-002
     type: north-star-architecture
     location: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-    summary: Approved ownership, exact-artifact release, dev/main, recovery, and cross-project architecture.
+    summary: Approved architecture defines dev integration, release-only main, exact artifacts, and Jason-or-James release authority.
     evidence_status: verified
   - id: IN-003
     type: project-definition
     location: .agent-workflow/project/project-definition.yaml
-    summary: Approved end-to-end definition with recovery, package, release, and delivery-control requirements.
+    summary: Approved project definition covers package recovery, release safety, branch controls, review, rollback, and outcome proof.
     evidence_status: verified
   - id: IN-004
     type: architecture
     location: .agent-workflow/architecture/architecture.yaml
-    summary: Approved twelve-component architecture and nine black-box module contracts.
+    summary: Current module contracts separate release-package, governance, quality, and external runtime ownership.
     evidence_status: verified
   - id: IN-005
     type: live-github
     location: .agent-workflow/strategy/github-backlog-sync.yaml
-    summary: Live issues, pull requests, checks, deployments, protections, releases, and delivery state captured for this strategy.
+    summary: Live issues, PRs, checks, branch protections, workflow permissions, and environment state captured at this assessment.
     evidence_status: verified
   - id: IN-006
     type: git
-    location: "dev@af44997ea79ae4f919fa29cf951334c4f291d5ff"
-    summary: Clean integration head containing approved foundations, terminal sprint recovery, committed-strategy routing, Wave 0 hygiene, controller scope, and lossless issue references.
+    location: "dev@e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
+    summary: "Clean dev contains terminal #130, #126, and #120 sprint evidence plus version 1.3.0 release-safety implementation."
     evidence_status: verified
   - id: IN-007
     type: git
     location: "main@898d7c78845f11a4cec29556e698ebd27aa58ef1"
-    summary: Current accepted and published 1.2.1 release branch.
+    summary: Main remains the published version 1.2.1 authority.
     evidence_status: verified
   - id: IN-008
-    type: recovery-ref
-    location: "rescue/pilot-artifacts-wip-2026-07-07@fe1f94e"
-    summary: Contains unpublished timeline-historian work and one registered research package requiring selective recovery.
-    evidence_status: verified
-  - id: IN-009
-    type: recovery-ref
-    location: "lane/northstar-delivery-loop-architecture@f425515"
-    summary: Contains four missing registered evidence packages plus superseded architecture and proposed schemas.
-    evidence_status: verified
-  - id: IN-010
     type: package-registry
     location: npm:@verdify-cli/cli@1.2.1
-    summary: npm latest is 1.2.1 and agrees with GitHub release v1.2.1.
+    summary: npm latest and GitHub release v1.2.1 agree with main gitHead 898d7c7.
+    evidence_status: verified
+  - id: IN-009
+    type: release-candidate
+    location: "GitHub issue #188 and PR #189"
+    summary: "James-authored 1.3.0 dev-to-main candidate is open, unapproved, unpublished, and held for issue #121."
     evidence_status: verified
 source_freshness:
   - surface: git
-    source_ref: local refs plus origin/main and origin/dev
+    source_ref: local clean dev plus origin/dev and origin/main
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Historical unreachable Git objects were not treated as accepted source.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Rescue refs remain intentionally retained until final release cleanup.
   - surface: github_issues
     source_ref: live GitHub issue API
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: No milestones, assignees, or GitHub Projects are configured for current open issues.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: GitHub Issues are authoritative; no milestone or Project is configured for this slice.
   - surface: github_pull_requests
-    source_ref: live GitHub pull request API
+    source_ref: "live GitHub pull request API through PR #192"
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Closed duplicate release PRs are retained as delivery-history evidence.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Closed invalid 1.2.1 candidates remain historical evidence.
   - surface: github_checks
-    source_ref: "live check rollups and workflow runs through PR #141"
+    source_ref: live PR check rollups and workflow runs through dev e702911
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Earlier failed reruns are retained alongside final successful checks.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "PR #189 has successful validate/compliance evidence but main's old policy check rejects the new candidate identity."
   - surface: github_deployments
-    source_ref: live npm deployment records
+    source_ref: npm environment and GitHub release API
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: This repository has package publication deployments, not a long-running application runtime.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "The npm environment has no protection rules; issue #121 owns repository delivery controls, not npm credential policy redesign."
   - surface: github_projects
-    source_ref: live GitHub Projects and milestones query
+    source_ref: live repository planning surfaces
     status: missing
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: The repository currently has no ProjectsV2 or milestones; GitHub Issues remain backlog authority.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: No Project or milestone is required for the one-issue next sprint.
   - surface: north_star
     source_ref: .agent-workflow/northstar/northstar-artifacts.yaml
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Selectively recovered evidence will require the normal evidence and North Star freshness loop.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: No new product or architecture decision is introduced by this refresh.
   - surface: project_definition
     source_ref: .agent-workflow/project/project-definition.yaml
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
+    captured_at: "2026-07-10T09:28:20Z"
     limitation: None.
   - surface: architecture
-    source_ref: .agent-workflow/architecture/architecture.yaml
+    source_ref: .agent-workflow/architecture/architecture.yaml and module contracts
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: External Agent Platform, Orbit, and Gravity runtime state remains owned by those projects.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Agent Platform, Orbit, and Gravity runtime state remains external to this package-control slice.
   - surface: sprint_artifacts
     source_ref: .agent-workflow/sprints
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: All three committed sprint transactions are terminal; no active sprint exists.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: All committed sprints are complete; no active lane exists.
   - surface: lane_artifacts
-    source_ref: completed sprint closeout and critic records
+    source_ref: "issue #120 D/I3/E4/S3 chain and terminal release/outcome records"
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: "PRs #122 and #123 lack GitHub APPROVED reviews, preserved in their outcome records."
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Final main and npm evidence intentionally does not exist yet.
   - surface: review_artifacts
-    source_ref: "PRs #78, #122, #123, #131, #136, and #139"
+    source_ref: "PR #184 critic and admin-exception evidence plus PR #189 review state"
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: "Single-identity approval remains an open delivery-control constraint in issue #121."
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "PR #189 has no approval; Jason can supply a real non-author review after #121 updates dev."
   - surface: deployment_runtime
-    source_ref: npm deployment 5350587304 and GitHub release v1.2.1
+    source_ref: npm 1.2.1 and GitHub release v1.2.1
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Package publication health does not prove a future 1.2.2 or 1.3.0 transaction.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Package publication has no long-running application runtime.
   - surface: logs
-    source_ref: package repository runtime logs
+    source_ref: package runtime logs
     status: not_applicable
     captured_at: null
-    limitation: No long-running application runtime is owned by this repository.
+    limitation: GitHub Actions and release transaction evidence are the applicable operational surfaces.
   - surface: metrics
-    source_ref: package repository runtime metrics
+    source_ref: package runtime metrics
     status: not_applicable
     captured_at: null
-    limitation: CI, release, and registry evidence are used instead.
+    limitation: No runtime service is deployed from this repository.
   - surface: traces
-    source_ref: package repository runtime traces
+    source_ref: package runtime traces
     status: not_applicable
     captured_at: null
-    limitation: No traced runtime service is deployed from this repository.
+    limitation: No traced runtime service exists.
   - surface: alerts
-    source_ref: package repository runtime alerts
+    source_ref: package runtime alerts
     status: not_applicable
     captured_at: null
-    limitation: Workflow failures and open issues are the applicable delivery signals.
+    limitation: Workflow failures and GitHub Issues are the relevant signals.
   - surface: local_artifacts
-    source_ref: rescue refs fe1f94e and f425515
+    source_ref: retained recovery commits fe1f94e, f425515, and 22f81bdc35e4f1e5a70797624c93bc86bc66056c
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: Only selective content may be recovered; the old trees are not accepted code.
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Do not delete until main 1.3.0 and recovery cleanup are verified.
   - surface: external_dependency
-    source_ref: npm registry and GitHub release API
+    source_ref: npm registry and GitHub Actions authority
     status: fresh
-    captured_at: "2026-07-10T02:32:25Z"
-    limitation: "GitHub Support cleanup from the private advisory remains external and issue #120-owned."
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: npm and GitHub availability can still stop the resumable final transaction.
 planning_inventory:
-  - artifact_type: other
-    location: .agent-workflow/hygiene/repo-hygiene.yaml
-    status: current
-    finding: Wave 0 is complete with approved issue-backed exceptions and an active repo-agent scope.
-    action: Proceed to sprint planning without treating hygiene completion as release approval.
   - artifact_type: north_star
     location: .agent-workflow/northstar
     status: current
-    finding: Iteration 25 is approved and aligns recovery plus trusted package promotion with the four-project method layer.
-    action: Preserve as authority; route recovered evidence through the registered evidence loop.
+    finding: Iteration-25 authority still requires the trusted package and delivery-control wave.
+    action: Preserve it unchanged.
   - artifact_type: project_definition
     location: .agent-workflow/project/project-definition.yaml
     status: current
-    finding: Approved requirements explicitly cover exact package release, selective ref recovery, and dev/main delivery.
-    action: Use FR-007, FR-011, FR-012, AC-007, AC-011, and AC-012 in sprint planning.
+    finding: Delivery control and exact release requirements remain applicable.
+    action: "Use them as #121 contract inputs."
   - artifact_type: architecture
     location: .agent-workflow/architecture/architecture.yaml
     status: current
-    finding: Release-package and planning-hygiene ownership boundaries support the recovery sequence.
-    action: "Keep #130, #126, #120, and #121 within their module contracts."
+    finding: "Existing release and governance boundaries support a one-issue #121 lane."
+    action: No architecture refresh is required.
   - artifact_type: module_contracts
     location: .agent-workflow/modules/contracts
     status: current
-    finding: Nine approved contracts cover the planned package, recovery, governance, and quality paths.
-    action: Use owned paths and interfaces when carving lanes.
-  - artifact_type: github_backlog_sync
-    location: .agent-workflow/strategy/github-backlog-sync.yaml
-    status: current
-    finding: Live backlog and delivery state are reconciled at this baseline.
-    action: Use candidate and dependency classifications in sprint planning.
+    finding: Governance and release-package contracts cover branch rules, policy workflows, and final promotion.
+    action: "Bind #121 ownership to those interfaces."
   - artifact_type: sprint_plan
     location: .agent-workflow/sprints
     status: current
-    finding: All committed sprint plans are complete; no active execution transaction exists.
-    action: Create a new bounded sprint only after this strategy is integrated.
+    finding: "#130, #126, and #120 are terminal with validated release and outcome evidence."
+    action: "Create a new bounded sprint for #121 only."
   - artifact_type: release_verification
-    location: .agent-workflow/sprints/*/release/release-verification.yaml
+    location: .agent-workflow/sprints/2026-07-10-release-safety/release/release-verification.yaml
     status: current
-    finding: Completed sprints have verified integration evidence; the next npm release has no valid transaction yet.
-    action: Do not infer future publication from completed sprint integration.
-  - artifact_type: outcome_review
-    location: .agent-workflow/sprints/*/outcome/outcome-review.yaml
+    finding: Version 1.3.0 release safety is verified on dev; privileged main/npm proof remains intentionally absent.
+    action: "Keep PR #189 held until #121 code and live rules are complete."
+  - artifact_type: github_backlog_sync
+    location: .agent-workflow/strategy/github-backlog-sync.yaml
     status: current
-    finding: Prior outcomes are accepted, with missing external GitHub reviews preserved as risk.
-    action: "Carry the review-identity gap into #121 rather than reopening completed scope."
-  - artifact_type: documentation
-    location: "issue #126 recovery comments"
-    status: current
-    finding: Local, remote, merged, superseded, and recovery refs have an interim durable disposition.
-    action: Convert the interim inventory into a checked-in final recovery ledger before ref deletion.
+    finding: "Live delivery state identifies #121 as the sole ready next slice."
+    action: "Hand #121 to sprint planning."
 north_star:
   goal: >-
-    Deliver an internal-first, durable method and planning layer that converts
-    human intent and evidence into bounded, independently reviewed, exactly
-    released, runtime-verifiable work across Verdify Skills, Agent Platform,
-    Orbit, and Gravity.
+    Deliver a durable method and planning layer that converts human intent and
+    evidence into bounded, independently reviewed, exactly released, and
+    runtime-verifiable work across Verdify projects.
   alignment_status: aligned
   source_refs: [IN-001, IN-002, IN-003, IN-004]
 current_state:
   summary: >-
-    Approved foundations, terminal historical sprints, committed-strategy
-    routing, and Wave 0 hygiene are on dev; main and npm remain at 1.2.1 while
-    selective unpublished work, host-dependent package selection, release
-    transaction safety, and live branch controls remain open.
+    Recovery, package integrity, and version 1.3.0 release safety are integrated
+    and terminal on dev. Main, npm, and GitHub release remain at 1.2.1. The only
+    blocking delivery gap is issue #121: dev is unprotected, main lacks review,
+    CODEOWNERS is ineffective, and the open James-authored PR #189 needs a
+    candidate-side bootstrap policy plus real Jason approval before promotion.
   lifecycle_state: READY
   active_sprint: null
   open_gates: []
   delivery_risks:
-    - Ignored host files can contaminate manifests and release archives until #130 lands.
-    - Unpublished authoritative skill and evidence work remains only on recovery refs until #126 lands.
-    - Repeated generated 1.2.1 promotions remain invalid until a new version and #120 release transaction exist.
-    - Dev is unprotected and main has no review requirement until #121 is applied live.
+    - Dev is unprotected, so ordinary integrations are not machine-bound to PRs, current checks, or critic evidence.
+    - Main requires old checks but no review; its 1.2.1 trusted policy cannot validate the 1.3.0 candidate body on PR #189.
+    - Workflow tokens cannot approve PR reviews, so dev must use transport-neutral critic status and releases must use a real non-author owner review.
+    - Rescue refs and the shared recovery checkout must remain until 1.3.0 reaches main and cleanup is verified.
 delivery_health:
   status: degraded
   diagnostic_refs:
     - .agent-workflow/strategy/github-backlog-sync.yaml
+    - .agent-workflow/sprints/2026-07-10-release-safety/release/release-verification.yaml
   deployment_refs:
-    - "GitHub npm deployment 5350587304 at main@898d7c78845f11a4cec29556e698ebd27aa58ef1"
-    - "GitHub release v1.2.1"
+    - "main@898d7c78845f11a4cec29556e698ebd27aa58ef1"
     - "npm:@verdify-cli/cli@1.2.1"
-  log_refs: []
+    - "GitHub release v1.2.1"
+    - "open release PR #189"
+  log_refs:
+    - "PR #189 failed policy run 29083094613"
   telemetry_refs:
-    - "PR #139 required checks passed at 08350751b0dcb8ab21fda1f930b3e646eea62dc6"
+    - "dev validate/compliance runs recorded in terminal sprint evidence"
   discovered_health_issues:
     - id: HEALTH-001
-      statement: Generated dev-to-main transactions repeatedly target already-published version 1.2.1 and fail release preflight.
+      statement: Live branch protection and ownership rules do not enforce the documented dev-first and reviewed-release model.
       severity: high
-      evidence_refs: ["PR #125", "PR #128", "PR #133", "PR #138", "PR #141", "issue #120"]
-      action: "Implement resumable new-version release state in #120 before another promotion is accepted."
+      evidence_refs: ["issue #121", "live main protection", "live unprotected dev", ".github/CODEOWNERS"]
+      action: "Plan, implement, and apply issue #121 before PR #189 can merge."
     - id: HEALTH-002
-      statement: Raw-worktree manifest and package selection includes ignored host-local files.
+      statement: "Main's current 1.2.1 trusted policy rejects PR #189 before the candidate-side 1.3.0 policy can become base authority."
       severity: high
-      evidence_refs: ["issue #130", ".claude/scheduled_tasks.lock reproduction"]
-      action: "Make #130 the first implementation dependency in the next sprint."
+      evidence_refs: ["PR #189", "policy run 29083094613", "main@898d7c7"]
+      action: Add a distinct candidate-side delivery-policy check for the bootstrap release, then restore the normal base policy requirement after 1.3.0 reaches main.
+    - id: HEALTH-003
+      statement: Recovery refs and the shared recovery checkout remain intentionally retained after dev integration.
+      severity: low
+      evidence_refs: ["docs/recovery-ledger-2026-07-10.md", "issue #126 outcome"]
+      action: Audit and clean only after final release verification.
 issue_inventory:
-  - issue: 153
-    title: Record Wave 0 assessment and controller scope
-    state: CLOSED
-    classification: done
-    rationale: "PR #154 integrated the approved hygiene report and active repo-controller scope."
-    dependencies: []
-    action: No action.
-  - issue: 143
-    title: Accept an artifact-only state-of-union commit over its assessed baseline
-    state: CLOSED
-    classification: done
-    rationale: "PR #147 accepts only committed strategy-artifact suffixes over a full ancestor baseline and rejects unrelated changes."
-    dependencies: []
-    action: No action after this strategy refresh proves the integrated route.
-  - issue: 130
-    title: Ignore host-local and untracked files in manifests and archives
-    state: OPEN
-    classification: candidate
-    rationale: The bug is reproduced, issue acceptance is complete, and it blocks reproducible validation and packaging.
-    dependencies: []
-    action: Execute first in the next sprint.
-  - issue: 126
-    title: Publish timeline-historian and reconcile local delivery residue
-    state: OPEN
-    classification: candidate
-    rationale: Exact recovery refs and selective content are known; final cleanup and default-branch completeness depend on it.
-    dependencies: ["issue #130"]
-    action: "Execute after #130 in the next sprint and route recovered evidence through North Star ingestion."
-  - issue: 120
-    title: Test and publish the exact packed artifact as an atomic, recoverable transaction
-    state: OPEN
-    classification: candidate
-    rationale: It is required before a trustworthy new npm and main promotion but should test the recovered final package shape.
-    dependencies: ["issue #130", "issue #126"]
-    action: Plan in the following sprint after recovery lands.
   - issue: 121
     title: Enforce protected dev integration and release-only main promotion
     state: OPEN
     classification: candidate
-    rationale: Live protections and approval transport must agree with the delivery model before final promotion.
-    dependencies: ["issue #120"]
-    action: Plan before the new-version release and record live rule evidence.
-  - issue: 12
-    title: Negotiate Agent Platform capabilities and supported worker adapters
+    rationale: The issue is complete enough, high risk, architecture-aligned, and the sole blocker for the approved 1.3.0 promotion.
+    dependencies: ["terminal #120 dev outcome", "open PR #189"]
+    action: Plan one lane with code, deterministic tests, bootstrap/steady-state branch protection, and live reconciliation.
+  - issue: 188
+    title: Release @verdify-cli/cli@1.3.0
     state: OPEN
-    classification: blocked
-    rationale: Critical four-project pilot work, but it requires Agent Platform readiness and owning-repository capability evidence.
-    dependencies: ["Agents #2889", "platform-readiness"]
-    action: Keep open for the later four-project pilot wave.
-  - issue: 43
-    title: Shared bounded agentic-loop control contract
+    classification: in_progress
+    rationale: "The valid James-authored release issue exists, but promotion is intentionally held for #121 and a real Jason review."
+    dependencies: ["#121", "PR #189 approval and checks"]
+    action: Keep open; do not merge until live delivery controls pass.
+  - issue: 120
+    title: Test and publish the exact packed artifact as an atomic recoverable transaction
     state: OPEN
-    classification: deferred
-    rationale: Strategically aligned, but current cleanup and release integrity are the prerequisite delivery outcome.
-    dependencies: ["issue #120", "issue #121"]
-    action: Reconcile after the trusted package release.
-  - issue: 54
-    title: Deferred coordination items from skills-hardening sprint
+    classification: in_progress
+    rationale: "Its bounded dev sprint is accepted, while final npm/tag/release verification remains pending on PR #189."
+    dependencies: ["#121", "#188"]
+    action: Close only after verified 1.3.0 publication and final transaction assets.
+  - issue: 130
+    title: Ignore host-local and untracked files in manifests and archives
     state: OPEN
-    classification: deferred
-    rationale: Historical follow-up remains durable but is not part of the repository-recovery release.
+    classification: in_progress
+    rationale: The implementation is verified on dev and awaits inclusion in the final main release.
+    dependencies: ["#188"]
+    action: Close after main and released artifact prove the package file set.
+  - issue: 126
+    title: Publish timeline-historian and reconcile local delivery residue
+    state: OPEN
+    classification: in_progress
+    rationale: Recovery is verified on dev, with final main inclusion and rescue cleanup intentionally pending.
+    dependencies: ["#188", "post-release cleanup"]
+    action: Close after main release and safe rescue-ref/worktree cleanup.
+  - issue: 190
+    title: Backfill missing release verification for completed package sprints
+    state: CLOSED
+    classification: done
+    rationale: "PR #191 added both missing verification records and restored valid global routing."
     dependencies: []
-    action: Re-triage after the trusted release outcome.
-  - issue: 70
-    title: Route change_class fast path
+    action: No further action.
+  - issue: 174
+    title: Reject malformed historian content digests and mismatched asset IDs
     state: OPEN
     classification: deferred
-    rationale: Velocity improvement is valid but does not block exact recovery or release safety.
+    rationale: Low-risk critic follow-up is issue-backed and outside the trusted release boundary.
     dependencies: []
-    action: Keep in post-release quality backlog.
+    action: Keep for the post-release quality wave.
   - issue: 71
     title: Validate route status strings and transitions
     state: OPEN
     classification: deferred
-    rationale: Quality work is important but separate from the bounded recovery release sequence.
+    rationale: "Valid quality work, but not required for #121 or the 1.3.0 release."
     dependencies: []
-    action: Keep in the next quality wave.
+    action: Keep for the post-release quality wave.
   - issue: 73
     title: Reject vacuous approval evidence
     state: OPEN
     classification: deferred
-    rationale: Quality hardening remains necessary but is not required to selectively recover known artifacts.
+    rationale: Valid quality work remains durable and outside the one-issue control sprint.
     dependencies: []
-    action: Keep in the next quality wave.
-  - issue: 74
-    title: Make semantic validation and evals consumer merge-blocking
-    state: OPEN
-    classification: deferred
-    rationale: "Consumer CI enforcement follows the trusted package artifact boundary in #120."
-    dependencies: ["issue #120"]
-    action: Sequence after the trusted release transaction.
-  - issue: 75
-    title: Build an executable eval runner
-    state: OPEN
-    classification: deferred
-    rationale: The eval runner is a distinct quality outcome and not needed for the immediate recovery slice.
-    dependencies: []
-    action: Keep in the next quality wave.
-  - issue: 76
-    title: Park unexercised platform and consensus surface
-    state: OPEN
-    classification: deferred
-    rationale: Simplification should follow recovery so unpublished evidence is not mistaken for accepted capability.
-    dependencies: ["issue #126"]
-    action: Reassess after the recovery ledger lands.
-  - issue: 98
-    title: Author the Orbit chief-of-staff skill suite
+    action: Keep for the post-release quality wave.
+  - issue: 12
+    title: Negotiate Agent Platform capabilities and supported worker adapters
     state: OPEN
     classification: blocked
-    rationale: The feature depends on Orbit-owned connector, privacy, and readiness contracts outside this package release.
-    dependencies: ["Orbit #198", "governed connector decisions"]
-    action: Keep for the four-project pilot after package trust.
+    rationale: External platform authority and readiness evidence are not part of this repository release.
+    dependencies: ["Agent Platform readiness"]
+    action: Keep blocked on owning platform evidence.
   - issue: 116
     title: Codify the platform loop-native operating convention
     state: OPEN
     classification: blocked
-    rationale: Fleet rollout depends on trusted package release and Agent Platform capability evidence.
-    dependencies: ["issue #12", "issue #120", "issue #121"]
-    action: Resume after package and platform prerequisites.
-  - issue: 117
-    title: North Star planning delegation contract
-    state: OPEN
-    classification: deferred
-    rationale: Delegation refinement is valid but no longer blocks iteration-25 recovery and release.
-    dependencies: []
-    action: Keep for the governance quality wave.
+    rationale: It depends on trusted package release plus Agent Platform capability work.
+    dependencies: ["#12", "#121", "verified 1.3.0 release"]
+    action: Resume after package trust and external platform gates.
   - issue: 142
     title: Sequence repository recovery and trusted main promotion
     state: OPEN
     classification: in_progress
-    rationale: This state-of-union transaction owns the current strategy artifact and PR.
-    dependencies: []
-    action: Close after the approved strategy merges to dev.
-  - issue: 119
-    title: Reconcile and lock the four-project North Star
-    state: CLOSED
-    classification: done
-    rationale: "PR #122 and downstream definition/architecture artifacts completed the outcome."
-    dependencies: []
-    action: No action.
-  - issue: 135
-    title: Reconcile completed sprint state
-    state: CLOSED
-    classification: done
-    rationale: "PR #139 terminalized the sprints and restored global routing."
-    dependencies: []
-    action: No action.
+    rationale: "The umbrella sequence is complete through #120 and remains active through #121, release, and cleanup."
+    dependencies: ["#121", "#188"]
+    action: Close after final release and cleanup reconciliation.
 gaps:
   - id: GAP-001
     type: delivery
-    statement: "Package and manifest selection is host-dependent until issue #130 is integrated."
-    owner: "issue #130"
-    blocking: false
-    apply_through: github_issue
-  - id: GAP-002
-    type: evidence
-    statement: "Authoritative historian and registered research artifacts remain only on recovery refs until issue #126 is integrated."
-    owner: "issue #126"
-    blocking: false
-    apply_through: github_issue
-  - id: GAP-003
-    type: delivery
-    statement: Exact artifact publication and resumable release identity are incomplete.
-    owner: "issue #120"
-    blocking: false
-    apply_through: github_issue
-  - id: GAP-004
-    type: delivery
-    statement: Live dev/main protections and independent approval transport do not enforce the approved branch model.
+    statement: Dev and main live protections do not enforce the documented integration and release model.
     owner: "issue #121"
     blocking: false
-    apply_through: github_issue
+    apply_through: sprint_planning
+  - id: GAP-002
+    type: delivery
+    statement: The bootstrap 1.3.0 candidate needs a candidate-side policy and review check because main still runs 1.2.1 policy code.
+    owner: "issue #121"
+    blocking: false
+    apply_through: sprint_planning
+  - id: GAP-003
+    type: deployment
+    statement: "npm, tag, GitHub release, exact retained artifact, and completed ledger evidence do not exist until PR #189 is approved and merged."
+    owner: release-verification
+    blocking: false
+    apply_through: release_verification
 recommended_sequence:
-  - id: SEQ-000
-    outcome: Make a committed approved state-of-union routable without accepting unrelated post-assessment changes.
-    issue_ids: [143]
-    prerequisites:
-      - Approved state-of-union artifact assessed at a full ancestor SHA.
-    risks:
-      - An overly broad suffix rule could accept stale strategy after implementation changes.
-    depends_on: []
   - id: SEQ-001
-    outcome: Make manifest and package file selection independent of ignored and untracked host state.
-    issue_ids: [130]
-    prerequisites:
-      - Approved release-package architecture and issue acceptance.
-    risks:
-      - A tracked package input could be accidentally omitted if the allowlist is incomplete.
-    depends_on: [SEQ-000]
+    outcome: Enforce delivery controls in code and live GitHub state.
+    issue_ids: [121]
+    prerequisites: ["approved current strategy", "clean dev baseline", "open PR #189 held"]
+    risks: ["branch-protection lockout", "bootstrap policy deadlock", "stale review or check acceptance"]
+    depends_on: []
   - id: SEQ-002
-    outcome: Selectively recover timeline-historian, missing evidence, and a final ref-disposition ledger.
-    issue_ids: [126]
-    prerequisites:
-      - Reproducible shipped-file selection from issue #130.
-      - Exact recovery refs fe1f94e and f425515 remain available.
-    risks:
-      - Wholesale replay would regress current lifecycle and release work.
-      - Newly registered evidence may restart North Star synthesis before later sprint planning.
+    outcome: Approve and promote the exact 1.3.0 dev candidate.
+    issue_ids: [188, 120]
+    prerequisites: ["#121 merged", "live pre-release protections verified", "Jason approval on current James-authored head"]
+    risks: ["immutable npm publish", "partial authority mutation", "artifact retention or registry outage"]
     depends_on: [SEQ-001]
   - id: SEQ-003
-    outcome: Build, test, and recover one exact immutable package publication transaction.
-    issue_ids: [120]
-    prerequisites:
-      - Final recovered package shape from SEQ-002.
-      - Canonical shipped-file selection from SEQ-001.
-    risks:
-      - Partial npm publication must resume without creating duplicate release issues.
-    depends_on: [SEQ-001, SEQ-002]
-  - id: SEQ-004
-    outcome: Enforce protected dev integration and release-only main promotion with current-head approval evidence.
-    issue_ids: [121]
-    prerequisites:
-      - Review transport and release ledger behavior from SEQ-003 are defined.
-    risks:
-      - Over-constrained rules can deadlock the single-operator path.
-    depends_on: [SEQ-003]
-  - id: SEQ-005
-    outcome: Promote a genuinely new version from dev to main and verify npm, tag, GitHub release, and clean ref state.
-    issue_ids: [120, 121, 126]
-    prerequisites:
-      - SEQ-001 through SEQ-004 accepted.
-      - Exact artifact checks and authorized release approval pass.
-    risks:
-      - Version drift or a partial publication could leave main, npm, and release metadata inconsistent.
-    depends_on: [SEQ-003, SEQ-004]
+    outcome: Reconcile final issues and safely clean retained recovery handles.
+    issue_ids: [126, 130, 142]
+    prerequisites: ["main/npm/tag/release/ledger verification complete"]
+    risks: ["deleting the last unique rescue source", "closing issues before main proof"]
+    depends_on: [SEQ-002]
 next_sprint_candidates:
-  - outcome: Reproducible package selection followed by selective unpublished-work recovery.
-    issue_ids: [130, 126]
+  - outcome: Protected dev integration and reviewed release-only main promotion
+    issue_ids: [121]
     readiness: ready
-    rationale: Both issues are fully specified, align with approved module boundaries, and can run in dependency-ordered waves without a material human decision.
-    required_actions:
-      - Sprint-planning must create separate issue lanes and make #126 depend on #130.
-      - The #126 lane must use northstar-research-ingest for recovered research and must not replay obsolete architecture or proposed schemas as accepted code.
-      - Review milestones must prove host-file exclusion, exact package set, timeline-historian validation, evidence hashes, and the final recovery ledger.
+    rationale: "Issue #121 has clear acceptance intent, current live evidence, no unresolved product or architecture decision, and is the only blocker for PR #189."
+    required_actions: ["create one lane contract", "include bootstrap and steady-state protection phases", "require fresh critic before dev integration", "apply and verify live rules after merge"]
 actions:
-  - id: ACT-005
-    type: update_issue
-    target: "issue #143 committed-strategy baseline routing"
-    owner: state-of-union
-    status: applied
   - id: ACT-001
-    type: update_issue
-    target: "issue #126 recovery evidence and ref inventory"
-    owner: state-of-union
-    status: applied
-  - id: ACT-002
-    type: set_dependency
-    target: "issue #126 depends on issue #130"
+    type: plan_sprint
+    target: "issue #121"
     owner: sprint-planning
+    status: proposed
+  - id: ACT-002
+    type: route
+    target: "PR #189 and issue #188 after #121"
+    owner: release-verification
     status: proposed
   - id: ACT-003
-    type: plan_sprint
-    target: "issues #130 and #126"
-    owner: sprint-planning
-    status: proposed
-  - id: ACT-004
-    type: route
-    target: sprint-planning / issue-readiness
-    owner: project-router
-    status: proposed
+    type: no_op
+    target: "issues #71, #73, and #174"
+    owner: state-of-union
+    status: not_applicable
 handoff:
   next_skill: sprint-planning
-  next_mode: issue-readiness
-  reason: "Issues #130 and #126 are the dependency-ordered, issue-backed recovery slice required before exact release and live delivery-control work."
+  next_mode: lane-transaction
+  reason: "Issue #121 is the sole ready candidate after terminal #120 evidence; live branch rules and PR #189 prove the exact bounded delivery-control scope."
   required_before_handoff: []
 approval:
   status: approved
-  approver: "Jason (continue the repository recovery and publish-to-main objective)"
-  approved_at: "2026-07-10T02:47:25Z"
+  approver: Jason Vallery
+  approved_at: "2026-07-10T09:29:52Z"
