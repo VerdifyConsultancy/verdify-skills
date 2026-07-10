@@ -1,0 +1,137 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-issue-71-route-authority
+lane_id: issue-71-route-authority-validation
+status: ready_for_critic
+issue_ids: [71]
+pull_request: 221
+baseline_sha: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
+implementation_head_sha: 154e3bbd717f93b422343e97b98b7a24beda64d1
+validated_head_sha: 154e3bbd717f93b422343e97b98b7a24beda64d1
+contract_hash: 712b88c45db87e0ce3c16561925c0bd4c3fd318bd6e1d9cd932d5c670a80d27a
+changed_paths:
+  - .agent-workflow/.gitignore
+  - .agent-workflow/router/route-decision.md
+  - .agent-workflow/router/route-decision.yaml
+  - MANIFEST.sha256
+  - Makefile
+  - docs/authority-model.md
+  - docs/skills/per-skill/project-router.md
+  - docs/skills/tools-and-mcp.md
+  - examples/minimal-project/.agent-workflow/.gitignore
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - skills/project-router/SKILL.md
+  - skills/project-router/references/artifact-readiness.md
+  - skills/project-router/references/routing-rules.md
+  - skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml
+  - tests/test_npm_install.sh
+  - tests/test_route_authority.sh
+validation_results:
+  - id: route-authority-suite
+    command: bash tests/test_route_authority.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:26Z"
+    artifact: tests/test_route_authority.sh
+  - id: router-gate-suite
+    command: bash tests/test_router_gate_bypass.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:21Z"
+    artifact: tests/test_router_gate_bypass.sh
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:43Z"
+    artifact: tests/test_cli.sh
+  - id: schema-validator-suite
+    command: ruby tests/test_schema_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:46:51Z"
+    artifact: tests/test_schema_validator.rb
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:20Z"
+    artifact: scripts/validate-repo.rb
+  - id: manifest-check
+    command: make manifest-check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:20Z"
+    artifact: MANIFEST.sha256
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:51:08Z"
+    artifact: Makefile
+  - id: installed-package-suite
+    command: bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:47:11Z"
+    artifact: tests/test_npm_install.sh
+  - id: route-cache-index-check
+    command: test -z "$(git ls-files .agent-workflow/router/route-decision.yaml .agent-workflow/router/route-decision.md)" && git check-ignore -q .agent-workflow/router/route-decision.yaml && git check-ignore -q .agent-workflow/router/route-decision.md
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:20Z"
+    artifact: .agent-workflow/.gitignore
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="af3e6b7e7b23b600e62c1aedf042ab9a5d244deb..HEAD"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:20Z"
+    artifact: null
+  - id: diff-check
+    command: git diff --check af3e6b7e7b23b600e62c1aedf042ab9a5d244deb..HEAD
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:45:20Z"
+    artifact: null
+  - id: dispatch-integrity
+    command: verify D parent, three-path dispatch shape, and byte-identical SprintPlan, wave release plan, and lane contract through I
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T23:51:23Z"
+    artifact: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [route-authority-suite, schema-validator-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [route-authority-suite, repository-validation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [route-authority-suite, cli-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [route-authority-suite, router-gate-suite, cli-suite, schema-validator-suite, full-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [route-authority-suite, route-cache-index-check, repository-validation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [route-authority-suite, installed-package-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-07
+    evidence_ids: [full-suite, installed-package-suite, repository-validation, manifest-check, changed-commit-secret-scan, diff-check, dispatch-integrity]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Existing initialized repositories need the two route-cache ignore entries; fresh initialization and forced package upgrade install them automatically.
+  - Fresh critic evidence, exact final-head checks, protected-dev integration, and a normal terminal receipt remain downstream requirements before issue closure.
+worktree_clean: true
+worker_agent: codex-issue71-worker
+worker_session_id: codex-issue71-worker-20260710t2327z
+completed_at: "2026-07-10T23:51:23Z"
+limitations:
+  - Specialized sprint, critic, review, release, outcome, and terminal-receipt validators were intentionally preserved rather than rebuilt.
+  - LANE-AC-08 contains controller-owned post-worker evidence; this closeout proves D/I and hands E to a fresh critic without claiming S, CI, merge, or receipt completion.
+  - No schema, protected planning artifact, delivery workflow, branch protection, package version, runtime, credential, or permission was changed.

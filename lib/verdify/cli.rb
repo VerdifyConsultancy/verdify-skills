@@ -44,6 +44,72 @@ module Verdify
     ].freeze
     SECRET_ASSIGNMENT_PATTERN = /\b(?:api[_-]?key|access[_-]?key|secret(?:[_-]?key)?|client[_-]?secret|auth[_-]?token|refresh[_-]?token|password|passwd|pwd|bearer[_-]?token|private[_-]?key)\b\s*(?:=|:|=>)\s*["']?([A-Za-z0-9+\/=_\-.]{20,})["']?/i
     CREDIT_CARD_CANDIDATE_PATTERN = /\b(?:\d[ -]*?){13,19}\b/
+    ROUTE_AUTHORITY_ERROR_LIMIT = 99
+    ROUTE_AUTHORITY_TYPES = {
+      transcript_replan: {
+        schema_name: "transcript-replan.schema.yaml",
+        producer_skill: "transcript-replan",
+        producer_mode: "ingest",
+        invalid_state: "TRANSCRIPT_REPLAN_INVALID",
+        label: "transcript replan"
+      },
+      evidence_registry: {
+        schema_name: "northstar-evidence-registry.schema.yaml",
+        producer_skill: "northstar-research-ingest",
+        producer_mode: "ingest-research",
+        invalid_state: "NORTHSTAR_EVIDENCE_REGISTRY_INVALID",
+        label: "North Star evidence registry"
+      },
+      northstar_plan: {
+        schema_name: "northstar-plan.schema.yaml",
+        producer_skill: "northstar-planning",
+        producer_mode: "synthesis",
+        invalid_state: "NORTHSTAR_PLAN_INVALID",
+        label: "North Star plan"
+      },
+      northstar_artifacts: {
+        schema_name: "northstar-artifacts.schema.yaml",
+        producer_skill: "northstar-planning",
+        producer_mode: "artifact-loop",
+        invalid_state: "NORTHSTAR_ARTIFACTS_INVALID",
+        label: "North Star artifacts"
+      },
+      project_definition: {
+        schema_name: "project-definition.schema.yaml",
+        producer_skill: "project-definition",
+        producer_mode: "discovery",
+        invalid_state: "PROJECT_DEFINITION_INVALID",
+        label: "project definition"
+      },
+      architecture: {
+        schema_name: "architecture.schema.yaml",
+        producer_skill: "architecture-contracts",
+        producer_mode: "north-star-architecture",
+        invalid_state: "ARCHITECTURE_INVALID",
+        label: "architecture"
+      },
+      module_contract: {
+        schema_name: "module-contract.schema.yaml",
+        producer_skill: "architecture-contracts",
+        producer_mode: "module-contracts",
+        invalid_state: "MODULE_CONTRACT_INVALID",
+        label: "module contract"
+      },
+      state_of_union: {
+        schema_name: "state-of-union.schema.yaml",
+        producer_skill: "state-of-union",
+        producer_mode: "strategy-review",
+        invalid_state: "STATE_OF_UNION_INVALID",
+        label: "state of union"
+      },
+      repo_hygiene: {
+        schema_name: "repo-hygiene.schema.yaml",
+        producer_skill: "repo-hygiene",
+        producer_mode: "assess",
+        invalid_state: "REPO_HYGIENE_INVALID",
+        label: "repository hygiene"
+      }
+    }.freeze
 
     def self.run(argv)
       new(argv.dup).run
@@ -197,7 +263,7 @@ module Verdify
       FileUtils.mkdir_p(root)
 
       files = {
-        root.join(".gitignore") => "github/snapshot.json\nruntime/\n*.tmp\nnorthstar/collateral/sources/\n",
+        root.join(".gitignore") => "github/snapshot.json\nruntime/\n*.tmp\nnorthstar/collateral/sources/\nrouter/route-decision.yaml\nrouter/route-decision.md\n",
         root.join("README.md") => <<~MD,
           # Verdify project artifacts
 
@@ -1395,7 +1461,11 @@ module Verdify
         missing << project_path.relative_path_from(repo.root).to_s
         return route_hash(repo, "PROJECT_DEFINITION_MISSING", "project-definition", "discovery", "No canonical project definition exists.", evidence, missing, open_gates)
       end
-      project = Verdify.safe_load_yaml(project_path)
+      project, invalid_route = route_authority_document(
+        repo, project_path, :project_definition, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+
       stage_order = [["discovery", "discovery"], ["requirements", "requirements"], ["product", "product"], ["design_surface", "design-surface"]]
       incomplete = stage_order.find { |key, _mode| project.dig("stage_status", key) != "approved" }
       if incomplete
@@ -1411,13 +1481,29 @@ module Verdify
       end
 
       architecture_path = root.join("architecture/architecture.yaml")
-      unless architecture_path.file? && Verdify.safe_load_yaml(architecture_path).dig("approval", "status") == "approved"
+      unless architecture_path.file?
+        missing << architecture_path.relative_path_from(repo.root).to_s
+        return route_hash(repo, "ARCHITECTURE_INCOMPLETE", "architecture-contracts", "north-star-architecture", "Approved architecture is missing or incomplete.", evidence, missing, open_gates)
+      end
+      architecture, invalid_route = route_authority_document(
+        repo, architecture_path, :architecture, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+      unless architecture.dig("approval", "status") == "approved"
         missing << architecture_path.relative_path_from(repo.root).to_s
         return route_hash(repo, "ARCHITECTURE_INCOMPLETE", "architecture-contracts", "north-star-architecture", "Approved architecture is missing or incomplete.", evidence, missing, open_gates)
       end
 
-      module_paths = Dir[root.join("modules/contracts/*.yaml")]
-      if module_paths.empty? || module_paths.any? { |path| Verdify.safe_load_yaml(path).dig("approval", "status") != "approved" }
+      module_paths = Dir[root.join("modules/contracts/*.yaml")].sort.map { |path| Pathname.new(path) }
+      module_documents = module_paths.map do |path|
+        document, module_invalid_route = route_authority_document(
+          repo, path, :module_contract, evidence, missing, open_gates
+        )
+        return module_invalid_route if module_invalid_route
+
+        document
+      end
+      if module_paths.empty? || module_documents.any? { |document| document.dig("approval", "status") != "approved" }
         missing << ".agent-workflow/modules/contracts/<module-id>.contract.yaml"
         return route_hash(repo, "MODULE_CONTRACTS_INCOMPLETE", "architecture-contracts", "module-contracts", "Approved black-box module contracts are missing or incomplete.", evidence, missing, open_gates)
       end
@@ -1958,7 +2044,11 @@ module Verdify
         return route_hash(repo, "STATE_OF_UNION_MISSING", "state-of-union", "strategy-review", "Approved foundations exist, but no strategy/backlog reconciliation has been recorded.", evidence, missing, open_gates)
       end
 
-      strategy = Verdify.safe_load_yaml(strategy_path)
+      strategy, invalid_route = route_authority_document(
+        repo, strategy_path, :state_of_union, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+
       evidence << { "source" => strategy_path.relative_path_from(repo.root).to_s, "finding" => "state-of-union status is #{strategy['status'].inspect}" }
       unless strategy["status"] == "approved" && strategy.dig("approval", "status") == "approved"
         return route_hash(repo, "STATE_OF_UNION_UNAPPROVED", "state-of-union", "strategy-review", "The strategy/backlog reconciliation is missing approval.", evidence, missing, open_gates)
@@ -2093,13 +2183,24 @@ module Verdify
 
     def strategy_handoff_route(repo, root, evidence, missing, open_gates)
       strategy_path = root.join("strategy/state-of-union.yaml")
-      strategy = Verdify.safe_load_yaml(strategy_path)
+      strategy, invalid_route = route_authority_document(
+        repo, strategy_path, :state_of_union, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+
       handoff = strategy["handoff"] || {}
       skill = handoff["next_skill"].to_s
       mode = handoff["next_mode"].to_s
       reason = handoff["reason"].to_s
       if skill.empty? || mode.empty? || reason.empty?
         return route_hash(repo, "STATE_OF_UNION_HANDOFF_INCOMPLETE", "state-of-union", "strategy-review", "The approved strategy does not name a complete handoff.", evidence, missing, open_gates)
+      end
+      unless declared_lifecycle_mode?(skill, mode)
+        evidence << {
+          "source" => strategy_path.relative_path_from(repo.root).to_s,
+          "finding" => "route authority rejected (type=illegal_handoff; expected_schema=state-of-union.schema.yaml)"
+        }
+        return route_hash(repo, "STATE_OF_UNION_HANDOFF_INVALID", "state-of-union", "strategy-review", "The approved strategy names a lifecycle handoff that is not declared by the canonical lifecycle model.", evidence, missing, open_gates)
       end
 
       hygiene_route = route_for_repo_hygiene(repo, root, evidence, missing, open_gates) if skill == "sprint-planning"
@@ -2114,7 +2215,11 @@ module Verdify
 
       intake_path = root.join("intake/transcript-replan.yaml")
       if intake_path.file?
-        intake = Verdify.safe_load_yaml(intake_path)
+        intake, invalid_route = route_authority_document(
+          repo, intake_path, :transcript_replan, evidence, missing, open_gates
+        )
+        return invalid_route if invalid_route
+
         evidence << { "source" => intake_path.relative_path_from(repo.root).to_s, "finding" => "transcript-replan status is #{intake['status'].inspect}" }
         return nil if %w[routed approved].include?(intake["status"])
       else
@@ -2136,7 +2241,11 @@ module Verdify
 
       registry_path = root.join("northstar/evidence-registry.yaml")
       registered = if registry_path.file?
-                     registry = Verdify.safe_load_yaml(registry_path)
+                     registry, invalid_route = route_authority_document(
+                       repo, registry_path, :evidence_registry, evidence, missing, open_gates
+                     )
+                     return invalid_route if invalid_route
+
                      Array(registry["evidence"]).map { |entry| entry["source_sha256"] }
                    else
                      missing << registry_path.relative_path_from(repo.root).to_s
@@ -2158,12 +2267,21 @@ module Verdify
       intake_path = root.join("intake/transcript-replan.yaml")
       evidence_sources = Dir[repo.root.join("docs/northstar/evidence/*")].map { |path| Pathname.new(path) }.select(&:file?)
       registry_path = root.join("northstar/evidence-registry.yaml")
-      registry = registry_path.file? ? Verdify.safe_load_yaml(registry_path) : nil
+      if registry_path.file?
+        registry, invalid_route = route_authority_document(
+          repo, registry_path, :evidence_registry, evidence, missing, open_gates
+        )
+        return invalid_route if invalid_route
+      end
       registry_has_evidence = registry.is_a?(Hash) && !Array(registry["evidence"]).empty?
       return nil unless intake_path.file? || !evidence_sources.empty? || registry_has_evidence
 
       if intake_path.file?
-        intake = Verdify.safe_load_yaml(intake_path)
+        intake, invalid_route = route_authority_document(
+          repo, intake_path, :transcript_replan, evidence, missing, open_gates
+        )
+        return invalid_route if invalid_route
+
         intake_source = intake_path.relative_path_from(repo.root).to_s
         unless evidence.any? { |item| item["source"] == intake_source }
           evidence << { "source" => intake_source, "finding" => "transcript-replan status is #{intake['status'].inspect}" }
@@ -2190,7 +2308,11 @@ module Verdify
       end
 
       if plan_path.file?
-        plan = Verdify.safe_load_yaml(plan_path)
+        plan, invalid_route = route_authority_document(
+          repo, plan_path, :northstar_plan, evidence, missing, open_gates
+        )
+        return invalid_route if invalid_route
+
         evidence << { "source" => plan_path.relative_path_from(repo.root).to_s, "finding" => "northstar-plan status is #{plan['status'].inspect}" }
         unless artifacts_present || (%w[approved].include?(plan["status"]) && plan.dig("approval", "status") == "approved")
           return route_hash(repo, "NORTHSTAR_PLAN_INCOMPLETE", "northstar-planning", "synthesis", "North Star planning exists but is not approved.", evidence, missing, open_gates)
@@ -2204,7 +2326,11 @@ module Verdify
         return route_hash(repo, "NORTHSTAR_ARTIFACTS_MISSING", "northstar-planning", "artifact-loop", "North Star evidence is routed, but product/architecture North Star artifacts or their signoff record are missing.", evidence, missing, open_gates)
       end
 
-      artifacts = Verdify.safe_load_yaml(artifacts_path)
+      artifacts, invalid_route = route_authority_document(
+        repo, artifacts_path, :northstar_artifacts, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+
       artifact_status = artifacts["status"].to_s
       evidence << { "source" => artifacts_path.relative_path_from(repo.root).to_s, "finding" => "northstar-artifacts status is #{artifact_status.inspect}" }
       product_ok = artifacts.dig("product", "status") == "approved"
@@ -2219,6 +2345,13 @@ module Verdify
              else
                "artifact-loop"
              end
+      unless declared_lifecycle_mode?("northstar-planning", mode)
+        evidence << {
+          "source" => artifacts_path.relative_path_from(repo.root).to_s,
+          "finding" => "route authority rejected (type=illegal_handoff; expected_schema=northstar-artifacts.schema.yaml)"
+        }
+        return route_hash(repo, "NORTHSTAR_ARTIFACTS_HANDOFF_INVALID", "northstar-planning", "artifact-loop", "The North Star artifacts name a lifecycle mode that is not declared for their producing skill.", evidence, missing, open_gates)
+      end
       route_hash(repo, "NORTHSTAR_ARTIFACTS_INCOMPLETE", "northstar-planning", mode, "Product and architecture North Star artifacts must be cross-linked and signed off before downstream lifecycle skills treat them as core planning authority.", evidence, missing, open_gates)
     end
 
@@ -2229,11 +2362,71 @@ module Verdify
         return route_hash(repo, "REPO_HYGIENE_MISSING", "repo-hygiene", "assess", "Approved strategy is ready for sprint planning, but Wave 0 repo hygiene is missing.", evidence, missing, open_gates)
       end
 
-      hygiene = Verdify.safe_load_yaml(hygiene_path)
+      hygiene, invalid_route = route_authority_document(
+        repo, hygiene_path, :repo_hygiene, evidence, missing, open_gates
+      )
+      return invalid_route if invalid_route
+
       evidence << { "source" => hygiene_path.relative_path_from(repo.root).to_s, "finding" => "repo-hygiene status is #{hygiene['status'].inspect}" }
       return nil if hygiene["status"] == "complete" && hygiene.dig("approval", "status") == "approved"
 
       route_hash(repo, "REPO_HYGIENE_INCOMPLETE", "repo-hygiene", "assess", "Repo hygiene must be complete and approved before sprint planning.", evidence, missing, open_gates)
+    end
+
+    def route_authority_document(repo, path, authority_type, evidence, missing, open_gates)
+      definition = ROUTE_AUTHORITY_TYPES.fetch(authority_type)
+      result = load_route_authority(path, definition.fetch(:schema_name))
+      return [result.fetch(:document), nil] if result[:document]
+
+      failure = result.fetch(:failure)
+      relative = path.relative_path_from(repo.root).to_s
+      finding = "route authority rejected (type=#{failure.fetch(:type)}; expected_schema=#{definition.fetch(:schema_name)}; errors=#{failure.fetch(:error_count)})"
+      finding += "; additional errors omitted" if failure[:truncated]
+      evidence << { "source" => relative, "finding" => finding }
+      route = route_hash(
+        repo,
+        definition.fetch(:invalid_state),
+        definition.fetch(:producer_skill),
+        definition.fetch(:producer_mode),
+        "The #{definition.fetch(:label)} is invalid and must be repaired by its producing lifecycle skill before routing can consume it.",
+        evidence,
+        missing,
+        open_gates
+      )
+      [nil, route]
+    end
+
+    def load_route_authority(path, schema_name)
+      document = SchemaValidator.load_document(path)
+      schema = SchemaValidator.load_document(Verdify::ROOT.join("schemas", schema_name))
+      schema_errors = SchemaValidator.new.validate(document, schema)
+      semantic_errors = schema_errors.empty? ? SemanticValidator.validate(document) : []
+      errors = schema_errors + semantic_errors
+      return { document: document, failure: nil } if errors.empty?
+
+      failure_type = if schema_errors.empty?
+                       "semantic_invalid"
+                     elsif semantic_errors.empty?
+                       "schema_invalid"
+                     else
+                       "schema_and_semantic_invalid"
+                     end
+      bounded_route_authority_failure(failure_type, errors.length)
+    rescue Verdify::Error
+      bounded_route_authority_failure("parse_invalid", 1)
+    rescue SystemCallError
+      bounded_route_authority_failure("unreadable", 1)
+    end
+
+    def bounded_route_authority_failure(type, error_count)
+      {
+        document: nil,
+        failure: {
+          type: type,
+          error_count: [error_count, ROUTE_AUTHORITY_ERROR_LIMIT].min,
+          truncated: error_count > ROUTE_AUTHORITY_ERROR_LIMIT
+        }
+      }
     end
 
     def route_hash(repo, state, skill, mode, reason, evidence, missing, open_gates)
@@ -2256,10 +2449,13 @@ module Verdify
     end
 
     def ensure_declared_lifecycle_mode!(skill, mode)
-      modes = lifecycle_modes[skill.to_s]
-      return if modes&.include?(mode.to_s)
+      return if declared_lifecycle_mode?(skill, mode)
 
       raise UsageError, "route next_mode #{mode.inspect} is not declared for #{skill} in config/lifecycle.yaml"
+    end
+
+    def declared_lifecycle_mode?(skill, mode)
+      lifecycle_modes[skill.to_s]&.include?(mode.to_s) == true
     end
 
     def lifecycle_modes

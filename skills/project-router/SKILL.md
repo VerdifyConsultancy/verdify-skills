@@ -22,6 +22,12 @@ Decide exactly one next lifecycle action without doing that action's substantive
    ancestry. Legacy terminal commits before the receipt cutover remain valid;
    controller refs, tags, statuses, and workflow URLs never substitute for the
    receipt.
+6. Treat route-decision YAML and Markdown as ignored, untracked local views.
+   The fresh computation is authoritative; `generated_at` is provenance only.
+7. Consume an upstream authority artifact only after the CLI validates it
+   against the code-selected expected schema and semantic contract. Invalid
+   artifacts and illegal handoffs route to their producing skill with bounded
+   diagnostics.
 
 ## Procedure
 
@@ -34,7 +40,7 @@ Decide exactly one next lifecycle action without doing that action's substantive
 
 3. Review the deterministic recommendation against material context that the CLI cannot judge, such as an explicit human request, a production incident, or an open decision gate.
 4. Classify missing information as `missing`, `stale`, `contradictory`, or `approval_required`.
-5. Write or update:
+5. Generate the ignored local views:
    - `.agent-workflow/router/route-decision.yaml`
    - `.agent-workflow/router/route-decision.md`
 6. Name one next skill and one mode. Explain prerequisites, why earlier stages are complete, and what must stop the next role.
@@ -79,7 +85,11 @@ An urgent incident may route directly to `release-verification` only when the re
 
 ## Required output fields
 
-The YAML decision must include current state, next skill, next mode, evidence, missing artifacts, open gates, and reason. Validate it against `../../schemas/route-decision.schema.yaml`.
+The YAML decision must include current state, next skill, next mode, evidence,
+missing artifacts, open gates, and reason. Validate it against
+`../../schemas/route-decision.schema.yaml`. YAML and Markdown must agree on
+`current_state`, `next_skill`, `next_mode`, and `reason`; do not commit either
+generated view.
 
 ## Stop conditions
 
@@ -88,6 +98,8 @@ Stop and report rather than guessing when:
 - repository identity or default branch is ambiguous;
 - GitHub cannot be reached and the cached snapshot is materially stale;
 - approved artifacts conflict with live code or GitHub state;
+- an authority artifact fails its expected schema or semantic contract and the
+  producing skill cannot repair it within its authority;
 - a material gate has no authorized resolver;
 - the user requests a later phase but prerequisites are absent.
 

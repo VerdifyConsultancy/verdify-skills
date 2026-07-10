@@ -57,6 +57,8 @@ OLD_WORKFLOW_DIR=".ver""dify"
 [[ -x "$INSTALL/bin/verdify" ]]
 [[ -f "$REPO/.agent-workflow/config.yaml" ]]
 [[ -f "$REPO/.agent-workflow/router/route-decision.yaml" ]]
+git -C "$REPO" check-ignore -q .agent-workflow/router/route-decision.yaml
+git -C "$REPO" check-ignore -q .agent-workflow/router/route-decision.md
 [[ -L "$REPO/.agents/skills/project-router" ]]
 [[ -L "$REPO/.agents/skills/crm-email" ]]
 [[ -f "$REPO/AGENTS.md" ]]

@@ -7,6 +7,7 @@ validate:
 test: validate manifest-check
 	bash tests/test_package_file_set.sh
 	ruby tests/test_schema_validator.rb
+	bash tests/test_route_authority.sh
 	bash tests/test_cli.sh
 	ruby tests/test_lane_review_validator.rb
 	ruby tests/test_sprint_terminal_receipt.rb

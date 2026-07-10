@@ -1,0 +1,158 @@
+---
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: '1.0'
+wave_id: wave-2026-07-10-issue-71-route-authority
+status: approved
+scope:
+  sprint_id: 2026-07-10-issue-71-route-authority
+  issue_ids: [71]
+  lane_ids: [issue-71-route-authority-validation]
+  northstar_ids: [NSM-007, NSM-008, NSM-009]
+  summary: Integrate fail-closed route authority validation and remove committed route cache authority from protected dev.
+  non_goals: [main or npm release, application runtime deployment, schema or North Star change, later platform lanes]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-71
+  decision_notes: One protected routing lane targets dev; its post-merge receipt is deterministic and receives no second critic cycle.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+  - name: validate
+    required: true
+    event_triggers: [pull_request, push]
+    timeout_minutes: 30
+    evidence_expected: [full repository tests, manifest verification, route authority and installed-package regressions]
+  - name: policy
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [standard lane identity and protected-base policy]
+  - name: delivery-gate
+    required: true
+    event_triggers: [pull_request, push, other]
+    timeout_minutes: 15
+    evidence_expected: [exact-head critic report, delivery policy, terminal receipt validation]
+  - name: compliance-selftest
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [fleet-standard repository compliance]
+  artifacts: [authority mapping, malformed route matrix, derived cache assertions, D/I/E/S evidence, terminal receipt]
+  required_events: [pull_request, push]
+environments:
+- name: repository-control-plane
+  environment_type: review
+  required: true
+  namespace: null
+  url: https://github.com/VerdifyConsultancy/verdify-skills
+  quota_policy: Routine source and package validation must remain local and deterministic; terminal evidence uses the existing bounded GitHub read policy.
+  limit_policy: No new credential or write authority is introduced.
+  network_policy: Route artifact validation performs no network access; existing GitHub delivery and receipt evidence paths remain unchanged.
+  ttl: null
+  secrets_scope: Existing ephemeral GitHub Actions token only; no new secret, personal token, persistence, or output.
+  protection_rules: [one fresh implementation critic, exact-head checks, CODEOWNERS or narrow recorded admin exception]
+  expected_revision_source: merged issue 71 dev SHA followed by merged normal terminal receipt dev SHA
+gitops:
+  controller: none
+  desired_state_refs: [lib/verdify/cli.rb, scripts/validate-repo.rb, .agent-workflow/.gitignore]
+  sync_order:
+  - phase: validation
+    wave: 1
+    resource: issue 71 implementation pull request
+    purpose: Exercise fail-closed authority loading, producer routes, cache tracking, packaging, and exact-head checks.
+  - phase: integration
+    wave: 2
+    resource: protected dev
+    purpose: Merge only the exact fresh-critic-approved head after required checks and protected-path decision evidence.
+  - phase: closeout
+    wave: 3
+    resource: normal terminal receipt pull request
+    purpose: Make completion authoritative and verify the global router advances to issue 73.
+  reconciliation_checks: [origin/dev exactness, authority mapping, route cache index and ignore state, generated pair agreement, terminal receipt ancestry]
+  remediation_policy: Stop and fix forward on any raw authority read, invalid producer route, unbounded error, cache tracking, test, CI, or receipt mismatch.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+  - id: STEP-01
+    action: Run the focused negative matrix, package and full tests, one fresh critic, and exact-head pull-request checks.
+    success_criteria: Every authority caller is validated, legal routes are preserved, caches are untracked, and all required evidence is green.
+    rollback_trigger: Any bypass, route regression, unbounded diagnostic, cache authority, failed test, or critic blocker.
+  - id: STEP-02
+    action: Merge the exact approved head to protected dev under CODEOWNERS or the preauthorized narrow exception.
+    success_criteria: The intended commit is integrated and all branch protections are verified restored.
+    rollback_trigger: Head changes, required check drift, or protection restoration failure.
+  - id: STEP-03
+    action: Generate and merge the normal deterministic terminal receipt, then rerun the global router.
+    success_criteria: Receipt policy checks pass, issue 71 is terminal, and routing selects the issue 73 sequence.
+    rollback_trigger: Any evidence mismatch, receipt failure, integrated unterminated sprint, or stale route.
+observability:
+  dashboards: [GitHub pull requests, checks, workflow runs, and branch protection]
+  logs: [focused test output, redacted validation output, Actions logs, terminal receipt validation]
+  metrics: [authority artifacts validated, negative fixtures rejected, legal handoffs preserved, tracked route cache count]
+  traces: [sprint ID, D/I/E/S SHAs, pull request, workflow run IDs, dev merge, terminal receipt]
+  runtime_checks: [route authority suite, installed-package suite, git index and ignore state, validate-repo, project-router]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the single implementation merge if valid routing or package behavior regresses on dev; rejected candidates are fixed forward before merge.
+  known_good_ref: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
+  procedure: Stop receipt generation, preserve bounded evidence, revert only the issue 71 merge if necessary, restore prior cache tracking only as a temporary rollback, and rerun the complete route and package matrix.
+  validation_steps: [validate repository, run focused route tests, run installed-package tests, verify branch protection, rerun project-router]
+release_health:
+  stabilization_window: through implementation merge, normal receipt merge, and post-merge route verification
+  signals:
+  - name: fail-closed route authority
+    source: route authority negative matrix
+    threshold: Every malformed or impossible authority fixture routes to its producer without advancement or crash.
+    blocking: true
+  - name: valid route preservation
+    source: focused and full route suites
+    threshold: Every declared legal handoff and complete valid fixture retains its expected route.
+    blocking: true
+  - name: cache authority removal
+    source: Git index, ignore, generated-pair, and repository validation checks
+    threshold: Both route cache files are untracked and ignored, route --write generates an agreeing pair, and re-tracking fails validation.
+    blocking: true
+  - name: terminal convergence
+    source: normal terminal receipt and project-router
+    threshold: Receipt checks are green, integrated_unterminated is zero, and routing advances to issue 73 planning.
+    blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/review/review-inbox-packet.yaml
+  human_test_steps:
+  - Inspect the caller-selected schema and producer mapping for every route authority artifact.
+  - Inspect malformed and impossible handoff failures for bounded fail-closed behavior.
+  - Confirm route cache files are untracked ignored output and generated YAML/Markdown agree.
+  approval_gate: One fresh implementation critic plus the preauthorized protected-path exception only if CODEOWNERS cannot be satisfied by an available non-author identity.
+risks:
+- id: RISK-01
+  severity: critical
+  statement: One unmigrated raw route-authority read would preserve the bypass.
+  mitigation: Require a complete caller matrix and malformed fixture for every named producer.
+- id: RISK-02
+  severity: high
+  statement: Fail-closed handling could accidentally suppress code defects or disclose untrusted artifact data.
+  mitigation: Bound validation errors, distinguish expected artifact failures from programmer exceptions, and test redaction.
+- id: RISK-03
+  severity: medium
+  statement: Derived-cache removal could break package or operator expectations.
+  mitigation: Preserve route --write, update documented consumers, and gate on installed-package and generated-pair tests.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-10T23:22:14Z'
+prepared_at: '2026-07-10T23:22:14Z'
+planner: root-issue71-route-authority
