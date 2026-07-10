@@ -1,0 +1,162 @@
+---
+schema_ref: review-inbox-packet.schema.yaml
+kind: ReviewInboxPacket
+schema_version: '2.0'
+packet_id: review-2026-07-10-issue-215-receipt-ci-auth
+status: approved
+scope:
+  review_unit: lane
+  sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+  lane_ids: [issue-215-receipt-ci-auth]
+  issue_ids: [215]
+  northstar_ids: []
+  summary: Post-merge packet for the exact reviewed receipt-CI authentication lane and protected-dev integration.
+traceability:
+  repository: VerdifyConsultancy/verdify-skills
+  base_ref: dev
+  head_ref: controller/2026-07-10-issue-215-receipt-ci-auth
+  review_submissions:
+  - pull_request: 217
+    review_submission_head_sha: 655d5a116023f2930dd7dca88456f2bfeba139af
+    reviewer_login: github-actions
+    reviewer_id: 15368
+  artifact_paths:
+  - .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/contracts/issue-215-receipt-ci-auth.contract.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/closeout/issue-215-receipt-ci-auth.closeout.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/critic/issue-215-receipt-ci-auth.critic.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/release/wave-release-plan.yaml
+  source_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/217
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/215
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/217#issuecomment-4940169487
+pull_requests:
+- provider: github
+  identifier: '#217'
+  url: https://github.com/VerdifyConsultancy/verdify-skills/pull/217
+  state: merged
+  author: jvallery
+  requested_reviewers: []
+  latest_review_state: not_applicable
+checks:
+- name: validate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128796118/job/86479907808
+  observed_at: '2026-07-10T22:52:32Z'
+- name: pull-request-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884063/job/86480157383
+  observed_at: '2026-07-10T22:52:02Z'
+- name: compliance / compliance
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128796226/job/86479908877
+  observed_at: '2026-07-10T22:50:03Z'
+- name: delivery-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884098/job/86480157473
+  observed_at: '2026-07-10T22:52:00Z'
+- name: critic-gate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884098/job/86480157461
+  observed_at: '2026-07-10T22:52:02Z'
+deployments:
+- environment: repository-only
+  environment_type: none
+  required: false
+  state: not_applicable
+  url: null
+  deployment_id: null
+  observed_revision: 52fbcbe957e69e81db014989bfdcf26b6863669f
+  desired_state_ref: dev
+  reconciliation_evidence:
+  - PR 217 merged exact S3 to protected dev as 52fbcbe957e69e81db014989bfdcf26b6863669f.
+  - Admin enforcement and every required branch protection were restored immediately after the exact-head merge.
+  log_url: null
+  observed_at: '2026-07-10T22:54:16Z'
+reviewer_guidance:
+  human_test_steps:
+  - Confirm exact D/I/E/S, merged PR identity, trusted checks, and protected-dev ancestry.
+  - Confirm pull-request jobs execute protected dev/main policy code and non-PR candidate code is limited to refs/heads/dev.
+  - Confirm authenticated failures cannot fall back anonymously or expose token/path/header material.
+  - Confirm the six-receipt ledger remains at 42 reads, below the fail-closed ceiling of 48.
+  review_urls:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/217/files
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/217/checks
+  route_maps: []
+telemetry:
+  dashboards: []
+  logs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128796118/job/86479907808
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884063/job/86480157383
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128796226/job/86479908877
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884098/job/86480157473
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29128884098/job/86480157461
+  metrics:
+  - six-receipt request count 42 of 48 maximum
+  - live single-PR evidence count 5 reads
+  traces:
+  - D 749b23d94c1704525432427cf540b74bbda00525
+  - I 8c04bb373c2217f9ef58a4c0139e54fdd72568c5
+  - E c3405f47e6a311f282ece7d7e62a73c5489c52d6
+  - S 655d5a116023f2930dd7dca88456f2bfeba139af
+  - merge 52fbcbe957e69e81db014989bfdcf26b6863669f
+  runtime_checks:
+  - name: exact-head protected delivery checks
+    result: passed
+    evidence: All five required trusted checks succeeded at exact S3 with expected workflow, event, app, and head identity.
+  - name: branch protection restoration
+    result: passed
+    evidence: Admin enforcement, CODEOWNERS, strict checks, force-push prohibition, and deletion prohibition were verified after merge.
+  missing_telemetry:
+  - The normal post-merge terminal receipt has not yet exercised the accepted protected-dev validator.
+security:
+  privileged_access_required: true
+  secret_exposure_reviewed: true
+  preview_generator_controls:
+  - github.token is step-scoped to three trusted validation steps with read-only actions, checks, contents, and pull-request permissions.
+  - Every owned workflow checkout disables persisted credentials.
+  - PR engines require same-repository protected dev/main bases; non-PR candidate engines require exact refs/heads/dev.
+  - Authenticated failures are bounded, allowlisted, token-redacted, and never retried anonymously.
+  unresolved_findings: []
+rollback:
+  ready: true
+  known_good_revision: fbe821899caf546e9b7b8daa718ea2ec74918091
+  procedure: Revert merge 52fbcbe957e69e81db014989bfdcf26b6863669f on dev, restore the prior workflow permission map, and regenerate controller and terminal evidence.
+  evidence:
+  - The exact merge commit, prior protected-dev revision, and changed workflow paths are recorded.
+risks:
+- id: RISK-01
+  severity: medium
+  statement: The repository-wide actionlint command retains one unrelated baseline SC2012 finding in compliance-gate.yml.
+  disposition: Both changed workflows lint cleanly; the baseline finding was reproduced and the unrelated workflow remained outside the lane.
+- id: RISK-02
+  severity: medium
+  statement: GitHub evidence and authenticated request behavior are point-in-time until the normal receipt merges.
+  disposition: Revalidate the live PR, check identities, controller head, branch protections, and authenticated receipt checks in the receipt gate.
+questions: []
+evidence_completeness:
+  verdict: complete
+  satisfied_required:
+  - Exact D/I/E/S, merged pull request, trusted checks, security finding disposition, protected-dev ancestry, and rollback are verified.
+  missing_required: []
+  blockers: []
+recommendation:
+  outcome: approve
+  rationale: The lane met its bounded authentication contract, all critic findings were resolved, exact-head CI is green, and protected dev contains the reviewed result.
+feedback_route:
+  route: release_verification
+  instructions: Commit verified release evidence and accepted outcome on this controller branch, then generate the normal terminal receipt.
+  target_refs:
+  - controller/2026-07-10-issue-215-receipt-ci-auth
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/217
+prepared_at: '2026-07-10T22:55:25Z'
+preparer: codex-root-issue215-controller
