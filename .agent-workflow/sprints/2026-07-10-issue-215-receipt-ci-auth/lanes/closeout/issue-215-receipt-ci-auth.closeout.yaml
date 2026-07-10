@@ -7,8 +7,8 @@ status: ready_for_critic
 issue_ids: [215]
 pull_request: 217
 baseline_sha: fbe821899caf546e9b7b8daa718ea2ec74918091
-implementation_head_sha: 7dbcd20b0970a8edf5ab193c97c7038d39ea26eb
-validated_head_sha: 7dbcd20b0970a8edf5ab193c97c7038d39ea26eb
+implementation_head_sha: 5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5
+validated_head_sha: 5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5
 contract_hash: 71b18893cf89eff0cd5b0db84253df0278996247707b8675a63e280e518da47b
 changed_paths:
   - .github/workflows/delivery-gate.yml
@@ -24,71 +24,77 @@ validation_results:
     command: ruby tests/test_sprint_terminal_receipt.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:46:55Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: tests/test_sprint_terminal_receipt.rb
   - id: pull-request-policy-suite
     command: bash tests/test_pr_policy.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:47:15Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: tests/test_pr_policy.sh
   - id: delivery-gate-suite
     command: bash tests/test_delivery_gate.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:47:20Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: tests/test_delivery_gate.sh
   - id: repository-validation
     command: ruby scripts/validate-repo.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:45:05Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: scripts/validate-repo.rb
   - id: workflow-lint
     command: actionlint .github/workflows/policy.yml .github/workflows/delivery-gate.yml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:48:14Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: .github/workflows/policy.yml
   - id: full-suite
     command: make test
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:47:56Z"
+    executed_at: "2026-07-10T22:14:35Z"
     artifact: Makefile
   - id: manifest-check
     command: make manifest-check
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:45:05Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: MANIFEST.sha256
   - id: changed-commit-secret-scan
     command: gitleaks git --no-banner --redact --log-opts="fbe821899caf546e9b7b8daa718ea2ec74918091..HEAD"
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:48:14Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: null
   - id: diff-check
     command: git diff --check fbe821899caf546e9b7b8daa718ea2ec74918091..HEAD
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:48:14Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: null
   - id: dispatch-integrity
     command: verify dispatch artifacts match 749b23d94c1704525432427cf540b74bbda00525 and contract SHA-256
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:48:14Z"
+    executed_at: "2026-07-10T22:11:35Z"
     artifact: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/contracts/issue-215-receipt-ci-auth.contract.yaml
   - id: authenticated-live-check-evidence
     command: authenticated read-only github_check_run_evidence probe for PR 213 exact S
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T21:48:14Z"
+    executed_at: "2026-07-10T22:14:58Z"
     artifact: https://github.com/VerdifyConsultancy/verdify-skills/pull/213/checks
+  - id: request-fixes-report-integrity
+    command: verify S1 34197999e5c908ac470236d9c832f9cc392fd173 critic report SHA-256 remains 7a7e3885d73e16a4bcba75cac3c7f07ac81ad7b1bc0a4ead143094fa8095581e
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T22:14:58Z"
+    artifact: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/critic/issue-215-receipt-ci-auth.critic.yaml
 acceptance_evidence:
   - criterion_id: LANE-AC-01
-    evidence_ids: [repository-validation, workflow-lint]
+    evidence_ids: [repository-validation, workflow-lint, request-fixes-report-integrity]
     assessment: satisfied
   - criterion_id: LANE-AC-02
     evidence_ids: [receipt-suite, authenticated-live-check-evidence]
@@ -116,10 +122,11 @@ residual_risks:
 worktree_clean: true
 worker_agent: codex-issue215-worker
 worker_session_id: codex-issue215-worker-20260710t2134z
-completed_at: "2026-07-10T21:49:24Z"
+completed_at: "2026-07-10T22:14:58Z"
 limitations:
   - "The exact contract command actionlint .github/workflows/*.yml exits 1 on pre-existing SC2012 in .github/workflows/compliance-gate.yml:55; the same result was reproduced from baseline fbe821899caf546e9b7b8daa718ea2ec74918091, and that out-of-lane path was not changed."
   - "Request accounting proves 42 reads for a six-receipt equivalent: 12 pull-request reads, 6 check-list reads, and 24 deduplicated workflow-run reads, below the fail-closed ceiling of 48."
   - "The authenticated live PR 213 exact-S probe made 5 reads, retained 11 matching check records, hydrated 5 selected checks through 4 shared workflow runs, and passed trusted-check validation."
-  - "Dispatch commit 749b23d94c1704525432427cf540b74bbda00525 is the immutable first post-baseline commit; implementation head 7dbcd20b0970a8edf5ab193c97c7038d39ea26eb is the last substantive commit."
-  - "No critic report, approval, merge, branch-protection change, token persistence, GitHub write, release, or deployment action was performed by this worker."
+  - "Request-fixes critic head 34197999e5c908ac470236d9c832f9cc392fd173 remains byte-identical; I2 5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5 remediates FIND-001 through FIND-003 without editing that report."
+  - "Dispatch commit 749b23d94c1704525432427cf540b74bbda00525 is the immutable first post-baseline commit; implementation head 5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5 is the last substantive commit."
+  - "No new critic report, approval, merge, branch-protection change, token persistence, GitHub write, release, or deployment action was performed by this worker."
