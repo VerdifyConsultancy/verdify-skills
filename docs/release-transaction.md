@@ -11,9 +11,17 @@ publication. An unprivileged job builds the candidate at the final `main` SHA,
 runs the complete installed-consumer matrix, and retains the bundle for 90 days
 under `verdify-release-candidate-v<version>-<source-sha>`. Bundle provenance
 binds the artifact to this repository, the publish workflow, its originating
-run, `main` source SHA, artifact name, sidecar digest, and all candidate file
-digests. The npm environment job downloads that exact artifact by run and
-artifact ID; it never invokes the packer.
+run and attempt, `main` source SHA, artifact name, sidecar digest, and all
+candidate file digests. After upload, a separate
+`candidate-artifact-binding.json` records the Actions artifact ID, API digest,
+and SHA-256 of `candidate-provenance.json`. The binding is deliberately not
+inside the artifact it identifies, so no file claims a recursive self-digest.
+It is uploaded afterward as a second retained Actions artifact. Publication
+verifies that binding artifact's independent API ID, run, attempt, name,
+archive digest, exact one-file set, and binding-file digest before trusting it.
+The npm environment job downloads the raw artifact archive by exact ID, hashes
+its bytes against the API record, and only then extracts it; it never invokes
+the packer or relies on download-action digest warnings.
 
 On a later workflow attempt, a retained bundle is accepted only from a publish
 workflow run for the same repository and `main` source SHA. It is reverified and
@@ -29,7 +37,10 @@ and immutable public authorities:
 1. npm package version, integrity, and `gitHead`;
 2. tag name and peeled source commit;
 3. GitHub release tag and asset digests;
-4. the clean candidate source, tarball, ZIP, and checksum identities.
+4. the clean candidate source, tarball, ZIP, and checksum identities;
+5. the Actions repository, workflow, `main` route, source SHA, run, attempt,
+   candidate artifact ID/name/digest, provenance digest, external binding
+   digest, and binding-artifact run/attempt/ID/name/digest.
 
 Local verification always precedes npm, Git, or GitHub authority queries. It
 recomputes archive size and SHA-256, the checksum filename, content, and digest,
@@ -41,8 +52,10 @@ The script never requires a previous ledger to resume. Every invocation writes
 a fresh ledger validated by `schemas/release-transaction.schema.yaml` and names
 one next action: verify, publish npm, push the tag, create or repair release
 assets, upload the completed ledger, or stop for manual reconciliation. Partial
-ledgers are audit output only. The completed ledger is uploaded to the GitHub
-release as `release-transaction-v<version>.json`.
+ledgers are audit output only. Candidate provenance and the external artifact
+binding are verified release assets. The completed ledger retains all of those
+identities and is uploaded to the GitHub release as
+`release-transaction-v<version>.json`.
 
 Identity mismatches fail closed. A published npm version is resumable only when
 its version, integrity, and `gitHead` match the candidate. Existing tags and
@@ -66,6 +79,15 @@ Reconstruct release state without mutating npm, Git, or GitHub:
 ```bash
 ruby scripts/release-transaction.rb \
   --sidecar dist/<tarball>.release-candidate.json \
+  --binding dist/candidate-artifact-binding.json \
+  --binding-sha256 <post-upload-binding-sha256> \
+  --artifact-archive /path/to/api-downloaded-artifact.zip \
+  --binding-artifact-archive /path/to/api-downloaded-binding-artifact.zip \
+  --binding-artifact-id <id> \
+  --binding-artifact-run-id <run-id> \
+  --binding-artifact-run-attempt <attempt> \
+  --binding-artifact-name <name> \
+  --binding-artifact-digest sha256:<digest> \
   --ledger dist/release-transaction-v<version>.json \
   --repository VerdifyConsultancy/verdify-skills
 ```

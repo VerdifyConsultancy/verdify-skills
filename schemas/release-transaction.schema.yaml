@@ -33,7 +33,7 @@ properties:
   artifact:
     type: object
     additionalProperties: false
-    required: [candidate_identity, tarball_filename, tarball_size, tarball_sha256, tarball_sha512, npm_integrity, npm_shasum, npm_pack_invocations, package_file_list_blob, member_files_sha256, archive_filename, archive_size, archive_sha256, checksum_filename, checksum_sha256]
+    required: [candidate_identity, tarball_filename, tarball_size, tarball_sha256, tarball_sha512, npm_integrity, npm_shasum, npm_pack_invocations, package_file_list_blob, member_files_sha256, archive_filename, archive_size, archive_sha256, checksum_filename, checksum_sha256, actions]
     properties:
       candidate_identity: {type: string, pattern: '^v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?-[0-9a-f]{40}$'}
       tarball_filename: {type: string, minLength: 1}
@@ -50,6 +50,29 @@ properties:
       archive_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
       checksum_filename: {type: string, minLength: 1}
       checksum_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      actions:
+        type: object
+        additionalProperties: false
+        required: [repository, workflow_path, source_branch, source_sha, workflow_run_id, workflow_run_attempt, artifact_id, artifact_name, artifact_digest, provenance_filename, provenance_sha256, binding_filename, binding_sha256, binding_artifact_run_id, binding_artifact_run_attempt, binding_artifact_id, binding_artifact_name, binding_artifact_digest]
+        properties:
+          repository: {type: string, pattern: '^[^/]+/[^/]+$'}
+          workflow_path: {type: string, minLength: 1}
+          source_branch: {type: string, minLength: 1}
+          source_sha: {type: string, pattern: '^[0-9a-f]{40}$'}
+          workflow_run_id: {type: integer, minimum: 1}
+          workflow_run_attempt: {type: integer, minimum: 1}
+          artifact_id: {type: integer, minimum: 1}
+          artifact_name: {type: string, minLength: 1}
+          artifact_digest: {type: string, pattern: '^sha256:[0-9a-f]{64}$'}
+          provenance_filename: {const: candidate-provenance.json}
+          provenance_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+          binding_filename: {const: candidate-artifact-binding.json}
+          binding_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+          binding_artifact_run_id: {type: integer, minimum: 1}
+          binding_artifact_run_attempt: {type: integer, minimum: 1}
+          binding_artifact_id: {type: integer, minimum: 1}
+          binding_artifact_name: {type: string, minLength: 1}
+          binding_artifact_digest: {type: string, pattern: '^sha256:[0-9a-f]{64}$'}
   authorities:
     type: object
     additionalProperties: false

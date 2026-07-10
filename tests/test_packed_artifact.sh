@@ -111,10 +111,19 @@ ruby -e '
   abort "publish job repacks the candidate" unless workflow.scan("build-release-candidate.sh").length == 1
   abort "stable candidate artifact name is missing" unless workflow.include?("verdify-release-candidate-v${VERSION}-${SOURCE_SHA}")
   abort "candidate retention is not explicit" unless workflow.include?("retention-days: 90")
-  abort "cross-run artifact identity is not pinned" unless workflow.include?("artifact-ids:") && workflow.include?("run-id:")
-  %w[repository workflow_path workflow_run_id artifact_name source_sha sidecar_sha256].each do |field|
+  abort "cross-run artifact identity is not pinned" unless workflow.include?(%q{actions/artifacts/${ARTIFACT_ID}}) && workflow.include?(%q{actions/runs/${ARTIFACT_RUN_ID}})
+  abort "platform artifact bytes are not digest verified" unless workflow.include?(%q{actions/artifacts/${ARTIFACT_ID}/zip}) && workflow.include?("Actions artifact archive digest")
+  abort "download-artifact warning behavior remains authoritative" if workflow.include?("actions/download-artifact@")
+  %w[repository workflow_path workflow_run_id workflow_run_attempt artifact_id artifact_name artifact_digest source_sha sidecar_sha256 provenance_sha256 binding_sha256 binding_artifact_id binding_artifact_run_id binding_artifact_run_attempt binding_artifact_name binding_artifact_digest].each do |field|
     abort "candidate provenance is missing #{field}" unless workflow.include?(field)
   end
+  upload = workflow.index("- uses: actions/upload-artifact@") or abort "candidate upload is missing"
+  binding = workflow.index("- name: Bind the uploaded Actions artifact") or abort "post-upload artifact binding is missing"
+  binding_upload = workflow.index("id: binding-upload", binding) or abort "external binding artifact upload is missing"
+  abort "artifact binding is recursively included in its own candidate artifact" unless upload < binding && binding < binding_upload
+  abort "external binding artifact bytes are not API-digest verified" unless workflow.include?(%q{actions/artifacts/${BINDING_ARTIFACT_ID}/zip})
+  abort "provenance release asset is missing" unless workflow.scan(%q{"${PROVENANCE}"}).length >= 2
+  abort "artifact binding release asset is missing" unless workflow.scan(%q{"${BINDING}"}).length >= 2
   abort "missing no-repack guard after npm mutation" unless workflow.include?("--require-unpublished")
   abort "missing no-repack guard after tag mutation" unless workflow.include?("refusing to repack after authority mutation")
   abort "missing no-repack guard after release mutation" unless workflow.include?("GitHub release v${VERSION} already exists; refusing to repack")

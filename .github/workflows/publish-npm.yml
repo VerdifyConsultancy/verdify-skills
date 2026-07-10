@@ -19,9 +19,18 @@ jobs:
       actions: read
       contents: read
     outputs:
-      artifact_id: ${{ steps.candidate.outputs.artifact_id || steps.upload.outputs.artifact-id }}
-      artifact_run_id: ${{ steps.candidate.outputs.artifact_run_id }}
-      bundle_name: ${{ steps.candidate.outputs.bundle_name }}
+      artifact_id: ${{ steps.binding.outputs.artifact_id }}
+      artifact_run_id: ${{ steps.binding.outputs.artifact_run_id }}
+      artifact_run_attempt: ${{ steps.binding.outputs.artifact_run_attempt }}
+      artifact_digest: ${{ steps.binding.outputs.artifact_digest }}
+      bundle_name: ${{ steps.binding.outputs.bundle_name }}
+      provenance_sha256: ${{ steps.binding.outputs.provenance_sha256 }}
+      binding_sha256: ${{ steps.binding-authority.outputs.binding_sha256 }}
+      binding_artifact_id: ${{ steps.binding-authority.outputs.binding_artifact_id }}
+      binding_artifact_run_id: ${{ steps.binding-authority.outputs.binding_artifact_run_id }}
+      binding_artifact_run_attempt: ${{ steps.binding-authority.outputs.binding_artifact_run_attempt }}
+      binding_artifact_name: ${{ steps.binding-authority.outputs.binding_artifact_name }}
+      binding_artifact_digest: ${{ steps.binding-authority.outputs.binding_artifact_digest }}
     steps:
       # actions/checkout v4.2.2
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -60,53 +69,75 @@ jobs:
           REUSED=false
           ARTIFACT_ID=""
           ARTIFACT_RUN_ID=""
-          while IFS=$'\t' read -r candidate_id candidate_run_id; do
+          ARTIFACT_RUN_ATTEMPT=""
+          ARTIFACT_DIGEST=""
+          PROVENANCE_SHA256=""
+          while IFS= read -r candidate_id; do
             [ -n "${candidate_id}" ] || continue
+            ARTIFACT_JSON="$(mktemp)"
+            gh api "repos/${REPOSITORY}/actions/artifacts/${candidate_id}" > "${ARTIFACT_JSON}"
+            candidate_run_id="$(ruby -rjson -e '
+              d = JSON.parse(File.read(ARGV.fetch(0)))
+              id, name = ARGV.drop(1)
+              abort unless d.fetch("id").to_s == id && d.fetch("name") == name && d["expired"] == false
+              abort unless d.fetch("digest").match?(/\Asha256:[0-9a-f]{64}\z/)
+              run_id = d.dig("workflow_run", "id")
+              abort unless run_id
+              puts run_id
+            ' "${ARTIFACT_JSON}" "${candidate_id}" "${BUNDLE_NAME}")"
             RUN_JSON="$(mktemp)"
-            if ! gh api "repos/${REPOSITORY}/actions/runs/${candidate_run_id}" > "${RUN_JSON}"; then
-              continue
-            fi
-            if ! ruby -rjson -e '
+            gh api "repos/${REPOSITORY}/actions/runs/${candidate_run_id}" > "${RUN_JSON}"
+            ruby -rjson -e '
               run, repository, workflow, source = ARGV
               d = JSON.parse(File.read(run))
               abort unless d.dig("repository", "full_name") == repository
               abort unless d["path"] == workflow && d["head_branch"] == "main" && d["head_sha"] == source
               abort unless %w[push workflow_dispatch].include?(d["event"])
-            ' "${RUN_JSON}" "${REPOSITORY}" "${WORKFLOW_PATH}" "${SOURCE_SHA}"; then
-              continue
-            fi
+              abort unless d.fetch("run_attempt").is_a?(Integer) && d.fetch("run_attempt").positive?
+            ' "${RUN_JSON}" "${REPOSITORY}" "${WORKFLOW_PATH}" "${SOURCE_SHA}"
 
             rm -rf dist
             mkdir -p dist
             ARTIFACT_ZIP="$(mktemp)"
             gh api "repos/${REPOSITORY}/actions/artifacts/${candidate_id}/zip" > "${ARTIFACT_ZIP}"
+            ruby -rdigest -rjson -e '
+              archive, record = ARGV
+              expected = JSON.parse(File.read(record)).fetch("digest").delete_prefix("sha256:")
+              abort "retained Actions artifact archive digest mismatch" unless Digest::SHA256.file(archive).hexdigest == expected
+            ' "${ARTIFACT_ZIP}" "${ARTIFACT_JSON}"
             unzip -q "${ARTIFACT_ZIP}" -d dist
-            if ruby -rjson -rdigest -e '
-              dir, repository, workflow, run_id, artifact, source = ARGV
+            ruby -rjson -rdigest -e '
+              dir, repository, workflow, run_file, artifact, source = ARGV
+              run = JSON.parse(File.read(run_file))
               p = JSON.parse(File.read(File.join(dir, "candidate-provenance.json")))
               abort unless p.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, workflow, artifact, source]
-              abort unless p.fetch("workflow_run_id").to_s == run_id
+              abort unless p.fetch("workflow_run_id") == run.fetch("id")
+              abort unless p.fetch("workflow_run_attempt") == run.fetch("run_attempt")
               files = p.fetch("files")
               abort if files.empty?
               files.each do |name, digest|
                 path = File.join(dir, name)
-                abort unless File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
+                abort unless File.basename(name) == name && File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
               end
+              actual = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }.sort
+              abort unless actual == (files.keys + ["candidate-provenance.json"]).sort
               sidecar = p.fetch("sidecar_filename")
               abort unless files.fetch(sidecar) == p.fetch("sidecar_sha256")
-            ' dist "${REPOSITORY}" "${WORKFLOW_PATH}" "${candidate_run_id}" "${BUNDLE_NAME}" "${SOURCE_SHA}"; then
-              REUSED=true
-              ARTIFACT_ID="${candidate_id}"
-              ARTIFACT_RUN_ID="${candidate_run_id}"
-              break
-            fi
+            ' dist "${REPOSITORY}" "${WORKFLOW_PATH}" "${RUN_JSON}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
+            REUSED=true
+            ARTIFACT_ID="${candidate_id}"
+            ARTIFACT_RUN_ID="${candidate_run_id}"
+            ARTIFACT_RUN_ATTEMPT="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("run_attempt")' "${RUN_JSON}")"
+            ARTIFACT_DIGEST="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("digest")' "${ARTIFACT_JSON}")"
+            PROVENANCE_SHA256="$(ruby -rdigest -e 'puts Digest::SHA256.file(ARGV.fetch(0)).hexdigest' dist/candidate-provenance.json)"
+            break
           done < <(ruby -rjson -e '
             pages = JSON.parse(File.read(ARGV.fetch(0))).flatten
             pages.flat_map { |page| Array(page["artifacts"]) }
               .reject { |artifact| artifact["expired"] }
               .sort_by { |artifact| artifact["created_at"].to_s }.reverse_each do |artifact|
                 run_id = artifact.dig("workflow_run", "id")
-                puts [artifact["id"], run_id].join("\t") if run_id
+                puts artifact["id"] if run_id
               end
           ' "${ARTIFACT_PAGES}")
 
@@ -151,6 +182,8 @@ jobs:
               File.write(File.join(dir, "candidate-provenance.json"), JSON.pretty_generate(document) + "\n")
             ' dist "${REPOSITORY}" "${WORKFLOW_PATH}" "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
             ARTIFACT_RUN_ID="${GITHUB_RUN_ID}"
+            ARTIFACT_RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT}"
+            PROVENANCE_SHA256="$(ruby -rdigest -e 'puts Digest::SHA256.file(ARGV.fetch(0)).hexdigest' dist/candidate-provenance.json)"
           fi
 
           SIDECAR="$(find dist -maxdepth 1 -type f -name '*.release-candidate.json' -print)"
@@ -164,7 +197,10 @@ jobs:
             echo "reused=${REUSED}"
             echo "artifact_id=${ARTIFACT_ID}"
             echo "artifact_run_id=${ARTIFACT_RUN_ID}"
+            echo "artifact_run_attempt=${ARTIFACT_RUN_ATTEMPT}"
+            echo "artifact_digest=${ARTIFACT_DIGEST}"
             echo "bundle_name=${BUNDLE_NAME}"
+            echo "provenance_sha256=${PROVENANCE_SHA256}"
           } >> "${GITHUB_OUTPUT}"
 
       # actions/upload-artifact v4.6.2
@@ -176,6 +212,210 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 90
+
+      - name: Bind the uploaded Actions artifact
+        id: binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          ARTIFACT_ID: ${{ steps.candidate.outputs.artifact_id || steps.upload.outputs.artifact-id }}
+          ARTIFACT_RUN_ID: ${{ steps.candidate.outputs.artifact_run_id }}
+          ARTIFACT_RUN_ATTEMPT: ${{ steps.candidate.outputs.artifact_run_attempt }}
+          EXPECTED_ARTIFACT_DIGEST: ${{ steps.candidate.outputs.artifact_digest || steps.upload.outputs.artifact-digest }}
+          BUNDLE_NAME: ${{ steps.candidate.outputs.bundle_name }}
+          PROVENANCE_SHA256: ${{ steps.candidate.outputs.provenance_sha256 }}
+        run: |
+          set -euo pipefail
+          WORKFLOW_PATH=".github/workflows/publish-npm.yml"
+          ARTIFACT_JSON="$(mktemp)"
+          RUN_JSON="$(mktemp)"
+          PLATFORM_ARCHIVE="$(mktemp)"
+          VERIFY_DIR="$(mktemp -d)"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}" > "${ARTIFACT_JSON}"
+          gh api "repos/${REPOSITORY}/actions/runs/${ARTIFACT_RUN_ID}" > "${RUN_JSON}"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > "${PLATFORM_ARCHIVE}"
+          ruby -rjson -rdigest -e '
+            artifact_file, run_file, archive, repository, workflow, source, id, run_id, run_attempt, name, expected_digest = ARGV
+            artifact = JSON.parse(File.read(artifact_file))
+            run = JSON.parse(File.read(run_file))
+            expected_digest = "sha256:#{expected_digest}" unless expected_digest.start_with?("sha256:")
+            abort unless expected_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+            abort unless artifact.fetch("id").to_s == id && artifact.fetch("name") == name && artifact["expired"] == false
+            abort unless artifact.dig("workflow_run", "id").to_s == run_id && artifact.fetch("digest") == expected_digest
+            abort unless Digest::SHA256.file(archive).hexdigest == expected_digest.delete_prefix("sha256:")
+            abort unless run.fetch("id").to_s == run_id && run.fetch("run_attempt").to_s == run_attempt
+            abort unless run.dig("repository", "full_name") == repository
+            abort unless run["path"] == workflow && run["head_branch"] == "main" && run["head_sha"] == source
+            abort unless %w[push workflow_dispatch].include?(run["event"])
+          ' "${ARTIFACT_JSON}" "${RUN_JSON}" "${PLATFORM_ARCHIVE}" "${REPOSITORY}" "${WORKFLOW_PATH}" \
+            "${SOURCE_SHA}" "${ARTIFACT_ID}" "${ARTIFACT_RUN_ID}" "${ARTIFACT_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${EXPECTED_ARTIFACT_DIGEST}"
+          unzip -q "${PLATFORM_ARCHIVE}" -d "${VERIFY_DIR}"
+          ruby -rjson -rdigest -e '
+            dir, expected_sha, repository, workflow, run_id, run_attempt, artifact, source = ARGV
+            path = File.join(dir, "candidate-provenance.json")
+            abort unless Digest::SHA256.file(path).hexdigest == expected_sha
+            p = JSON.parse(File.read(path))
+            abort unless p.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, workflow, artifact, source]
+            abort unless p.fetch("workflow_run_id").to_s == run_id && p.fetch("workflow_run_attempt").to_s == run_attempt
+            files = p.fetch("files")
+            abort if files.empty?
+            files.each do |name, digest|
+              file = File.join(dir, name)
+              abort unless File.basename(name) == name && File.file?(file) && Digest::SHA256.file(file).hexdigest == digest
+            end
+            actual = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }.sort
+            abort unless actual == (files.keys + ["candidate-provenance.json"]).sort
+            sidecar = p.fetch("sidecar_filename")
+            abort unless files.fetch(sidecar) == p.fetch("sidecar_sha256")
+          ' "${VERIFY_DIR}" "${PROVENANCE_SHA256}" "${REPOSITORY}" "${WORKFLOW_PATH}" \
+            "${ARTIFACT_RUN_ID}" "${ARTIFACT_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
+          ruby -rjson -rdigest -e '
+            output, repository, workflow, source, run_id, run_attempt, artifact_id, name, digest, provenance_sha = ARGV
+            digest = "sha256:#{digest}" unless digest.start_with?("sha256:")
+            document = {
+              "schema_version"=>"1.0", "repository"=>repository, "workflow_path"=>workflow,
+              "source_branch"=>"main", "source_sha"=>source,
+              "workflow_run_id"=>Integer(run_id), "workflow_run_attempt"=>Integer(run_attempt),
+              "artifact_id"=>Integer(artifact_id), "artifact_name"=>name, "artifact_digest"=>digest,
+              "provenance_filename"=>"candidate-provenance.json", "provenance_sha256"=>provenance_sha
+            }
+            File.write(output, JSON.pretty_generate(document) + "\n")
+          ' dist/candidate-artifact-binding.json "${REPOSITORY}" "${WORKFLOW_PATH}" "${SOURCE_SHA}" \
+            "${ARTIFACT_RUN_ID}" "${ARTIFACT_RUN_ATTEMPT}" "${ARTIFACT_ID}" "${BUNDLE_NAME}" \
+            "${EXPECTED_ARTIFACT_DIGEST}" "${PROVENANCE_SHA256}"
+          BINDING_SHA256="$(ruby -rdigest -e 'puts Digest::SHA256.file(ARGV.fetch(0)).hexdigest' dist/candidate-artifact-binding.json)"
+          {
+            echo "artifact_id=${ARTIFACT_ID}"
+            echo "artifact_run_id=${ARTIFACT_RUN_ID}"
+            echo "artifact_run_attempt=${ARTIFACT_RUN_ATTEMPT}"
+            echo "artifact_digest=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("artifact_digest")' dist/candidate-artifact-binding.json)"
+            echo "bundle_name=${BUNDLE_NAME}"
+            echo "provenance_sha256=${PROVENANCE_SHA256}"
+            echo "binding_sha256=${BINDING_SHA256}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Reuse an exact external binding artifact
+        id: retained-binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          BINDING_SHA256: ${{ steps.binding.outputs.binding_sha256 }}
+          BINDING_ARTIFACT_NAME: ${{ steps.binding.outputs.bundle_name }}-binding
+        run: |
+          set -euo pipefail
+          PAGES="$(mktemp)"
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/actions/artifacts?name=${BINDING_ARTIFACT_NAME}&per_page=100" > "${PAGES}"
+          mapfile -t RETAINED_IDS < <(ruby -rjson -e '
+            pages = JSON.parse(File.read(ARGV.fetch(0))).flatten
+            artifacts = pages.flat_map { |page| Array(page["artifacts"]) }.reject { |artifact| artifact["expired"] }
+            abort "ambiguous retained binding artifacts" if artifacts.length > 1
+            puts artifacts.first["id"] if artifacts.one?
+          ' "${PAGES}")
+          if [ "${#RETAINED_IDS[@]}" = 0 ]; then
+            echo "reused=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          ARTIFACT_ID="${RETAINED_IDS[0]}"
+          ARTIFACT_JSON="$(mktemp)"
+          RUN_JSON="$(mktemp)"
+          ARCHIVE="$(mktemp)"
+          DIRECTORY="$(mktemp -d)"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}" > "${ARTIFACT_JSON}"
+          RUN_ID="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("workflow_run", "id")' "${ARTIFACT_JSON}")"
+          gh api "repos/${REPOSITORY}/actions/runs/${RUN_ID}" > "${RUN_JSON}"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > "${ARCHIVE}"
+          ruby -rjson -rdigest -e '
+            artifact_file, run_file, archive, repository, source, id, name = ARGV
+            artifact = JSON.parse(File.read(artifact_file))
+            run = JSON.parse(File.read(run_file))
+            digest = artifact.fetch("digest")
+            abort unless digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+            abort unless artifact.fetch("id").to_s == id && artifact.fetch("name") == name && artifact["expired"] == false
+            abort unless artifact.dig("workflow_run", "id") == run.fetch("id")
+            abort unless Digest::SHA256.file(archive).hexdigest == digest.delete_prefix("sha256:")
+            abort unless run.dig("repository", "full_name") == repository
+            abort unless run["path"] == ".github/workflows/publish-npm.yml" && run["head_branch"] == "main" && run["head_sha"] == source
+          ' "${ARTIFACT_JSON}" "${RUN_JSON}" "${ARCHIVE}" "${REPOSITORY}" "${SOURCE_SHA}" "${ARTIFACT_ID}" "${BINDING_ARTIFACT_NAME}"
+          unzip -q "${ARCHIVE}" -d "${DIRECTORY}"
+          ruby -rdigest -e '
+            dir, expected = ARGV
+            files = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }
+            abort unless files == ["candidate-artifact-binding.json"]
+            abort unless Digest::SHA256.file(File.join(dir, files.first)).hexdigest == expected
+          ' "${DIRECTORY}" "${BINDING_SHA256}"
+          {
+            echo "reused=true"
+            echo "artifact_id=${ARTIFACT_ID}"
+            echo "artifact_run_id=${RUN_ID}"
+            echo "artifact_run_attempt=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("run_attempt")' "${RUN_JSON}")"
+            echo "artifact_digest=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("digest")' "${ARTIFACT_JSON}")"
+          } >> "${GITHUB_OUTPUT}"
+
+      # actions/upload-artifact v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        id: binding-upload
+        if: steps.retained-binding.outputs.reused == 'false'
+        with:
+          name: ${{ steps.binding.outputs.bundle_name }}-binding
+          path: dist/candidate-artifact-binding.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Verify retained binding artifact authority
+        id: binding-authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          BINDING_SHA256: ${{ steps.binding.outputs.binding_sha256 }}
+          BINDING_ARTIFACT_ID: ${{ steps.retained-binding.outputs.artifact_id || steps.binding-upload.outputs.artifact-id }}
+          BINDING_ARTIFACT_RUN_ID: ${{ steps.retained-binding.outputs.artifact_run_id || github.run_id }}
+          BINDING_ARTIFACT_RUN_ATTEMPT: ${{ steps.retained-binding.outputs.artifact_run_attempt || github.run_attempt }}
+          EXPECTED_BINDING_ARTIFACT_DIGEST: ${{ steps.retained-binding.outputs.artifact_digest || steps.binding-upload.outputs.artifact-digest }}
+          BINDING_ARTIFACT_NAME: ${{ steps.binding.outputs.bundle_name }}-binding
+        run: |
+          set -euo pipefail
+          ARTIFACT_JSON="$(mktemp)"
+          RUN_JSON="$(mktemp)"
+          BINDING_ARCHIVE="$(mktemp)"
+          BINDING_DIR="$(mktemp -d)"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${BINDING_ARTIFACT_ID}" > "${ARTIFACT_JSON}"
+          gh api "repos/${REPOSITORY}/actions/runs/${BINDING_ARTIFACT_RUN_ID}" > "${RUN_JSON}"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${BINDING_ARTIFACT_ID}/zip" > "${BINDING_ARCHIVE}"
+          ruby -rjson -rdigest -e '
+            artifact_file, run_file, archive, repository, source, id, name, expected_digest, run_id, run_attempt = ARGV
+            artifact = JSON.parse(File.read(artifact_file))
+            run = JSON.parse(File.read(run_file))
+            expected_digest = "sha256:#{expected_digest}" unless expected_digest.start_with?("sha256:")
+            abort unless expected_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+            abort unless artifact.fetch("id").to_s == id && artifact.fetch("name") == name && artifact["expired"] == false
+            abort unless artifact.dig("workflow_run", "id").to_s == run_id && artifact.fetch("digest") == expected_digest
+            abort unless Digest::SHA256.file(archive).hexdigest == expected_digest.delete_prefix("sha256:")
+            abort unless run.fetch("id").to_s == run_id && run.fetch("run_attempt").to_s == run_attempt
+            abort unless run.dig("repository", "full_name") == repository
+            abort unless run["path"] == ".github/workflows/publish-npm.yml" && run["head_branch"] == "main" && run["head_sha"] == source
+          ' "${ARTIFACT_JSON}" "${RUN_JSON}" "${BINDING_ARCHIVE}" "${REPOSITORY}" "${SOURCE_SHA}" \
+            "${BINDING_ARTIFACT_ID}" "${BINDING_ARTIFACT_NAME}" "${EXPECTED_BINDING_ARTIFACT_DIGEST}" \
+            "${BINDING_ARTIFACT_RUN_ID}" "${BINDING_ARTIFACT_RUN_ATTEMPT}"
+          unzip -q "${BINDING_ARCHIVE}" -d "${BINDING_DIR}"
+          ruby -rdigest -e '
+            dir, expected = ARGV
+            files = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }
+            abort unless files == ["candidate-artifact-binding.json"]
+            abort unless Digest::SHA256.file(File.join(dir, files.first)).hexdigest == expected
+          ' "${BINDING_DIR}" "${BINDING_SHA256}"
+          {
+            echo "binding_sha256=${BINDING_SHA256}"
+            echo "binding_artifact_id=${BINDING_ARTIFACT_ID}"
+            echo "binding_artifact_run_id=${BINDING_ARTIFACT_RUN_ID}"
+            echo "binding_artifact_run_attempt=${BINDING_ARTIFACT_RUN_ATTEMPT}"
+            echo "binding_artifact_name=${BINDING_ARTIFACT_NAME}"
+            echo "binding_artifact_digest=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("digest")' "${ARTIFACT_JSON}")"
+          } >> "${GITHUB_OUTPUT}"
 
   publish:
     needs: candidate
@@ -208,42 +448,121 @@ jobs:
       - name: Check release identity
         run: ruby scripts/release-preflight.rb
 
-      # actions/download-artifact v4.3.0
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          artifact-ids: ${{ needs.candidate.outputs.artifact_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: ${{ needs.candidate.outputs.artifact_run_id }}
-          path: dist
-          merge-multiple: true
-
-      - name: Verify retained candidate provenance
+      - name: Download and verify exact Actions artifact bytes
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
           SOURCE_SHA: ${{ github.sha }}
           BUNDLE_NAME: ${{ needs.candidate.outputs.bundle_name }}
+          ARTIFACT_ID: ${{ needs.candidate.outputs.artifact_id }}
           ARTIFACT_RUN_ID: ${{ needs.candidate.outputs.artifact_run_id }}
+          ARTIFACT_RUN_ATTEMPT: ${{ needs.candidate.outputs.artifact_run_attempt }}
+          ARTIFACT_DIGEST: ${{ needs.candidate.outputs.artifact_digest }}
+          PROVENANCE_SHA256: ${{ needs.candidate.outputs.provenance_sha256 }}
+          BINDING_SHA256: ${{ needs.candidate.outputs.binding_sha256 }}
+          BINDING_ARTIFACT_ID: ${{ needs.candidate.outputs.binding_artifact_id }}
+          BINDING_ARTIFACT_RUN_ID: ${{ needs.candidate.outputs.binding_artifact_run_id }}
+          BINDING_ARTIFACT_RUN_ATTEMPT: ${{ needs.candidate.outputs.binding_artifact_run_attempt }}
+          BINDING_ARTIFACT_NAME: ${{ needs.candidate.outputs.binding_artifact_name }}
+          BINDING_ARTIFACT_DIGEST: ${{ needs.candidate.outputs.binding_artifact_digest }}
         run: |
           set -euo pipefail
-          RUN_JSON="$(mktemp)"
-          gh api "repos/${REPOSITORY}/actions/runs/${ARTIFACT_RUN_ID}" > "${RUN_JSON}"
+          WORKFLOW_PATH=".github/workflows/publish-npm.yml"
+          BINDING_ARTIFACT_JSON="$(mktemp)"
+          BINDING_RUN_JSON="$(mktemp)"
+          BINDING_PLATFORM_ARCHIVE="${RUNNER_TEMP}/verdify-binding-${BINDING_ARTIFACT_ID}.zip"
+          BINDING_DIR="$(mktemp -d)"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${BINDING_ARTIFACT_ID}" > "${BINDING_ARTIFACT_JSON}"
+          gh api "repos/${REPOSITORY}/actions/runs/${BINDING_ARTIFACT_RUN_ID}" > "${BINDING_RUN_JSON}"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${BINDING_ARTIFACT_ID}/zip" > "${BINDING_PLATFORM_ARCHIVE}"
           ruby -rjson -rdigest -e '
-            dir, run_file, repository, run_id, artifact, source = ARGV
+            artifact_file, run_file, archive, repository, workflow, source, id, run_id, run_attempt, name, expected_digest = ARGV
+            artifact = JSON.parse(File.read(artifact_file))
             run = JSON.parse(File.read(run_file))
+            abort unless expected_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+            abort unless artifact.fetch("id").to_s == id && artifact.fetch("name") == name && artifact["expired"] == false
+            abort unless artifact.dig("workflow_run", "id").to_s == run_id && artifact.fetch("digest") == expected_digest
+            abort unless Digest::SHA256.file(archive).hexdigest == expected_digest.delete_prefix("sha256:")
+            abort unless run.fetch("id").to_s == run_id && run.fetch("run_attempt").to_s == run_attempt
             abort unless run.dig("repository", "full_name") == repository
-            abort unless run["path"] == ".github/workflows/publish-npm.yml" && run["head_branch"] == "main" && run["head_sha"] == source
-            provenance = JSON.parse(File.read(File.join(dir, "candidate-provenance.json")))
-            abort unless provenance.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, ".github/workflows/publish-npm.yml", artifact, source]
+            abort unless run["path"] == workflow && run["head_branch"] == "main" && run["head_sha"] == source
+          ' "${BINDING_ARTIFACT_JSON}" "${BINDING_RUN_JSON}" "${BINDING_PLATFORM_ARCHIVE}" "${REPOSITORY}" \
+            "${WORKFLOW_PATH}" "${SOURCE_SHA}" "${BINDING_ARTIFACT_ID}" "${BINDING_ARTIFACT_RUN_ID}" \
+            "${BINDING_ARTIFACT_RUN_ATTEMPT}" "${BINDING_ARTIFACT_NAME}" "${BINDING_ARTIFACT_DIGEST}"
+          unzip -q "${BINDING_PLATFORM_ARCHIVE}" -d "${BINDING_DIR}"
+          VERIFIED_BINDING="${BINDING_DIR}/candidate-artifact-binding.json"
+          ruby -rdigest -e '
+            dir, binding, expected = ARGV
+            files = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }
+            abort unless files == [File.basename(binding)]
+            abort unless Digest::SHA256.file(binding).hexdigest == expected
+          ' "${BINDING_DIR}" "${VERIFIED_BINDING}" "${BINDING_SHA256}"
+
+          ARTIFACT_JSON="$(mktemp)"
+          RUN_JSON="$(mktemp)"
+          PLATFORM_ARCHIVE="${RUNNER_TEMP}/verdify-candidate-${ARTIFACT_ID}.zip"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}" > "${ARTIFACT_JSON}"
+          gh api "repos/${REPOSITORY}/actions/runs/${ARTIFACT_RUN_ID}" > "${RUN_JSON}"
+          gh api "repos/${REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > "${PLATFORM_ARCHIVE}"
+          rm -rf dist
+          mkdir -p dist
+          ruby -rjson -rdigest -e '
+            artifact_file, run_file, archive, repository, workflow, source, id, run_id, run_attempt, name, expected_digest = ARGV
+            artifact = JSON.parse(File.read(artifact_file))
+            run = JSON.parse(File.read(run_file))
+            abort unless expected_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+            abort unless artifact.fetch("id").to_s == id && artifact.fetch("name") == name && artifact["expired"] == false
+            abort unless artifact.dig("workflow_run", "id").to_s == run_id && artifact.fetch("digest") == expected_digest
+            abort unless Digest::SHA256.file(archive).hexdigest == expected_digest.delete_prefix("sha256:")
+            abort unless run.fetch("id").to_s == run_id && run.fetch("run_attempt").to_s == run_attempt
+            abort unless run.dig("repository", "full_name") == repository
+            abort unless run["path"] == workflow && run["head_branch"] == "main" && run["head_sha"] == source
+            abort unless %w[push workflow_dispatch].include?(run["event"])
+          ' "${ARTIFACT_JSON}" "${RUN_JSON}" "${PLATFORM_ARCHIVE}" "${REPOSITORY}" "${WORKFLOW_PATH}" \
+            "${SOURCE_SHA}" "${ARTIFACT_ID}" "${ARTIFACT_RUN_ID}" "${ARTIFACT_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${ARTIFACT_DIGEST}"
+          unzip -q "${PLATFORM_ARCHIVE}" -d dist
+          ruby -rjson -rdigest -e '
+            dir, expected_sha, repository, workflow, run_id, run_attempt, artifact, source = ARGV
+            path = File.join(dir, "candidate-provenance.json")
+            abort unless Digest::SHA256.file(path).hexdigest == expected_sha
+            provenance = JSON.parse(File.read(path))
+            abort unless provenance.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, workflow, artifact, source]
             abort unless provenance.fetch("workflow_run_id").to_s == run_id
-            provenance.fetch("files").each do |name, digest|
+            abort unless provenance.fetch("workflow_run_attempt").to_s == run_attempt
+            files = provenance.fetch("files")
+            abort if files.empty?
+            files.each do |name, digest|
               path = File.join(dir, name)
-              abort unless File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
+              abort unless File.basename(name) == name && File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
             end
+            actual = Dir.children(dir).select { |name| File.file?(File.join(dir, name)) }.sort
+            abort unless actual == (files.keys + ["candidate-provenance.json"]).sort
             sidecar = provenance.fetch("sidecar_filename")
-            abort unless provenance.fetch("files").fetch(sidecar) == provenance.fetch("sidecar_sha256")
-          ' dist "${RUN_JSON}" "${REPOSITORY}" "${ARTIFACT_RUN_ID}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
+            abort unless files.fetch(sidecar) == provenance.fetch("sidecar_sha256")
+          ' dist "${PROVENANCE_SHA256}" "${REPOSITORY}" "${WORKFLOW_PATH}" "${ARTIFACT_RUN_ID}" \
+            "${ARTIFACT_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
+          cp "${VERIFIED_BINDING}" dist/candidate-artifact-binding.json
+          ruby -rjson -rdigest -e '
+            binding_file, repository, workflow, source, run_id, run_attempt, artifact_id, name, digest, provenance_sha, expected_binding_sha = ARGV
+            binding = JSON.parse(File.read(binding_file))
+            abort unless binding.values_at("repository", "workflow_path", "source_branch", "source_sha") == [repository, workflow, "main", source]
+            abort unless binding.values_at("workflow_run_id", "workflow_run_attempt", "artifact_id") == [Integer(run_id), Integer(run_attempt), Integer(artifact_id)]
+            abort unless binding.values_at("artifact_name", "artifact_digest") == [name, digest]
+            abort unless binding.values_at("provenance_filename", "provenance_sha256") == ["candidate-provenance.json", provenance_sha]
+            abort unless Digest::SHA256.file(binding_file).hexdigest == expected_binding_sha
+          ' dist/candidate-artifact-binding.json "${REPOSITORY}" "${WORKFLOW_PATH}" "${SOURCE_SHA}" \
+            "${ARTIFACT_RUN_ID}" "${ARTIFACT_RUN_ATTEMPT}" "${ARTIFACT_ID}" "${BUNDLE_NAME}" \
+            "${ARTIFACT_DIGEST}" "${PROVENANCE_SHA256}" "${BINDING_SHA256}"
+          {
+            echo "PLATFORM_ARTIFACT_ARCHIVE=${PLATFORM_ARCHIVE}"
+            echo "BINDING_ARTIFACT_ARCHIVE=${BINDING_PLATFORM_ARCHIVE}"
+            echo "BINDING_SHA256=${BINDING_SHA256}"
+            echo "BINDING_ARTIFACT_ID=${BINDING_ARTIFACT_ID}"
+            echo "BINDING_ARTIFACT_RUN_ID=${BINDING_ARTIFACT_RUN_ID}"
+            echo "BINDING_ARTIFACT_RUN_ATTEMPT=${BINDING_ARTIFACT_RUN_ATTEMPT}"
+            echo "BINDING_ARTIFACT_NAME=${BINDING_ARTIFACT_NAME}"
+            echo "BINDING_ARTIFACT_DIGEST=${BINDING_ARTIFACT_DIGEST}"
+          } >> "${GITHUB_ENV}"
 
       - name: Resume immutable release transaction
         env:
@@ -259,6 +578,8 @@ jobs:
           TARBALL="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("tarball", "filename")' "${SIDECAR}")"
           ARCHIVE="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "filename")' "${SIDECAR}")"
           CHECKSUM="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "checksum_filename")' "${SIDECAR}")"
+          PROVENANCE="dist/candidate-provenance.json"
+          BINDING="dist/candidate-artifact-binding.json"
           LEDGER="dist/release-transaction-v${VERSION}.json"
 
           git config user.name "github-actions[bot]"
@@ -267,6 +588,15 @@ jobs:
           reconcile() {
             ruby scripts/release-transaction.rb \
               --sidecar "${SIDECAR}" \
+              --binding "${BINDING}" \
+              --binding-sha256 "${BINDING_SHA256}" \
+              --artifact-archive "${PLATFORM_ARTIFACT_ARCHIVE}" \
+              --binding-artifact-archive "${BINDING_ARTIFACT_ARCHIVE}" \
+              --binding-artifact-id "${BINDING_ARTIFACT_ID}" \
+              --binding-artifact-run-id "${BINDING_ARTIFACT_RUN_ID}" \
+              --binding-artifact-run-attempt "${BINDING_ARTIFACT_RUN_ATTEMPT}" \
+              --binding-artifact-name "${BINDING_ARTIFACT_NAME}" \
+              --binding-artifact-digest "${BINDING_ARTIFACT_DIGEST}" \
               --ledger "${LEDGER}" \
               --repository "${REPOSITORY}" > dist/release-state.json
           }
@@ -301,13 +631,15 @@ jobs:
                   "${SIDECAR}" \
                   "${ARCHIVE}" \
                   "${CHECKSUM}" \
+                  "${PROVENANCE}" \
+                  "${BINDING}" \
                   --repo "${REPOSITORY}" \
                   --verify-tag \
                   --title "Verdify skills ${VERSION}" \
                   --notes "Published @verdify-cli/cli@${VERSION} from ${SOURCE_SHA}."
                 ;;
               upload_release_assets)
-                for asset in "${TARBALL}" "${SIDECAR}" "${ARCHIVE}" "${CHECKSUM}"; do
+                for asset in "${TARBALL}" "${SIDECAR}" "${ARCHIVE}" "${CHECKSUM}" "${PROVENANCE}" "${BINDING}"; do
                   name="$(basename "${asset}")"
                   if ! gh release view "${TAG}" --repo "${REPOSITORY}" --json assets --jq ".assets[] | select(.name == \"${name}\") | .name" | grep -qx "${name}"; then
                     gh release upload "${TAG}" "${asset}" --repo "${REPOSITORY}"
@@ -317,6 +649,15 @@ jobs:
               upload_completed_ledger)
                 ruby scripts/release-transaction.rb \
                   --sidecar "${SIDECAR}" \
+                  --binding "${BINDING}" \
+                  --binding-sha256 "${BINDING_SHA256}" \
+                  --artifact-archive "${PLATFORM_ARTIFACT_ARCHIVE}" \
+                  --binding-artifact-archive "${BINDING_ARTIFACT_ARCHIVE}" \
+                  --binding-artifact-id "${BINDING_ARTIFACT_ID}" \
+                  --binding-artifact-run-id "${BINDING_ARTIFACT_RUN_ID}" \
+                  --binding-artifact-run-attempt "${BINDING_ARTIFACT_RUN_ATTEMPT}" \
+                  --binding-artifact-name "${BINDING_ARTIFACT_NAME}" \
+                  --binding-artifact-digest "${BINDING_ARTIFACT_DIGEST}" \
                   --ledger "${LEDGER}" \
                   --repository "${REPOSITORY}" \
                   --finalize > dist/release-finalize.json

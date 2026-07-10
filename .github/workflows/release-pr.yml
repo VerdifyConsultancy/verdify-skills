@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          PREFLIGHT="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --json)"
+          PREFLIGHT="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --repository "${GITHUB_REPOSITORY}" --json)"
           DECISION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).fetch("decision")' "${PREFLIGHT}")"
           if [ "${DECISION}" = "skip" ]; then
             echo "${PREFLIGHT}"
@@ -82,13 +82,15 @@ jobs:
             pulls = JSON.parse(File.read(pulls_pages)).flatten.map do |pull|
               {
                 "number"=>pull.fetch("number"), "state"=>pull.fetch("state"), "merged_at"=>pull["merged_at"],
-                "body"=>pull["body"], "base"=>pull.dig("base", "ref"), "head"=>pull.dig("head", "ref")
+                "body"=>pull["body"],
+                "base"=>pull.dig("base", "ref"), "base_repo"=>pull.dig("base", "repo", "full_name"),
+                "head"=>pull.dig("head", "ref"), "head_repo"=>pull.dig("head", "repo", "full_name")
               }
             end
             File.write(output, JSON.generate({"issues"=>issues, "pull_requests"=>pulls}) + "\n")
           ' "${ISSUES_PAGES}" "${PULLS_PAGES}" "${CANDIDATE_STATE}"
 
-          RECONCILIATION="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --candidate-state "${CANDIDATE_STATE}" --json)"
+          RECONCILIATION="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --candidate-state "${CANDIDATE_STATE}" --repository "${GITHUB_REPOSITORY}" --json)"
           RECONCILE_DECISION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).fetch("decision")' "${RECONCILIATION}")"
           if [ "${RECONCILE_DECISION}" = "skip" ]; then
             echo "${RECONCILIATION}"

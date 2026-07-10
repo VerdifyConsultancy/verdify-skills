@@ -14,17 +14,19 @@ options = {
   require_unpublished: false,
   release_pr_base: nil,
   candidate_state: nil,
+  repository: "VerdifyConsultancy/verdify-skills",
   skip_registry: false,
   json: false
 }
 
 OptionParser.new do |o|
-  o.banner = "Usage: ruby scripts/release-preflight.rb [--root PATH] [--require-version-bump GIT-REF] [--require-unpublished] [--release-pr-base GIT-REF] [--skip-registry] [--json]"
+  o.banner = "Usage: ruby scripts/release-preflight.rb [--root PATH] [--require-version-bump GIT-REF] [--require-unpublished] [--release-pr-base GIT-REF] [--candidate-state FILE] [--repository OWNER/REPO] [--skip-registry] [--json]"
   o.on("--root PATH", "Repository root to inspect") { |v| options[:root] = Pathname.new(v).expand_path }
   o.on("--require-version-bump GIT-REF", "Require package.json and VERSION to differ from GIT-REF") { |v| options[:require_version_bump] = v }
   o.on("--require-unpublished", "Fail when the current npm package version is already published") { options[:require_unpublished] = true }
   o.on("--release-pr-base GIT-REF", "Return create/skip for release-PR automation") { |v| options[:release_pr_base] = v }
   o.on("--candidate-state FILE", "Reconcile durable release issue/PR identities from a GitHub state snapshot") { |v| options[:candidate_state] = Pathname.new(v).expand_path }
+  o.on("--repository OWNER/REPO", "Repository that owns both sides of the release PR") { |v| options[:repository] = v }
   o.on("--skip-registry", "Skip npm registry checks") { options[:skip_registry] = true }
   o.on("--json", "Emit a machine-readable result") { options[:json] = true }
   o.on("-h", "--help") { puts o; exit 0 }
@@ -109,18 +111,32 @@ if options[:release_pr_base]
     pulls = Array(candidate_state.fetch("pull_requests"))
     matching_issues = issues.select { |issue| issue["body"].to_s.include?(marker) }
     matching_pulls = pulls.select { |pull| pull["body"].to_s.include?(marker) }
-    route_pulls = pulls.select { |pull| pull["base"] == "main" && pull["head"] == "dev" }
+    expected_repository = options.fetch(:repository)
+    exact_route = lambda do |pull|
+      pull.values_at("base_repo", "base", "head_repo", "head") ==
+        [expected_repository, "main", expected_repository, "dev"]
+    end
+    authoritative_matching_pulls = matching_pulls.select(&exact_route)
+    wrong_route_matching_pulls = matching_pulls.reject(&exact_route)
+    route_pulls = pulls.select(&exact_route)
     conflicting_route_pulls = route_pulls.select do |pull|
       pull["state"] == "open" && !pull["body"].to_s.include?(marker)
     end
 
     errors << "multiple release issues claim durable identity #{identity}" if matching_issues.length > 1
     errors << "multiple release pull requests claim durable identity #{identity}" if matching_pulls.length > 1
+    wrong_route_matching_pulls.each do |pull|
+      errors << "release pull request ##{pull['number']} claims durable identity #{identity} on a non-authoritative route"
+    end
     errors << "an open dev-to-main pull request has a different or missing release identity" unless conflicting_route_pulls.empty?
 
-    issue = matching_issues.first
-    pull = matching_pulls.first
-    issue_action = if issue.nil?
+    issue_conflict = matching_issues.length > 1
+    pull_conflict = matching_pulls.length > 1 || wrong_route_matching_pulls.any? || conflicting_route_pulls.any?
+    issue = matching_issues.one? ? matching_issues.first : nil
+    pull = authoritative_matching_pulls.one? ? authoritative_matching_pulls.first : nil
+    issue_action = if issue_conflict
+                     "conflict"
+                   elsif issue.nil?
                      "create"
                    elsif issue["state"] == "open"
                      "reuse"
@@ -130,7 +146,9 @@ if options[:release_pr_base]
                      errors << "release issue has unsupported state #{issue['state'].inspect}"
                      "conflict"
                    end
-    pull_action = if pull.nil?
+    pull_action = if pull_conflict
+                    "conflict"
+                  elsif pull.nil?
                     "create"
                   elsif pull["merged_at"]
                     "stop_merged"
@@ -145,6 +163,9 @@ if options[:release_pr_base]
     result["candidate"] = {
       "identity" => identity,
       "marker" => marker,
+      "repository" => expected_repository,
+      "base_ref" => "main",
+      "head_ref" => "dev",
       "issue_action" => issue_action,
       "issue_number" => issue && issue["number"],
       "pull_request_action" => pull_action,

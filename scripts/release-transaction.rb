@@ -10,10 +10,25 @@ require_relative "../lib/verdify"
 
 ROOT = Pathname.new(File.expand_path("..", __dir__))
 
-options = { sidecar: nil, ledger: nil, facts: nil, repository: nil, finalize: false }
+options = {
+  sidecar: nil, binding: nil, binding_sha256: nil, artifact_archive: nil,
+  binding_artifact_archive: nil, binding_artifact_id: nil,
+  binding_artifact_run_id: nil, binding_artifact_run_attempt: nil,
+  binding_artifact_name: nil, binding_artifact_digest: nil,
+  ledger: nil, facts: nil, repository: nil, finalize: false
+}
 OptionParser.new do |o|
-  o.banner = "Usage: ruby scripts/release-transaction.rb --sidecar FILE --ledger FILE [--repository OWNER/REPO | --facts FILE] [--finalize]"
+  o.banner = "Usage: ruby scripts/release-transaction.rb --sidecar FILE --binding FILE --binding-sha256 HEX --artifact-archive FILE --binding-artifact-archive FILE --binding-artifact-id ID --binding-artifact-run-id ID --binding-artifact-run-attempt N --binding-artifact-name NAME --binding-artifact-digest DIGEST --ledger FILE --repository OWNER/REPO [--facts FILE] [--finalize]"
   o.on("--sidecar FILE", "Release-candidate sidecar") { |v| options[:sidecar] = Pathname.new(v).expand_path }
+  o.on("--binding FILE", "Post-upload Actions artifact binding") { |v| options[:binding] = Pathname.new(v).expand_path }
+  o.on("--binding-sha256 HEX", "External SHA-256 of the post-upload binding") { |v| options[:binding_sha256] = v }
+  o.on("--artifact-archive FILE", "Raw Actions artifact archive downloaded from the API") { |v| options[:artifact_archive] = Pathname.new(v).expand_path }
+  o.on("--binding-artifact-archive FILE", "Raw external-binding artifact archive downloaded from the API") { |v| options[:binding_artifact_archive] = Pathname.new(v).expand_path }
+  o.on("--binding-artifact-id ID", Integer, "External-binding Actions artifact ID") { |v| options[:binding_artifact_id] = v }
+  o.on("--binding-artifact-run-id ID", Integer, "External-binding workflow run ID") { |v| options[:binding_artifact_run_id] = v }
+  o.on("--binding-artifact-run-attempt N", Integer, "External-binding workflow run attempt") { |v| options[:binding_artifact_run_attempt] = v }
+  o.on("--binding-artifact-name NAME", "External-binding Actions artifact name") { |v| options[:binding_artifact_name] = v }
+  o.on("--binding-artifact-digest DIGEST", "External-binding Actions artifact API digest") { |v| options[:binding_artifact_digest] = v }
   o.on("--ledger FILE", "Ledger output path") { |v| options[:ledger] = Pathname.new(v).expand_path }
   o.on("--facts FILE", "Isolated authority-facts fixture") { |v| options[:facts] = Pathname.new(v).expand_path }
   o.on("--repository OWNER/REPO", "GitHub repository for live reconciliation") { |v| options[:repository] = v }
@@ -22,13 +37,22 @@ OptionParser.new do |o|
 end.parse!
 
 abort "--sidecar is required" unless options[:sidecar]
+abort "--binding is required" unless options[:binding]
+abort "--binding-sha256 must be 64 lowercase hexadecimal characters" unless options[:binding_sha256]&.match?(/\A[0-9a-f]{64}\z/)
+abort "--artifact-archive is required" unless options[:artifact_archive]
+abort "--binding-artifact-archive is required" unless options[:binding_artifact_archive]
+abort "--binding-artifact-id must be positive" unless options[:binding_artifact_id]&.positive?
+abort "--binding-artifact-run-id must be positive" unless options[:binding_artifact_run_id]&.positive?
+abort "--binding-artifact-run-attempt must be positive" unless options[:binding_artifact_run_attempt]&.positive?
+abort "--binding-artifact-name is required" if options[:binding_artifact_name].to_s.empty?
+abort "--binding-artifact-digest must be a sha256 digest" unless options[:binding_artifact_digest]&.match?(/\Asha256:[0-9a-f]{64}\z/)
 abort "--ledger is required" unless options[:ledger]
-abort "choose exactly one of --facts or --repository" unless !!options[:facts] ^ !!options[:repository]
+abort "--repository is required" unless options[:repository]
 
 begin
 
 def capture(*command, chdir: nil)
-  Open3.capture3(*command, chdir: chdir)
+  chdir ? Open3.capture3(*command, chdir: chdir) : Open3.capture3(*command)
 end
 
 def absent_npm
@@ -46,17 +70,94 @@ end
 sidecar_path = options.fetch(:sidecar)
 abort "sidecar not found: #{sidecar_path}" unless sidecar_path.file?
 sidecar = JSON.parse(sidecar_path.read)
+binding_path = options.fetch(:binding)
+abort "artifact binding not found: #{binding_path}" unless binding_path.file?
+binding = JSON.parse(binding_path.read)
+artifact_archive_path = options.fetch(:artifact_archive)
+abort "Actions artifact archive not found: #{artifact_archive_path}" unless artifact_archive_path.file?
+binding_artifact_archive_path = options.fetch(:binding_artifact_archive)
+abort "external-binding Actions artifact archive not found: #{binding_artifact_archive_path}" unless binding_artifact_archive_path.file?
 package_name = sidecar.dig("package", "name").to_s
 version = sidecar.dig("package", "version").to_s
 source_sha = sidecar.dig("source", "commit").to_s
 tag_name = "v#{version}"
 artifact_dir = sidecar_path.dirname
+provenance_path = artifact_dir.join(binding["provenance_filename"].to_s)
 tarball_path = artifact_dir.join(sidecar.dig("tarball", "filename").to_s)
 archive_path = artifact_dir.join(sidecar.dig("archive", "filename").to_s)
 checksum_path = artifact_dir.join(sidecar.dig("archive", "checksum_filename").to_s)
 completed_ledger_name = "release-transaction-v#{version}.json"
 errors = []
 completed_ledger_remote_digest = nil
+
+expected_artifact_name = "verdify-release-candidate-v#{version}-#{source_sha}"
+expected_repository = options.fetch(:repository)
+binding_digest = Digest::SHA256.file(binding_path).hexdigest
+errors << "artifact binding digest does not match external post-upload authority" unless binding_digest == options.fetch(:binding_sha256)
+expected_binding_artifact_name = "#{expected_artifact_name}-binding"
+errors << "external-binding artifact name does not match candidate identity" unless options.fetch(:binding_artifact_name) == expected_binding_artifact_name
+binding_archive_digest = Digest::SHA256.file(binding_artifact_archive_path).hexdigest
+errors << "external-binding Actions artifact archive digest does not match platform authority" unless options.fetch(:binding_artifact_digest) == "sha256:#{binding_archive_digest}"
+binding_entries, binding_list_error, binding_list_status = capture("unzip", "-Z1", binding_artifact_archive_path.to_s)
+if binding_list_status.success? && binding_entries.lines(chomp: true) == ["candidate-artifact-binding.json"]
+  retained_binding, binding_read_error, binding_read_status = capture("unzip", "-p", binding_artifact_archive_path.to_s, "candidate-artifact-binding.json")
+  if binding_read_status.success?
+    errors << "external-binding artifact does not retain the exact binding file" unless retained_binding == binding_path.binread && Digest::SHA256.hexdigest(retained_binding) == options.fetch(:binding_sha256)
+  else
+    errors << "cannot read external binding from Actions artifact: #{binding_read_error.strip}"
+  end
+else
+  errors << "external-binding Actions artifact has an unexpected file set: #{binding_list_error.strip}"
+end
+errors << "artifact binding must be the canonical external binding beside the candidate" unless binding_path.dirname == artifact_dir && binding_path.basename.to_s == "candidate-artifact-binding.json"
+errors << "artifact binding schema version is unsupported" unless binding["schema_version"] == "1.0"
+errors << "artifact binding repository does not match release repository" unless binding["repository"] == expected_repository
+errors << "artifact binding workflow does not match publish workflow" unless binding["workflow_path"] == ".github/workflows/publish-npm.yml"
+errors << "artifact binding source route is not main" unless binding["source_branch"] == "main"
+errors << "artifact binding source SHA does not match candidate" unless binding["source_sha"] == source_sha
+errors << "artifact binding run ID is invalid" unless binding["workflow_run_id"].is_a?(Integer) && binding["workflow_run_id"].positive?
+errors << "artifact binding run attempt is invalid" unless binding["workflow_run_attempt"].is_a?(Integer) && binding["workflow_run_attempt"].positive?
+errors << "artifact binding artifact ID is invalid" unless binding["artifact_id"].is_a?(Integer) && binding["artifact_id"].positive?
+errors << "artifact binding name does not match candidate" unless binding["artifact_name"] == expected_artifact_name
+errors << "artifact binding digest is invalid" unless binding["artifact_digest"].to_s.match?(/\Asha256:[0-9a-f]{64}\z/)
+errors << "artifact binding provenance filename is invalid" unless binding["provenance_filename"] == "candidate-provenance.json"
+errors << "artifact binding provenance digest is invalid" unless binding["provenance_sha256"].to_s.match?(/\A[0-9a-f]{64}\z/)
+
+if binding["artifact_digest"].to_s.match?(/\Asha256:[0-9a-f]{64}\z/)
+  archive_digest = Digest::SHA256.file(artifact_archive_path).hexdigest
+  errors << "Actions artifact archive digest does not match platform binding" unless binding["artifact_digest"] == "sha256:#{archive_digest}"
+end
+
+provenance = nil
+if provenance_path.file?
+  provenance_digest = Digest::SHA256.file(provenance_path).hexdigest
+  errors << "candidate provenance digest does not match artifact binding" unless provenance_digest == binding["provenance_sha256"]
+  provenance = JSON.parse(provenance_path.read)
+  errors << "candidate provenance repository does not match binding" unless provenance["repository"] == binding["repository"]
+  errors << "candidate provenance workflow does not match binding" unless provenance["workflow_path"] == binding["workflow_path"]
+  errors << "candidate provenance run ID does not match binding" unless provenance["workflow_run_id"] == binding["workflow_run_id"]
+  errors << "candidate provenance run attempt does not match binding" unless provenance["workflow_run_attempt"] == binding["workflow_run_attempt"]
+  errors << "candidate provenance artifact name does not match binding" unless provenance["artifact_name"] == binding["artifact_name"]
+  errors << "candidate provenance source SHA does not match binding" unless provenance["source_sha"] == binding["source_sha"]
+  files = provenance["files"]
+  if files.is_a?(Hash) && !files.empty?
+    files.each do |name, digest|
+      unless name.is_a?(String) && Pathname.new(name).basename.to_s == name
+        errors << "candidate provenance contains an unsafe file name"
+        next
+      end
+      path = artifact_dir.join(name)
+      errors << "candidate provenance file digest mismatch: #{name}" unless path.file? && digest.to_s.match?(/\A[0-9a-f]{64}\z/) && Digest::SHA256.file(path).hexdigest == digest
+    end
+    sidecar_name = provenance["sidecar_filename"]
+    errors << "candidate provenance sidecar filename does not match exact sidecar" unless sidecar_name == sidecar_path.basename.to_s
+    errors << "candidate provenance sidecar digest does not match exact sidecar" unless provenance["sidecar_sha256"] == files[sidecar_name] && provenance["sidecar_sha256"] == Digest::SHA256.file(sidecar_path).hexdigest
+  else
+    errors << "candidate provenance file map is missing"
+  end
+else
+  errors << "candidate provenance file is missing"
+end
 
 unless sidecar.dig("source", "clean") == true
   errors << "candidate sidecar does not identify a clean source"
@@ -170,7 +271,9 @@ elsif artifact_verified
       tarball_path.basename.to_s => Digest::SHA256.file(tarball_path).hexdigest,
       sidecar_path.basename.to_s => Digest::SHA256.file(sidecar_path).hexdigest,
       archive_path.basename.to_s => Digest::SHA256.file(archive_path).hexdigest,
-      checksum_path.basename.to_s => Digest::SHA256.file(checksum_path).hexdigest
+      checksum_path.basename.to_s => Digest::SHA256.file(checksum_path).hexdigest,
+      provenance_path.basename.to_s => Digest::SHA256.file(provenance_path).hexdigest,
+      binding_path.basename.to_s => Digest::SHA256.file(binding_path).hexdigest
     }
     missing_assets = expected_assets.keys - assets.keys
     mismatched_assets = expected_assets.filter_map do |name, digest|
@@ -276,7 +379,27 @@ ledger = {
     "archive_size" => sidecar.dig("archive", "size"),
     "archive_sha256" => sidecar.dig("archive", "sha256"),
     "checksum_filename" => sidecar.dig("archive", "checksum_filename"),
-    "checksum_sha256" => sidecar.dig("archive", "checksum_sha256")
+    "checksum_sha256" => sidecar.dig("archive", "checksum_sha256"),
+    "actions" => {
+      "repository" => binding["repository"],
+      "workflow_path" => binding["workflow_path"],
+      "source_branch" => binding["source_branch"],
+      "source_sha" => binding["source_sha"],
+      "workflow_run_id" => binding["workflow_run_id"],
+      "workflow_run_attempt" => binding["workflow_run_attempt"],
+      "artifact_id" => binding["artifact_id"],
+      "artifact_name" => binding["artifact_name"],
+      "artifact_digest" => binding["artifact_digest"],
+      "provenance_filename" => binding["provenance_filename"],
+      "provenance_sha256" => binding["provenance_sha256"],
+      "binding_filename" => binding_path.basename.to_s,
+      "binding_sha256" => options.fetch(:binding_sha256),
+      "binding_artifact_run_id" => options.fetch(:binding_artifact_run_id),
+      "binding_artifact_run_attempt" => options.fetch(:binding_artifact_run_attempt),
+      "binding_artifact_id" => options.fetch(:binding_artifact_id),
+      "binding_artifact_name" => options.fetch(:binding_artifact_name),
+      "binding_artifact_digest" => options.fetch(:binding_artifact_digest)
+    }
   },
   "authorities" => { "npm" => npm, "tag" => tag, "github_release" => release },
   "errors" => errors.uniq.sort
