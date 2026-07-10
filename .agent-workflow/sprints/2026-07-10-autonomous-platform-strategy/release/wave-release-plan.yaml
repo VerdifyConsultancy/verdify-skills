@@ -1,0 +1,104 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-autonomous-platform-strategy
+status: approved
+scope:
+  sprint_id: 2026-07-10-autonomous-platform-strategy
+  issue_ids: [211]
+  lane_ids: [issue-211-autonomous-platform-strategy]
+  northstar_ids: [NSM-007, NSM-008, NSM-009, NSM-010]
+  summary: Integrate the reviewed evidence-backed platform strategy into dev with no runtime deployment.
+  non_goals: [feature execution, runtime rollout, North Star relock, production release]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-211
+  decision_notes: One documentation and strategy lane targets protected dev and carries no deployable runtime change.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [repository validation, schema validation, package and delivery regressions]
+    - name: delivery-gate
+      required: true
+      event_triggers: [pull_request, push, workflow_dispatch]
+      timeout_minutes: 15
+      evidence_expected: [exact-head critic, policy-compliant PR metadata]
+  artifacts: [registered research, state-of-union, autonomous platform plan]
+  required_events: [pull_request, push]
+environments:
+  - name: repository-only
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: No environment secrets are required or authorized.
+    protection_rules: [fresh critic, protected dev checks]
+    expected_revision_source: merged dev revision
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: [merged dev revision, issue closure, evidence query]
+  remediation_policy: Revert the strategy PR if review finds materially unsupported claims; no runtime rollback is applicable.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+    - id: STEP-01
+      action: Merge the fresh-critic-approved strategy lane to dev.
+      success_criteria: Exact S passes required checks and issue 211 closes.
+      rollback_trigger: A material unsupported claim, invalid artifact, or delivery-policy failure.
+observability:
+  dashboards: [GitHub pull request checks]
+  logs: [repository test output, critic report]
+  metrics: []
+  traces: []
+  runtime_checks: []
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the dev merge if the durable strategy is invalidated before implementation begins.
+  known_good_ref: "314516e1ba110fa981a235b21f09750bcbc42500"
+  procedure: Revert the single documentation merge and regenerate routing and strategy from corrected evidence.
+  validation_steps: [validate repository, query evidence registry, confirm issue state]
+release_health:
+  stabilization_window: through merge and issue reconciliation
+  signals:
+    - name: strategy integrity
+      source: repository validation and fresh critic
+      threshold: All artifacts validate and no material findings remain.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: false
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-autonomous-platform-strategy/review/review-inbox-packet.yaml
+  human_test_steps: [inspect maturity claims, dependency ordering, and vertical-slice acceptance test]
+  approval_gate: Fresh independent critic at exact evidence head.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A strategy merge could authorize execution based on unsupported or stale system claims.
+    mitigation: Require source-backed current-state evidence, fresh criticism, and explicit downstream approval gates.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T13:37:41Z"
+prepared_at: "2026-07-10T13:37:41Z"
+planner: root-autonomous-platform-strategy-controller
