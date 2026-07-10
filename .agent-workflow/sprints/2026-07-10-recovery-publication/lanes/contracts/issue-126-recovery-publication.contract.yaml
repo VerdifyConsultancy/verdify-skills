@@ -1,0 +1,181 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-recovery-publication
+lane_id: issue-126-recovery-publication
+title: Selective unpublished-work recovery and disposition ledger
+status: approved
+issue_ids: [126]
+coupling_justification: null
+objective: Recover every useful unpublished artifact from the three retained source commits onto the current dev baseline without replaying obsolete trees or weakening current package integrity.
+desired_outcome: Timeline-historian, delivery-loop evidence, crm-email, skill packs, and their provenance are accepted on dev; every rescue ref/worktree has a durable disposition; current package and lifecycle behavior remains green.
+non_goals:
+  - Change VERSION or the package.json version field, publish npm, tag Git, create a GitHub release, or promote main.
+  - Cherry-pick or merge fe1f94e, f425515, or 22f81bd wholesale.
+  - Accept f425515 alternate architecture, wave/task/worker-run schemas, stale sprint state, or embedded source instructions.
+  - Modify live CRM/email data, use production credentials, or copy raw secrets into tests, artifacts, commits, or logs.
+  - Delete rescue refs, clean the shared Agent Platform checkout, or remove branches/worktrees before final main-release ledger proof.
+baseline_sha: "17b3762f024186a336556f60c27268006a8d59b6"
+branch: lane/126-recovery-publication
+module_contracts: [evidence-northstar, release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [skill-recovery, evidence-recovery, skill-pack-registry, package-distribution, recovery-ledger]
+  owned_paths:
+    - skills/timeline-historian/**
+    - evaluations/timeline-historian/**
+    - .agents/skills/timeline-historian
+    - .claude/skills/timeline-historian
+    - skills/crm-email/**
+    - evaluations/crm-email/**
+    - .agents/skills/crm-email
+    - .claude/skills/crm-email
+    - packs/**
+    - schemas/skill-pack.schema.yaml
+    - .agent-workflow/northstar/evidence-registry.yaml
+    - .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md
+    - .agent-workflow/northstar/research-inbox/2026-06-27-timeline-historian-claims-provenance-brave-research.md
+    - .agent-workflow/northstar/collateral/NSE-20260627-timeline-historian-claims-provenance-and.yaml
+    - .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-audit-closeout.yaml
+    - .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-sdlc-best-practices.yaml
+    - .agent-workflow/northstar/collateral/NSE-20260625-recommended-event-driven-sdlc-control-plane.yaml
+    - .agent-workflow/northstar/collateral/NSE-20260625-walk-transcript-delivery-loop-topology.yaml
+    - .agent-workflow/northstar/collateral/sources/NSE-20260627-timeline-historian-claims-provenance-and-2026-06-27-timeline-historian-claims-provenance
+    - .agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-audit-closeout-pasted-text-1-txt
+    - .agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-sdlc-best-practices-pasted-text-1-txt
+    - .agent-workflow/northstar/collateral/sources/NSE-20260625-recommended-event-driven-sdlc-control-plane-recommended-model-critique-md
+    - .agent-workflow/northstar/collateral/sources/NSE-20260625-walk-transcript-delivery-loop-topology-walk-transcript-loop-topology-md
+    - README.md
+    - docs/architecture.md
+    - docs/lifecycle.md
+    - docs/skill-packs.md
+    - docs/skills/README.md
+    - docs/skills/schemas-catalog.md
+    - docs/skills/per-skill/crm-email.md
+    - docs/skills/per-skill/timeline-historian.md
+    - docs/recovery-ledger-2026-07-10.md
+    - lib/verdify/cli.rb
+    - npm/bin/verdify.js
+    - package.json
+    - scripts/package.sh
+    - scripts/setup-agent-hosts.rb
+    - scripts/validate-repo.rb
+    - tests/test_cli.sh
+    - tests/test_npm_install.sh
+    - MANIFEST.sha256
+  prohibited_paths:
+    - VERSION
+    - .github/workflows/**
+    - .mcp.json
+    - scripts/package-file-list.rb
+    - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+    - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+    - .agent-workflow/northstar/northstar-artifacts.yaml
+    - .agent-workflow/northstar/northstar-plan.yaml
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/strategy/**
+    - .agent-workflow/hygiene/**
+    - schemas/wave-contract.schema.yaml
+    - schemas/task-contract.schema.yaml
+    - schemas/worker-run-event.schema.yaml
+  coordination_required_paths:
+    - Makefile
+    - scripts/gen-manifest.sh
+    - scripts/verify-package.sh
+    - tests/test_package_file_set.sh
+  owned_interfaces:
+    - Timeline-historian standalone skill, deterministic helpers, and registered evidence bundle.
+    - Skill-pack schema plus verdify pack list/install and npm dl/init distribution surfaces.
+    - Recovery ledger mapping local/remote refs and worktrees to evidence-backed dispositions.
+dependencies:
+  hard:
+    - lane_id: issue-130-package-file-set
+      required_output: Preserve the integrated immutable Git-index shipped-file selector and exact archive behavior from dev commit 17b3762.
+  soft:
+    - lane_id: issue-120-release-safety
+      coordination: Leave exact publication, provenance, release ledger, and recovery transaction behavior for the following release-safety sprint.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: All timeline-historian skill/eval/link files and the timeline claims/provenance evidence entry are selectively recovered from fe1f94e and validate on the current baseline.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [source-to-target path ledger, skill/script validation, registry ID and SHA audit, read-only Sunshine smoke or explicit source-unavailable result]
+  - id: LANE-AC-02
+    statement: The four delivery-loop evidence packages and AGENTIC_LOOP_SKILL_AUDIT.md from f425515 are registered as historical evidence without replaying alternate architecture/schema work.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [four registry entries, copied source hash verification, prohibited-path diff audit]
+  - id: LANE-AC-03
+    statement: "crm-email and skill packs from 22f81bd are ported semantically, validate/install in isolated targets, preserve package version 1.2.1, and retain issue #130 index-object staging."
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [pack schema/list/install/dl tests, CRM no-live-write tests, package version/archive audit]
+  - id: LANE-AC-04
+    statement: The checked-in recovery ledger accounts for fe1f94e, f425515, 22f81bd, mapped merged branches, superseded refs, shared runner state, and cleanup eligibility without destructive cleanup.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [docs/recovery-ledger-2026-07-10.md, git branch/worktree/ref snapshot, "issue #126 cross-links"]
+  - id: LANE-AC-05
+    statement: Exact implementation and report heads pass secret scan, repository validation, focused recovery tests, make test, package verification, and live GitHub checks.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [gitleaks changed-path summary, make test, manifest/package results, required check URLs]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate recovered skills, packs, schemas, evidence, references, discovery links, and repository invariants.
+    required: true
+  - id: pack-cli-list
+    command: bin/verdify pack list --json
+    purpose: Prove every pack manifest validates and references known skills.
+    required: true
+  - id: cli-lifecycle-suite
+    command: bash tests/test_cli.sh
+    purpose: Exercise pack list/install and existing lifecycle CLI behavior.
+    required: true
+  - id: installed-package-suite
+    command: bash tests/test_npm_install.sh
+    purpose: Prove npm-distributed pack and skill surfaces install without changing version identity.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run manifest, schema, skill, package, policy, release-preflight, and npm tests together.
+    required: true
+  - id: changed-path-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="17b3762f024186a336556f60c27268006a8d59b6..HEAD"
+    purpose: Scan the final changed artifact set without exposing matched values.
+    required: true
+required_evidence:
+  - Exact rescue commit IDs, source paths, selected target paths, and rejected stale paths.
+  - Evidence registry queries and source SHA-256 validation for all five recovered evidence records.
+  - Timeline skill and deterministic helper outputs plus read-only Sunshine smoke result when the source manifest exists.
+  - Pack schema/list/install/dl and CRM fixture/help validation with no live service mutation.
+  - Current package version, immutable index staging, manifest, archive exact-set, and npm install proof.
+  - Checked-in branch/worktree/ref disposition ledger and retained rescue-ref proof.
+  - Clean implementation worktree, worker closeout, fresh critic report, and exact-head GitHub checks.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - "A source file conflicts with current behavior and intent cannot be resolved from issue #126, source evidence, or current tests."
+  - Recovery requires protected North Star/product/architecture changes rather than evidence registration.
+  - crm-email validation requires live credentials, service mutation, or unredacted secret handling.
+  - Pack support requires changing VERSION, publish workflows, archive identity, or scripts/package-file-list.rb.
+  - Any rescue ref or shared checkout would need destructive mutation before accepted current-baseline recovery.
+definition_of_done:
+  - Every selected source artifact and every intentionally rejected source artifact has a durable ledger entry with an exact ref.
+  - All acceptance criteria have exact implementation evidence and the worktree is clean at I.
+  - Evidence head E adds only the canonical closeout after substantive implementation.
+  - A different critic agent/session commits only the critic report at S with approve or approve_with_risks outcome.
+  - Validate, pull-request-policy, and compliance checks pass at S.
+  - Integration uses a non-author review when available or a user-authorized, recorded admin-merge policy exception.
+  - "Release publication, main promotion, and destructive cleanup remain separate controller steps after issues #120 and #121."
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T04:50:00Z"
