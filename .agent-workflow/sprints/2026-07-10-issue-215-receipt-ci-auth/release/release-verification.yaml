@@ -1,0 +1,78 @@
+---
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+status: verified
+integrated_sha: 52fbcbe957e69e81db014989bfdcf26b6863669f
+release:
+  tag: null
+  url: null
+artifact_identity:
+- type: git-commit
+  identifier: 52fbcbe957e69e81db014989bfdcf26b6863669f
+- type: github-pull-request
+  identifier: https://github.com/VerdifyConsultancy/verdify-skills/pull/217
+- type: critic-report-head
+  identifier: 655d5a116023f2930dd7dca88456f2bfeba139af
+integration_results:
+- name: D/I/E/S evidence chain
+  result: passed
+  evidence: Dispatch 749b23d94c1704525432427cf540b74bbda00525, implementation 8c04bb373c2217f9ef58a4c0139e54fdd72568c5, closeout c3405f47e6a311f282ece7d7e62a73c5489c52d6, and approving critic 655d5a116023f2930dd7dca88456f2bfeba139af validate.
+- name: validate
+  result: passed
+  evidence: Trusted pull_request check 86479907808 passed at exact S3.
+- name: pull-request-policy
+  result: passed
+  evidence: Trusted pull_request check 86480157383 passed from policy.yml at exact S3.
+- name: compliance / compliance
+  result: passed
+  evidence: Trusted pull_request check 86479908877 passed at exact S3.
+- name: delivery-policy
+  result: passed
+  evidence: Trusted pull_request check 86480157473 passed from delivery-gate.yml at exact S3.
+- name: critic-gate
+  result: passed
+  evidence: Trusted pull_request check 86480157461 passed from delivery-gate.yml at exact S3.
+- name: protected-dev merge
+  result: passed
+  evidence: PR 217 merged exact S3 as 52fbcbe957e69e81db014989bfdcf26b6863669f and branch protections were restored.
+deployment:
+  environment: protected-dev
+  deployment_id: 217
+  deployed_at: '2026-07-10T22:54:16Z'
+  observed_revision: 52fbcbe957e69e81db014989bfdcf26b6863669f
+  deployer: github-merge
+  approval:
+    required: true
+    approved_by: Jason Vallery delegated repository authority
+    approved_at: '2026-07-10T22:54:16Z'
+    evidence: Exact-head protected-path exception recorded at https://github.com/VerdifyConsultancy/verdify-skills/pull/217#issuecomment-4940169487.
+runtime_checks:
+- name: protected dev exactness and ancestry
+  result: passed
+  observed_at: '2026-07-10T22:58:03Z'
+  evidence: origin/dev and the local dev branch equal 52fbcbe957e69e81db014989bfdcf26b6863669f, whose second parent is exact S3.
+- name: branch protection restoration
+  result: passed
+  observed_at: '2026-07-10T22:54:22Z'
+  evidence: Admin enforcement, strict required contexts, CODEOWNERS, stale-review dismissal, and force/deletion prohibitions match the pre-merge state.
+- name: repository validation
+  result: passed
+  observed_at: '2026-07-10T22:54:40Z'
+  evidence: ruby scripts/validate-repo.rb passed with 28 skills and 49 schemas on merged dev.
+- name: terminal authority set
+  result: passed
+  observed_at: '2026-07-10T22:58:03Z'
+  evidence: All six prior transactions remain terminal and issue 215 is the sole integrated unterminated sprint.
+migrations:
+- name: repository-only
+  result: not_applicable
+  evidence: No data, schema, package, or runtime migration exists.
+rollback:
+  ready: true
+  known_good_revision: fbe821899caf546e9b7b8daa718ea2ec74918091
+  procedure: Revert merge 52fbcbe957e69e81db014989bfdcf26b6863669f on dev, restore the prior workflow permission map, rerun protected-base policy tests, and regenerate controller and terminal evidence.
+incidents: []
+verified_at: '2026-07-10T22:58:03Z'
+verifier: codex-root-issue215-release-verifier
