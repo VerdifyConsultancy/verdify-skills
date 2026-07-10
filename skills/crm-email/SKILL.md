@@ -3,7 +3,7 @@ name: crm-email
 description: Draft, review, search context for, and send CRM-backed email through Verdify CRM. Use when Codex needs to work with crm.verdify.ai email workflows, contact/account context, follow-up drafting, campaign or one-to-one email preparation, CRM activity logging, or API-backed email operations using credential references only.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
   category: registry
 ---
 

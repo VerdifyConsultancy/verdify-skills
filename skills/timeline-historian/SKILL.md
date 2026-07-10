@@ -3,7 +3,7 @@ name: timeline-historian
 description: Builds source-backed timeline narratives over document corpora with asset traceability, OCR/span provenance, semantic or hybrid search ledgers, Shepard-style claim treatment, window summaries, and critical-historian review. Use when Codex needs to research or write historical narratives from archives, vaults, OCR exports, semantic-search systems, decade/year folders, or source ledgers, especially when every claim must trace to assets and later evidence can support, qualify, contradict, supersede, or distinguish prior claims.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
   category: standalone
 ---
 

@@ -18,60 +18,129 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
-      - uses: ruby/setup-ruby@v1
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
         with:
           ruby-version: "3.3"
 
-      - uses: actions/setup-node@v4
+      # actions/setup-node v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Use current npm
-        run: npm install -g npm@latest
+      - name: Use reviewed npm
+        run: npm install --global npm@11.4.2
 
-      - name: Check release version
-        run: ruby scripts/release-preflight.rb --require-unpublished
+      - name: Check release identity
+        run: ruby scripts/release-preflight.rb
 
-      - name: Check release tag
+      - name: Build and verify one release candidate
+        id: candidate
         run: |
           set -euo pipefail
-          VERSION="$(cat VERSION)"
-          TAG="v${VERSION}"
-          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
-            echo "Release tag ${TAG} already exists"
-            exit 1
-          fi
+          bash scripts/build-release-candidate.sh dist | tee dist/candidate.outputs
+          while IFS='=' read -r key value; do
+            case "${key}" in
+              tarball|sidecar|archive|checksum|source_sha)
+                echo "${key}=${value}" >> "${GITHUB_OUTPUT}"
+                ;;
+            esac
+          done < dist/candidate.outputs
 
-      - name: Build release archive
-        id: package
-        run: |
-          set -euo pipefail
-          ARCHIVE="$(bash scripts/package.sh dist)"
-          bash scripts/verify-package.sh "${ARCHIVE}"
-          echo "archive=${ARCHIVE}" >> "${GITHUB_OUTPUT}"
-          echo "checksum=${ARCHIVE}.sha256" >> "${GITHUB_OUTPUT}"
-
-      - name: Publish to npm
-        run: npm publish --access public --provenance
-
-      - name: Tag and create GitHub release
+      - name: Resume immutable release transaction
         env:
           GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TARBALL: ${{ steps.candidate.outputs.tarball }}
+          SIDECAR: ${{ steps.candidate.outputs.sidecar }}
+          ARCHIVE: ${{ steps.candidate.outputs.archive }}
+          CHECKSUM: ${{ steps.candidate.outputs.checksum }}
+          SOURCE_SHA: ${{ steps.candidate.outputs.source_sha }}
         run: |
           set -euo pipefail
           VERSION="$(cat VERSION)"
           TAG="v${VERSION}"
+          LEDGER="dist/release-transaction-v${VERSION}.json"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "${TAG}" -m "Verdify skills ${VERSION}"
-          git push origin "${TAG}"
-          gh release create "${TAG}" \
-            "${{ steps.package.outputs.archive }}" \
-            "${{ steps.package.outputs.checksum }}" \
-            --title "Verdify skills ${VERSION}" \
-            --notes "Published @verdify-cli/cli@${VERSION} to npm."
+
+          reconcile() {
+            ruby scripts/release-transaction.rb \
+              --sidecar "${SIDECAR}" \
+              --ledger "${LEDGER}" \
+              --repository "${REPOSITORY}" > dist/release-state.json
+          }
+          next_action() {
+            ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("next_action")' "${LEDGER}"
+          }
+
+          for _attempt in 1 2 3 4 5 6 7 8; do
+            reconcile
+            ACTION="$(next_action)"
+            case "${ACTION}" in
+              publish_npm)
+                npm publish "${TARBALL}" --access public --provenance
+                for _registry_attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+                  if npm view "@verdify-cli/cli@${VERSION}" version --json >/dev/null 2>&1; then
+                    break
+                  fi
+                  if [ "${_registry_attempt}" = "12" ]; then
+                    echo "published version did not become observable; refusing a duplicate publish attempt" >&2
+                    exit 1
+                  fi
+                  sleep 5
+                done
+                ;;
+              push_tag)
+                git tag -a "${TAG}" "${SOURCE_SHA}" -m "Verdify skills ${VERSION}"
+                git push origin "refs/tags/${TAG}"
+                ;;
+              create_github_release)
+                gh release create "${TAG}" \
+                  "${TARBALL}" \
+                  "${SIDECAR}" \
+                  "${ARCHIVE}" \
+                  "${CHECKSUM}" \
+                  --repo "${REPOSITORY}" \
+                  --verify-tag \
+                  --title "Verdify skills ${VERSION}" \
+                  --notes "Published @verdify-cli/cli@${VERSION} from ${SOURCE_SHA}."
+                ;;
+              upload_release_assets)
+                for asset in "${TARBALL}" "${SIDECAR}" "${ARCHIVE}" "${CHECKSUM}"; do
+                  name="$(basename "${asset}")"
+                  if ! gh release view "${TAG}" --repo "${REPOSITORY}" --json assets --jq ".assets[] | select(.name == \"${name}\") | .name" | grep -qx "${name}"; then
+                    gh release upload "${TAG}" "${asset}" --repo "${REPOSITORY}"
+                  fi
+                done
+                ;;
+              upload_completed_ledger)
+                ruby scripts/release-transaction.rb \
+                  --sidecar "${SIDECAR}" \
+                  --ledger "${LEDGER}" \
+                  --repository "${REPOSITORY}" \
+                  --finalize > dist/release-finalize.json
+                gh release upload "${TAG}" "${LEDGER}" --repo "${REPOSITORY}"
+                ;;
+              none)
+                break
+                ;;
+              *)
+                echo "unsupported release recovery action: ${ACTION}" >&2
+                exit 1
+                ;;
+            esac
+          done
+
+          reconcile
+          ruby -rjson -e '
+            ledger = JSON.parse(File.read(ARGV.fetch(0)))
+            abort "release transaction did not complete" unless ledger.fetch("state") == "completed" && ledger.fetch("next_action") == "none"
+          ' "${LEDGER}"

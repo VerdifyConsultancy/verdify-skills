@@ -4,7 +4,7 @@ description: Performs fresh-context, evidence-based review of a completed Verdif
 compatibility: Requires read access to the repository, pull request, checks, contracts, and evidence, plus narrowly scoped permission to commit only the canonical critic report. A separate detached worktree or clean clone is required; advancing approval comes afterward from a repository admin or maintainer other than the PR author.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Independent Critic

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "tmpdir"
+
 module Verdify
   class CLI
     SKILLS = %w[
@@ -379,9 +381,8 @@ module Verdify
       pack = load_skill_pack(options[:pack])
       selected = pack_skill_names(pack, options[:include_optional])
       repo = GitRepository.new(options[:repo])
+      install_pack_transaction(repo.root, pack, selected, options)
       command_init_for_pack(repo, options[:force]) if options[:init_workflow]
-      install_skill_links(repo.root, selected, options[:host], options[:force])
-      write_pack_manifest(repo.root, pack, selected, options)
       puts "Installed skill pack #{pack['name']} (#{selected.length} skills) into #{repo.root}"
       puts "Hosts: #{options[:host]}"
       puts "Manifest: .agent-skills/verdify-packs/#{pack['name']}.yaml"
@@ -2446,34 +2447,110 @@ module Verdify
       Dir[Verdify::ROOT.join("skills/*/SKILL.md")].sort.map { |path| Pathname.new(path).dirname.basename.to_s }
     end
 
-    def install_skill_links(repo_root, skills, host, force)
-      hosts = host == "all" ? %w[codex claude] : [host]
+    def install_pack_transaction(repo_root, pack, skills, options)
+      hosts = options[:host] == "all" ? %w[codex claude] : [options[:host]]
       host_dirs = { "codex" => ".agents/skills", "claude" => ".claude/skills" }
-      hosts.each do |current_host|
-        dir = repo_root.join(host_dirs.fetch(current_host))
-        FileUtils.mkdir_p(dir)
-        skills.each do |skill|
+      manifest_path = repo_root.join(".agent-skills/verdify-packs/#{pack['name']}.yaml")
+      manifest_content = pack_manifest_content(pack, skills, options)
+      targets = hosts.flat_map do |current_host|
+        skills.map do |skill|
           source = Verdify::ROOT.join("skills", skill)
           raise UsageError, "missing source skill #{skill}" unless source.join("SKILL.md").file?
 
-          link = dir.join(skill)
-          if link.exist? || link.symlink?
-            begin
-              next if link.symlink? && link.realpath == source.realpath
-            rescue Errno::ENOENT
-              # Replace broken link below.
-            end
-            raise UsageError, "refusing to replace #{link}; pass --force" unless force
-            FileUtils.rm_rf(link)
-          end
-          File.symlink(source.relative_path_from(link.dirname), link)
+          {
+            path: repo_root.join(host_dirs.fetch(current_host), skill),
+            kind: :symlink,
+            source: source
+          }
         end
+      end
+      targets << { path: manifest_path, kind: :file, content: manifest_content }
+
+      targets.each do |target|
+        ensure_pack_parent_path!(repo_root, target.fetch(:path).dirname)
+        path = target.fetch(:path)
+        next unless path.exist? || path.symlink?
+
+        same = if target.fetch(:kind) == :symlink
+                 begin
+                   path.symlink? && path.realpath == target.fetch(:source).realpath
+                 rescue Errno::ENOENT
+                   false
+                 end
+               else
+                 path.file? && !path.symlink? && path.read == target.fetch(:content)
+               end
+        target[:keep] = same
+        raise UsageError, "refusing to replace #{path}; pass --force" unless same || options[:force]
+      end
+
+      backup_root = Pathname.new(Dir.mktmpdir("verdify-pack-rollback-"))
+      backups = []
+      created_dirs = []
+      changed_targets = targets.reject { |target| target[:keep] }
+
+      begin
+        changed_targets.each_with_index do |target, index|
+          path = target.fetch(:path)
+          next unless path.exist? || path.symlink?
+
+          backup = backup_root.join(index.to_s)
+          FileUtils.mv(path, backup)
+          backups << [path, backup]
+        end
+
+        changed_targets.each do |target|
+          path = target.fetch(:path)
+          missing = []
+          cursor = path.dirname
+          until cursor == repo_root || cursor.exist? || cursor.symlink?
+            missing << cursor
+            cursor = cursor.dirname
+          end
+          FileUtils.mkdir_p(path.dirname)
+          created_dirs.concat(missing.reverse)
+
+          if target.fetch(:kind) == :symlink
+            source = target.fetch(:source)
+            File.symlink(source.relative_path_from(path.dirname), path)
+          end
+        end
+
+        if ENV["VERDIFY_TESTING"] == "1" && ENV["VERDIFY_TEST_PACK_FAILURE"] == "before-manifest"
+          raise Error, "injected pack manifest failure"
+        end
+
+        manifest_target = changed_targets.find { |target| target.fetch(:kind) == :file }
+        Verdify.atomic_write(manifest_target.fetch(:path), manifest_target.fetch(:content)) if manifest_target
+      rescue StandardError
+        changed_targets.reverse_each do |target|
+          path = target.fetch(:path)
+          FileUtils.rm_rf(path) if path.exist? || path.symlink?
+        end
+        backups.reverse_each do |path, backup|
+          FileUtils.mkdir_p(path.dirname)
+          FileUtils.mv(backup, path)
+        end
+        created_dirs.reverse_each { |dir| Dir.rmdir(dir) if dir.directory? && dir.children.empty? }
+        raise
+      ensure
+        FileUtils.rm_rf(backup_root)
       end
     end
 
-    def write_pack_manifest(repo_root, pack, skills, options)
-      dir = repo_root.join(".agent-skills/verdify-packs")
-      FileUtils.mkdir_p(dir)
+    def ensure_pack_parent_path!(repo_root, parent)
+      relative = parent.relative_path_from(repo_root)
+      cursor = repo_root
+      relative.each_filename do |component|
+        cursor = cursor.join(component)
+        next unless cursor.exist? || cursor.symlink?
+
+        raise UsageError, "pack destination parent is a symlink: #{cursor}" if cursor.symlink?
+        raise UsageError, "pack destination parent is not a directory: #{cursor}" unless cursor.directory?
+      end
+    end
+
+    def pack_manifest_content(pack, skills, options)
       manifest = {
         "schema_ref" => "skill-pack.schema.yaml",
         "kind" => "VerdifySkillPack",
@@ -2496,7 +2573,7 @@ module Verdify
         }
       }
       validate_hash!(manifest, "skill-pack.schema.yaml", "installed skill pack manifest")
-      Verdify.atomic_write(dir.join("#{pack['name']}.yaml"), YAML.dump(manifest))
+      YAML.dump(manifest)
     end
 
     def command_init_for_pack(repo, force)

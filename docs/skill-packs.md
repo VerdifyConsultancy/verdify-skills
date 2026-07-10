@@ -55,6 +55,12 @@ Install one pack into a target repository:
 verdify pack install --repo /path/to/repo --pack research-analysis --host codex
 ```
 
+Pack installation is transactional. Verdify preflights every selected host
+link and the installed-pack manifest before changing the repository. A conflict
+without `--force` leaves zero new links or manifest state. A later write failure
+rolls back every newly created target and restores any operator-owned target
+temporarily replaced by `--force`.
+
 Download and install one pack through npm:
 
 ```bash

@@ -44,6 +44,67 @@ git -C "$PACK_REPO" commit -qm "initial"
 [[ ! -e "$PACK_REPO/.agents/skills/project-router" ]]
 [[ -f "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
 "$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" >/dev/null
+
+make_pack_repo() {
+  local path="$1"
+  mkdir -p "$path"
+  git -C "$path" init -q -b main
+  git -C "$path" config user.name "Verdify Test"
+  git -C "$path" config user.email "verdify-test@example.invalid"
+  printf '# Pack transaction fixture\n' > "$path/README.md"
+  git -C "$path" add README.md
+  git -C "$path" commit -qm "initial"
+}
+
+PACK_SKILLS=(northstar-research-ingest northstar-question-resolution northstar-interview)
+for position in 0 1 2; do
+  COLLISION_REPO="$TMP/pack-collision-$position"
+  make_pack_repo "$COLLISION_REPO"
+  conflict="${PACK_SKILLS[$position]}"
+  mkdir -p "$COLLISION_REPO/.agents/skills/$conflict"
+  printf 'operator owned\n' > "$COLLISION_REPO/.agents/skills/$conflict/owner.txt"
+  if "$ROOT/bin/verdify" pack install --repo "$COLLISION_REPO" --pack research-analysis --host codex >"$TMP/collision-$position.out" 2>"$TMP/collision-$position.err"; then
+    echo "expected pack conflict at position $position to fail" >&2
+    exit 1
+  fi
+  [[ "$(cat "$COLLISION_REPO/.agents/skills/$conflict/owner.txt")" == "operator owned" ]]
+  for skill in "${PACK_SKILLS[@]}"; do
+    if [[ "$skill" != "$conflict" ]]; then
+      [[ ! -e "$COLLISION_REPO/.agents/skills/$skill" ]]
+    fi
+  done
+  [[ ! -e "$COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+done
+
+MANIFEST_COLLISION_REPO="$TMP/pack-manifest-collision"
+make_pack_repo "$MANIFEST_COLLISION_REPO"
+mkdir -p "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if "$ROOT/bin/verdify" pack install --repo "$MANIFEST_COLLISION_REPO" --pack research-analysis --host codex >"$TMP/manifest-collision.out" 2>"$TMP/manifest-collision.err"; then
+  echo "expected operator-owned manifest conflict to fail" >&2
+  exit 1
+fi
+[[ "$(cat "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+for skill in "${PACK_SKILLS[@]}"; do
+  [[ ! -e "$MANIFEST_COLLISION_REPO/.agents/skills/$skill" ]]
+done
+
+ROLLBACK_REPO="$TMP/pack-rollback"
+make_pack_repo "$ROLLBACK_REPO"
+mkdir -p "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest"
+printf 'operator link target\n' > "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt"
+mkdir -p "$ROLLBACK_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE=before-manifest \
+  "$ROOT/bin/verdify" pack install --repo "$ROLLBACK_REPO" --pack research-analysis --host codex --force >"$TMP/rollback.out" 2>"$TMP/rollback.err"; then
+  echo "expected injected late pack failure" >&2
+  exit 1
+fi
+[[ "$(cat "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt")" == "operator link target" ]]
+[[ "$(cat "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-question-resolution" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-interview" ]]
+
 "$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack crm-email --host all >/dev/null
 [[ -L "$PACK_REPO/.agents/skills/crm-email" ]]
 [[ -L "$PACK_REPO/.claude/skills/crm-email" ]]

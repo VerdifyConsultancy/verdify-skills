@@ -56,10 +56,11 @@ echo "npm ERR! code E404" >&2
 exit 1
 SH
 chmod +x "$FAKE_BIN/npm"
-PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --require-version-bump "$BASE" --require-unpublished
-
 ruby -rjson -e 'path=ARGV.fetch(0); data=JSON.parse(File.read(path)); data["version"]="1.1.1"; File.write(path, JSON.pretty_generate(data) + "\n")' "$REPO/package.json"
 printf '1.1.1\n' > "$REPO/VERSION"
+PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --require-version-bump "$BASE" --require-unpublished
+CREATE_RESULT="$(PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --json)"
+ruby -rjson -e 'd=JSON.parse(ARGV.fetch(0)); abort unless d["decision"] == "create" && d["reason"] == "new_unpublished_version"' "$CREATE_RESULT"
 
 cat > "$FAKE_BIN/npm" <<'SH'
 #!/usr/bin/env bash
@@ -70,6 +71,8 @@ if PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REP
   echo "expected an already-published npm version to fail" >&2
   exit 1
 fi
+PUBLISHED_RESULT="$(PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --json)"
+ruby -rjson -e 'd=JSON.parse(ARGV.fetch(0)); abort unless d["decision"] == "skip" && d["reason"] == "already_published"' "$PUBLISHED_RESULT"
 
 cat > "$FAKE_BIN/npm" <<'SH'
 #!/usr/bin/env bash
@@ -78,6 +81,10 @@ exit 1
 SH
 chmod +x "$FAKE_BIN/npm"
 PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --require-unpublished
+
+git -C "$REPO" checkout -q -- package.json VERSION
+UNBUMPED_RESULT="$(PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --json)"
+ruby -rjson -e 'd=JSON.parse(ARGV.fetch(0)); abort unless d["decision"] == "skip" && d["reason"] == "version_not_bumped"' "$UNBUMPED_RESULT"
 
 cat > "$FAKE_BIN/npm" <<'SH'
 #!/usr/bin/env bash
@@ -89,5 +96,17 @@ if PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REP
   echo "expected an inconclusive npm registry response to fail" >&2
   exit 1
 fi
+if PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --json >/dev/null 2>&1; then
+  echo "expected release PR preflight to fail on an inconclusive registry response" >&2
+  exit 1
+fi
+
+ruby -e '
+  workflow = File.read(ARGV.fetch(0))
+  preflight = workflow.index("release-preflight.rb --release-pr-base") or abort "release PR preflight is missing"
+  mutations = [workflow.index("gh issue create"), workflow.index("gh pr edit"), workflow.index("gh pr create")]
+  abort "release PR mutation precedes npm preflight" unless mutations.all? { |position| position && position > preflight }
+  abort "release PR author gate is missing" unless workflow.include?(%q{AUTHOR="$(gh api user --jq .login)"}) && workflow.include?(%q{!= "jrvallery"})
+' "$ROOT/.github/workflows/release-pr.yml"
 
 echo "release preflight tests passed."

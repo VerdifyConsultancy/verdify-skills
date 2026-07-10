@@ -18,9 +18,23 @@ jobs:
   release-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+
+      # actions/setup-node v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+
+      - name: Use reviewed npm
+        run: npm install --global npm@11.4.2
 
       - name: Open or update release PR
         env:
@@ -29,9 +43,26 @@ jobs:
         run: |
           set -euo pipefail
 
+          PREFLIGHT="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --json)"
+          DECISION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).fetch("decision")' "${PREFLIGHT}")"
+          if [ "${DECISION}" = "skip" ]; then
+            echo "${PREFLIGHT}"
+            exit 0
+          fi
+          if [ "${DECISION}" != "create" ]; then
+            echo "release PR preflight did not authorize mutation: ${PREFLIGHT}" >&2
+            exit 1
+          fi
+
           if [ -z "${GH_TOKEN}" ]; then
             echo "::warning::VERDIFY_RELEASE_PR_TOKEN is not configured; skipping automatic release PR creation."
             exit 0
+          fi
+
+          AUTHOR="$(gh api user --jq .login)"
+          if [ "${AUTHOR}" != "jrvallery" ]; then
+            echo "release PR token must authenticate as jrvallery, got ${AUTHOR}" >&2
+            exit 1
           fi
 
           VERSION="$(cat VERSION)"

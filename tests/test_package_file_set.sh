@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-for command in git node ruby unzip zip; do
+for command in git node python3 ruby unzip zip; do
   command -v "$command" >/dev/null || { echo "$command is required for package file-set tests" >&2; exit 1; }
 done
 
@@ -167,5 +167,51 @@ ruby -e '
   actual = File.readlines(manifest_file, chomp: true).map { |line| line.split(/  /, 2).fetch(1) }
   abort "manifest paths differ from selected regular files" unless actual == expected
 ' "$INDEX_STAGE" "$TMP/paths.before" "$TMP/manifest.before"
+
+MUTATOR="$TMP/mutate_zip.py"
+cat > "$MUTATOR" <<'PY'
+import copy
+import stat
+import sys
+import warnings
+import zipfile
+
+source, output, mutation, root = sys.argv[1:]
+target = f"{root}/VERSION"
+with zipfile.ZipFile(source, "r") as zin, zipfile.ZipFile(output, "w") as zout:
+    duplicate = copy.copy(zin.getinfo(target))
+    duplicate_data = zin.read(target)
+    for info in zin.infolist():
+        if mutation == "missing" and info.filename == target:
+            continue
+        data = zin.read(info)
+        if mutation == "changed" and info.filename == target:
+            data += b"changed\n"
+        if mutation == "wrong-type" and info.filename == target:
+            replacement = zipfile.ZipInfo(info.filename, info.date_time)
+            replacement.create_system = 3
+            replacement.external_attr = (stat.S_IFLNK | 0o777) << 16
+            zout.writestr(replacement, b"VERSION")
+        else:
+            zout.writestr(copy.copy(info), data)
+    if mutation == "extra":
+        zout.writestr(f"{root}/unlisted.txt", b"extra\n")
+    elif mutation == "duplicate":
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            zout.writestr(duplicate, duplicate_data)
+    elif mutation == "unsafe":
+        zout.writestr("../archive-escape.txt", b"unsafe\n")
+PY
+
+for mutation in missing changed extra duplicate unsafe wrong-type; do
+  mutated="$TMP/$mutation.zip"
+  python3 "$MUTATOR" "$ARCHIVE" "$mutated" "$mutation" "$ARCHIVE_ROOT"
+  if bash "$FIXTURE/scripts/verify-package.sh" "$mutated" >"$TMP/$mutation.out" 2>"$TMP/$mutation.err"; then
+    echo "expected $mutation archive mutation to fail" >&2
+    exit 1
+  fi
+done
+[[ ! -e "$TMP/archive-escape.txt" ]]
 
 echo "Package file-set tests passed."
