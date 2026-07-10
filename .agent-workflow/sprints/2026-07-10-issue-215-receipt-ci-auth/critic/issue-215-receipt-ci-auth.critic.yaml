@@ -1,0 +1,229 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+lane_id: issue-215-receipt-ci-auth
+pull_request: 217
+worker_agent: codex-issue215-worker
+worker_session_id: codex-issue215-worker-20260710t2134z
+critic_agent: codex-issue215-critic
+implementation_head_sha: "7dbcd20b0970a8edf5ab193c97c7038d39ea26eb"
+evidence_head_sha: "72e7c72d835016151da70d997f9eea25051e9c5e"
+reviewed_head_sha: "72e7c72d835016151da70d997f9eea25051e9c5e"
+closeout_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/closeout/issue-215-receipt-ci-auth.closeout.yaml
+closeout_sha256: "b9390e9c7f25c2bdb4fea1e7d8e39dcf582b835200ae530725cd74a10987af27"
+critic_session_id: codex-issue215-critic-20260710t2152z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-issue-215-receipt-ci-auth/critic
+outcome: request_fixes
+findings:
+  - id: FIND-001
+    severity: high
+    statement: >-
+      The job token is exposed to candidate-controlled code and is also
+      persisted by every checkout, so the workflow does not maintain the
+      approved trusted-engine and no-token-persistence boundary.
+    evidence:
+      - >-
+        .github/workflows/delivery-gate.yml:51-64 exports github.token as
+        GH_TOKEN and then executes candidate/scripts/pr-policy.rb from the pull
+        request head. A pull request can replace that script and read or
+        exfiltrate the read-scoped token instead of performing validation.
+      - >-
+        .github/workflows/delivery-gate.yml:22-28,69-83 and
+        .github/workflows/policy.yml:14-27 invoke the pinned actions/checkout
+        revision without persist-credentials: false. The exact pinned action's
+        action.yml declares persist-credentials default true and states that the
+        token is configured in local git config; this was verified with
+        gh api repos/actions/checkout/contents/action.yml at revision
+        11bd71901bbe5b1630ceea73d27597364c9af683.
+      - >-
+        AGENTS.md and COMMON_OPERATING_CONTRACT.md require candidate policy
+        validation to run from the protected base or another trusted engine,
+        while issue 215 requires that the job token not be printed or persisted.
+        The repository validator checks only the permission map and three added
+        GH_TOKEN values, so the current tests do not detect either exposure.
+    requested_action: >-
+      Run every token-consuming PR validator from protected-base or otherwise
+      trusted code with the candidate checkout only as data, set
+      persist-credentials: false on all relevant checkouts, and add workflow
+      invariants that reject candidate-engine token execution and persisted
+      checkout credentials while retaining the exact read-only permission map.
+  - id: FIND-002
+    severity: medium
+    statement: >-
+      Authenticated GitHub API errors can still disclose GH_TOKEN through the
+      unsanitized request resource even though response fields are redacted.
+    evidence:
+      - >-
+        lib/verdify/git_repository.rb:282,294,410,412 interpolates path directly
+        into every authenticated failure form, outside
+        sanitize_github_diagnostic at lines 415-419.
+      - >-
+        An independent failure fixture invoked github_api_json with
+        GH_TOKEN=issue215-token-sentinel and a resource ending in
+        ?probe=issue215-token-sentinel. The raised CommandError contained the
+        sentinel verbatim and reported path_token_leaked=true.
+      - >-
+        The committed test at tests/test_sprint_terminal_receipt.rb:435-468
+        injects the token only into the JSON message. It proves arbitrary
+        response headers are omitted and a normal authenticated failure does
+        not call curl, but it cannot fail when the resource itself carries
+        sensitive material.
+    requested_action: >-
+      Sanitize or structurally normalize the resource before every authenticated
+      error interpolation, including CLI-unavailable and invalid-JSON branches,
+      and add a regression that places a sentinel token in the resource as well
+      as in the message, stderr, and arbitrary headers while asserting no curl
+      invocation.
+  - id: FIND-003
+    severity: medium
+    statement: >-
+      Malformed fractional check-run IDs are truncated to integers and can pass
+      highest-ID selection and trusted-check validation.
+    evidence:
+      - >-
+        lib/verdify/git_repository.rb:173-178 and
+        lib/verdify/sprint_terminal_receipt.rb:669-676 use Integer(value) as a
+        validity check. Ruby converts a Float such as 1.75 to 1 instead of
+        rejecting it.
+      - >-
+        An independent end-to-end loader fixture supplied all five required
+        checks with IDs 1.75 through 5.75, returned matching workflow metadata,
+        and produced all_fractional_ids_accepted=true with no trusted-check
+        errors.
+      - >-
+        tests/test_sprint_terminal_receipt.rb:368-395 covers duplicate integers
+        and a nonnumeric string only, so the current malformed-ID regression
+        does not exercise non-integral JSON numbers or other noncanonical IDs.
+    requested_action: >-
+      Require each check-run ID to have a canonical positive-integer type or
+      representation before selection and validation, and add loader-plus-
+      validator regressions for fractional and other noncanonical IDs while
+      retaining every matching check and performing no hydration on any invalid
+      or duplicate set.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: not_satisfied
+    evidence:
+      - >-
+        Both workflows declare exactly actions, checks, contents, and
+        pull-requests read permissions with no write scope, and the three added
+        validation-step GH_TOKEN entries are step-scoped. FIND-001 nevertheless
+        shows that delivery-policy hands the token to candidate code and that
+        checkout persists it, contradicting the trusted/no-persistence boundary.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        github_check_run_evidence filters to required names but returns every
+        matching check, selects only a uniquely ordered highest ID per name,
+        hydrates only selected checks, deduplicates shared run IDs, and fails
+        above five workflow-run reads per lane.
+      - >-
+        The focused highest-ID and shared-run tests passed. A live authenticated
+        PR 213 probe retained 11 matching checks, made five API reads including
+        four deduplicated workflow-run reads, and passed trusted-check
+        validation at head 4073b6748c608021681212e0602729ad72f8a08f.
+  - criterion_id: LANE-AC-03
+    assessment: not_satisfied
+    evidence:
+      - >-
+        Workflow path, event, head SHA, app, completion, success, and uniquely
+        highest-ID checks remain present and the committed duplicate/nonnumeric
+        tests pass, but FIND-003 demonstrates that fractional malformed IDs can
+        satisfy the same trusted-check path.
+  - criterion_id: LANE-AC-04
+    assessment: not_satisfied
+    evidence:
+      - >-
+        With GH_TOKEN present, ordinary command failure, CLI absence, and
+        invalid JSON do not fall back to curl; response diagnostics include only
+        allowlisted fields and arbitrary headers are omitted. FIND-002 shows the
+        unsanitized resource can still disclose the token, so the no-token-
+        exposure invariant is not complete.
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - >-
+        The no-token compatibility regression passed: gh failure falls back to
+        the existing bounded anonymous curl read, and failure of both paths
+        raises CommandError rather than accepting missing evidence.
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - >-
+        The six-receipt ledger regression passed with 12 pull-request, six
+        check-list, and 24 workflow-run reads for 42 total, below the declared
+        ceiling of 48. E-head GitHub Actions pull-request-policy and
+        delivery-policy checks passed with the job-token workflow environment,
+        and both local protected policy entrypoint suites passed.
+  - criterion_id: LANE-AC-07
+    assessment: not_satisfied
+    evidence:
+      - >-
+        Independent receipt, pull-request-policy, delivery-gate, repository,
+        manifest, gitleaks, changed-workflow actionlint, and full-suite checks
+        passed at E, but FIND-001 through FIND-003 require implementation changes
+        and this request_fixes report cannot produce an approving exact-S critic
+        gate.
+evidence_assessment:
+  - >-
+    The detached locked review worktree began at live PR evidence head E
+    72e7c72d835016151da70d997f9eea25051e9c5e. Critic agent
+    codex-issue215-critic and session
+    codex-issue215-critic-20260710t2152z differ from closeout worker
+    codex-issue215-worker and session
+    codex-issue215-worker-20260710t2134z.
+  - >-
+    D 749b23d94c1704525432427cf540b74bbda00525 is the direct child of
+    baseline fbe821899caf546e9b7b8daa718ea2ec74918091 and changes only the
+    approved sprint plan, wave release plan, and lane contract. Those artifacts
+    are byte-identical through E, and the independently computed contract
+    SHA-256 is 71b18893cf89eff0cd5b0db84253df0278996247707b8675a63e280e518da47b.
+  - >-
+    I 7dbcd20b0970a8edf5ab193c97c7038d39ea26eb changes only eight
+    contract-owned workflow, library, validator, test, and manifest paths. E
+    adds only the canonical closeout, whose independent SHA-256 is
+    b9390e9c7f25c2bdb4fea1e7d8e39dcf582b835200ae530725cd74a10987af27.
+  - >-
+    ruby tests/test_sprint_terminal_receipt.rb passed 27 runs and 108
+    assertions; bash tests/test_pr_policy.sh, bash tests/test_delivery_gate.sh,
+    ruby scripts/validate-repo.rb, make manifest-check, changed-workflow
+    actionlint, and the redacted three-commit gitleaks scan all passed.
+  - >-
+    make test passed at E: its Ruby suites reported 120 runs/649 assertions,
+    52 runs/129 assertions, and 27 runs/108 assertions with zero failures,
+    errors, or skips; all CLI, policy, delivery, release, package, install, and
+    packed-artifact suites completed successfully.
+  - >-
+    Whole-repository actionlint exits 1 only for inherited ShellCheck SC2012 at
+    .github/workflows/compliance-gate.yml:55. An independent git-archive run at
+    baseline fbe821899caf546e9b7b8daa718ea2ec74918091 reproduced the exact same
+    file, line, rule, and message, while both changed workflows lint cleanly.
+  - >-
+    At E, live validate, compliance, pull-request-policy, and delivery-policy
+    checks passed. The critic-gate failures are the expected pre-report state
+    because no canonical critic report existed at E.
+integration_risks:
+  - >-
+    PR 217 must not integrate while candidate-controlled code can receive or
+    recover the job token, while authenticated resource diagnostics can echo
+    token material, or while malformed fractional IDs can satisfy trusted check
+    identity.
+  - >-
+    A fix worker must create a new implementation and closeout chain, followed
+    by a fresh independent critic. This report-only S is durable request-fixes
+    evidence and is not an approval or merge authorization.
+residual_risks:
+  - >-
+    The job token is read-only, which limits but does not remove the impact of
+    exposing private repository contents, checks, workflow-run metadata, or
+    actions resources to candidate-controlled code during the job.
+  - >-
+    Whole-repository actionlint retains the approved baseline-only SC2012
+    exception; any new diagnostic in policy.yml or delivery-gate.yml remains
+    blocking.
+  - >-
+    A normal post-integration terminal receipt with green authenticated policy,
+    delivery, and critic checks remains required after a corrected lane merges.
+reviewed_at: "2026-07-10T22:02:05Z"
