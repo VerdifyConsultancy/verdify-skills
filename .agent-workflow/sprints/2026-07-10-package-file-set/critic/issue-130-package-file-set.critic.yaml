@@ -1,0 +1,73 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-package-file-set
+lane_id: issue-130-package-file-set
+pull_request: 166
+worker_agent: codex-subagent
+worker_session_id: local-issue-130-package-file-set
+critic_agent: codex-independent-critic
+implementation_head_sha: "d6c7834655bc27f30ce2f914b768c6cd3c3af585"
+evidence_head_sha: "a3c81f786d4c0c41db612fd315c3e8184e97b14d"
+reviewed_head_sha: "a3c81f786d4c0c41db612fd315c3e8184e97b14d"
+closeout_path: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
+closeout_sha256: "b629e0709084fd37863358306aa39f8edb40d19a31c7f77ef36940e677644457"
+critic_session_id: critic-issue-130-package-file-set
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-package-file-set/critic-issue-130-package-file-set
+outcome: request_fixes
+findings:
+  - id: FIND-001
+    severity: high
+    statement: The Git-index allowlist can still copy host-external bytes because staging follows an untracked symlink inserted at an ancestor of a tracked regular-file path.
+    evidence:
+      - scripts/package-file-list.rb:78-90 joins each tracked path to the worktree, checks only the leaf with File.lstat, and then calls FileUtils.copy_file; File.lstat and copy_file follow symlinks in parent components.
+      - An independent isolated probe at reviewed head E committed tracked/value.txt, replaced the tracked directory with an untracked symlink to an external directory, and ran the selector with --stage. The selector still emitted tracked/value.txt and the staged file contained the external marker HOST SECRET BYTES.
+      - Git reported the probe source as a deleted tracked file plus an untracked tracked-directory symlink, proving the copied bytes came through host-local worktree state rather than a tracked symlink or index object.
+      - tests/test_package_file_set.sh:32-87 checks one tracked discovery symlink at its leaf but does not replace a tracked directory with an untracked symlink, so the focused regression and full suite both pass despite this exposure path.
+    requested_action: Reject any selected path whose ancestor below the repository root is a symlink or otherwise escapes the root, add a regression that proves staging and archive generation fail closed for an untracked parent symlink, and rebuild the I/E evidence chain.
+  - id: FIND-002
+    severity: medium
+    statement: Staged regular-file permissions come from mutable worktree metadata instead of the validated Git index mode, so an unchanged tracked file can produce host-dependent archive metadata.
+    evidence:
+      - scripts/package-file-list.rb:51-67 reads and validates the index mode, but scripts/package-file-list.rb:90-91 copies the worktree file with metadata and chmods the target to stat.mode masked with 07777 instead of applying the index mode 0644 or 0755.
+      - An independent isolated probe committed tool.sh as index mode 100644, changed only its local mode to 0755, and staged it twice. The staged copies had identical SHA-256 content but modes 0644 and 0755 respectively while the index remained 100644.
+      - MANIFEST.sha256 hashes file bytes only, and tests/test_package_file_set.sh:14-30 stages current worktree metadata before creating its fixture index, so neither manifest-check nor the focused regression detects source/index mode drift.
+    requested_action: Enforce or normalize regular-file permissions from the Git index mode, reject unsupported or mismatched worktree types without preserving setuid, setgid, sticky, or host-only mode bits, and add an archive-mode regression before rebuilding I/E.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - scripts/gen-manifest.sh and scripts/package.sh both consume scripts/package-file-list.rb, and the focused regression proves clean selected regular paths, manifest paths, and archive paths agree.
+      - The selector excludes the approved roots and MANIFEST.sha256 from the Git-index path set; the implementation changes no package version, publish workflow, or prohibited path.
+  - criterion_id: LANE-AC-02
+    assessment: not_satisfied
+    evidence:
+      - The committed ignored-file fixtures leave clean selector and manifest outputs unchanged, but the independent untracked-parent-symlink probe changes staged bytes by reading an external host path while the selected tracked path remains the same.
+      - The independent mode probe also changes staged archive metadata without any content or index-mode change, so archive output is not independent of mutable host worktree state.
+  - criterion_id: LANE-AC-03
+    assessment: not_satisfied
+    evidence:
+      - Clean package extraction preserves .agents/skills/project-router as a symlink with its relative target, and verify-package checks the complete host-link set.
+      - The independent parent-symlink probe nevertheless dereferences host-local topology for an intended tracked regular file, so the implementation does not establish the contract's no-host-target-dereference boundary.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - ruby scripts/validate-repo.rb passed independently at E with 26 skills and 46 schemas; bash tests/test_package_file_set.sh passed independently.
+      - make test passed independently at E with 90 runs, 531 assertions, zero failures, errors, or skips, followed by passing CLI, PR-policy, release-preflight, and npm-install tests.
+      - Required validate, pull-request-policy, and compliance checks succeeded at I and E; the first E policy run failed only on stale PR exact-head metadata and was superseded by a successful rerun after metadata correction.
+      - The deterministic checks do not cover FIND-001 or FIND-002, so their passing status does not satisfy LANE-AC-02 or LANE-AC-03.
+evidence_assessment:
+  - The detached critic worktree, active critic lease, local lane ref, remote lane ref, and live PR head all matched E before report creation; codex-independent-critic and critic-issue-130-package-file-set differ from the committed worker identity and session.
+  - Dispatch D b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the first post-baseline commit and adds only the approved sprint plan, wave release plan, and lane contract; their SHA-256 values are unchanged through E.
+  - Implementation I d6c7834655bc27f30ce2f914b768c6cd3c3af585 changes only seven contract-owned paths, and E adds only the canonical closeout after I.
+  - The independently computed closeout SHA-256 is b629e0709084fd37863358306aa39f8edb40d19a31c7f77ef36940e677644457, and the closeout contract hash matches the immutable lane contract.
+  - Worker validation provenance and live I/E GitHub checks are revision-bound and credible, but the acceptance narrative overstates host-contamination resistance because the passing regressions omit unsafe ancestor topology and index/worktree mode drift.
+integration_risks:
+  - A local package or release run from a contaminated checkout can stage bytes reached through an untracked parent symlink, including external host data, under an allowed tracked archive path.
+  - Local permission drift can change executable or other Unix mode metadata in the archive while content hashes and the current tests remain unchanged.
+  - This request-fixes report must remain draft and must not receive an advancing approval; fixes require a new substantive implementation head, closeout-only evidence head, fresh critic report, and exact-head required checks.
+residual_risks:
+  - The exported-tree two-argument manifest compatibility path intentionally lacks a Git index and therefore retains exclusion-list semantics for already-exported input; it should remain explicitly bounded and should not become the release archive source.
+  - No npm publication, GitHub release, dev integration, runtime deployment, or deployment verification was performed in this lane or critic session.
+  - A future approving report head will still require an APPROVED review from a repository admin or maintainer other than PR author jvallery; this critic is not that external approval authority.
+reviewed_at: "2026-07-10T03:49:28Z"
