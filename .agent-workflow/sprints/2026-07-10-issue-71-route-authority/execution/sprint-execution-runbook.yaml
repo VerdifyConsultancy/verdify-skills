@@ -70,7 +70,7 @@ lanes:
     executor: codex-subagent
     model:
     effort:
-    status: active
+    status: complete
   prompt:
     prompt_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/prompts/issue-71-route-authority-validation.worker.md"
     manifest_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/prompts/issue-71-route-authority-validation.worker.manifest.json"
@@ -79,7 +79,7 @@ lanes:
     tmux_session:
     browser_terminal_url:
     operator_attach_required: false
-  status: dispatched
+  status: ready_for_critic
 coordination:
   poll_steps:
   - Refresh GitHub, lease, session, PR, check, and deployment state.
@@ -115,7 +115,10 @@ ci_cd:
     a review or merge the controller evidence branch.
   deployment_trigger: Trigger review deployment only from approved release plan and
     authorized environment policy.
-  evidence_refs: []
+  evidence_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/221
+  - git:154e3bbd717f93b422343e97b98b7a24beda64d1
+  - git:37d0c903b9d014d6643ed78f2071e8cafca99e01
 deployment:
   target_environment: repository-control-plane
   namespace:

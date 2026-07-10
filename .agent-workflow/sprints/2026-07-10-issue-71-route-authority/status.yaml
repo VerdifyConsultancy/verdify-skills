@@ -3,8 +3,8 @@ schema_ref: status.schema.yaml
 kind: SprintStatus
 schema_version: '1.0'
 sprint_id: 2026-07-10-issue-71-route-authority
-state: READY
-updated_at: '2026-07-10T23:22:14Z'
-active_lanes: []
+state: VALIDATING
+updated_at: '2026-07-10T23:55:30Z'
+active_lanes: [issue-71-route-authority-validation]
 blockers: []
-next_action: Dispatch the single approved issue-71-route-authority-validation lane from protected dev baseline af3e6b7e7b23b600e62c1aedf042ab9a5d244deb.
+next_action: Fresh critic reviews exact evidence head 37d0c903b9d014d6643ed78f2071e8cafca99e01 and appends only the canonical report as S.
