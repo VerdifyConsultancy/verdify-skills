@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-07-10T05:12:24Z'
+updated_at: '2026-07-10T14:12:32Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1769,3 +1769,54 @@ evidence:
   - Supports the trusted publication, minimal skill graph, four-pilot contract, governed
     connector, current Gravity, and lifecycle-coherence requirements in iteration
     25.
+- id: NSE-20260710-autonomous-development-platform-best-practices
+  reference: northstar://evidence/NSE-20260710-autonomous-development-platform-best-practices
+  title: Autonomous development platform best practices
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-07-10T13:20:29Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260710-autonomous-development-platform-best-practices.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260710-autonomous-development-platform-best-practices-2026-07-10-autonomous-development-platform-best"
+  source_uri: repo://.agent-workflow/northstar/research-inbox/2026-07-10-autonomous-development-platform-best-practices.md
+  source_sha256: 9e8ae8b3b65c12d05e5f6823da92b2f19dd57ebb94ce5b40cce0fa9e438479c5
+  summary: Primary-source observations about long-running agent harnesses, workflow/agent
+    tradeoffs, durable execution, evaluation, risk-sensitive oversight, authorization,
+    telemetry, and provenance; Verdify-specific architecture choices are recorded
+    separately as planning relevance.
+  tags:
+  - agent-evals
+  - agent-security
+  - autonomous-development
+  - brave-search
+  - durable-execution
+  - four-project-pilot
+  claims:
+  - Anthropic distinguishes predefined workflows from model-directed agents and recommends
+    using the simplest agentic pattern that fits the task.
+  - Long-running-agent harness guidance uses incremental tasks, durable requirements
+    and progress records, clean Git checkpoints, and end-to-end verification across
+    sessions.
+  - Durable workflow execution uses persisted event history, replay, worker separation,
+    retries, timers, and visibility to recover after failures.
+  - Agent evaluation guidance combines outcome grading, trace inspection, repeatable
+    datasets, pre-deployment evaluations, production monitoring, and calibrated human
+    review.
+  - Effective autonomy oversight emphasizes risk-sensitive autonomy, trustworthy visibility,
+    uncertainty-aware stops, and simple human interruption.
+  - Secure MCP integrations should reject token passthrough, validate token audience,
+    enforce server-side authorization, minimize scopes, preserve identity boundaries,
+    and correlate authorization events.
+  - Portable GenAI telemetry conventions cover agents, model calls, events, metrics,
+    and MCP operations; SLSA provenance links artifacts to sources and build processes.
+  planning_relevance:
+  - 'Supports issue #116 and the iteration-25 four-project root-planner execution
+    strategy.'
+  - Verdify infers that a deterministic durable lifecycle spine with bounded model
+    workers fits its approved architecture; the cited sources do not prescribe that
+    product-specific design.
+  - Verdify proposes versioned operation contracts, idempotency, and typed failures
+    as local interface requirements derived from broader interoperability and security
+    guidance.
+  - Verdify proposes one integrated four-project vertical slice before broader rollout;
+    the cited sources support incremental, measured expansion but do not identify
+    Verdify's projects or sequence.
