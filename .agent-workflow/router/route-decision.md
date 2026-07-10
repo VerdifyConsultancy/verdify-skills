@@ -1,10 +1,10 @@
 # Route decision
 
-- Current state: `GATE_STATE_UNCOMMITTED`
+- Current state: `SPRINT_TRANSACTION_AMBIGUOUS`
 - Next skill: `project-router`
 - Next mode: `route`
 
-Durable gate state must be committed, present, and schema-valid before routing.
+Multiple committed sprint transactions are active; rerun route with --sprint ID.
 
 ## Missing artifacts
 

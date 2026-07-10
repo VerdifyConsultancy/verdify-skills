@@ -1,0 +1,42 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260710-autonomous-development-platform-best-practices
+reference: northstar://evidence/NSE-20260710-autonomous-development-platform-best-practices
+title: Autonomous development platform best practices
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-07-10T13:20:29Z'
+source:
+  uri: repo://.agent-workflow/northstar/research-inbox/2026-07-10-autonomous-development-platform-best-practices.md
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-07-10-autonomous-development-platform-best-practices.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260710-autonomous-development-platform-best-practices-2026-07-10-autonomous-development-platform-best"
+  sha256: 2dc098ac7fd07a7717cf9716cbef82c6a329e49d17dad04144b8844accc87f00
+summary: Brave-discovered and primary-source-verified guidance for a durable, governed
+  four-project outer and inner loop.
+tags:
+- agent-evals
+- agent-security
+- autonomous-development
+- brave-search
+- durable-execution
+- four-project-pilot
+claims:
+- Reliable long-running agents need incremental tasks, durable progress, authoritative
+  reconstruction, clean checkpoints, and end-to-end verification.
+- A deterministic workflow spine plus bounded agent workers is a stronger fit than
+  either a free-running root model or a fully hardcoded workflow.
+- Agent quality requires outcome and trace evaluation, production monitoring, and
+  periodic human calibration; schema validity alone is insufficient.
+- Autonomy should be risk-proportional and intervention-ready rather than gated by
+  per-action approval or enabled by universal auto-approval.
+- Cross-project tools require versioned capability, identity, authorization, least-privilege
+  scope, telemetry, and typed failure contracts.
+- The first safe scale milestone is one fully verified four-project vertical slice,
+  followed by fleet and customer rollout through the same contract.
+planning_relevance:
+- 'Supports issue #116 and the iteration-25 four-project root-planner execution strategy.'
+limitations:
+- Provider guidance is not a framework mandate; the durable-execution technology choice
+  still requires a local recovery spike.
