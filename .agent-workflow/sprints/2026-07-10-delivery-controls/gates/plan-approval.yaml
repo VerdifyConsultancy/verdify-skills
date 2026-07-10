@@ -1,0 +1,21 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: plan-approval-2026-07-10-delivery-controls
+sprint_id: 2026-07-10-delivery-controls
+lane_id: null
+type: plan_approval
+status: approved
+question: Approve the one-issue delivery-control sprint, bootstrap and steady-state phases, code/live authority split, risks, review milestones, and release hold?
+owner: Jason Vallery
+evidence_required:
+  - Approved current state of union at dev baseline 91828dd.
+  - "Live issue #121 acceptance intent and bootstrap-constraint comment."
+  - "Live main and dev protection, CODEOWNERS, workflow permission, npm environment, and PR #189 evidence."
+  - Sprint plan, lane map, contract, wave plan, validation commands, and rollback controls.
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: Jason authorized autonomous completion and PR administration. The plan preserves real release approval, isolates worker code from controller live mutation, and keeps PR #189 unmerged until verified controls exist.
+opened_at: "2026-07-10T09:38:46Z"
+resolved_at: "2026-07-10T09:38:46Z"
+resume_state: READY
