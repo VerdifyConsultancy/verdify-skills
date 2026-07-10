@@ -1,0 +1,106 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-recovery
+lane_id: issue-200-relative-tarball
+title: Normalize relative release candidate tarball paths
+status: approved
+issue_ids: [200]
+coupling_justification: null
+objective: Ensure npm consumer validation treats an existing relative candidate tarball as the exact local file rather than a Git package spec.
+desired_outcome: Relative and absolute candidate tarball paths pass the exact consumer matrix without Git transport, while missing or corrupt candidates fail closed.
+non_goals:
+  - Change package version, contents, release workflow, provenance, binding, transaction, or rollback behavior.
+  - Mutate main, npm, tags, releases, branch protection, credentials, or retained artifacts from the worker.
+baseline_sha: "a6ebbfae1c54950bbe3a51828e50db36095a3d2e"
+branch: lane/200-relative-tarball
+module_contracts: [release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 8
+  critic_ttl_hours: 4
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [release-package, quality-enablement]
+  owned_paths:
+    - MANIFEST.sha256
+    - tests/test_npm_install.sh
+  prohibited_paths:
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+    - .github/**
+    - scripts/build-release-candidate.sh
+    - scripts/release-transaction.rb
+    - scripts/release-preflight.rb
+    - schemas/**
+    - skills/**
+    - packs/**
+  coordination_required_paths: []
+  owned_interfaces:
+    - Candidate tarball filesystem path passed to npm install in the consumer test.
+dependencies:
+  hard:
+    - lane_id: issue-121-delivery-controls
+      required_output: Protected dev/main controls live and first 1.3.0 release attempt safely stopped before immutable mutation.
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: A repository-relative supplied tarball path is canonicalized to the existing local file before npm install and never interpreted as Git shorthand.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [relative-path regression, no Git transport error, exact installed version]
+  - id: LANE-AC-02
+    statement: Absolute supplied paths remain supported and missing or corrupt candidates fail closed through existing verification.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [absolute-path regression, missing rejection, corrupt rejection]
+  - id: LANE-AC-03
+    statement: Exact artifact, upgrade, transaction, and repository regressions pass at the implementation head with no release mutation.
+    sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
+    evidence_required: [npm install suite, packed artifact suite, make test, gitleaks, clean worktree]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate repository and manifest shape.
+    required: true
+  - id: npm-install-suite
+    command: bash tests/test_npm_install.sh
+    purpose: Exercise exact candidate install, upgrade, collision, and rollback behavior.
+    required: true
+  - id: packed-artifact-suite
+    command: bash tests/test_packed_artifact.sh
+    purpose: Exercise the workflow-equivalent relative candidate consumer path and exact artifact matrix.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run every repository, package, delivery, and release regression.
+    required: true
+  - id: secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="a6ebbfae1c54950bbe3a51828e50db36095a3d2e..HEAD"
+    purpose: Scan every lane commit.
+    required: true
+required_evidence:
+  - Exact failed run and root-cause reproduction.
+  - Relative and absolute candidate path results with exact installed version.
+  - Full packed artifact and repository test results at I.
+  - Closeout-only E and fresh report-only S with current GitHub checks.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The fix requires changing workflow, package contents, version, provenance, release transaction, or any prohibited path.
+  - Any npm, tag, release, or retained artifact authority appears before controller recovery.
+definition_of_done:
+  - D contains only the approved sprint plan, wave plan, and lane contract.
+  - I changes only the npm consumer path and manifest, with all required validation green.
+  - E adds only the canonical closeout and a fresh critic commits only S.
+  - Exact S passes protected dev checks before integration.
+  - ROOT separately repromotes, approves, publishes, verifies, and records the recovered release.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T11:22:00Z"

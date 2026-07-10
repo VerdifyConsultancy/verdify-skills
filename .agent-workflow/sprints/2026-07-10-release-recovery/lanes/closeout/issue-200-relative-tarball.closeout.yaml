@@ -1,0 +1,102 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-release-recovery
+lane_id: issue-200-relative-tarball
+status: ready_for_critic
+issue_ids: [200]
+pull_request: 201
+baseline_sha: "a6ebbfae1c54950bbe3a51828e50db36095a3d2e"
+implementation_head_sha: "97b102a78ac8e675300791c8e759136432a1be2c"
+validated_head_sha: "97b102a78ac8e675300791c8e759136432a1be2c"
+contract_hash: "16f8eb5fc4137d4ab4b1d476da93053b61d340fa95cb13dbd9a3412aefb454d9"
+changed_paths:
+  - MANIFEST.sha256
+  - tests/test_npm_install.sh
+validation_results:
+  - id: root-cause-reproduction
+    command: "expected-failure harness: npm install --ignore-scripts --no-audit --no-fund --prefix <temp>/tool dist/verdify-cli-cli-1.3.0.tgz; assert exit 128 and Git remote interpretation"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:27:38Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/root-cause-reproduction.err
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:29:45Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/repository-validation.log
+  - id: npm-install-suite
+    command: bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:28:46Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/focused-relative-npm-install.log
+  - id: npm-install-absolute-supplied
+    command: VERDIFY_TARBALL=<absolute-candidate> VERDIFY_SIDECAR=<absolute-sidecar> bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:30:30Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/npm-install-absolute-supplied.log
+  - id: npm-install-relative-supplied
+    command: VERDIFY_TARBALL=dist/issue-200-validation/verdify-cli-cli-1.3.0.tgz VERDIFY_SIDECAR=dist/issue-200-validation/verdify-cli-cli-1.3.0.tgz.release-candidate.json bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:30:30Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/npm-install-relative-supplied.log
+  - id: missing-candidate-rejection
+    command: "expected-failure harness: VERDIFY_TARBALL=dist/issue-200-validation/missing.tgz bash tests/test_npm_install.sh; assert missing-file rejection"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:30:54Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/missing-rejection.log
+  - id: corrupt-candidate-rejection
+    command: "expected-failure harness: VERDIFY_TARBALL=dist/issue-200-validation/corrupt/verdify-cli-cli-1.3.0.tgz VERDIFY_SIDECAR=dist/issue-200-validation/verdify-cli-cli-1.3.0.tgz.release-candidate.json bash tests/test_npm_install.sh; assert SHA-256 rejection before npm"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:31:15Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/corrupt-rejection.log
+  - id: packed-artifact-suite
+    command: VERDIFY_TARBALL=dist/issue-200-validation/verdify-cli-cli-1.3.0.tgz VERDIFY_SIDECAR=dist/issue-200-validation/verdify-cli-cli-1.3.0.tgz.release-candidate.json VERDIFY_ARCHIVE=dist/issue-200-validation/verdify-lifecycle-skills-v1.3.0.zip bash tests/test_packed_artifact.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:31:32Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/packed-artifact-workflow-relative.log
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:33:50Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/make-test.log
+  - id: secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="a6ebbfae1c54950bbe3a51828e50db36095a3d2e..HEAD"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:29:44Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/gitleaks-I.log
+  - id: publish-workflow-actionlint
+    command: actionlint .github/workflows/publish-npm.yml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T11:29:58Z"
+    artifact: /tmp/issue-200-relative-tarball-evidence/actionlint-publish-workflow.log
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [root-cause-reproduction, npm-install-suite, npm-install-relative-supplied]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [npm-install-absolute-supplied, missing-candidate-rejection, corrupt-candidate-rejection]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [repository-validation, npm-install-suite, packed-artifact-suite, full-suite, secret-scan]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Fresh independent critic report and the critic-gate remain pending by design at evidence head E.
+worktree_clean: true
+worker_agent: codex-release-recovery
+worker_session_id: worker-200-relative-tarball-20260710t1125z
+completed_at: "2026-07-10T11:35:00Z"
+limitations:
+  - No npm publish, tag, release, workflow, branch-protection, or retained-artifact mutation was performed.
+  - Repository-wide actionlint reports pre-existing SC2012 in unchanged compliance-gate.yml; the affected publish workflow and GitHub compliance check pass.
