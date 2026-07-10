@@ -1,0 +1,162 @@
+---
+schema_ref: sprint-execution-runbook.schema.yaml
+kind: SprintExecutionRunbook
+schema_version: '1.0'
+runbook_id: exec-2026-07-10-issue-71-route-authority
+status: ready
+sprint_id: 2026-07-10-issue-71-route-authority
+wave_id: wave-2026-07-10-issue-71-route-authority
+repository: VerdifyConsultancy/verdify-skills
+prepared_at: '2026-07-10T23:26:52Z'
+controller:
+  session_id: codex-root-issue71-controller-20260710t2322z
+  owner: root
+  authority: Coordinate one isolated local subagent worktree, answer delegated lane
+    questions, reconcile CI/CD, and stop at protected gates.
+  interfaces:
+  - other
+  - github
+  - ci
+  - gitops
+  - telemetry
+  poll_interval_minutes: 2
+  delegation_policy: Full delegated authority inside approved lane contracts; protected
+    decisions remain gated.
+prerequisites:
+  approved_sprint_plan: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/sprint-plan.yaml"
+  approved_lane_contracts:
+  - ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml"
+  wave_release_plan: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/release/wave-release-plan.yaml"
+  platform_readiness: ".agent-workflow/platform/platform-readiness.yaml"
+  open_blockers: []
+platform:
+  mcp_server:
+  api_ref: subagent-worktree local lease
+  auth_mode: local_operator
+  required_tools:
+  - name: subagent-worktree
+    purpose: Dispatch one approved lane worker through an isolated local lease and worktree
+      while Agent Platform Stage 0 stops remain open.
+    required: true
+  terminal_access:
+    mode: none
+    operator_visible: false
+    attach_refs: []
+  fallback_policy: Local dispatch is explicitly approved by the plan gate and issue 71
+    dispatch comment; it is limited to this one repository lane and grants no Agent Platform
+    or four-project fan-out authority.
+cadence:
+  poll_interval_minutes: 2
+  heartbeat_timeout_minutes: 15
+  loop_until:
+  - Every required lane has a separate approved dispatch D, implementation I, and
+    closeout-only evidence head E.
+  - A distinct critic agent/session commits only its report as S, required checks
+    succeed, and the declared exact-head protected-path integration decision is recorded.
+  - The evidence-only controller branch has packet-only commit P with exact lane S
+    heads, CI, deployment, telemetry, rollback, and questions.
+  - Deployment verification and outcome review are ready for the next role.
+lanes:
+- lane_id: issue-71-route-authority-validation
+  issue_ids:
+  - 71
+  contract_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml"
+  branch: lane/71-route-authority-validation
+  owner: codex-issue71-worker
+  dependency_state: ready
+  platform_session:
+    create_operation_ref: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/gates/local-subagent-dispatch.yaml"
+    session_id: codex-issue71-worker-20260710t2327z
+    executor: codex-subagent
+    model:
+    effort:
+    status: requested
+  prompt:
+    prompt_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/prompts/issue-71-route-authority-validation.worker.md"
+    manifest_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/prompts/issue-71-route-authority-validation.worker.manifest.json"
+    contract_hash: 712b88c45db87e0ce3c16561925c0bd4c3fd318bd6e1d9cd932d5c670a80d27a
+  terminal:
+    tmux_session:
+    browser_terminal_url:
+    operator_attach_required: false
+  status: planned
+coordination:
+  poll_steps:
+  - Refresh GitHub, lease, session, PR, check, and deployment state.
+  - Observe lane progress through GitHub, PR checks, leases, closeout artifacts, and
+    recorded Agent Platform result refs.
+  - Capture questions, blockers, closeout, and coordination requests from durable
+    lane evidence.
+  - Answer delegated questions or open gates for protected decisions.
+  - Record controller and session-ledger events, then update sprint status.
+  controller_responses:
+  - Answer contract-scoped worker questions.
+  - Dispatch only dependency-ready lanes with no active worker lease or recorded worktree-agent
+    result.
+  - Route scope changes to sprint-planning or architecture-contracts.
+  - Route closeout E to a distinct critic agent/session, then route externally approved
+    S heads to the packet-only review-inbox commit P.
+  coordination_request_policy: Resolve only within approved lane contracts and delegation;
+    route protected changes to gates.
+  escalation_paths: []
+ci_cd:
+  required_checks:
+  - validate
+  - pull-request-policy
+  - compliance / compliance
+  - critic-gate
+  workflows:
+  - validate
+  - policy
+  - delivery-gate
+  - compliance-selftest
+  merge_policy: Merge each lane PR only after a valid D/I/E/S chain, fresh critic approval
+    on S, packet P, required checks, and the declared protected-path decision; never fabricate
+    a review or merge the controller evidence branch.
+  deployment_trigger: Trigger review deployment only from approved release plan and
+    authorized environment policy.
+  evidence_refs: []
+deployment:
+  target_environment: repository-control-plane
+  namespace:
+  strategy: manual
+  approval_required: false
+  rollout_refs:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - ".agent-workflow/.gitignore"
+  rollback_refs:
+  - validate repository
+  - run focused route tests
+  - run installed-package tests
+  - verify branch protection
+  - rerun project-router
+review:
+  review_packet_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/review/review-inbox-packet.yaml"
+  human_review_trigger: Packet-only commit P is complete on the evidence-only controller
+    branch with the lane PR's exact S head, fresh criticism, checks, protected-path
+    decision, rollback, and open questions.
+  reviewer_visibility: []
+ledger:
+  controller_state_path: ".agent-workflow/controller/controller-state.yaml"
+  session_ledger_path: ".agent-workflow/controller/session-ledger.yaml"
+  required_events:
+  - lane_dispatched
+  - prompt_compiled
+  - worker_status
+  - worker_closeout
+  - critic_reviewed
+  - review_packet_created
+  - ci_observed
+  - deployment_observed
+stop_conditions:
+- The local lane lease, worktree, branch, prompt, or subagent identity is missing or conflicts.
+- A lane session, issue, branch, PR, lease, or contract identity conflicts.
+- A worker asks for protected production, schema, security, migration, or destructive
+  authority.
+- Required CI/CD, review, deployment, telemetry, or rollback evidence cannot be obtained.
+handoff:
+  next_skill: subagent-worktree
+  next_mode: local-dispatch
+  reason: Dispatch the single dependency-ready lane through the approved isolated local
+    fallback and supervise execution from GitHub, leases, and durable evidence.

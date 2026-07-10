@@ -1,0 +1,23 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: local-subagent-dispatch-2026-07-10-issue-71-route-authority
+sprint_id: 2026-07-10-issue-71-route-authority
+lane_id: issue-71-route-authority-validation
+type: policy_exception
+status: approved
+question: Allow one isolated local Codex subagent lane while Agent Platform Stage 0 security stops prohibit platform fan-out?
+owner: Jason Vallery
+evidence_required:
+- active autonomous platform goal naming issue 71 next
+- explicit user delegation for autonomous work and self-managed approvals
+- open Agents Stage 0 stops 2884, 2887, and 2906
+- approved one-issue sprint plan and lane contract
+- no active issue-71 lane lease or pull request
+allowed_decisions: [approve, reject]
+decision: approve
+rationale: A local leased worktree preserves one-issue and one-session isolation without exercising the blocked Agent Platform. The exception is limited to this lane, requires one fresh critic and exact-head CI, and grants no cross-project or runtime authority.
+opened_at: '2026-07-10T23:26:54Z'
+resolved_at: '2026-07-10T23:26:54Z'
+resume_state: READY

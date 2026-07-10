@@ -1,0 +1,25 @@
+{
+  "schema_ref": "github-reconciliation.schema.yaml",
+  "kind": "GitHubReconciliation",
+  "schema_version": "1.0",
+  "sprint_id": "2026-07-10-issue-71-route-authority",
+  "repository": "VerdifyConsultancy/verdify-skills",
+  "snapshot_captured_at": "2026-07-10T23:26:54Z",
+  "reconciled_at": "2026-07-10T23:26:54Z",
+  "lanes": [
+    {
+      "lane_id": "issue-71-route-authority-validation",
+      "contract": ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml",
+      "issue_ids": [
+        71
+      ],
+      "branch": "lane/71-route-authority-validation",
+      "pull_requests": []
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "issue-71-route-authority-validation: no pull request found for branch lane/71-route-authority-validation"
+  ],
+  "ok": true
+}
