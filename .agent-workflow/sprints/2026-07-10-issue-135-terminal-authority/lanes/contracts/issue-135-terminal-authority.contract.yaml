@@ -1,0 +1,187 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-issue-135-terminal-authority
+lane_id: issue-135-terminal-authority
+title: Protected-dev sprint terminal receipts and lightweight closeout
+status: approved
+issue_ids: [135]
+coupling_justification: null
+objective: Replace stale active sprint state with a typed protected-dev receipt and block later implementation until deterministic closeout lands, without stacking routine reviews or human gates.
+desired_outcome: Completed work becomes terminal through an automatically generated receipt-only PR on dev; project-router is truthful, the next lane cannot outrun closeout, and humans are asked only for protected decisions.
+non_goals:
+  - Use controller branches, tags, custom statuses, rulesets, or workflow URLs as final terminal authority.
+  - Merge controller evidence or mix receipt and implementation changes.
+  - Require another lane, critic, or human approval for a deterministic receipt PR.
+  - Implement the general issue-70 change-class/autonomy-policy schema.
+  - Change VERSION, package publication, npm, main, credentials, or application runtime.
+baseline_sha: "1cd75f4556d88d2ddbfaf70e719d1380e962f51c"
+branch: lane/135-terminal-authority
+module_contracts: [governance-routing, execution-control, lane-assurance, release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [lifecycle-routing, sprint-terminal-receipt, receipt-pr-policy, controller-closeout, automated-authority]
+  owned_paths:
+    - COMMON_OPERATING_CONTRACT.md
+    - MANIFEST.sha256
+    - Makefile
+    - config/authority-matrix.yaml
+    - docs/decisions/ADR-0017-lane-review-evidence-chain.md
+    - docs/lifecycle.md
+    - lib/verdify.rb
+    - lib/verdify/cli.rb
+    - lib/verdify/git_repository.rb
+    - lib/verdify/sprint_terminal_receipt.rb
+    - schemas/sprint-terminal-receipt.schema.yaml
+    - scripts/delivery-gate.rb
+    - scripts/pr-policy.rb
+    - scripts/validate-repo.rb
+    - skills/controller-loop/SKILL.md
+    - skills/project-router/SKILL.md
+    - skills/release-verification/**
+    - tests/test_cli.sh
+    - tests/test_delivery_gate.sh
+    - tests/test_lane_review_validator.rb
+    - tests/test_pr_policy.sh
+    - tests/test_sprint_terminal_receipt.rb
+  prohibited_paths:
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+    - .github/workflows/**
+    - config/github-delivery-controls.yaml
+    - scripts/github-delivery-controls.rb
+    - scripts/release-transaction.rb
+    - schemas/release-transaction.schema.yaml
+    - .agent-workflow/northstar/**
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/strategy/**
+    - .agent-workflow/sprints/2026-07-10-release-recovery/**
+    - .agent-workflow/sprints/2026-07-10-publish-path-recovery/**
+    - .agent-workflow/sprints/2026-07-10-npm-oidc-recovery/**
+    - .agent-workflow/sprints/2026-07-10-delivery-controls/**
+    - .agent-workflow/sprints/2026-07-10-autonomous-platform-strategy/**
+  coordination_required_paths:
+    - tests/test_packed_artifact.sh
+    - .github/CODEOWNERS
+    - schemas/manifest.json
+  owned_interfaces:
+    - SprintTerminalReceipt schema and generator.
+    - Terminal receipt PR marker, path policy, and protected-base gate.
+    - Integrated-but-unterminated next-merge blocker.
+    - Project-router terminal selection from accepted dev.
+    - Controller-loop automatic receipt open/monitor/merge handoff.
+dependencies:
+  hard:
+    - lane_id: issue-211-autonomous-platform-strategy
+      required_output: PR 212 merged to dev and issue 135 recurrence recorded.
+  soft:
+    - lane_id: issue-70-risk-policy
+      coordination: Issue 70 owns the general change_class, risk envelope, and human-gate minimization schema beyond this receipt path.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: The authority matrix, ADR, schema, and skills define the protected dev SprintTerminalReceipt as the sole post-cutover terminal authority.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [schema validation, authority docs, no tag/status authority path]
+  - id: LANE-AC-02
+    statement: Receipt generation reuses trusted P/R/O and lane-review semantics and rejects rejected/blocked/wrong-scope P, invalid R/O, stale or unmerged PRs, ambiguous checks, and ancestry mismatch.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [shared validator tests, critic adversarial reproductions converted to regressions]
+  - id: LANE-AC-03
+    statement: A normal receipt PR has an exact marker and branch shape, changes only one sprint's receipt/release/outcome/plan/status paths, and passes a protected-base machine gate without D/I/E/S or human review.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [receipt PR fixtures, mixed-path rejection, protected-base delivery-gate tests]
+  - id: LANE-AC-04
+    statement: Protected-base policy blocks ordinary dev implementation PRs when the base contains integrated but unterminated work and permits only the exact matching receipt repair.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [base-state matrix, active concurrency case, receipt exception case]
+  - id: LANE-AC-05
+    statement: Router terminal selection requires a valid receipt for post-cutover sprints, validates local plan/status/R/O/receipt agreement, and remains true after later dev commits.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [global route tests, forged/backfill rejection, integrated ancestry]
+  - id: LANE-AC-06
+    statement: Controller-loop and release-verification automatically generate, open, monitor, and auto-merge receipt PRs; one implementation critic is sufficient and deterministic receipts add no review/human gate.
+    sprint_acceptance_ids: [SPR-AC-03, SPR-AC-06]
+    evidence_required: [skill contract, CLI output/runbook, no extra critic path]
+  - id: LANE-AC-07
+    statement: Human gates are reserved for protected decisions outside a recorded preauthorization envelope; routine success advances and typed evidence/policy failures stop.
+    sprint_acceptance_ids: [SPR-AC-06]
+    evidence_required: [COMMON contract and skill wording, issue 70 handoff]
+  - id: LANE-AC-08
+    statement: A recovery mode is bound to the six exact stale/self sprint IDs and accepted base, while future normal receipts enforce one sprint per PR.
+    sprint_acceptance_ids: [SPR-AC-07]
+    evidence_required: [bounded recovery fixture, unlisted sprint rejection]
+  - id: LANE-AC-09
+    statement: Exact implementation and report heads pass focused, full, security, manifest, policy, and GitHub gates.
+    sprint_acceptance_ids: [SPR-AC-08]
+    evidence_required: [make test, validate-repo, gitleaks, diff check, closeout, critic, GitHub checks]
+validation_commands:
+  - id: receipt-suite
+    command: ruby tests/test_sprint_terminal_receipt.rb
+    purpose: Prove receipt generation, semantic binding, routing, recovery bounds, and tamper rejection.
+    required: true
+  - id: delivery-gate-suite
+    command: bash tests/test_delivery_gate.sh
+    purpose: Prove receipt-only critic-gate mode and integrated-but-unterminated next-merge blocking.
+    required: true
+  - id: pull-request-policy-suite
+    command: bash tests/test_pr_policy.sh
+    purpose: Prove exact receipt marker/path policy and ordinary lane policy preservation.
+    required: true
+  - id: lane-review-suite
+    command: ruby tests/test_lane_review_validator.rb
+    purpose: Preserve one fresh D/I/E/S implementation review chain.
+    required: true
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    purpose: Prove router and receipt command behavior.
+    required: true
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate lifecycle, schema, skill, authority, and package consistency.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run the complete repository, policy, release, package, and installed-artifact gates.
+    required: true
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="1cd75f4556d88d2ddbfaf70e719d1380e962f51c..HEAD"
+    purpose: Scan every lane commit while redacting detected match values.
+    required: true
+required_evidence:
+  - Valid and invalid receipt documents bound to exact controller P/R/O, lane PRs, integrated SHA, and protected dev base.
+  - Regressions for every request_fixes finding from critic S b98dab8fb2369605b55e617129a970fb6cfd98aa.
+  - Exact receipt PR marker/path/base/head fixtures and next-implementation merge blocker fixtures.
+  - Automatic controller receipt generation/auto-merge guidance with no second critic or routine human gate.
+  - Explicit six-sprint recovery bundle and rejection of generic historical shortcuts.
+  - Full local checks, exact GitHub checks, clean worktree, closeout, and one fresh critic report.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The solution reintroduces mutable controller/tag/status authority, custom workflow attestation, or self-asserted R/O as accepted dev truth.
+  - Receipt PRs can mix implementation paths, bypass protected-base validation, or require another full review cycle.
+  - Ordinary implementation can merge while an integrated sprint lacks its receipt.
+  - Routine receipt success requires human approval, or a genuinely protected decision advances without its authorized gate.
+  - The worker must mutate live GitHub settings, legacy sprint artifacts, main, npm, credentials, or runtime.
+definition_of_done:
+  - Revised D contains only the approved sprint plan, wave plan, and receipt-based lane contract.
+  - I implements the minimal receipt schema/generator/router/policy/skill path and removes the rejected tag/ruleset/workflow design.
+  - E adds only the canonical closeout with exact validation and critic-finding remediation evidence.
+  - One fresh critic independently verifies all former findings and commits only S.
+  - Exact S passes required checks; ROOT records the temporary protected-path exception and merges only the implementation PR.
+  - ROOT generates and auto-merges one bounded recovery receipt PR, verifies all six transactions terminal on dev, and reruns global project-router.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T18:15:19Z"

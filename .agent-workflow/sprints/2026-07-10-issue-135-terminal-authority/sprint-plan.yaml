@@ -1,0 +1,124 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-10-issue-135-terminal-authority
+status: approved
+goal: Make completed sprint state truthful on protected dev through a typed terminal receipt while keeping routine delivery automated and review-light.
+baseline_sha: "1cd75f4556d88d2ddbfaf70e719d1380e962f51c"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [135]
+scope:
+  - Define a schema-backed SprintTerminalReceipt committed through a generated receipt-only pull request to protected dev after integration and accepted outcome.
+  - Reuse the existing controller P, release R, outcome O, D/I/E/S, live PR, and check validators when generating and validating the receipt.
+  - Make project-router require the protected receipt for post-cutover terminal state and exclude only reconciled completed sprints.
+  - Block later implementation PRs when accepted dev contains an integrated but unterminated sprint, while allowing its exact terminal-receipt PR.
+  - Make controller-loop and release-verification automatically open, monitor, and auto-merge deterministic receipt PRs without another lane, critic, or human gate.
+  - "Record the risk-tiered authority rule: automation is default; human gates remain only for protected decisions outside a preauthorized envelope."
+non_goals:
+  - Use mutable controller branches, custom commit statuses, tags, rulesets, or workflow-run URLs as terminal authority.
+  - Merge a controller evidence branch or mix implementation code into a terminal receipt PR.
+  - Add a second full lane/review cycle for deterministic receipt artifacts.
+  - Implement the general change-class and autonomy-policy schema owned by issue 70.
+  - Implement later autonomous-platform issues, publish a package release, or change application runtime.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: A validated terminal receipt on protected dev is the sole post-cutover terminal authority and pins exact controller P/R/O plus integrated dev and lane PR identities.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [receipt schema, authority matrix, ADR, positive and tamper fixtures]
+  - id: SPR-AC-02
+    statement: The receipt generator reuses one shared semantic validator for P/R/O, D/I/E/S, PR scope, checks, reviews, ancestry, and accepted outcome before producing any dev candidate.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [rejected packet tests, ambiguous check tests, stale PR tests, exact receipt bundle]
+  - id: SPR-AC-03
+    statement: A receipt PR changes only canonical terminal artifacts, is validated by protected-base policy, and auto-merges without another critic or human review when deterministic gates pass.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [PR marker/path policy, critic-gate receipt mode, auto-merge runbook tests]
+  - id: SPR-AC-04
+    statement: Any later implementation PR is merge-blocked while its base contains integrated but unterminated sprint work, but the exact receipt repair path remains allowed.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [delivery-policy base-state matrix, receipt exemption tests, genuine active concurrency tests]
+  - id: SPR-AC-05
+    statement: Global routing from dev advances after receipt merge, remains terminal after later dev commits, and never trusts issue closure, PR merge, or same-branch file backfill alone.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [post-merge route fixture, ancestry fixture, legacy and forged receipt rejection]
+  - id: SPR-AC-06
+    statement: Skills codify automated authority by default, one independent critic per implementation lane, no stacked review without a specific unresolved finding, and human gates only for protected decisions.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [operating contract, controller-loop, release-verification and project-router guidance]
+  - id: SPR-AC-07
+    statement: The five stale transactions and this sprint can be reconciled in one explicitly bounded recovery receipt PR, while normal future receipts remain one sprint per PR.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [bounded migration fixture, no generic historical bypass, issue 135 self-terminalization]
+  - id: SPR-AC-08
+    statement: Focused tests, full repository/package tests, secret scan, one fresh critic, exact-head CI, and protected-path exception evidence pass before integration.
+    lane_ids: [issue-135-terminal-authority]
+    evidence_expected: [D/I/E/S chain, make test, gitleaks, GitHub checks, critic report]
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A generated receipt could conceal invalid controller evidence or be mixed with implementation changes.
+    mitigation: Reuse the trusted evidence validator and enforce exact marker, base, head, and changed-path rules from protected-base policy.
+  - id: RISK-02
+    severity: high
+    statement: Receipt automation could become another approval loop or bypass a genuinely protected decision.
+    mitigation: Auto-advance deterministic receipts, but require a referenced approved gate only when the receipt declares a protected decision under the authority matrix.
+  - id: RISK-03
+    severity: medium
+    statement: Legacy migration exceptions could become a permanent shortcut.
+    mitigation: Bind the recovery bundle to the six exact sprint IDs and accepted tree, then make the normal one-sprint receipt rule mandatory for later baselines.
+lanes:
+  - lane_id: issue-135-terminal-authority
+    issue_ids: [135]
+    contract_path: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/lanes/contracts/issue-135-terminal-authority.contract.yaml
+    branch: lane/135-terminal-authority
+    owner: codex-issue135-receipt-worker
+    reviewer: fresh-independent-critic
+    summary: Implement protected-dev terminal receipts, merge-blocking, and lightweight automated closeout.
+dependency_order:
+  - [issue-135-terminal-authority]
+deployment_expectations:
+  - The implementation changes lifecycle CLI/policy/schema/skills only and targets protected dev.
+  - After integration, ROOT creates one bounded recovery receipt PR for the five stale transactions plus issue 135; it does not merge controller branches.
+  - Receipt PRs are deterministic evidence changes and auto-merge after protected-base machine gates without a second critic or human gate.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Receipt and merge-blocking matrix
+      due: before worker closeout
+      evidence_expected: [receipt schema tests, route tests, PR policy tests, delivery-gate tests]
+    - id: QA-02
+      name: Full repository and package gate
+      due: at implementation head
+      evidence_expected: [validate-repo, make test, actionlint if applicable, diff check, redacted secret scan]
+  human_review_milestones:
+    - id: HR-01
+      name: One independent implementation criticism
+      owner: Fresh critic
+      trigger: Exact implementation and closeout heads pass required validation.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/review/review-inbox-packet.yaml
+    - id: HR-02
+      name: Temporary protected-path exception decision
+      owner: Jason Vallery
+      trigger: Exact approving S and all required checks are current, and no non-author credential is available.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/gates/pr-213-admin-merge-override.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As ROOT, I can continue autonomous delivery from dev without completed work becoming active or routine receipts asking for human approval.
+      issue_ids: [135]
+      lane_ids: [issue-135-terminal-authority]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05, SPR-AC-06]
+  reporting_summary:
+    included: [terminal receipt schema, generator, receipt PR policy, next-merge blocker, router convergence, lightweight authority guidance]
+    deferred: [general change_class and risk envelope schema, dedicated trusted attestor, later platform implementation]
+    ownership:
+      - lane_id: issue-135-terminal-authority
+        owner: codex-issue135-receipt-worker
+        responsibility: Implement and validate the bounded receipt-based lifecycle repair.
+    next_review: One fresh critic at exact evidence head, then protected dev integration and automatic recovery receipt.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T18:15:19Z"
