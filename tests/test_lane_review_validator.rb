@@ -799,6 +799,60 @@ class LaneReviewValidatorTest < Minitest::Test
     FileUtils.rm_rf(chain[:root]) if chain
   end
 
+  def test_route_accepts_strategy_only_merge_over_assessed_baseline
+    chain = build_chain(route_ready: true)
+    baseline = commit_cancelled_sprint(chain[:root])
+    git(chain[:root], "checkout", "-qb", "strategy-update")
+    write_approved_strategy(chain[:root], baseline)
+    git(chain[:root], "add", ".agent-workflow/strategy")
+    git(chain[:root], "commit", "-qm", "record approved strategy")
+    git(chain[:root], "checkout", "-q", "main")
+    git(chain[:root], "merge", "--no-ff", "-qm", "merge approved strategy", "strategy-update")
+
+    stdout, = capture_io { Verdify::CLI.run(["route", "--repo", chain[:root], "--json"]) }
+    decision = JSON.parse(stdout)
+
+    assert_equal "REPO_HYGIENE_MISSING", decision["current_state"]
+    assert_equal "repo-hygiene", decision["next_skill"]
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
+  def test_route_rejects_material_change_after_strategy_baseline
+    chain = build_chain(route_ready: true)
+    baseline = commit_cancelled_sprint(chain[:root])
+    write_approved_strategy(chain[:root], baseline)
+    git(chain[:root], "add", ".agent-workflow/strategy")
+    git(chain[:root], "commit", "-qm", "record approved strategy")
+    File.open(File.join(chain[:root], "README.md"), "a") { |file| file << "material change\n" }
+    git(chain[:root], "add", "README.md")
+    git(chain[:root], "commit", "-qm", "change repository after assessment")
+
+    stdout, = capture_io { Verdify::CLI.run(["route", "--repo", chain[:root], "--json"]) }
+    decision = JSON.parse(stdout)
+
+    assert_equal "STATE_OF_UNION_STALE", decision["current_state"]
+    assert decision["evidence"].any? { |item| item["finding"].include?("README.md") }
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
+  def test_route_rejects_nonexistent_strategy_baseline
+    chain = build_chain(route_ready: true)
+    commit_cancelled_sprint(chain[:root])
+    write_approved_strategy(chain[:root], "0" * 40)
+    git(chain[:root], "add", ".agent-workflow/strategy")
+    git(chain[:root], "commit", "-qm", "record strategy with invalid baseline")
+
+    stdout, = capture_io { Verdify::CLI.run(["route", "--repo", chain[:root], "--json"]) }
+    decision = JSON.parse(stdout)
+
+    assert_equal "STATE_OF_UNION_STALE", decision["current_state"]
+    assert decision["evidence"].any? { |item| item["finding"].include?("full ancestor commit") }
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
   def test_route_rejects_committed_invalid_sprint_plan
     chain = build_chain(route_ready: true)
     plan_path = File.join(chain[:root], ".agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml")
@@ -992,6 +1046,40 @@ class LaneReviewValidatorTest < Minitest::Test
       document["sprint_id"] = sprint_id
       File.write(File.join(sprint_root, relative), YAML.dump(document))
     end
+  end
+
+  def commit_cancelled_sprint(root)
+    sprint_root = File.join(root, ".agent-workflow/sprints/2026-06-22-a")
+    plan_path = File.join(sprint_root, "sprint-plan.yaml")
+    plan = YAML.safe_load(File.read(plan_path), permitted_classes: [], aliases: false)
+    plan["status"] = "cancelled"
+    File.write(plan_path, YAML.dump(plan))
+    File.write(File.join(sprint_root, "status.yaml"), YAML.dump(valid_sprint_status("2026-06-22-a", "CANCELLED")))
+
+    gate = valid_gate("cancel-2026-06-22-a", "2026-06-22-a", "approved")
+    gate["question"] = "Cancel this sprint?"
+    gate["allowed_decisions"] = ["cancel", "continue"]
+    gate["decision"] = "cancel"
+    gate["rationale"] = "Terminalize the fixture before strategy routing."
+    gate["resolved_at"] = "2026-07-09T00:11:00Z"
+    gate["resume_state"] = "CANCELLED"
+    gate_path = File.join(sprint_root, "gates/cancellation.yaml")
+    FileUtils.mkdir_p(File.dirname(gate_path))
+    File.write(gate_path, YAML.dump(gate))
+
+    git(root, "add", plan_path, File.join(sprint_root, "status.yaml"), gate_path)
+    git(root, "commit", "-qm", "cancel fixture sprint")
+    git(root, "rev-parse", "HEAD").strip
+  end
+
+  def write_approved_strategy(root, baseline)
+    strategy_root = File.join(root, ".agent-workflow/strategy")
+    FileUtils.mkdir_p(strategy_root)
+    strategy = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/strategy/state-of-union.yaml")
+    )
+    strategy["baseline_sha"] = baseline
+    File.write(File.join(strategy_root, "state-of-union.yaml"), YAML.dump(strategy))
   end
 
   def valid_gate(gate_id, sprint_id, status)

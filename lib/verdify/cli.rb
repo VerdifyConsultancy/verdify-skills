@@ -1788,7 +1788,35 @@ module Verdify
       end
 
       head = repo.head_sha
-      return nil if strategy["baseline_sha"].to_s == head
+      baseline = strategy["baseline_sha"].to_s
+      strategy_paths = [
+        strategy_path,
+        root.join("strategy/state-of-union.md"),
+        root.join("strategy/github-backlog-sync.yaml")
+      ].select(&:file?).map { |path| path.relative_path_from(repo.root).to_s }
+      baseline_valid = baseline.match?(/\A[0-9a-f]{40}\z/i) &&
+                       repo.commit_exists?(baseline) &&
+                       repo.ancestor?(baseline, head)
+      suffix_paths = if baseline_valid
+                       repo.commits_between(baseline, head).flat_map { |commit| repo.changed_paths(commit) }.uniq.sort
+                     else
+                       []
+                     end
+      unauthorized_paths = suffix_paths - strategy_paths
+      snapshot_errors = strategy_paths.filter_map do |relative|
+        commit = repo.last_change_sha(relative, ref: head)
+        path = repo.root.join(relative)
+        relative unless commit && repo.file_at(commit, relative) == path.binread
+      end
+      if baseline_valid && unauthorized_paths.empty? && snapshot_errors.empty?
+        return nil
+      end
+
+      findings = []
+      findings << "baseline_sha must be a full ancestor commit" unless baseline_valid
+      findings << "post-assessment changes include non-strategy paths: #{unauthorized_paths.join(', ')}" unless unauthorized_paths.empty?
+      findings << "strategy artifacts are uncommitted or differ from HEAD: #{snapshot_errors.join(', ')}" unless snapshot_errors.empty?
+      evidence << { "source" => strategy_path.relative_path_from(repo.root).to_s, "finding" => findings.join("; ") }
 
       route_hash(repo, "STATE_OF_UNION_STALE", "state-of-union", "strategy-refresh", "The approved strategy was assessed against a different repository baseline.", evidence, missing, open_gates)
     end
