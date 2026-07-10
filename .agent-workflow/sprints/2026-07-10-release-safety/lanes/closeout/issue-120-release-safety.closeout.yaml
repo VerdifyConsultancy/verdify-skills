@@ -1,0 +1,200 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+status: ready_for_critic
+issue_ids: [120]
+pull_request: 184
+baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+implementation_head_sha: "a6e886046886108d3f38f5728a39edb849172fdc"
+validated_head_sha: "a6e886046886108d3f38f5728a39edb849172fdc"
+contract_hash: "a59c8c57bc52606de707e812fd87bb8b8d446f7754f3c0109e26d001bcf405ef"
+changed_paths:
+  - .github/workflows/publish-npm.yml
+  - .github/workflows/release-pr.yml
+  - .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
+  - CHANGELOG.md
+  - MANIFEST.sha256
+  - Makefile
+  - VERSION
+  - docs/release-transaction.md
+  - docs/skill-packs.md
+  - docs/vendoring-standard.md
+  - lib/verdify/cli.rb
+  - npm/bin/verdify.js
+  - package.json
+  - schemas/release-transaction.schema.yaml
+  - scripts/build-release-candidate.sh
+  - scripts/release-preflight.rb
+  - scripts/release-transaction.rb
+  - scripts/verify-npm-tarball.rb
+  - scripts/verify-package.sh
+  - skills/adversarial-audit/SKILL.md
+  - skills/architecture-contracts/SKILL.md
+  - skills/consensus-audit-workflow/SKILL.md
+  - skills/controller-loop/SKILL.md
+  - skills/controller-merge/SKILL.md
+  - skills/crm-email/SKILL.md
+  - skills/gravity-readiness/SKILL.md
+  - skills/independent-critic/SKILL.md
+  - skills/issue-triage/SKILL.md
+  - skills/lane-delivery/SKILL.md
+  - skills/northstar-interview/SKILL.md
+  - skills/northstar-planning/SKILL.md
+  - skills/northstar-question-resolution/SKILL.md
+  - skills/northstar-research-ingest/SKILL.md
+  - skills/platform-readiness/SKILL.md
+  - skills/project-definition/SKILL.md
+  - skills/project-router/SKILL.md
+  - skills/release-verification/SKILL.md
+  - skills/repo-bootstrap/SKILL.md
+  - skills/repo-hygiene/SKILL.md
+  - skills/sprint-handoff/SKILL.md
+  - skills/sprint-orchestrator/SKILL.md
+  - skills/sprint-planning/SKILL.md
+  - skills/sprint-replan/SKILL.md
+  - skills/state-of-union/SKILL.md
+  - skills/subagent-worktree/SKILL.md
+  - skills/timeline-historian/SKILL.md
+  - skills/transcript-replan/SKILL.md
+  - tests/test_cli.sh
+  - tests/test_npm_install.sh
+  - tests/test_package_file_set.sh
+  - tests/test_packed_artifact.sh
+  - tests/test_release_preflight.sh
+  - tests/test_release_transaction.sh
+validation_results:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:10Z"
+    artifact: "28 skills and 48 schemas validated at a6e886046886108d3f38f5728a39edb849172fdc"
+  - id: packed-artifact-suite
+    command: bash tests/test_packed_artifact.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:20Z"
+    artifact: "Exact tarball SHA-256 d618f6f8c0144aef8f08fb387d0d54790ab8edf166cd49521908bc240ad14db1; install matrix and workflow static audit passed"
+  - id: release-transaction-suite
+    command: bash tests/test_release_transaction.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:24Z"
+    artifact: "Prepared through completed, partial release, failed mismatch, resumable unknown authority, corrupt prior ledger, and deterministic finalization fixtures passed"
+  - id: release-preflight-suite
+    command: bash tests/test_release_preflight.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:28Z"
+    artifact: "Create, already-published skip, unbumped skip, registry failure, and pre-mutation workflow ordering passed"
+  - id: package-file-set-suite
+    command: bash tests/test_package_file_set.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:34Z"
+    artifact: "Immutable Git-index staging and ZIP missing, changed, extra, duplicate, unsafe, and wrong-type mutations passed"
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:41Z"
+    artifact: "Pack conflict preflight at first, middle, last, and manifest targets plus late rollback/operator restoration passed"
+  - id: npm-install-suite
+    command: bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:56:48Z"
+    artifact: "Fresh install, same-version reinstall, local public 1.2.1 upgrade fixture, Node 18, collision, corruption, rollback, and installed commands passed"
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:57:33Z"
+    artifact: "90 runs, 533 assertions, 446 manifest entries, all package/release/CLI/policy suites passed"
+  - id: changed-commit-secret-scan
+    command: 'gitleaks git --no-banner --redact --log-opts="da2f43392e768c7554fd35d750507eea64ca0fb3..HEAD"'
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:57:39Z"
+    artifact: "Three commits and approximately 112.64 KB scanned; no leaks found"
+  - id: retained-candidate-identity
+    command: bash scripts/build-release-candidate.sh /tmp/issue-120-I-package
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:57:48Z"
+    artifact: "source a6e886046886108d3f38f5728a39edb849172fdc; tarball SHA-256 d618f6f8c0144aef8f08fb387d0d54790ab8edf166cd49521908bc240ad14db1; SHA-512 e6b8ba6303e34331a29d413ce0d0073f62d2b5fa2cb9ba398fe2357be368de59cd5a1fa220f77c129e98057bd21f43ee2be3610bfb93a5ae9394dfa30798f7b8; npm integrity sha512-5ri6YwPjQzGinUE84NAHP2LStfosubo5j+I1e+No3lnNWh+iIPd8Ep6YBXvSH0PuK+NhC/uTpa6TlN+jB5j3uA==; archive SHA-256 b25a59398e607ab1f8ce4fed806da2a0c380c82d9d2cb56806861c831e928ea9; pack count 1"
+  - id: live-release-reconciliation
+    command: ruby scripts/release-transaction.rb --sidecar /tmp/issue-120-I-package/verdify-cli-cli-1.3.0.tgz.release-candidate.json --ledger /tmp/issue-120-I-package/release-transaction-v1.3.0.json --repository VerdifyConsultancy/verdify-skills
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:57:50Z"
+    artifact: "state artifact_verified; next_action publish_npm; npm, v1.3.0 tag, and GitHub release absent; zero errors; no mutation"
+  - id: live-release-pr-preflight
+    command: ruby scripts/release-preflight.rb --release-pr-base origin/main --json
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:52:03Z"
+    artifact: "decision=create reason=new_unpublished_version package=@verdify-cli/cli@1.3.0 base=1.2.1 npm_status=unpublished"
+  - id: baseline-release-identity
+    command: verify origin/main, peeled v1.2.1, npm @verdify-cli/cli@1.2.1, and GitHub release v1.2.1
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:52:19Z"
+    artifact: "main, tag, npm gitHead, and GitHub release identify 898d7c78845f11a4cec29556e698ebd27aa58ef1"
+  - id: dispatch-scope-audit
+    command: verify D-only first post-baseline commit, immutable dispatch inputs, owned paths, prohibited paths, 28 skill-body diffs, and package-file-list blob
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:52:30Z"
+    artifact: "D 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3; 52 implementation paths owned; zero prohibited paths; 28 metadata-only skill diffs; package-file-list blob 23dadc1d138fdd5b8269ffc76d11d691f2faed9b"
+  - id: github-checks
+    command: gh pr checks 184 --repo VerdifyConsultancy/verdify-skills --watch --interval 10 --fail-fast
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:59:27Z"
+    artifact: "validate https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29075281179/job/86305412522; pull-request-policy https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29075281209/job/86305412621; compliance https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29075281272/job/86305412666"
+  - id: closeout-validation
+    command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T06:59:40Z"
+    artifact: .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [packed-artifact-suite, retained-candidate-identity, dispatch-scope-audit, full-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [packed-artifact-suite, npm-install-suite, retained-candidate-identity]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [cli-suite, npm-install-suite, packed-artifact-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [package-file-set-suite, packed-artifact-suite, dispatch-scope-audit]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [release-transaction-suite, live-release-reconciliation, retained-candidate-identity]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [release-preflight-suite, live-release-pr-preflight, packed-artifact-suite, github-checks]
+    assessment: satisfied
+  - criterion_id: LANE-AC-07
+    evidence_ids: [repository-validation, full-suite, changed-commit-secret-scan, github-checks, dispatch-scope-audit]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "The privileged publish workflow was statically audited and its public authority reads were exercised, but npm publication, tag push, GitHub release creation, main promotion, and deployment were intentionally not performed by this worker."
+  - "npm or GitHub authority unavailability stops recovery with a schema-valid failed/resumable ledger; an authorized release operator must retry after authority availability returns."
+  - "The generated dev-to-main release PR must authenticate as jrvallery and still requires jvallery's real non-author approval after issue #121 delivery controls are complete."
+  - "A fresh critic agent/session and a distinct admin or maintainer GitHub approval at the final critic head remain required before integration."
+worktree_clean: true
+worker_agent: codex
+worker_session_id: worker-120-release-safety-20260710t0611z-v2
+completed_at: "2026-07-10T06:59:40Z"
+limitations:
+  - "The immutable dispatch-only commit is 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3 and contains only the approved sprint plan, wave release plan, and corrected lane contract."
+  - "Implementation head 8a23df5c1917837ff7323273307f3dd0d2e8d8e5 was superseded after GitHub CI exposed a test-only ripgrep dependency; a6e886046886108d3f38f5728a39edb849172fdc is the last substantive and validated implementation head."
+  - "This closeout is the only path permitted after implementation head a6e886046886108d3f38f5728a39edb849172fdc; the worker will stop writing after evidence commit E."
+  - "No live npm mutation, tag or GitHub release mutation, main promotion, CRM/email operation, private advisory disclosure, pull-request review, merge, or deployment was performed."
