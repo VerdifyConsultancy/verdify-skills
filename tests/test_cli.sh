@@ -44,6 +44,129 @@ git -C "$PACK_REPO" commit -qm "initial"
 [[ ! -e "$PACK_REPO/.agents/skills/project-router" ]]
 [[ -f "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
 "$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" >/dev/null
+
+make_pack_repo() {
+  local path="$1"
+  mkdir -p "$path"
+  git -C "$path" init -q -b main
+  git -C "$path" config user.name "Verdify Test"
+  git -C "$path" config user.email "verdify-test@example.invalid"
+  printf '# Pack transaction fixture\n' > "$path/README.md"
+  git -C "$path" add README.md
+  git -C "$path" commit -qm "initial"
+}
+
+PACK_SKILLS=(northstar-research-ingest northstar-question-resolution northstar-interview)
+for position in 0 1 2; do
+  COLLISION_REPO="$TMP/pack-collision-$position"
+  make_pack_repo "$COLLISION_REPO"
+  conflict="${PACK_SKILLS[$position]}"
+  mkdir -p "$COLLISION_REPO/.agents/skills/$conflict"
+  printf 'operator owned\n' > "$COLLISION_REPO/.agents/skills/$conflict/owner.txt"
+  if "$ROOT/bin/verdify" pack install --repo "$COLLISION_REPO" --pack research-analysis --host codex >"$TMP/collision-$position.out" 2>"$TMP/collision-$position.err"; then
+    echo "expected pack conflict at position $position to fail" >&2
+    exit 1
+  fi
+  [[ "$(cat "$COLLISION_REPO/.agents/skills/$conflict/owner.txt")" == "operator owned" ]]
+  for skill in "${PACK_SKILLS[@]}"; do
+    if [[ "$skill" != "$conflict" ]]; then
+      [[ ! -e "$COLLISION_REPO/.agents/skills/$skill" ]]
+    fi
+  done
+  [[ ! -e "$COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+done
+
+MANIFEST_COLLISION_REPO="$TMP/pack-manifest-collision"
+make_pack_repo "$MANIFEST_COLLISION_REPO"
+mkdir -p "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if "$ROOT/bin/verdify" pack install --repo "$MANIFEST_COLLISION_REPO" --pack research-analysis --host codex >"$TMP/manifest-collision.out" 2>"$TMP/manifest-collision.err"; then
+  echo "expected operator-owned manifest conflict to fail" >&2
+  exit 1
+fi
+[[ "$(cat "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+for skill in "${PACK_SKILLS[@]}"; do
+  [[ ! -e "$MANIFEST_COLLISION_REPO/.agents/skills/$skill" ]]
+done
+
+ROLLBACK_REPO="$TMP/pack-rollback"
+make_pack_repo "$ROLLBACK_REPO"
+mkdir -p "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest"
+printf 'operator link target\n' > "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt"
+mkdir -p "$ROLLBACK_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE=before-manifest \
+  "$ROOT/bin/verdify" pack install --repo "$ROLLBACK_REPO" --pack research-analysis --host codex --force >"$TMP/rollback.out" 2>"$TMP/rollback.err"; then
+  echo "expected injected late pack failure" >&2
+  exit 1
+fi
+[[ "$(cat "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt")" == "operator link target" ]]
+[[ "$(cat "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-question-resolution" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-interview" ]]
+
+snapshot_pack_operator_state() {
+  local repo="$1"
+  local output="$2"
+  ruby -rdigest -rjson -e '
+    root, output = ARGV
+    paths = %w[
+      .agents/skills/northstar-research-ingest
+      .agents/skills/northstar-question-resolution
+      .agents/skills/northstar-interview
+      .agent-skills/verdify-packs/research-analysis.yaml
+    ]
+    snapshot = lambda do |path|
+      stat = File.lstat(path)
+      value = {"mode" => stat.mode & 0o7777}
+      if stat.symlink?
+        value.merge("type" => "symlink", "target" => File.readlink(path))
+      elsif stat.file?
+        value.merge("type" => "file", "sha256" => Digest::SHA256.file(path).hexdigest)
+      elsif stat.directory?
+        children = Dir.children(path).sort.to_h { |name| [name, snapshot.call(File.join(path, name))] }
+        value.merge("type" => "directory", "children" => children)
+      else
+        abort "unsupported fixture type: #{path}"
+      end
+    end
+    document = paths.to_h { |relative| [relative, snapshot.call(File.join(root, relative))] }
+    File.write(output, JSON.generate(document) + "\n")
+  ' "$repo" "$output"
+}
+
+seed_pack_operator_state() {
+  local repo="$1"
+  mkdir -p "$repo/.agents/skills/northstar-research-ingest/nested"
+  printf 'first operator directory\n' > "$repo/.agents/skills/northstar-research-ingest/nested/owner.txt"
+  printf 'symlink destination\n' > "$repo/operator-source.txt"
+  ln -s ../../operator-source.txt "$repo/.agents/skills/northstar-question-resolution"
+  printf 'last operator regular file\n' > "$repo/.agents/skills/northstar-interview"
+  chmod 0600 "$repo/.agents/skills/northstar-interview"
+  mkdir -p "$repo/.agent-skills/verdify-packs/research-analysis.yaml"
+  printf 'operator manifest directory\n' > "$repo/.agent-skills/verdify-packs/research-analysis.yaml/owner.txt"
+}
+
+# No backup failure may mutate any operator target. Write, manifest, and
+# rollback failures must restore every original byte, type, link target, and
+# mode; an injected restore error is reported only after the target is safe.
+PACK_FAILURES=(backup-0 backup-1 backup-3 write-2 before-manifest after-manifest before-manifest,restore-0)
+for failure in "${PACK_FAILURES[@]}"; do
+  SAFE_REPO="$TMP/pack-safe-${failure//,/-}"
+  make_pack_repo "$SAFE_REPO"
+  seed_pack_operator_state "$SAFE_REPO"
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.before.json"
+  if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE="$failure" \
+    "$ROOT/bin/verdify" pack install --repo "$SAFE_REPO" --pack research-analysis --host codex --force \
+      >"$TMP/$failure.out" 2>"$TMP/$failure.err"; then
+    echo "expected injected pack failure at $failure" >&2
+    exit 1
+  fi
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.after.json"
+  cmp "$TMP/$failure.before.json" "$TMP/$failure.after.json"
+done
+grep -q 'verified backups retained at' "$TMP/before-manifest,restore-0.err"
+
 "$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack crm-email --host all >/dev/null
 [[ -L "$PACK_REPO/.agents/skills/crm-email" ]]
 [[ -L "$PACK_REPO/.claude/skills/crm-email" ]]

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 1.3.0 - 2026-07-10
+
+- Build one exact npm tarball per release candidate, bind it to the clean source
+  commit with a digest and integrity sidecar, and use that same file for every
+  install test and the eventual `npm publish` command.
+- Verify npm tarball membership and release ZIP membership as exact typed sets;
+  reject missing, changed, extra, duplicate, unsafe, or wrong-type entries.
+- Make skill-pack installation transactional across every selected host link
+  and the installed-pack manifest, preserving operator-owned conflicts on any
+  failed install.
+- Add a schema-valid release ledger reconstructed from npm, tag, GitHub release,
+  archive, and clean-source facts so publication resumes with one deterministic
+  next action after partial success.
+- Pin privileged workflow actions to reviewed commit SHAs and npm to an exact
+  version, and prevent release PR mutation for unbumped or published versions.
+
 ## 1.2.1 - 2026-07-07
 
 Patch release: manifest integrity fix + CI gate, fleet vendoring standard, and
