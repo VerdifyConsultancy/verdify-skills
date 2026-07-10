@@ -7,14 +7,16 @@
 #
 #   gen-manifest.sh                       # regenerate ./MANIFEST.sha256 from the repo tree
 #   gen-manifest.sh <src_dir> <out_file>  # regenerate a Git worktree or exported tree
-#   gen-manifest.sh <src_dir> <out_file> <selection_root>
-#                                        # hash a staged tree using selection_root's Git index
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC="${1:-$ROOT}"
 OUT="${2:-$ROOT/MANIFEST.sha256}"
-SELECTION_ROOT="${3:-$SRC}"
+
+if (( $# > 2 )); then
+  echo "Usage: scripts/gen-manifest.sh [src_dir] [out_file]" >&2
+  exit 2
+fi
 
 command -v ruby >/dev/null || { echo "ruby is required to generate MANIFEST.sha256" >&2; exit 1; }
 
@@ -22,13 +24,14 @@ command -v ruby >/dev/null || { echo "ruby is required to generate MANIFEST.sha2
 OUT_DIR="$(cd "$(dirname "$OUT")" && pwd)"
 OUT="$OUT_DIR/$(basename "$OUT")"
 
-LIST="$(mktemp)"
-trap 'rm -f "$LIST"' EXIT
-if [[ $# -ge 3 ]]; then
-  ruby "$ROOT/scripts/package-file-list.rb" --null "$SELECTION_ROOT" > "$LIST"
-elif git_root="$(git -C "$SRC" rev-parse --show-toplevel 2>/dev/null)" && \
+SNAPSHOT="$(mktemp -d)"
+LIST="$SNAPSHOT/paths"
+HASH_ROOT="$SRC"
+trap 'rm -rf "$SNAPSHOT"' EXIT
+if git_root="$(git -C "$SRC" rev-parse --show-toplevel 2>/dev/null)" && \
      [[ "$(cd "$git_root" && pwd -P)" == "$(cd "$SRC" && pwd -P)" ]]; then
-  ruby "$ROOT/scripts/package-file-list.rb" --null "$SRC" > "$LIST"
+  HASH_ROOT="$SNAPSHOT/tree"
+  ruby "$ROOT/scripts/package-file-list.rb" --null --stage "$HASH_ROOT" "$SRC" > "$LIST"
 else
   ruby "$ROOT/scripts/package-file-list.rb" --null --tree "$SRC" > "$LIST"
 fi
@@ -45,4 +48,4 @@ ruby -rdigest -e '
       manifest.puts "#{Digest::SHA256.file(full_path).hexdigest}  #{path}"
     end
   end
-' "$SRC" "$OUT" "$LIST"
+' "$HASH_ROOT" "$OUT" "$LIST"

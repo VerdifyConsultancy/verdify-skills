@@ -64,17 +64,20 @@ Every consuming repository MUST satisfy all five rules:
 Release archives and `MANIFEST.sha256` use the same Git-index-derived file set,
 implemented by `scripts/package-file-list.rb`. The selector includes tracked
 regular files and tracked discovery symlinks, excludes controller state and
-generated install/build roots, and rejects unsupported Git modes. Before it
-emits or stages anything, it rejects selected paths with a symlink or
-non-directory ancestor below the repository root. Ignored and untracked host
-files are never candidates, even when they are present inside a normally shipped
-directory such as `.claude/`.
+generated install/build roots, and rejects unsupported Git modes. Repository
+staging reads regular bytes and symlink targets from the blob object IDs captured
+with each Git-index entry; it never reads those values through mutable worktree
+paths. Ignored, untracked, and locally modified host files are never package
+inputs, even when they are present inside a normally shipped directory such as
+`.claude/`. Explicit exported-tree manifest generation remains available when
+Git metadata is intentionally absent and reads only that supplied tree boundary.
 
 The archive stores tracked discovery symlinks as symlinks. Manifest hashing
 covers the selected regular files without following those links, so a host-local
 target can neither enter an archive nor influence an integrity digest. Staged
 regular-file permissions come from the Git index: `100644` becomes `0644` and
-`100755` becomes `0755`, independent of mutable worktree permission bits.
+`100755` becomes `0755`, independent of mutable worktree content, type, symlink
+targets, or permission bits.
 
 ## Current consumer census (2026-07-07)
 

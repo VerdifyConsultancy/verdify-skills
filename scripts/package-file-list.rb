@@ -14,6 +14,7 @@ EXCLUDED_ROOTS = %w[
 ].freeze
 EXCLUDED_FILES = %w[MANIFEST.sha256].freeze
 SUPPORTED_MODES = %w[100644 100755 120000].freeze
+Entry = Struct.new(:path, :mode, :blob_oid, keyword_init: true)
 
 def validate_tracked_path(root, path, mode)
   current = root
@@ -31,6 +32,45 @@ def validate_tracked_path(root, path, mode)
   stat
 rescue Errno::ENOENT, Errno::ENOTDIR
   abort "tracked path is missing or inaccessible: #{path}"
+end
+
+def stage_index_entries(root, destination, entries)
+  Open3.popen3("git", "-C", root, "cat-file", "--batch") do |input, output, error, wait_thread|
+    [input, output, error].each(&:binmode)
+
+    entries.each do |entry|
+      input.write("#{entry.blob_oid}\n")
+      input.flush
+
+      header = output.gets
+      abort "could not read Git object #{entry.blob_oid} for #{entry.path}" unless header
+
+      match = header.match(/\A([0-9a-f]+) ([^ ]+) (\d+)\n\z/)
+      abort "could not materialize Git object #{entry.blob_oid} for #{entry.path}: #{header.inspect}" unless match
+
+      object_id, object_type, size = match.captures
+      abort "Git object changed while staging #{entry.path}" unless object_id == entry.blob_oid
+      abort "tracked object is not a blob: #{entry.path}" unless object_type == "blob"
+
+      bytes = output.read(Integer(size, 10))
+      abort "truncated Git object while staging #{entry.path}" unless bytes&.bytesize == Integer(size, 10)
+      abort "invalid Git object terminator while staging #{entry.path}" unless output.read(1) == "\n"
+
+      target = File.join(destination, entry.path)
+      FileUtils.mkdir_p(File.dirname(target))
+      if entry.mode == "120000"
+        File.symlink(bytes, target)
+      else
+        File.binwrite(target, bytes)
+        File.chmod(entry.mode == "100755" ? 0o755 : 0o644, target)
+      end
+    end
+
+    input.close
+    git_error = error.read
+    status = wait_thread.value
+    abort "could not materialize the Git index for #{root}: #{git_error}" unless status.success?
+  end
 end
 
 options = {null: false, stage: nil, tree: false}
@@ -59,7 +99,7 @@ entries = if options[:tree]
     next if stat.directory?
     abort "exported tree path is not a regular file or symlink: #{path}" unless stat.file? || stat.symlink?
     mode = stat.symlink? ? "120000" : (stat.executable? ? "100755" : "100644")
-    [path, mode]
+    Entry.new(path: path, mode: mode)
   end
 else
   git_root, git_error, git_status = Open3.capture3("git", "-C", root, "rev-parse", "--show-toplevel")
@@ -72,27 +112,28 @@ else
   index.split("\0", -1).filter_map do |record|
     next if record.empty?
 
-    match = record.match(/\A(\d{6}) [0-9a-f]+ ([0-3])\t(.*)\z/m)
+    match = record.match(/\A(\d{6}) ([0-9a-f]+) ([0-3])\t(.*)\z/m)
     abort "could not parse Git index entry: #{record.inspect}" unless match
 
-    mode, stage, path = match.captures
+    mode, object_id, stage, path = match.captures
     abort "unmerged Git index entry is not packageable: #{path}" unless stage == "0"
     abort "unsafe tracked path is not packageable: #{path.inspect}" if path.empty? || path.start_with?("/") || path.split("/").include?("..")
 
     next if excluded_path.call(path)
 
     abort "unsupported tracked file mode #{mode} for #{path}" unless SUPPORTED_MODES.include?(mode)
-    [path, mode]
+    Entry.new(path: path, mode: mode, blob_oid: object_id)
   end
 end
 
-entries.sort_by!(&:first)
+entries.sort_by!(&:path)
 
-# Validate the entire source topology before emitting paths or staging bytes. A
-# tracked leaf is not safe when an untracked symlink replaces one of its parent
-# directories, even though the leaf itself still appears to have the right type.
-validated_stats = entries.to_h do |path, mode|
-  [path, validate_tracked_path(root, path, mode)]
+# Exported trees have no immutable Git objects, so retain their explicit
+# filesystem boundary and validate the complete source topology before copying.
+validated_stats = if options[:tree]
+  entries.to_h do |entry|
+    [entry.path, validate_tracked_path(root, entry.path, entry.mode)]
+  end
 end
 
 if options[:stage]
@@ -100,21 +141,25 @@ if options[:stage]
   FileUtils.mkdir_p(destination)
   abort "stage directory must be empty: #{destination}" unless Dir.empty?(destination)
 
-  entries.each do |path, mode|
-    source = File.join(root, path)
-    target = File.join(destination, path)
-    stat = validated_stats.fetch(path)
+  if options[:tree]
+    entries.each do |entry|
+      source = File.join(root, entry.path)
+      target = File.join(destination, entry.path)
+      stat = validated_stats.fetch(entry.path)
 
-    FileUtils.mkdir_p(File.dirname(target))
-    if stat.symlink?
-      File.symlink(File.readlink(source), target)
-    else
-      FileUtils.copy_file(source, target)
-      File.chmod(mode == "100755" ? 0o755 : 0o644, target)
+      FileUtils.mkdir_p(File.dirname(target))
+      if stat.symlink?
+        File.symlink(File.readlink(source), target)
+      else
+        FileUtils.copy_file(source, target)
+        File.chmod(entry.mode == "100755" ? 0o755 : 0o644, target)
+      end
     end
+  else
+    stage_index_entries(root, destination, entries)
   end
 end
 
 separator = options[:null] ? "\0" : "\n"
-STDOUT.write(entries.map(&:first).join(separator))
+STDOUT.write(entries.map(&:path).join(separator))
 STDOUT.write(separator) unless entries.empty?

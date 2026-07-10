@@ -17,8 +17,9 @@ if [[ "${VERDIFY_PACKAGE_SKIP_TESTS:-0}" != "1" ]]; then
   make -C "$ROOT" test >&2
 fi
 ruby "$ROOT/scripts/package-file-list.rb" --stage "$STAGE/$NAME" "$ROOT" >/dev/null
-# Hash the staged bytes using the same Git-index selection that populated the stage.
-bash "$ROOT/scripts/gen-manifest.sh" "$STAGE/$NAME" "$STAGE/$NAME/MANIFEST.sha256" "$ROOT"
+# The staged tree is the immutable Git-object snapshot. Hash that exact exported
+# tree so a later worktree or index change cannot alter the archive manifest.
+bash "$ROOT/scripts/gen-manifest.sh" "$STAGE/$NAME" "$STAGE/$NAME/MANIFEST.sha256"
 (
   cd "$STAGE"
   zip -qry -y "$OUT/$NAME.zip" "$NAME"
