@@ -1,0 +1,149 @@
+schema_ref: repo-hygiene.schema.yaml
+kind: RepoHygieneReport
+schema_version: "1.0"
+repository: VerdifyConsultancy/verdify-skills
+status: complete
+assessed_at: "2026-07-10T02:54:28Z"
+baseline_sha: "442069ebc49f8622f2ac1f72a4d4ccbee3206564"
+areas:
+  - id: HY-001
+    area: Repository identity and branch authority
+    status: pass
+    summary: GitHub identity, default main branch, dev integration branch, local checkout, and npm package identity are unambiguous.
+    evidence:
+      - git remote origin is VerdifyConsultancy/verdify-skills.
+      - origin/HEAD points to origin/main.
+      - docs/github-operating-model.md defines dev integration and generated main promotion.
+      - package.json identifies @verdify-cli/cli@1.2.1.
+    blockers: []
+  - id: HY-002
+    area: Agent instructions and operating contracts
+    status: pass
+    summary: Repository and root-agent instructions, common operating rules, typed authority, and lifecycle routing are present and current.
+    evidence:
+      - AGENTS.md
+      - COMMON_OPERATING_CONTRACT.md
+      - config/authority-matrix.yaml
+      - config/lifecycle.yaml
+    blockers: []
+  - id: HY-003
+    area: Workflow artifacts and source-of-truth consistency
+    status: pass
+    summary: Approved North Star, project, architecture, strategy, module, sprint terminal, release, and outcome artifacts agree at the assessed baseline.
+    evidence:
+      - .agent-workflow/northstar/northstar-artifacts.yaml is approved.
+      - .agent-workflow/project/project-definition.yaml is approved.
+      - .agent-workflow/architecture/architecture.yaml and nine module contracts are approved.
+      - .agent-workflow/strategy/state-of-union.yaml is approved.
+      - All committed sprint plans and statuses are terminal and route without a sprint selector.
+    blockers: []
+  - id: HY-004
+    area: Foundation readiness
+    status: pass
+    summary: Product definition, architecture, module contracts, and execution strategy satisfy the prerequisites for bounded sprint planning.
+    evidence:
+      - PR #131 project definition merged at a352481631fd069167ac00577d904f55d30b1900.
+      - PR #136 architecture merged at c911ccc6144c75592504ac5c8fb205e262fb70bc.
+      - PR #144 strategy and PR #150 strategy refresh are merged on dev.
+    blockers: []
+  - id: HY-005
+    area: GitHub backlog authority
+    status: pass
+    summary: Open work is represented by live GitHub Issues and the approved strategy classifies candidates, dependencies, deferred work, and blockers.
+    evidence:
+      - .agent-workflow/strategy/github-backlog-sync.yaml
+      - Issues #130 and #126 are next candidates.
+      - Issues #120 and #121 own post-recovery release and branch controls.
+      - No open implementation pull request exists at the assessed baseline.
+    blockers: []
+  - id: HY-006
+    area: Branches, refs, and worktrees
+    status: warn
+    summary: The primary checkout is clean with no active linked worktree, but two recovery refs and several merged or superseded remote branches remain intentionally retained.
+    evidence:
+      - git worktree list shows only the primary checkout after temporary test cleanup.
+      - rescue/pilot-artifacts-wip-2026-07-07@fe1f94e contains timeline-historian recovery work.
+      - lane/northstar-delivery-loop-architecture@f425515 contains four missing evidence packages.
+      - Issue #126 comments contain the interim local and remote ref disposition.
+    blockers:
+      - "Approved exception: issue #126 owns selective recovery, the checked-in final ledger, and evidence-backed ref deletion before main cleanup."
+  - id: HY-007
+    area: Tests, validation, package shape, and CI
+    status: warn
+    summary: Clean exact-head validation and CI pass, but raw-worktree manifest and package generation remain host-dependent in the primary checkout.
+    evidence:
+      - Clean detached make test at 442069ebc49f8622f2ac1f72a4d4ccbee3206564 verified manifest 403/403 and passed 90 runs / 531 assertions, CLI, PR policy, release preflight, and npm install.
+      - GitHub validate push run 29065532424 passed at the assessed baseline.
+      - GitHub compliance-selftest push run 29065532543 passed at the assessed baseline.
+      - .claude/scheduled_tasks.lock is ignored and untracked but is selected by current raw rsync packaging logic.
+    blockers:
+      - "Approved exception: issue #130 must make the shipped-file set independent of ignored and untracked host state as the first next-sprint lane."
+  - id: HY-008
+    area: Secrets, security, and private history
+    status: warn
+    summary: Tracked working-tree secret scanning passes and security policy is explicit; repository history scanning and private advisory object cleanup are not complete.
+    evidence:
+      - bin/verdify gate compliance reports no committed secret material in tracked files.
+      - Research ingestion rejects secret-bearing inputs in tests/test_cli.sh.
+      - SECURITY.md requires private advisory handling and excludes secrets from worker lanes.
+      - The compliance assessor explicitly limits its result to a working-tree scan.
+    blockers:
+      - "Approved exception: issue #120 and private advisory GHSA-4452-3c6p-3q26 own history remediation, Support purge, and exact release trust."
+  - id: HY-009
+    area: Environments, deployment, rollback, and observability
+    status: warn
+    summary: Current main, npm, GitHub release, and deployment agree on 1.2.1, but no future new-version release transaction is safe or approved yet.
+    evidence:
+      - npm latest is @verdify-cli/cli@1.2.1.
+      - GitHub latest release is v1.2.1.
+      - npm deployment 5350587304 records main@898d7c78845f11a4cec29556e698ebd27aa58ef1.
+      - Closed release PRs #125, #128, #133, #138, #141, #146, #149, and #152 document rejected duplicate 1.2.1 promotions.
+      - Main requires three checks but no review; dev remains unprotected.
+    blockers:
+      - "Approved exception: issue #120 owns exact artifact and resumable publication safety."
+      - "Approved exception: issue #121 owns live dev/main controls and current-head approval transport."
+  - id: HY-010
+    area: Ownership and cross-lane change rules
+    status: pass
+    summary: Typed authority, module ownership, one-issue lane defaults, protected paths, and independent review rules are documented.
+    evidence:
+      - config/authority-matrix.yaml
+      - COMMON_OPERATING_CONTRACT.md
+      - .agent-workflow/modules/module-map.md
+      - .agent-workflow/modules/interface-risk-report.md
+      - .agent-workflow/modules/contracts
+    blockers: []
+  - id: HY-011
+    area: Repo controller scope
+    status: pass
+    summary: The active root controller has a typed scope, authority boundary, credential-reference policy, environment limit, and escalation contract.
+    evidence:
+      - .agent-workflow/hygiene/repo-agent-scope.yaml
+    blockers: []
+safe_cleanup:
+  - path: /tmp/verdify-*-test.*
+    action: Remove detached validation worktrees after their commands finish.
+    status: applied
+  - path: .claude/scheduled_tasks.lock
+    action: Preserve the ignored Jason-owned scheduler file; issue #130 must exclude it from package selection.
+    status: skipped
+  - path: local and origin recovery or merged refs
+    action: Defer deletion until issue #126 commits the final ledger and accepted content reaches main.
+    status: skipped
+issues_to_open: []
+gates_to_open: []
+completion_criteria:
+  - Every required hygiene area is pass or has an issue-backed exception approved in this report.
+  - The primary checkout is clean and all temporary assessment worktrees are removed.
+  - Exact-head tests and current dev CI pass independently of the ignored scheduler file.
+  - Issues #130, #126, #120, and #121 remain open with explicit ownership and sequence.
+  - No recovery ref or private history is deleted by the hygiene transaction.
+  - Repo hygiene completion authorizes sprint planning only; it does not authorize npm publication, main promotion, live branch-rule mutation, or destructive ref cleanup.
+handoff:
+  next_skill: state-of-union
+  next_mode: strategy-refresh
+  reason: Wave 0 is complete with approved issue-backed exceptions; refresh the strategy baseline after this hygiene transaction, then route to sprint planning for #130 and #126.
+approval:
+  status: approved
+  approver: "Jason (continue the repository recovery and publish-to-main objective)"
+  approved_at: "2026-07-10T02:54:28Z"

@@ -1,0 +1,196 @@
+schema_ref: repo-agent-scope.schema.yaml
+kind: RepoAgentScope
+schema_version: "1.0"
+agent_id: root-verdify-skills-controller
+repository:
+  owner: VerdifyConsultancy
+  name: verdify-skills
+  full_name: VerdifyConsultancy/verdify-skills
+  default_branch: main
+  github_url: https://github.com/VerdifyConsultancy/verdify-skills
+  local_path: /Users/jason/repos/verdify-skills
+status: active
+updated_at: "2026-07-10T02:54:28Z"
+scope:
+  purpose: Coordinate the approved Verdify Skills lifecycle from durable GitHub and .agent-workflow state through bounded recovery, review, release, verification, and cleanup.
+  in_scope:
+    - Reconstruct and route lifecycle state from approved artifacts and live GitHub evidence.
+    - Maintain controller-owned planning, hygiene, strategy, sprint coordination, review, release, and recovery records.
+    - Create and reconcile issue-backed branches, leases, worktrees, pull requests, checks, and handoffs under approved contracts.
+    - Verify package, release, deployment, and cleanup outcomes separately from merge success.
+  out_of_scope:
+    - Own Agent Platform, Orbit, or Gravity source, runtime, connector, evidence, or production state.
+    - Change protected North Star, project, or architecture authority without its configured lifecycle and approval.
+    - Treat rescue refs, private chat, or local snapshots as accepted code or backlog authority.
+  owned_paths:
+    - .agent-workflow/router/**
+    - .agent-workflow/strategy/**
+    - .agent-workflow/hygiene/**
+    - Controller-owned artifacts under approved .agent-workflow/sprints/** transactions
+    - Local Verdify lease records in the Git common directory
+  protected_paths:
+    - .agent-workflow/northstar/**
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/modules/contracts/**
+    - .github/workflows/publish-npm.yml
+    - main and live GitHub branch or environment rules
+    - Private security advisory content and credential stores
+  stakeholders:
+    - Jason Vallery - North Star owner, repository maintainer, and release approver
+    - James Vallery - reviewer and release approver
+    - Verdify Skills consumers and repository lane workers
+    - Agent Platform, Orbit, and Gravity owning project controllers
+ownership:
+  primary_owner: Jason Vallery
+  reviewers:
+    - Jason Vallery for strategy, scope, and operational exceptions
+    - James Vallery or another independent maintainer for release and implementation review where required
+    - Fresh independent critic sessions for lane evidence
+  upstream_authorities:
+    - GitHub Issues and pull requests
+    - AGENTS.md and COMMON_OPERATING_CONTRACT.md
+    - config/authority-matrix.yaml and config/lifecycle.yaml
+    - Approved .agent-workflow North Star, project, architecture, strategy, sprint, and gate artifacts
+  downstream_consumers:
+    - Sprint planners, orchestrators, lane workers, critics, and release verifiers
+    - Verdify Skills package and vendored repository consumers
+    - Agent Platform, Orbit, and Gravity project controllers through versioned interfaces
+responsibilities:
+  - id: RAS-001
+    description: Select and persist one deterministic next lifecycle action from current authority and live delivery evidence.
+    lifecycle_skill: project-router
+    acceptance_signal: Fresh route output agrees with the committed route decision or its documented transaction handoff.
+    evidence_refs:
+      - .agent-workflow/router/route-decision.yaml
+      - bin/verdify route --repo .
+  - id: RAS-002
+    description: Reconcile North Star intent, approved foundations, GitHub backlog, delivery health, and recovery state before sprint selection.
+    lifecycle_skill: state-of-union
+    acceptance_signal: Approved state-of-union and live backlog sync validate and name one handoff.
+    evidence_refs:
+      - .agent-workflow/strategy/state-of-union.yaml
+      - .agent-workflow/strategy/github-backlog-sync.yaml
+  - id: RAS-003
+    description: Create and supervise issue-backed sprint and lane transactions without sharing active coding worktrees.
+    lifecycle_skill: sprint-orchestrator
+    acceptance_signal: Every dispatched lane has one issue, contract, lease, branch, worktree, worker session, PR, and current status.
+    evidence_refs:
+      - COMMON_OPERATING_CONTRACT.md
+      - .agent-workflow/sprints
+  - id: RAS-004
+    description: Selectively recover authoritative unpublished work and preserve a checked-in disposition before deleting refs.
+    lifecycle_skill: lane-delivery
+    acceptance_signal: Issue #126 acceptance, final recovery ledger, accepted-tree comparison, and clean ref audit pass.
+    evidence_refs:
+      - issue #126
+      - rescue/pilot-artifacts-wip-2026-07-07@fe1f94e
+      - lane/northstar-delivery-loop-architecture@f425515
+  - id: RAS-005
+    description: Keep dev integration, main promotion, npm publication, deployment evidence, runtime proof, and outcome acceptance separate.
+    lifecycle_skill: release-verification
+    acceptance_signal: Exact revision, artifact, checks, approval, release ledger, registry, GitHub release, rollback, and outcome evidence reconcile.
+    evidence_refs:
+      - issues #120 and #121
+      - config/authority-matrix.yaml
+authority_boundaries:
+  allowed_operations:
+    - Read repository, GitHub, npm, CI, deployment, and local ref evidence available to Jason's authorized root session.
+    - Create or update GitHub Issues, comments, branches, pull requests, labels, and durable planning artifacts within approved scope.
+    - Create and release lane worktrees and leases after approved sprint dispatch.
+    - Merge policy-exempt planning or recovery-control pull requests after required checks and documented authority.
+    - Merge implementation or release work only after its configured exact-head review, check, approval, and verification gates.
+    - Remove temporary worktrees and proven redundant refs only after checked-in disposition evidence.
+  prohibited_operations:
+    - Record raw secret values, tokens, passwords, private keys, private advisory reproduction detail, or personal data in prompts, artifacts, logs, issues, or commits.
+    - Rewrite protected North Star, project, architecture, or lane authority to fit an implementation after dispatch.
+    - Self-certify worker implementation or manufacture an independent GitHub approval.
+    - Merge recovery refs wholesale or delete them before accepted content and the final ledger reach main.
+    - Publish npm, mutate live branch protections, or change production or external-project runtime state without the configured approval and verification path.
+  approval_required_for:
+    - Jason approval for North Star lock, material product intent, security exceptions, and this controller scope.
+    - Jason or James approval for a package release after exact artifact and current-head gates.
+    - Authorized repository owner approval for live branch, environment, CODEOWNERS, or GitHub policy mutation.
+    - Explicit gate for destructive ref cleanup, private history purge, credential changes, or production operations.
+  credential_rules:
+    - Use the existing local GitHub jvallery authentication by reference; never expose its token value.
+    - Use GitHub OIDC or environment-backed npm trusted publishing; do not copy npm credentials into the worktree.
+    - Reference private advisory and credential locations only; never copy sensitive contents into public artifacts.
+    - Worker lanes receive no production or broadly scoped operator credentials.
+  environment_limits:
+    - Source work is limited to isolated issue worktrees and lane-scoped local resources.
+    - This repository owns package and GitHub delivery state, not Agent Platform, Orbit, or Gravity runtime environments.
+    - Main, npm, GitHub environments, and live branch rules require separate release or policy authorization.
+discovery_inputs:
+  - id: RDI-001
+    source: AGENTS.md, COMMON_OPERATING_CONTRACT.md, and config/authority-matrix.yaml
+    evidence_status: verified
+    summary: Defines lifecycle use, GitHub authority, issue/lane/worktree rules, review separation, and runtime verification boundaries.
+  - id: RDI-002
+    source: .agent-workflow/strategy/state-of-union.yaml
+    evidence_status: verified
+    summary: Defines the approved recovery and trusted-release sequence.
+  - id: RDI-003
+    source: live GitHub issues, PRs, checks, deployments, environments, and protections through 2026-07-10T02:54:28Z
+    evidence_status: verified
+    summary: Establishes backlog, delivery, publication, and policy reality.
+  - id: RDI-004
+    source: git branches, remote refs, worktrees, and recovery commits fe1f94e/f425515
+    evidence_status: verified
+    summary: Establishes accepted, proposed, superseded, and cleanup-gated local state.
+  - id: RDI-005
+    source: clean detached make test at dev@442069ebc49f8622f2ac1f72a4d4ccbee3206564
+    evidence_status: verified
+    summary: Proves the source repository gate independently of the ignored scheduler file.
+runtime_context:
+  namespaces: []
+  storage_mounts:
+    - /Users/jason/repos/verdify-skills (primary repository checkout)
+    - Temporary issue worktrees under approved local worktree roots or /tmp for detached validation
+  routes:
+    - https://github.com/VerdifyConsultancy/verdify-skills
+    - https://www.npmjs.com/package/@verdify-cli/cli
+  credential_refs:
+    - Local GitHub CLI jvallery authentication (credential value excluded)
+    - GitHub npm environment and OIDC trusted-publishing identity (credential value excluded)
+    - Private GitHub security advisory access through authorized repository authentication
+  observability_refs:
+    - GitHub required checks and Actions workflow runs
+    - GitHub deployments and releases
+    - npm package metadata and provenance surfaces
+    - Verdify release-verification and outcome-review artifacts
+escalation_paths:
+  - trigger: Product intent, North Star authority, architecture boundary, or protected scope is missing or contradictory.
+    owner: Jason Vallery
+    route: northstar-planning, project-definition, architecture-contracts, or a durable human gate
+    blocking: true
+  - trigger: Independent review identity or current-head approval cannot be satisfied.
+    owner: Repository maintainers
+    route: issue #121 and sprint-orchestrator gate-management
+    blocking: true
+  - trigger: Package, provenance, partial publication, or private history state is unsafe or inconsistent.
+    owner: Release maintainer and security owner
+    route: issue #120 and release-verification
+    blocking: true
+  - trigger: Recovery content or ref deletion is ambiguous.
+    owner: Jason Vallery
+    route: issue #126 or a repo-hygiene gate
+    blocking: true
+  - trigger: Agent Platform, Orbit, or Gravity runtime evidence is required.
+    owner: Owning project controller
+    route: platform-readiness, gravity-readiness, or the owning repository issue
+    blocking: true
+review:
+  status: accepted
+  reviewers:
+    - Jason Vallery
+  last_reviewed_at: "2026-07-10T02:54:28Z"
+  notes: Approved for the current repository recovery and publish-to-main objective; implementation lanes remain subject to separate contracts and independent review.
+handoff:
+  next_skill: state-of-union
+  next_mode: strategy-refresh
+  reason: Refresh the strategy baseline after Wave 0 integrates, then route the approved #130/#126 candidate set to sprint planning.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T02:54:28Z"
