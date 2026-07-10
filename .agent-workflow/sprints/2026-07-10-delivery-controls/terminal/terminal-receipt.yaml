@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-delivery-controls
+mode: recovery
+recovery_bundle: issue-135-recovery-v1
+receipt_base_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-delivery-controls
+  head_sha: e6ef9077f78532fb4e6452bc62f58822622b3ee6
+  packet_commit_sha: d0f268772eb360ada5b10939f5e345143b39ab55
+  release_commit_sha: b3ff1c025556681f169a970855a65f8bd8dceb54
+  outcome_commit_sha: e6ef9077f78532fb4e6452bc62f58822622b3ee6
+  packet_path: ".agent-workflow/sprints/2026-07-10-delivery-controls/review/review-inbox-packet.yaml"
+  packet_sha256: 540da3de9807f68a151598c48cc2344d7219bb6c20f8490224af567a69744f2b
+  release_sha256: 600425a2740e4e44ded376c2274c739774572f0cfb40e1f5201ed5a34e78566a
+  outcome_sha256: 862448e3458eca6f5978777790efdb8d0df1eb0a8ce2f64970dc5744847fa668
+lanes:
+- lane_id: issue-121-delivery-controls
+  issue_ids:
+  - 121
+  branch: lane/121-delivery-controls
+  pull_request: 196
+  dispatch_head_sha: bd9e567d5b24688edc9de36da34063c7bc4408ee
+  implementation_head_sha: 6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a
+  evidence_head_sha: 4d9ffbc0658b81ab28bae38e0b1f43ca6c953b8b
+  critic_report_head_sha: 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8
+  merge_commit_sha: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+artifacts:
+  plan_sha256: 0f13a2bc20bfe446c1830cfbeb07aaa9675c490d7f4532676f474c169da4fdaf
+  status_sha256: '0909c633516de00a6a7ca229a012cf3d245e00aa0d56acda0ae4eba47e91d7a4'
+  release_sha256: 600425a2740e4e44ded376c2274c739774572f0cfb40e1f5201ed5a34e78566a
+  outcome_sha256: 862448e3458eca6f5978777790efdb8d0df1eb0a8ce2f64970dc5744847fa668
+terminal:
+  integrated_sha: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-10T20:58:01Z'
+generator: verdify-controller

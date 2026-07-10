@@ -1,0 +1,27 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-10-publish-path-recovery
+decision: accepted
+reviewed_at: '2026-07-10T20:57:43Z'
+reviewer: codex-root under Jason Vallery delegated authority
+intended_outcome: Repair the privileged publish path that stopped the second 1.3.0
+  publish run, then independently review the exact recovery before another release
+  retry.
+delivered_outcomes:
+- The exact reviewed lane merged to protected dev as b5c106c3ee62f8530f85a00b4576c8e28cbfb92c
+  with trusted checks green.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/205
+- git:da5abe2fd076bdb80c9dc5e5905bbbd58f8f389f
+- git:b5c106c3ee62f8530f85a00b4576c8e28cbfb92c
+- git:803f313206feb999b018f19f64880b4a87c3fdae
+incomplete_items: []
+residual_risks: []
+follow_up_issues: []
+lessons_learned:
+- Terminal authority belongs on protected dev and must remain bound to exact review
+  and integration evidence.
+rationale: The issue-backed lane met its acceptance contract and was independently
+  reviewed, checked, and merged.

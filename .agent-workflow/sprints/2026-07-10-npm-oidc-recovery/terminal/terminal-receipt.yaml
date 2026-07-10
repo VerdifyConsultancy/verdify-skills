@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-npm-oidc-recovery
+mode: recovery
+recovery_bundle: issue-135-recovery-v1
+receipt_base_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-npm-oidc-recovery
+  head_sha: dcdfee0d39f04259b4782d1ae0310c4f677b4205
+  packet_commit_sha: dd25fe917195ba29fb54ac8795bbd51252d5b518
+  release_commit_sha: f153c8e30ffec2368183c8e4d56b1a693f13dac3
+  outcome_commit_sha: dcdfee0d39f04259b4782d1ae0310c4f677b4205
+  packet_path: ".agent-workflow/sprints/2026-07-10-npm-oidc-recovery/review/review-inbox-packet.yaml"
+  packet_sha256: 8c29e0df6474ebcc59bd6da436f2b6a104abbe7603c5ad198f18c808dad49d3e
+  release_sha256: 1a0c356db2f80577a4110bded3ede4fa478d2ab91cae863182d5335edebc539c
+  outcome_sha256: 0cf1aa1c0cc1331d3191fe4c112f33a01521cb9c2781f118a7e34bc1ecbbac98
+lanes:
+- lane_id: issue-207-npm-oidc-cli
+  issue_ids:
+  - 207
+  branch: lane/207-npm-oidc-cli
+  pull_request: 208
+  dispatch_head_sha: 9f05d365d8c07886753d66137bbc7d33160ed67b
+  implementation_head_sha: c4b519c9f773ca41ac625b54f7fb47a6927a0240
+  evidence_head_sha: 6c9fc3409967fd83f1c73ab24c9eff2028de8514
+  critic_report_head_sha: 05f53aac723abe3ed97bae5044666434aa8cb2c1
+  merge_commit_sha: 2f98073eddc53d75ceec0bebe1f20fdfa5a58ea4
+artifacts:
+  plan_sha256: 6e900ad6cf5144f18d6970eb5ab6a4b090fecdc87701c6cf43cfbcf14018e425
+  status_sha256: 454ee3513912f169a8081f881264562aefff8490cb0c19a465c431729f35bd9a
+  release_sha256: 1a0c356db2f80577a4110bded3ede4fa478d2ab91cae863182d5335edebc539c
+  outcome_sha256: 0cf1aa1c0cc1331d3191fe4c112f33a01521cb9c2781f118a7e34bc1ecbbac98
+terminal:
+  integrated_sha: 2f98073eddc53d75ceec0bebe1f20fdfa5a58ea4
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted
+generated_at: '2026-07-10T20:58:06Z'
+generator: verdify-controller

@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-135-terminal-authority
+mode: recovery
+recovery_bundle: issue-135-recovery-v1
+receipt_base_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-issue-135-terminal-authority
+  head_sha: 6db3804ef85ec73524c2cc67e7ce7632d0dc5170
+  packet_commit_sha: 1b1378eece25b16ccd9e86a8be1668ecd77f616b
+  release_commit_sha: cd570456eaa9360a72ed098c23507d50a830a67e
+  outcome_commit_sha: 6db3804ef85ec73524c2cc67e7ce7632d0dc5170
+  packet_path: ".agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/review/review-inbox-packet.yaml"
+  packet_sha256: a8596ef0535c9a93e0743560677044f6d89bf0338ba5fb296b69de7baf70f3c5
+  release_sha256: 306e6e7b15b7ee4fcfbb46cb6ef68f720645548e574d2dc977a4d846cd875033
+  outcome_sha256: f37b1a849851867c40efc5dcd9f60e83318663faa313528dd0a5a93ca7cd14b8
+lanes:
+- lane_id: issue-135-terminal-authority
+  issue_ids:
+  - 135
+  branch: lane/135-terminal-authority
+  pull_request: 213
+  dispatch_head_sha: 6289755e33272298a595990562ca3e37960d035d
+  implementation_head_sha: de525fcab4a224f2f42c274bab142c07f498db81
+  evidence_head_sha: afd11be669dbaf9b20a0d041b0d4c73e3c4212c1
+  critic_report_head_sha: 4073b6748c608021681212e0602729ad72f8a08f
+  merge_commit_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+artifacts:
+  plan_sha256: 6a335d01a7c4ab85110d8b8fa2ab313edab0714097af1e7b70d2704d1db02583
+  status_sha256: b788694ab167703089c4fbc1d05e0498522d56eea584cfe15272a0c5f0289e4e
+  release_sha256: 306e6e7b15b7ee4fcfbb46cb6ef68f720645548e574d2dc977a4d846cd875033
+  outcome_sha256: f37b1a849851867c40efc5dcd9f60e83318663faa313528dd0a5a93ca7cd14b8
+terminal:
+  integrated_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-10T20:58:04Z'
+generator: verdify-controller
