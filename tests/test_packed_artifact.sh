@@ -88,6 +88,13 @@ grep -q '^## 1.3.0 - 2026-07-10$' "$ROOT/CHANGELOG.md"
 
 for skill in "$ROOT"/skills/*/SKILL.md; do
   relative="${skill#$ROOT/}"
+  case "$relative" in
+    skills/controller-merge/SKILL.md|skills/independent-critic/SKILL.md|skills/release-verification/SKILL.md)
+      # Issue #121 owns transport-neutral delivery-governance changes in these
+      # skills; the version-only release assertion remains strict for all others.
+      continue
+      ;;
+  esac
   git -C "$ROOT" show "$BASELINE:$relative" | sed 's/^  version: "1\.2\.1"$/  version: "VERSION"/' > "$TMP/old-skill"
   sed 's/^  version: "1\.3\.0"$/  version: "VERSION"/' "$skill" > "$TMP/new-skill"
   cmp "$TMP/old-skill" "$TMP/new-skill"
