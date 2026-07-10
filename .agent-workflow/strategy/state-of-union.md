@@ -1,32 +1,49 @@
-# State of union
+# State of Union: Delivery Controls and 1.3.0 Release
 
-Iteration 25 product, project, architecture, strategy, and Wave 0 hygiene are
-approved on `dev@af44997ea79ae4f919fa29cf951334c4f291d5ff`. All historical
-sprint transactions are terminal, the repo-controller scope is active, and
-global routing no longer needs a sprint selector.
+Assessed at `dev@e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4` on
+2026-07-10T09:29:52Z.
 
-The repository is not release-ready. `main`, npm latest, and GitHub latest
-release agree on `1.2.1`, while repeated generated `1.2.1` promotions from
-`dev` fail the required new-version gate. Package selection is also
-host-dependent because ignored files can enter the manifest and archive, and
-two recovery refs still contain authoritative unpublished skill and evidence
-work. Live `dev` is unprotected; `main` requires checks but no review.
+## Verdict
 
-The committed-strategy routing prerequisite in issue #143 is complete at
-`dev@ce912de11605879188d32675293fb1a49a25a56d`. The remaining approved
-execution order is:
+Recovery, package integrity, and release safety are integrated and terminal on
+`dev`. `main`, npm, and the latest GitHub release remain at 1.2.1. Issue #121 is
+the sole ready sprint candidate and the only blocker for James-authored release
+PR #189.
 
-1. Fix reproducible shipped-file selection in issue #130.
-2. Selectively recover timeline-historian, registered evidence, and the final
-   ref-disposition ledger in issue #126.
-3. Implement exact packed-artifact and resumable publication safety in issue
-   #120.
-4. Enforce protected dev integration and release-only main promotion in issue
-   #121.
-5. Promote one genuinely new version and verify main, npm, GitHub release,
-   provenance, and final ref cleanup.
+Delivery health is degraded because `dev` is unprotected, `main` has no review
+requirement, CODEOWNERS is ineffective, and main's current 1.2.1 policy cannot
+validate the 1.3.0 candidate. No product or architecture decision is missing.
 
-The next handoff is `sprint-planning / issue-readiness` for separate #130 and
-#126 lanes, with #126 dependent on #130. Agent Platform, Orbit, Gravity, route
-quality, eval, and simplification issues remain durable backlog but are outside
-this repository-recovery release.
+## Current Truth
+
+- `dev`: `e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4`, version 1.3.0.
+- `main`: `898d7c78845f11a4cec29556e698ebd27aa58ef1`, version 1.2.1.
+- npm/GitHub release: `@verdify-cli/cli@1.2.1` / `v1.2.1`.
+- Release candidate: issue #188 and PR #189, `dev -> main`, author `jrvallery`, no review.
+- Live protection: main requires three checks and admin/conversation enforcement but no review; dev is unprotected.
+- Workflow token: read default and cannot approve PR reviews.
+- Retained recovery sources: `fe1f94e`, `f425515`, and `22f81bdc35e4f1e5a70797624c93bc86bc66056c`.
+
+## Sequence
+
+1. Plan and execute one issue #121 lane.
+2. Merge #121 to dev after fresh criticism and the recorded bootstrap exception.
+3. Apply and verify pre-release branch protections without locking out PR #189.
+4. Jason approves current-head PR #189 authored by James.
+5. Promote 1.3.0 and verify npm, tag, GitHub release, retained artifact, provenance, checksums, and completed ledger.
+6. Reconcile #120/#126/#130/#142 and clean rescue handles only after final proof.
+
+## Sprint Candidate
+
+Issue #121 is ready. Its contract must cover:
+
+- effective `@jvallery @jrvallery` CODEOWNERS;
+- ordinary PRs targeting protected `dev` only;
+- same-repository `dev -> main` release promotions only;
+- transport-neutral current-head critic status on dev;
+- real current-head non-author owner approval on main;
+- a candidate-side bootstrap `delivery-policy` check for PR #189;
+- idempotent dry-run/apply live protection tooling with pre-release and steady-state phases;
+- deterministic tests, fresh criticism, live GET verification, and rollback.
+
+The next skill is `sprint-planning` in `lane-transaction` mode.
