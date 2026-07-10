@@ -1,0 +1,166 @@
+---
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: '1.0'
+wave_id: wave-2026-07-10-issue-215-receipt-ci-auth
+status: approved
+scope:
+  sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+  issue_ids: [215]
+  lane_ids: [issue-215-receipt-ci-auth]
+  northstar_ids: [NSM-007, NSM-008, NSM-009, NSM-010]
+  summary: Integrate the least-privilege receipt-CI authentication repair to dev, then prove it through the normal terminal-receipt transaction.
+  non_goals:
+  - main or npm release
+  - application runtime deployment
+  - personal credentials or GitHub write permission
+  - later autonomous-platform lanes
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-215
+  decision_notes: One protected policy lane targets dev; the post-merge receipt is a deterministic receipt-only PR and adds no second critic cycle.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+  - name: validate
+    required: true
+    event_triggers: [pull_request, push]
+    timeout_minutes: 30
+    evidence_expected: [full repository tests, manifest verification, six-receipt request-bound regression]
+  - name: policy
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [authenticated protected-base receipt evidence, lightweight and standard PR policy preservation]
+  - name: delivery-gate
+    required: true
+    event_triggers: [pull_request, push, other]
+    timeout_minutes: 15
+    evidence_expected: [authenticated delivery-policy and critic-gate evidence, no anonymous fallback]
+  - name: compliance-selftest
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [fleet-standard repository compliance]
+  artifacts:
+  - workflow permission and token-scope diff
+  - API request-count ledger
+  - authenticated failure diagnostics
+  - D/I/E/S evidence
+  - terminal receipt
+  required_events: [pull_request, push]
+environments:
+- name: github-control-plane
+  environment_type: review
+  required: true
+  namespace: null
+  url: https://github.com/VerdifyConsultancy/verdify-skills
+  quota_policy: GitHub API reads must stay below the declared fail-closed request bound; no anonymous allowance is an authority assumption.
+  limit_policy: Only actions, checks, contents, and pull-request read permissions are allowed.
+  network_policy: GitHub calls are limited to the repository pull-request, check-run, and workflow-run evidence paths required by the terminal validator.
+  ttl: null
+  secrets_scope: Ephemeral github.token in three exact validation-step environments; no persistence, copy, personal token, or log output.
+  protection_rules: [one fresh implementation critic, exact-head checks, CODEOWNERS or narrow recorded admin exception]
+  expected_revision_source: merged issue 215 dev SHA followed by merged normal terminal receipt dev SHA
+gitops:
+  controller: none
+  desired_state_refs:
+  - .github/workflows/policy.yml
+  - .github/workflows/delivery-gate.yml
+  - .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/terminal/terminal-receipt.yaml
+  sync_order:
+  - phase: validation
+    wave: 1
+    resource: issue 215 implementation pull request
+    purpose: Exercise the exact workflow permissions, step tokens, evidence loaders, and protected-base checks.
+  - phase: integration
+    wave: 2
+    resource: protected dev
+    purpose: Merge only the exact critic-approved head after required checks and protected-path decision evidence.
+  - phase: closeout
+    wave: 3
+    resource: normal terminal receipt pull request
+    purpose: Prove deterministic receipt CI is authenticated and green without another critic or human gate.
+  reconciliation_checks: [origin/dev exactness, exact workflow permission map, authenticated policy logs, normal receipt path set, terminal receipt ancestry]
+  remediation_policy: Stop and fix forward on any permission, token, request-bound, evidence-identity, CI, or receipt mismatch; do not bypass with anonymous reads.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+  - id: STEP-01
+    action: Run focused and full tests, one fresh critic, and exact-head pull-request checks.
+    success_criteria: Every criterion passes with no write permission, anonymous authenticated-failure fallback, or check-identity regression.
+    rollback_trigger: Any failed test, critic finding, permission mismatch, token exposure, or request count above the bound.
+  - id: STEP-02
+    action: Merge the exact approved head to protected dev under CODEOWNERS or the preauthorized narrow exception.
+    success_criteria: The intended commit is integrated and all branch protections are verified restored.
+    rollback_trigger: Head changes, required check drift, or protection restoration failure.
+  - id: STEP-03
+    action: Generate and auto-merge the normal deterministic terminal receipt.
+    success_criteria: Pull-request policy, delivery policy, and critic gate are green using authenticated evidence, then the router advances.
+    rollback_trigger: Any anonymous fallback, rate-limit failure, evidence mismatch, or route ambiguity.
+observability:
+  dashboards: [GitHub pull requests, checks, workflow runs, and branch protection]
+  logs: [redacted local validation, Actions logs, terminal receipt validation]
+  metrics: [GitHub API calls by evidence type, selected required checks, deduplicated workflow runs, receipt policy failures]
+  traces: [sprint ID, D/I/E/S SHAs, pull request, workflow run IDs, dev merge, terminal receipt]
+  runtime_checks: [exact workflow permissions, GH_TOKEN step scope, Actions request count, receipt validate_full, project-router]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the single implementation merge if authenticated policy checks regress on dev; rejected PR or receipt candidates are fixed forward before merge.
+  known_good_ref: fbe821899caf546e9b7b8daa718ea2ec74918091
+  procedure: Stop receipt generation, preserve redacted evidence, revert only the issue 215 merge if necessary, restore the prior workflow permission map, and rerun protected-base policy tests.
+  validation_steps: [validate repository, inspect workflow permissions, run policy and delivery suites, verify branch protection, rerun terminal receipt validation]
+release_health:
+  stabilization_window: through implementation merge, normal receipt merge, and post-merge route verification
+  signals:
+  - name: authenticated evidence
+    source: policy and delivery Actions logs
+    threshold: All receipt evidence reads use github.token and no authenticated failure retries anonymously.
+    blocking: true
+  - name: bounded request count
+    source: six-receipt integration regression
+    threshold: Total GitHub API reads are at or below 48 while all identity checks remain enabled.
+    blocking: true
+  - name: terminal convergence
+    source: normal terminal receipt and project-router
+    threshold: Receipt checks are green, integrated_unterminated is zero, and routing advances to issue 71 reconciliation.
+    blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/review/review-inbox-packet.yaml
+  human_test_steps:
+  - Inspect the exact workflow permissions and three token-scoped validation steps.
+  - Inspect the API request ledger, authenticated failure redaction, and highest-check-ID regressions.
+  - Confirm the normal terminal receipt checks are green and branch protections are restored.
+  approval_gate: One fresh implementation critic plus the preauthorized protected-path exception only if CODEOWNERS cannot be satisfied by an available non-author identity.
+risks:
+- id: RISK-01
+  severity: high
+  statement: A job token or response metadata could leak through diagnostics.
+  mitigation: Keep the token step-scoped, never persist it, and allowlist diagnostic fields with explicit redaction tests.
+- id: RISK-02
+  severity: high
+  statement: Optimizing API reads could weaken trusted check selection.
+  mitigation: Validate the complete matching check set first, then hydrate only unique highest IDs and retain every negative identity test.
+- id: RISK-03
+  severity: medium
+  statement: Protected workflow paths cannot receive an ordinary self-authored CODEOWNERS approval.
+  mitigation: Require exact-head critic and CI evidence, use only the recorded one-PR admin exception if needed, and restore and verify every protection immediately.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-10T21:29:02Z'
+prepared_at: '2026-07-10T21:29:02Z'
+planner: root-issue215-receipt-ci-auth

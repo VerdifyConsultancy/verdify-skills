@@ -1,0 +1,161 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+lane_id: issue-215-receipt-ci-auth
+title: Authenticated bounded GitHub evidence reads for terminal receipts
+status: approved
+issue_ids: [215]
+coupling_justification: null
+objective: Authenticate the exact policy steps that validate terminal-receipt GitHub evidence, bound workflow-run metadata reads, and preserve fail-closed check identity.
+desired_outcome: Valid multi-receipt evidence passes GitHub Actions using the job token and least-privilege reads, while invalid, ambiguous, unauthenticated, or rate-limited evidence fails clearly without token exposure or anonymous fallback.
+non_goals:
+- Add a GitHub write permission, personal token, credential copy, or persisted token.
+- Remove live evidence or weaken highest-check-ID, workflow, event, app, head, conclusion, base, or protected-path validation.
+- Refactor unrelated GitHub operations or implement issue 70 risk classes and lightweight critic routing.
+- Modify package version, publish npm, promote main, or change application runtime.
+baseline_sha: fbe821899caf546e9b7b8daa718ea2ec74918091
+branch: lane/215-receipt-ci-auth
+module_contracts: [governance-routing, execution-control, lane-assurance, release-package]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [github-evidence-authentication, receipt-policy-ci, check-run-identity, api-failure-diagnostics]
+  owned_paths:
+  - .github/workflows/policy.yml
+  - .github/workflows/delivery-gate.yml
+  - lib/verdify/git_repository.rb
+  - lib/verdify/sprint_terminal_receipt.rb
+  - scripts/validate-repo.rb
+  - tests/test_sprint_terminal_receipt.rb
+  - tests/test_pr_policy.sh
+  - tests/test_delivery_gate.sh
+  - MANIFEST.sha256
+  prohibited_paths:
+  - VERSION
+  - package.json
+  - CHANGELOG.md
+  - .github/CODEOWNERS
+  - config/github-delivery-controls.yaml
+  - config/github-primitives.yaml
+  - config/authority-matrix.yaml
+  - scripts/github-delivery-controls.rb
+  - scripts/release-transaction.rb
+  - schemas/**
+  - skills/**
+  - .agent-workflow/northstar/**
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/strategy/**
+  - .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/**
+  coordination_required_paths:
+  - scripts/pr-policy.rb
+  - scripts/delivery-gate.rb
+  - tests/test_packed_artifact.sh
+  owned_interfaces:
+  - Job-scoped GitHub token and least-privilege workflow permission boundary.
+  - GitRepository authenticated GitHub API failure behavior.
+  - Required check selection and workflow-run evidence hydration.
+  - SprintTerminalReceipt trusted check validation.
+dependencies:
+  hard:
+  - lane_id: issue-135-terminal-authority
+    required_output: Issue 135 terminal receipt contract and six-sprint recovery are merged on protected dev with integrated_unterminated equal to zero.
+  soft:
+  - lane_id: issue-70-risk-policy
+    coordination: Issue 70 owns the later cross-policy lightweight fast path; this lane must not broaden into change-class routing.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: Policy and delivery workflows give github.token only to the three receipt-validation steps and declare read-only actions, checks, contents, and pull-request permissions with no write scope.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [workflow diff, validate-repo invariants, actionlint]
+- id: LANE-AC-02
+  statement: GitRepository retains all matching required checks for valid unique ordering, then fetches workflow metadata only for the selected highest check per required name and deduplicates shared run IDs.
+  sprint_acceptance_ids: [SPR-AC-02, SPR-AC-04]
+  evidence_required: [API call ledger, per-name highest-ID tests, shared-run deduplication test, six-receipt request bound]
+- id: LANE-AC-03
+  statement: Required check validation still rejects missing, duplicate, malformed, stale, wrong-workflow, wrong-event, wrong-head, wrong-app, non-complete, or unsuccessful evidence.
+  sprint_acceptance_ids: [SPR-AC-02]
+  evidence_required: [negative check identity matrix, unchanged fail-closed receipt validator]
+- id: LANE-AC-04
+  statement: When GH_TOKEN is present, gh API failure never falls back to anonymous curl and emits only an allowlisted HTTP status, message, rate-limit, resource, reset, and request-ID diagnostic.
+  sprint_acceptance_ids: [SPR-AC-03]
+  evidence_required: [authenticated error fixture, no-curl assertion, token and arbitrary-header redaction assertion]
+- id: LANE-AC-05
+  statement: When GH_TOKEN is absent, the existing public-read compatibility path remains bounded and any API failure still fails closed.
+  sprint_acceptance_ids: [SPR-AC-03]
+  evidence_required: [no-token compatibility test, anonymous failure test]
+- id: LANE-AC-06
+  statement: A six-receipt equivalent policy scenario completes below the declared request ceiling and both protected policy entrypoints pass under the job-token environment.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [six-receipt fixture, request count at or below 48, policy and delivery tests, exact-head Actions checks]
+- id: LANE-AC-07
+  statement: Exact implementation and report heads pass focused, full, workflow, security, manifest, critic, and GitHub gates before protected-dev integration.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [D/I/E/S chain, make test, actionlint, gitleaks, diff check, fresh critic, exact-head CI]
+validation_commands:
+- id: receipt-suite
+  command: ruby tests/test_sprint_terminal_receipt.rb
+  purpose: Prove request bounds, check identity, API failure behavior, and terminal receipt preservation.
+  required: true
+- id: pull-request-policy-suite
+  command: bash tests/test_pr_policy.sh
+  purpose: Preserve protected-base pull-request and receipt policy behavior.
+  required: true
+- id: delivery-gate-suite
+  command: bash tests/test_delivery_gate.sh
+  purpose: Exercise delivery and critic receipt validation entrypoints with the intended environment contract.
+  required: true
+- id: repository-validation
+  command: ruby scripts/validate-repo.rb
+  purpose: Validate workflow token/permission invariants, skills, schemas, and repository shape.
+  required: true
+- id: workflow-lint
+  command: actionlint .github/workflows/*.yml
+  purpose: Validate workflow syntax and expression placement.
+  required: true
+- id: full-suite
+  command: make test
+  purpose: Run the full repository, package, policy, delivery, and release regression suite.
+  required: true
+- id: changed-commit-secret-scan
+  command: gitleaks git --no-banner --redact --log-opts="fbe821899caf546e9b7b8daa718ea2ec74918091..HEAD"
+  purpose: Scan every lane commit without exposing detected match values.
+  required: true
+required_evidence:
+- Exact workflow step names, token environments, and read-only permission maps.
+- API call counts for pull-request, check-run, and workflow-run evidence in the six-receipt equivalent.
+- Highest-ID selection, malformed/duplicate ordering, and shared-run deduplication regressions.
+- Authenticated error diagnostics showing no anonymous fallback, token value, or arbitrary response header.
+- D/I/E/S commits, worker closeout, one fresh critic, exact-head required checks, and protected-path decision evidence.
+- Post-merge normal terminal receipt with green pull-request-policy, delivery-policy, and critic-gate checks.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Any implementation requires a GitHub write permission, personal token, token persistence, or credential copy.
+- Request reduction would discard matching checks before malformed or duplicate ordering is validated.
+- Workflow identity could no longer be proven from path, event, head SHA, app, conclusion, and highest check ID.
+- Authenticated failures would retry anonymously or diagnostics could include token material or unbounded headers.
+- The six-receipt equivalent cannot stay at or below 48 GitHub API reads without weakening validation.
+- Work outside the owned paths or issue 215 acceptance becomes necessary.
+definition_of_done:
+- Every lane and sprint acceptance criterion has committed deterministic evidence.
+- The approved dispatch inputs remain byte-identical to the dispatch commit.
+- Focused tests, validate-repo, actionlint, make test, manifest check, diff check, and redacted secret scan pass.
+- Worker closeout records exact D/I/E and a different fresh critic approves exact evidence head with no unresolved high or critical finding.
+- Exact critic-report head passes required GitHub checks and any protected-path exception is narrow, durable, and immediately restored.
+- The implementation merges to protected dev and a normal terminal receipt validates and merges with authenticated green policy checks.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-10T21:29:02Z'
