@@ -23,13 +23,13 @@ snapshot:
       captured: true
       limitation: None for relevant open and recently completed issues.
     - surface: pulls
-      source_ref: live pull request API through PR #192
+      source_ref: "live pull request API through PR #192"
       captured: true
       limitation: Closed invalid release candidates remain historical evidence.
     - surface: checks
       source_ref: live PR check rollups
       captured: true
-      limitation: PR #189 includes repeated checks from each dev advance.
+      limitation: "PR #189 includes repeated checks from each dev advance."
     - surface: workflow_runs
       source_ref: live Actions runs through dev e702911
       captured: true
@@ -78,7 +78,7 @@ issue_findings:
     project_refs: []
     evidence_refs: ["dev version 1.3.0", "James-authored dev-to-main PR"]
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/188"]
-    required_action: Keep open and unmerged until issue #121 and live verification complete.
+    required_action: "Keep open and unmerged until issue #121 and live verification complete."
   - issue: 120
     title: Test and publish the exact packed artifact as an atomic recoverable transaction
     state: OPEN
@@ -218,7 +218,7 @@ issue_findings:
     project_refs: []
     evidence_refs: ["this state-of-union refresh"]
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
-    required_action: Close after #121, final release, and cleanup reconciliation.
+    required_action: "Close after #121, final release, and cleanup reconciliation."
 pr_findings:
   - pr: 189
     branch: dev
@@ -229,7 +229,7 @@ pr_findings:
     head_sha: "e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
     checks_status: fail
     deployment_status: missing
-    finding: Valid 1.3.0 route and James authorship; held because main's old policy fails and no real approval or #121 live controls exist.
+    finding: "Valid 1.3.0 route and James authorship; held because main's old policy fails and no real approval or #121 live controls exist."
     evidence_refs: ["policy run 29083094613", "issue #121"]
   - pr: 184
     branch: lane/120-release-safety
@@ -262,7 +262,7 @@ pr_findings:
     head_sha: "6ee649aed51481b06f71c72c584a9c5b4752365f"
     checks_status: pass
     deployment_status: not_applicable
-    finding: Terminalized the bounded #120 dev outcome and routed to this strategy refresh.
+    finding: "Terminalized the bounded #120 dev outcome and routed to this strategy refresh."
     evidence_refs: ["dev@e702911"]
 lane_findings:
   - lane_id: issue-120-release-safety
@@ -294,7 +294,7 @@ delivery_findings:
     type: check
     status: fail
     evidence_refs: ["policy run 29083094613", "main@898d7c7"]
-    finding: Main's 1.2.1 trusted policy expects version 1.2.1 and rejects the 1.3.0 marker; issue #121 needs a bootstrap candidate-side delivery policy.
+    finding: "Main's 1.2.1 trusted policy expects version 1.2.1 and rejects the 1.3.0 marker; issue #121 needs a bootstrap candidate-side delivery policy."
   - ref: npm release 1.2.1
     type: release
     status: pass
@@ -337,4 +337,4 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: Issue #121 is the sole ready candidate; terminal #120 evidence, live branch rules, and held PR #189 define its complete scope.
+  reason: "Issue #121 is the sole ready candidate; terminal #120 evidence, live branch rules, and held PR #189 define its complete scope."
