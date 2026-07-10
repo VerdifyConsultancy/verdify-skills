@@ -7,8 +7,8 @@ status: ready_for_critic
 issue_ids: [121]
 pull_request: 196
 baseline_sha: "91828dd4f0b632a2833a3d4f62cf4f92c1e35901"
-implementation_head_sha: "2699321ed31d2c378df6fadcaad953fee89131df"
-validated_head_sha: "2699321ed31d2c378df6fadcaad953fee89131df"
+implementation_head_sha: "6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a"
+validated_head_sha: "6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a"
 contract_hash: "20b00ca7604106249eebddd7b9ecefbcd87c34b5d02d0451090d35af903fc06e"
 changed_paths:
   - .github/CODEOWNERS
@@ -42,89 +42,83 @@ validation_results:
     command: ruby scripts/validate-repo.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
-    artifact: "28 skills and 48 schemas validated at 2699321ed31d2c378df6fadcaad953fee89131df"
+    executed_at: "2026-07-10T10:54:00Z"
+    artifact: "28 skills and 48 schemas validated at 6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a"
   - id: pull-request-policy-suite
     command: bash tests/test_pr_policy.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "Ordinary dev, exact same-repository release, fork, wrong-base, wrong-ref, candidate identity, durable marker, and placeholder fixtures passed"
   - id: delivery-gate-suite
     command: bash tests/test_delivery_gate.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "Exact D/I/E/S, stale/current head, independent identity, approving outcome, unique push bootstrap PR, and owner review-history fixtures passed"
   - id: github-controls-suite
     command: bash tests/test_github_delivery_controls.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
-    artifact: "Pre-release and steady-state dry-run/apply/verify/idempotency/snapshot rollback mock API matrix passed"
+    executed_at: "2026-07-10T10:54:00Z"
+    artifact: "Pre-release and steady-state owner restrictions, selective CODEOWNERS adversarial matrix, dry-run/apply/verify/idempotency, normalized restriction snapshot rollback, and ordinary zero-review critic path passed"
   - id: lane-review-suite
     command: ruby tests/test_lane_review_validator.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "52 runs, 129 assertions, 0 failures; transport-neutral dev status and human main submission paths both passed"
   - id: cli-suite
     command: bash tests/test_cli.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "CLI lifecycle and router project-definition gate bypass regression passed"
   - id: packed-artifact-suite
     command: bash tests/test_packed_artifact.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:22:20Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "Approved PR #195 coordination excludes only the three contract-owned delivery skills from the version-only comparison; all package/archive/install/provenance/checksum/release assertions passed"
   - id: workflow-lint
     command: actionlint .github/workflows/delivery-gate.yml .github/workflows/policy.yml .github/workflows/release-pr.yml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "All three workflows linted with immutable action pins and read/check-only delivery-gate permissions"
   - id: full-suite
     command: make test
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:20Z"
+    executed_at: "2026-07-10T10:54:00Z"
     artifact: "93 schema runs/541 assertions, 52 lane-review runs/129 assertions, package, CLI, policy, delivery, release, npm, and packed-artifact suites passed"
   - id: changed-commit-secret-scan
     command: 'gitleaks git --no-banner --redact --log-opts="91828dd4f0b632a2833a3d4f62cf4f92c1e35901..HEAD"'
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:40Z"
-    artifact: "Four commits and approximately 103.28 KB scanned; no leaks found"
+    executed_at: "2026-07-10T10:54:00Z"
+    artifact: "Seven commits and approximately 138.16 KB scanned; no leaks found"
   - id: live-pre-release-dry-run
     command: GH_TOKEN=<existing-gh-auth> ruby scripts/github-delivery-controls.rb --phase pre-release --mode dry-run
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:24:55Z"
-    artifact: "Read-only live GET/diff completed; both dev and main require change; no apply or rollback request was issued"
+    executed_at: "2026-07-10T10:54:00Z"
+    artifact: "Read-only live GET/diff completed; both dev and main require change and both desired payloads contain jvallery/jrvallery users-only restrictions; no apply or rollback request was issued"
   - id: live-pr-189-bootstrap-spot-check
     command: prepare the unique live PR 189 event at its current dev head, run candidate delivery-policy, then run critic-gate with empty and synthetic current-owner review fixtures
     exit_status: 0
     result: passed
     executed_at: "2026-07-10T10:24:55Z"
     artifact: "At live head 1b571f4497ee7f8eb13c5c96edd5513206b084f1, route policy passed, zero live reviews blocked, and a synthetic current jvallery fixture passed without submitting a review"
-  - id: github-worker-checks
-    command: inspect PR 196 current-head check rollup and require validate, delivery-policy, pull-request-policy, and compliance success with critic-gate failing until S
-    exit_status: 0
-    result: passed
-    executed_at: "2026-07-10T10:28:00Z"
-    artifact: "validate https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29086269894/job/86340623037; delivery-policy https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29086279479/job/86340652752; pull-request-policy https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29086279519/job/86340652741; compliance https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29086270175/job/86340623769; critic-gate expected red until report-only S https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29086279479/job/86340652719"
   - id: dispatch-and-scope-audit
     command: verify D-only first post-baseline commit, immutable dispatch artifacts, implementation paths, approved test coordination, and prohibited-path absence
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T10:28:23Z"
-    artifact: "D bd9e567d5b24688edc9de36da34063c7bc4408ee; no dispatch artifact changed after D; all implementation paths are owned except tests/test_packed_artifact.sh authorized by merged gate PR #195; zero prohibited paths"
+    executed_at: "2026-07-10T10:55:00Z"
+    artifact: "D bd9e567d5b24688edc9de36da34063c7bc4408ee; no dispatch artifact changed after D; I4 changes contract-owned paths only and preserves the tests/test_packed_artifact.sh coordination invariant from merged gate PR #195; zero prohibited paths"
 acceptance_evidence:
   - criterion_id: LANE-AC-01
-    evidence_ids: [pull-request-policy-suite, live-pr-189-bootstrap-spot-check, github-worker-checks]
+    evidence_ids: [pull-request-policy-suite, live-pr-189-bootstrap-spot-check]
     assessment: satisfied
   - criterion_id: LANE-AC-02
     evidence_ids: [delivery-gate-suite, lane-review-suite, cli-suite]
@@ -133,7 +127,7 @@ acceptance_evidence:
     evidence_ids: [delivery-gate-suite, live-pr-189-bootstrap-spot-check]
     assessment: satisfied
   - criterion_id: LANE-AC-04
-    evidence_ids: [delivery-gate-suite, workflow-lint, github-worker-checks]
+    evidence_ids: [delivery-gate-suite, workflow-lint, github-controls-suite]
     assessment: satisfied
   - criterion_id: LANE-AC-05
     evidence_ids: [github-controls-suite, live-pre-release-dry-run]
@@ -145,20 +139,20 @@ acceptance_evidence:
     evidence_ids: [lane-review-suite, cli-suite, repository-validation]
     assessment: satisfied
   - criterion_id: LANE-AC-08
-    evidence_ids: [full-suite, workflow-lint, changed-commit-secret-scan, github-worker-checks, dispatch-and-scope-audit]
+    evidence_ids: [full-suite, workflow-lint, changed-commit-secret-scan, github-controls-suite, dispatch-and-scope-audit]
     assessment: satisfied
 discovered_issues: []
 residual_risks:
-  - "A fresh critic must independently reproduce the high-risk route, bootstrap, identity, permission, payload, idempotency, and rollback cases and commit only S; critic-gate intentionally remains red before S."
+  - "A fresh critic must independently reproduce FIND-001 compensation, protected-path CODEOWNERS matching, no-op workflow rejection, owner restrictions, ordinary zero-review behavior, and prior high-risk route/payload/rollback cases and commit only S2."
   - "Pre-release approval may require rerunning the same failed dev-push delivery-gate run after the real owner review when candidate-only pull_request_review discovery is unavailable."
   - "Current main has placeholder CODEOWNERS, so pre-release identity depends on critic-gate plus one required review; steady-state CODEOWNERS becomes independently effective only after 1.3.0 reaches main."
   - "The live dry-run shows both branches require reconciliation. Applying/verifying pre-release rules and preserving the controller rollback snapshot remain privileged controller work after reviewed dev integration."
 worktree_clean: true
-worker_agent: codex-delivery-controls
-worker_session_id: worker-121-delivery-controls-20260710t0950z
-completed_at: "2026-07-10T10:29:00Z"
+worker_agent: codex-delivery-controls-fix1
+worker_session_id: worker-121-delivery-controls-fix1-20260710t1050z
+completed_at: "2026-07-10T10:55:00Z"
 limitations:
   - "The immutable dispatch-only commit is bd9e567d5b24688edc9de36da34063c7bc4408ee; its SprintPlan, wave release plan, and lane contract are unchanged through I3."
-  - "Implementation head I3 2699321ed31d2c378df6fadcaad953fee89131df supersedes I a12926654e0eab4af0ed2d4ff3eba5e23168a92a and I2 3a7cdfe108125c83b8008ef5c8a2e4b360d59b7f."
-  - "This closeout follows I3 as the only authorized evidence path; the containing E commit is derived by Git and will be recorded in PR metadata after push."
+  - "Implementation head I4 6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a supersedes I3 2699321ed31d2c378df6fadcaad953fee89131df after request-fixes report S1 7f6b5f31ca471f0902a20488c1fee248f272a387."
+  - "This rewritten closeout follows I4 as the only authorized evidence path; the containing E2 commit is derived by Git and will be recorded in PR metadata after push."
   - "No live branch-protection apply/rollback, repository setting change, PR review, merge, main update, npm publish, tag, release, environment, credential, PR 189, or rescue-ref mutation was performed. Live access was limited to read-only GET/dry-run evidence."
