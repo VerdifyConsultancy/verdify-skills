@@ -1,10 +1,10 @@
 # Route decision
 
-- Current state: `SPRINT_TRANSACTION_AMBIGUOUS`
-- Next skill: `project-router`
-- Next mode: `route`
+- Current state: `STATE_OF_UNION_HANDOFF`
+- Next skill: `sprint-planning`
+- Next mode: `lane-transaction`
 
-Multiple committed sprint transactions are active; rerun route with --sprint ID.
+Issues 135 and 215 are terminal, issue 71 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
 
 ## Missing artifacts
 
