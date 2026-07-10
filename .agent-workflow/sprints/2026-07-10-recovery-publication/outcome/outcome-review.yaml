@@ -1,0 +1,36 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-07-10-recovery-publication
+decision: accepted_with_risks
+reviewed_at: "2026-07-10T05:54:00Z"
+reviewer: "Jason Vallery (user-authorized administrator merge recorded by ROOT)"
+intended_outcome: >-
+  Selectively recover all useful unpublished Verdify Skills work and its provenance
+  onto the current dev baseline without replaying stale trees or losing retrieval handles.
+delivered_outcomes:
+  - "PR #173 integrated timeline-historian, crm-email, six skill packs, five registered evidence packages, and the recovery ledger into dev at da2f43392e768c7554fd35d750507eea64ca0fb3."
+  - "The recovered source is selectively mapped to fe1f94e, f425515, and 22f81bd while obsolete architecture, schemas, router state, and .mcp.json remain excluded."
+  - "Fresh criticism, 90 tests with 533 assertions, five source hashes, secret scanning, package exact-set, npm install, and all required GitHub checks passed."
+  - "The integrated repository validates with 28 skills, 47 schemas, and 439 manifest entries."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/173"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/issues/126"
+  - ".agent-workflow/sprints/2026-07-10-recovery-publication/lanes/closeout/issue-126-recovery-publication.closeout.yaml"
+  - ".agent-workflow/sprints/2026-07-10-recovery-publication/critic/issue-126-recovery-publication.critic.yaml"
+  - ".agent-workflow/sprints/2026-07-10-recovery-publication/gates/pr-173-admin-merge-override.yaml"
+  - "docs/recovery-ledger-2026-07-10.md"
+incomplete_items: []
+residual_risks:
+  - "The real Sunshine manifest was unavailable; deterministic synthetic read-only validation passed and a later mounted-vault smoke remains useful."
+  - "Historian digest hardening is tracked in issue #174, and transactional pack rollback is incorporated into issue #120."
+  - "Rescue refs and the shared Agent Platform checkout remain retained until the new main release and final cleanup audit."
+  - "PR #173 used the user-authorized administrator exception because the author cannot submit a GitHub approval; issue #121 owns durable enforcement and exception transport."
+follow_up_issues: [120, 121, 174]
+lessons_learned:
+  - "Selective source mapping plus a checked-in disposition ledger preserves retrieval without replaying stale authority."
+  - "Critic-discovered low risks must become GitHub backlog evidence before an accepted-with-risks merge."
+rationale: >-
+  The complete approved recovery outcome is integrated on dev with independent
+  source-fidelity, package, security, and exact-head evidence. Remaining risks are
+  explicit, bounded, and durably owned by follow-up issues.

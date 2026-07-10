@@ -1,0 +1,164 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-release-safety
+status: approved
+scope:
+  sprint_id: 2026-07-10-release-safety
+  issue_ids: [120]
+  lane_ids: [issue-120-release-safety]
+  northstar_ids: [FR-007, AC-007, NFR-006, NFR-009]
+  summary: Implement and prove version 1.3.0 exact-artifact and resumable-release behavior on dev, then hold final promotion for issue #121 controls and non-author release approval.
+  non_goals:
+    - Publish npm, create v1.3.0, create the GitHub release, or merge main from the worker/critic lane.
+    - Apply branch protection, CODEOWNERS, or critic-gate policy.
+    - Deploy runtime or mutate CRM, Agent Platform, Orbit, Gravity, or GitOps state.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: main
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-120
+  decision_notes: One issue and lane own the tightly coupled artifact, release-state, workflow, and installer transaction. Final dev-to-main promotion is a later authorized release step after issue #121.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [single-tarball matrix, release transaction suite, exact ZIP verification, full repository gate]
+    - name: policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected: [issue, lane, contract, current-head, and release-branch policy]
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 15
+      evidence_expected: [compliance workflow result]
+    - name: publish npm
+      required: false
+      event_triggers: [push, workflow_dispatch]
+      timeout_minutes: 30
+      evidence_expected: [exact tarball publish, provenance, resumable ledger, tag/release reconciliation]
+  artifacts:
+    - Exact npm tarball plus SHA-256 and npm integrity identity.
+    - Packed-artifact consumer/failure matrix.
+    - Release transaction ledger fixtures and transition audit.
+    - Exact ZIP and checksum artifacts.
+    - Workflow pin and publish-input audit.
+  required_events: [pull_request, push]
+environments:
+  - name: not-applicable
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: none
+    protection_rules: []
+    expected_revision_source: null
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: []
+  remediation_policy: This package release does not deploy a runtime or mutate GitOps state.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+    - id: STEP-01
+      action: Build and test the exact version 1.3.0 tarball on the lane implementation head without credentials.
+      success_criteria: One tarball identity passes the complete consumer, archive, and recovery matrix.
+      rollback_trigger: Any identity mismatch, incomplete test, live mutation, or mutable publish input.
+    - id: STEP-02
+      action: Integrate the approved lane to dev and let the release workflow open or update the James-authored dev-to-main candidate.
+      success_criteria: Dev contains the approved S chain and exactly one version 1.3.0 release candidate exists.
+      rollback_trigger: Failed dev checks, duplicate candidate, or version/source drift.
+    - id: STEP-03
+      action: Integrate issue #121 code and apply its approved live GitHub rules.
+      success_criteria: Dev and main protections, CODEOWNERS, policy, and critic gate match the approved branch model.
+      rollback_trigger: Rules deadlock authorized release or permit ordinary main-target PRs.
+    - id: STEP-04
+      action: Obtain Jason's commit-bound non-author approval on the final James-authored release PR.
+      success_criteria: Latest effective review is APPROVED on the exact final dev head and all required checks pass.
+      rollback_trigger: Dev advances, approval becomes stale, or any required check fails.
+    - id: STEP-05
+      action: Merge main, let trusted publishing resume the ledger, and verify npm, provenance, tag, release, archive, checksum, and gitHead.
+      success_criteria: All release identities agree and the transaction reaches completed with no duplicate state.
+      rollback_trigger: Partial publication with an identity mismatch; preserve the ledger and stop rather than creating a second release.
+observability:
+  dashboards: []
+  logs: [GitHub Actions validate, policy, compliance, release-pr, and publish-npm logs]
+  metrics: [npm package version/integrity visibility, GitHub release/tag state]
+  traces: []
+  runtime_checks:
+    - Verify the exact tarball digest tested in CI equals the ledger and publish input.
+    - Verify npm gitHead/version/integrity, v1.3.0 target, GitHub release assets/digests, and completed ledger identify one source commit.
+  missing_telemetry:
+    - npm provenance attestation is verified through registry/GitHub evidence after authorized publication, not during the worker lane.
+rollback:
+  ready: true
+  strategy: Revert the issue #120 dev merge before publication; after immutable npm publication, resume the transaction or roll forward with a newer version rather than attempting deletion.
+  known_good_ref: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+  procedure: Before publish, revert the lane merge and rerun make test. After npm succeeds, preserve the ledger, finish missing tag/release/provenance steps when identities agree, or publish a corrective newer version.
+  validation_steps:
+    - Prove no npm, tag, or GitHub release mutation occurred during lane work.
+    - Exercise failed/resumable ledger fixtures for every partial state.
+    - Confirm the known-good dev baseline still packages and validates.
+release_health:
+  stabilization_window: through final npm/tag/release/ledger reconciliation
+  signals:
+    - name: exact-artifact identity
+      source: release ledger, tarball digests, npm metadata, and GitHub release assets
+      threshold: one version, source SHA, tarball integrity, tag target, and completed transaction agree
+      blocking: true
+    - name: required checks and approval
+      source: final dev-to-main release PR
+      threshold: validate, pull-request-policy, compliance, issue #121 critic gate, and non-author APPROVED review are current
+      blocking: true
+    - name: duplicate prevention
+      source: release-pr workflow and GitHub issue/PR state
+      threshold: no generated candidate for an unchanged or already-published version
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-release-safety/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Inspect one exact tarball identity across the full consumer matrix and the workflow npm publish argument.
+    - Exercise archive mutations and a middle-link pack conflict; confirm both fail closed with no partial install.
+    - Resume each partial release ledger fixture and verify one deterministic next action without duplicate issues, tags, or releases.
+    - Confirm VERSION/package/changelog are 1.3.0 and scripts/package-file-list.rb is byte-identical to baseline.
+  approval_gate: Fresh critic approval on exact S for dev integration; final release waits for issue #121 and a real non-author approval on the James-authored dev-to-main PR.
+risks:
+  - id: RISK-01
+    severity: critical
+    statement: npm may be immutable and partially published before GitHub release state completes.
+    mitigation: Persist and validate a resumable transaction with identity checks before every idempotent step.
+  - id: RISK-02
+    severity: high
+    statement: Workflow repacking or mutable dependencies can invalidate tested artifact evidence.
+    mitigation: Pack once, publish the verified path, and pin privileged dependencies immutably.
+  - id: RISK-03
+    severity: high
+    statement: Final promotion before issue #121 can preserve unprotected dev or insufficient review enforcement.
+    mitigation: Keep main merge explicitly blocked until #121 code/live rules and non-author release approval are verified.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T05:55:37Z"
+prepared_at: "2026-07-10T05:55:37Z"
+planner: root-verdify-skills-controller

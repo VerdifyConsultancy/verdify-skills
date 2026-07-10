@@ -1,0 +1,190 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+title: Exact packed artifact and resumable release transaction
+status: approved
+issue_ids: [120]
+coupling_justification: null
+objective: Build and validate one exact version 1.3.0 npm tarball and a resumable publication transaction without performing live publication or main promotion.
+desired_outcome: Every tested, installed, and eventual publish input is one immutable tarball bound to dev source, while ZIP contents, pack installation, partial release recovery, duplicate prevention, provenance, tag, and release identity fail closed and resume deterministically.
+non_goals:
+  - Publish npm, push a tag, create or modify a GitHub release, merge main, or use live npm credentials from the worker.
+  - Apply branch protection, CODEOWNERS, critic-gate, or main-target policy owned by issue #121.
+  - Change scripts/package-file-list.rb or replace issue #130 immutable Git-object staging.
+  - Implement issue #174 historian digest hardening or unrelated lifecycle/router work.
+  - Put private advisory identifiers or exploit reproduction details in public artifacts.
+baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+branch: lane/120-release-safety
+module_contracts: [release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [package-artifact, release-transaction, publication-recovery, installer-transaction]
+  owned_paths:
+    - .github/workflows/publish-npm.yml
+    - .github/workflows/release-pr.yml
+    - CHANGELOG.md
+    - VERSION
+    - package.json
+    - Makefile
+    - MANIFEST.sha256
+    - lib/verdify/cli.rb
+    - npm/bin/verdify.js
+    - schemas/release-transaction.schema.yaml
+    - scripts/build-release-candidate.sh
+    - scripts/package.sh
+    - scripts/release-preflight.rb
+    - scripts/release-transaction.rb
+    - scripts/verify-npm-tarball.rb
+    - scripts/verify-package.sh
+    - tests/test_cli.sh
+    - tests/test_npm_install.sh
+    - tests/test_package_file_set.sh
+    - tests/test_packed_artifact.sh
+    - tests/test_release_preflight.sh
+    - tests/test_release_transaction.sh
+    - docs/vendoring-standard.md
+    - docs/skill-packs.md
+    - docs/release-transaction.md
+  prohibited_paths:
+    - scripts/package-file-list.rb
+    - scripts/pr-policy.rb
+    - .github/CODEOWNERS
+    - .github/workflows/policy.yml
+    - .github/workflows/validate.yml
+    - .github/workflows/compliance-gate.yml
+    - .github/workflows/compliance-selftest.yml
+    - config/github-primitives.yaml
+    - .agent-workflow/northstar/**
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/strategy/**
+    - .agent-workflow/hygiene/**
+    - skills/**
+    - evaluations/**
+    - packs/**
+  coordination_required_paths:
+    - scripts/gen-manifest.sh
+    - scripts/setup-agent-hosts.rb
+    - scripts/validate-repo.rb
+    - schemas/manifest.json
+  owned_interfaces:
+    - Exact npm release candidate builder and verifier.
+    - Resumable release transaction schema, CLI, and workflow state transitions.
+    - Exact ZIP regular-file set verification.
+    - Transactional skill-pack host-link installation and rollback behavior.
+dependencies:
+  hard:
+    - lane_id: issue-130-package-file-set
+      required_output: Preserve immutable Git-index object staging integrated at dev commit 17b3762.
+    - lane_id: issue-126-recovery-publication
+      required_output: Build against the complete recovered package shape integrated at dev commit da2f433.
+  soft:
+    - lane_id: issue-121-delivery-controls
+      coordination: Final release PR approval and main promotion wait for delivery-control code and live rule reconciliation.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: Version identity is 1.3.0 and one pack operation creates the sole npm tarball used by every consumer test and the eventual workflow publish command.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [tarball path and digests, npm pack invocation count, workflow publish command, VERSION/package/changelog consistency]
+  - id: LANE-AC-02
+    statement: The exact tarball passes fresh install, same-version reinstall, upgrade from published 1.2.1, Node 18, collision, corruption, rollback, and installed-command tests in isolated targets.
+    sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
+    evidence_required: [packed artifact matrix, npm test from extracted/installed package, no-network fixtures, zero partial state]
+  - id: LANE-AC-03
+    statement: Skill-pack installation preflights all selected link and manifest destinations or completely rolls back created state when any target conflicts or a later write fails.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [critic FIND-002 reproduction, conflict-at-first/middle/last tests, manifest failure test, operator-file preservation]
+  - id: LANE-AC-04
+    statement: ZIP verification derives expected files from MANIFEST.sha256 and rejects every missing, altered, duplicate, unsafe, non-regular, or unlisted archive member without weakening issue #130 staging.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [archive mutation matrix, package file-set regression, unchanged package-file-list blob]
+  - id: LANE-AC-05
+    statement: The release transaction ledger validates legal transitions, records source/tarball/integrity/npm/provenance/tag/release/archive identities, and resumes idempotently after every partial state including npm-already-published.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [schema/state-machine tests, recorded next action, duplicate tag/release prevention, mismatch fail-closed cases]
+  - id: LANE-AC-06
+    statement: Release PR generation rejects unbumped or already-published versions, workflow dependencies are immutable-version pinned, and npm publish receives only the verified tarball path.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [release-preflight matrix, workflow static audit, already-published resume test]
+  - id: LANE-AC-07
+    statement: Exact implementation and report heads pass all focused, full, security, artifact, policy, and GitHub checks with no live publication or secret use.
+    sprint_acceptance_ids: [SPR-AC-06]
+    evidence_required: [gitleaks, make test, validator, package artifacts and digests, check URLs, no-live-mutation statement]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate the complete repository, release schema, manifest, links, and version identity.
+    required: true
+  - id: packed-artifact-suite
+    command: bash tests/test_packed_artifact.sh
+    purpose: Build once and exercise the exact tarball consumer, failure, runtime, and rollback matrix.
+    required: true
+  - id: release-transaction-suite
+    command: bash tests/test_release_transaction.sh
+    purpose: Prove legal ledger transitions, partial-release recovery, identity reconciliation, and idempotency.
+    required: true
+  - id: release-preflight-suite
+    command: bash tests/test_release_preflight.sh
+    purpose: Prove version, published/unpublished, bump, duplicate, and resume behavior.
+    required: true
+  - id: package-file-set-suite
+    command: bash tests/test_package_file_set.sh
+    purpose: Preserve immutable Git-index staging and prove exact ZIP mutation rejection.
+    required: true
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    purpose: Prove transactional pack installation and existing CLI behavior.
+    required: true
+  - id: npm-install-suite
+    command: bash tests/test_npm_install.sh
+    purpose: Prove installed-package commands and supported npm distribution behavior.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run repository, schema, manifest, CLI, policy, release, package, and npm gates.
+    required: true
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="da2f43392e768c7554fd35d750507eea64ca0fb3..HEAD"
+    purpose: Scan every lane commit while redacting any match value.
+    required: true
+required_evidence:
+  - Exact tarball filename, SHA-256, npm integrity, package name/version, source SHA, and one-pack invocation proof.
+  - Install/reinstall/upgrade/minimum-runtime/collision/corruption/rollback results against that exact tarball.
+  - Transactional pack conflict reproduction showing zero newly created links or manifest residue.
+  - ZIP expected/actual set comparison and missing/extra/duplicate/unsafe/member-type mutation failures.
+  - Release ledger fixtures for prepared, artifact_verified, npm_published, tag_pushed, github_released, completed, and failed/resumable states.
+  - Static workflow proof for immutable action/npm versions, exact tarball publish input, and no duplicate published-version PR creation.
+  - Unchanged scripts/package-file-list.rb blob and passing issue #130 regression.
+  - Clean implementation worktree, worker closeout, fresh critic report, exact-head checks, and no-live-publication proof.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - A required release identity cannot be represented without weakening provenance, trusted publishing, or immutable version semantics.
+  - Testing requires live npm credentials, tag/release mutation, main promotion, production access, or private advisory disclosure.
+  - The worker must change scripts/package-file-list.rb, protected North Star/project/architecture authority, or issue #121 delivery controls.
+  - npm 1.3.0 is already published or v1.3.0 already exists before authorized final promotion.
+  - The exact artifact cannot run on Node 18 without a material public compatibility or dependency decision.
+definition_of_done:
+  - D is dispatch-only and all substantive version, artifact, release, workflow, installer, test, and documentation changes are committed at I.
+  - Every acceptance criterion has exact command/artifact evidence bound to I, and I contains no live publication result.
+  - E adds only the canonical closeout with status ready_for_critic.
+  - A fresh critic commits only the canonical report at S and independently exercises high-risk artifact and recovery paths.
+  - Validate, pull-request-policy, and compliance pass at S.
+  - Integration uses a valid non-author approval when available or the recorded user-authorized admin exception without fabricating a review.
+  - Final main promotion remains blocked until issue #121 code and live delivery rules are complete and the James-authored release PR receives Jason's real non-author approval.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T05:55:37Z"
