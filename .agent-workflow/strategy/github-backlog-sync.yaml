@@ -1,0 +1,399 @@
+schema_ref: github-backlog-sync.schema.yaml
+kind: GitHubBacklogSync
+schema_version: "1.0"
+sync_id: gbs-verdify-skills-20260710-recovery
+status: reconciled
+repository: VerdifyConsultancy/verdify-skills
+captured_at: "2026-07-10T02:32:25Z"
+source_authority:
+  github_is_authoritative: true
+  snapshot_is_cache: false
+  live_access: live
+  snapshot_ref: null
+  limitations:
+    - The repository has no GitHub ProjectsV2 or milestones.
+    - Native issue dependency and sub-issue relationships were not present in the captured issue list; strategy records the required dependency for sprint planning.
+    - Deployment records cover npm publication only; this repository has no long-running application runtime.
+snapshot:
+  snapshot_ref: null
+  captured_at: "2026-07-10T02:32:25Z"
+  freshness: live_only
+  api_sources:
+    - surface: issues
+      source_ref: live GitHub Issues API through issue #142
+      captured: true
+      limitation: No milestones or assignees are configured on the recovery issues.
+    - surface: pulls
+      source_ref: live GitHub Pull Requests API through PR #141
+      captured: true
+      limitation: Closed duplicate release transactions remain visible as history.
+    - surface: checks
+      source_ref: live PR check rollups and Actions workflow runs
+      captured: true
+      limitation: Consolidated status distinguishes final passing reruns from earlier failures in evidence text.
+    - surface: workflow_runs
+      source_ref: GitHub Actions runs for merged dev heads and generated release PRs
+      captured: true
+      limitation: No future release run exists for a new version.
+    - surface: deployments
+      source_ref: live repository deployments API
+      captured: true
+      limitation: Only npm environment publication records exist.
+    - surface: deployment_statuses
+      source_ref: npm deployment records and GitHub releases
+      captured: true
+      limitation: npm registry identity was probed separately.
+    - surface: environments
+      source_ref: live repository environments API
+      captured: true
+      limitation: Environments are copilot and npm; neither currently has protection rules.
+    - surface: projects
+      source_ref: live ProjectsV2 and milestones GraphQL query
+      captured: true
+      limitation: Both collections are empty.
+    - surface: sub_issues
+      source_ref: issue bodies and current planning artifacts
+      captured: false
+      limitation: No authoritative sub-issue hierarchy was returned for the selected issues.
+    - surface: dependencies
+      source_ref: issue bodies and strategy sequence
+      captured: false
+      limitation: The #130 before #126 dependency must be encoded in the sprint transaction.
+    - surface: timeline
+      source_ref: issue and PR comments for #120, #126, #135, and #139
+      captured: true
+      limitation: Only delivery-relevant comments were inspected.
+    - surface: search
+      source_ref: live open issue and recent PR lists
+      captured: true
+      limitation: Closed historical backlog was sampled where it affected recovery.
+    - surface: local_artifacts
+      source_ref: approved .agent-workflow artifacts and refs fe1f94e/f425515
+      captured: true
+      limitation: Recovery refs remain proposed content, not accepted code.
+    - surface: git
+      source_ref: origin/main, origin/dev, local branches, remote branches, and worktrees
+      captured: true
+      limitation: Ref deletion remains gated on the final checked-in recovery ledger and main verification.
+issue_findings:
+  - issue: 143
+    title: Accept an artifact-only state-of-union commit over its assessed baseline
+    state: OPEN
+    classification: candidate
+    labels: [bug, type:problem]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["lib/verdify/cli.rb route_for_strategy", "strategy baseline 45150ee76b770c2e97345dfdfa9196b4acebcc3b"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/143"]
+    required_action: Apply the artifact-only suffix fix before normal sprint routing.
+  - issue: 130
+    title: Ignore host-local and untracked files in manifests and archives
+    state: OPEN
+    classification: candidate
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: [".claude/scheduled_tasks.lock reproduction", "scripts/gen-manifest.sh", "scripts/package.sh"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/130"]
+    required_action: Plan as the first lane in the next dependency-ordered sprint.
+  - issue: 126
+    title: Publish timeline-historian and reconcile local delivery residue
+    state: OPEN
+    classification: candidate
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: ["#130"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["fe1f94e", "f425515", "issue #126 recovery comments"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/126"]
+    required_action: Plan after #130; selectively recover skill/evidence and commit the final ref ledger.
+  - issue: 120
+    title: Test and publish the exact packed artifact as an atomic recoverable transaction
+    state: OPEN
+    classification: candidate
+    labels: [type:problem, risk:high]
+    assignees: []
+    milestone: null
+    dependencies: ["#130", "#126"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["npm 1.2.1", "GitHub release v1.2.1", "closed release PRs #125/#128/#133/#138/#141"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/120"]
+    required_action: Plan after final package recovery so exact-artifact tests exercise the intended release shape.
+  - issue: 121
+    title: Enforce protected dev integration and release-only main promotion
+    state: OPEN
+    classification: candidate
+    labels: [type:problem, risk:high]
+    assignees: []
+    milestone: null
+    dependencies: ["#120"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["live main branch protection", "live unprotected dev branch", "PRs #122/#123 missing GitHub approval"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/121"]
+    required_action: Implement and apply live controls before final release promotion.
+  - issue: 12
+    title: Negotiate Agent Platform capabilities and supported worker adapters
+    state: OPEN
+    classification: blocked
+    labels: [bug, type:problem, risk:critical]
+    assignees: []
+    milestone: null
+    dependencies: ["Agents #2889", "platform-readiness"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["iteration-25 project definition", "architecture external provider boundary"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/12"]
+    required_action: Keep blocked until owning platform evidence is approved.
+  - issue: 116
+    title: Codify the platform loop-native operating convention
+    state: OPEN
+    classification: blocked
+    labels: [enhancement]
+    assignees: []
+    milestone: null
+    dependencies: ["#12", "#120", "#121"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["iteration-25 North Star"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/116"]
+    required_action: Resume only after package trust and Agent Platform capability gates.
+  - issue: 71
+    title: Validate route status strings and transitions
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/71"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 73
+    title: Reject vacuous approval evidence
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/73"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 74
+    title: Make semantic validation and evals consumer merge-blocking
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: ["#120"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog", "exact package boundary"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/74"]
+    required_action: Sequence after the trusted package artifact work.
+  - issue: 75
+    title: Build an executable eval runner
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/75"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 142
+    title: Sequence repository recovery and trusted main promotion
+    state: OPEN
+    classification: in_progress
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: [".agent-workflow/strategy/state-of-union.yaml"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
+    required_action: Merge and close the strategy transaction.
+pr_findings:
+  - pr: 139
+    branch: fix/135-sprint-terminal-routing
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [135]
+    head_sha: "08350751b0dcb8ab21fda1f930b3e646eea62dc6"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Restored deterministic global routing and terminalized completed sprint evidence on dev.
+    evidence_refs: ["dev@45150ee76b770c2e97345dfdfa9196b4acebcc3b", "issue #135"]
+  - pr: 141
+    branch: dev
+    base_branch: main
+    state: CLOSED
+    draft: false
+    linked_issues: [140]
+    head_sha: "45150ee76b770c2e97345dfdfa9196b4acebcc3b"
+    checks_status: fail
+    deployment_status: missing
+    finding: Invalid duplicate 1.2.1 promotion; closed because npm and GitHub already publish 1.2.1.
+    evidence_refs: ["npm:@verdify-cli/cli@1.2.1", "GitHub release v1.2.1"]
+  - pr: 122
+    branch: lane/119-northstar-review-feedback
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [119]
+    head_sha: "decc7a177f669150ffa8767fbde063f5a4e9fe31"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: North Star lock integrated, but no GitHub APPROVED review exists; residual risk is committed in outcome evidence.
+    evidence_refs: ["dev@d9aa3e4c9c9127435fe8b77a8f04b37c0c051c05", "issue #121"]
+  - pr: 123
+    branch: lane/72-exact-head-evidence
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [72]
+    head_sha: "71e3f6eee0c5fb58f118536ce9b43ebcc1cfe1a5"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Exact evidence-chain repair integrated, but no GitHub APPROVED review exists; residual risk is committed in outcome evidence.
+    evidence_refs: ["dev@c90801f97646238a3d7b3bfb064c799038d40c68", "issue #121"]
+  - pr: 131
+    branch: project/129-iteration-25-definition
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [129]
+    head_sha: "2e1fbecfdca0a96f5dcd196c3cfadd9b88c1004b"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Approved project definition is integrated and current.
+    evidence_refs: ["dev@a352481631fd069167ac00577d904f55d30b1900"]
+  - pr: 136
+    branch: architecture/134-iteration-25-contracts
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [134]
+    head_sha: "735efb856bc84f83a606cd98869fc0e2dd960d11"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Approved architecture and nine module contracts are integrated and current.
+    evidence_refs: ["dev@c911ccc6144c75592504ac5c8fb205e262fb70bc"]
+lane_findings:
+  - lane_id: issue-69-pr-policy
+    contract_ref: .agent-workflow/sprints/2026-06-25-first-pilot/lanes/contracts/issue-69-pr-policy.contract.yaml
+    issue_ids: [69]
+    branch: pilot/first-test-pass
+    pr_refs: ["#78"]
+    status: warning
+    findings:
+      - Sprint is complete and verified; branch is historical and eligible for deletion after the recovery ledger reaches main.
+  - lane_id: issue-72-exact-head-evidence
+    contract_ref: .agent-workflow/sprints/2026-07-09-issue-72-exact-head/lanes/contracts/issue-72-exact-head-evidence.contract.yaml
+    issue_ids: [72]
+    branch: lane/72-exact-head-evidence
+    pr_refs: ["#123"]
+    status: warning
+    findings:
+      - Sprint is complete; missing external GitHub approval is retained as a delivery-control risk.
+  - lane_id: issue-119-northstar-review-feedback
+    contract_ref: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/contracts/issue-119-northstar-review-feedback.contract.yaml
+    issue_ids: [119]
+    branch: lane/119-northstar-review-feedback
+    pr_refs: ["#122"]
+    status: warning
+    findings:
+      - Sprint is complete; missing external GitHub approval is retained as a delivery-control risk.
+delivery_findings:
+  - ref: main branch protection
+    type: branch_rule
+    status: fail
+    evidence_refs: ["GitHub branches/main/protection", "issue #121"]
+    finding: Main requires validate, pull-request-policy, compliance, admin enforcement, and conversation resolution, but no pull-request review.
+  - ref: dev branch protection
+    type: branch_rule
+    status: missing
+    evidence_refs: ["GitHub branches/dev/protection", "issue #121"]
+    finding: Dev has no required checks, pull-request rule, review, admin, or conversation-resolution protection.
+  - ref: npm release 1.2.1
+    type: release
+    status: pass
+    evidence_refs: ["npm:@verdify-cli/cli@1.2.1", "GitHub release v1.2.1", "deployment 5350587304"]
+    finding: Current main, npm latest, and GitHub latest release agree on 1.2.1.
+  - ref: next release transaction
+    type: workflow_run
+    status: fail
+    evidence_refs: ["PR #141", "issue #120"]
+    finding: The workflow generates an invalid same-version promotion until dev carries a genuinely new version and resumable release state.
+actions:
+  - id: GBSA-005
+    type: update_issue
+    target: issue #143
+    owner: state-of-union
+    status: applied
+    apply_through: github_issue
+    evidence_refs: ["route_for_strategy exact-HEAD comparison", "state-of-union baseline contract"]
+  - id: GBSA-001
+    type: update_issue
+    target: issue #126
+    owner: state-of-union
+    status: applied
+    apply_through: github_issue
+    evidence_refs: ["issue #126 recovery comments", "fe1f94e", "f425515"]
+  - id: GBSA-002
+    type: set_dependency
+    target: "#126 depends on #130"
+    owner: sprint-planning
+    status: proposed
+    apply_through: github_dependency
+    evidence_refs: ["issue #130 reproduction", "state-of-union SEQ-001/SEQ-002"]
+  - id: GBSA-003
+    type: route
+    target: issues #130 and #126
+    owner: project-router
+    status: proposed
+    apply_through: state_of_union
+    evidence_refs: [".agent-workflow/strategy/state-of-union.yaml"]
+  - id: GBSA-004
+    type: no_op
+    target: deferred and blocked quality/platform issues
+    owner: state-of-union
+    status: not_applicable
+    apply_through: none
+    evidence_refs: ["live open issue inventory"]
+handoff:
+  next_skill: sprint-planning
+  next_mode: issue-readiness
+  reason: Issue #143 must restore committed-strategy routing, then issues #130 and #126 are ready and dependency ordered; #120 and #121 remain the required post-recovery release sequence.
