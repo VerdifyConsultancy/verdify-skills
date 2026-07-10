@@ -1,0 +1,32 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-07-09-issue-72-exact-head
+decision: accepted_with_risks
+reviewed_at: "2026-07-10T02:22:18Z"
+reviewer: "Jason Vallery (manual merge of PR #123); recorded by issue #135 lifecycle recovery"
+intended_outcome: >-
+  Repair lane evidence identity so implementation, closeout, critic, external
+  approval, integration, deployment, and outcome revisions are independently
+  verifiable.
+delivered_outcomes:
+  - "PR #123 integrated the version-2 implementation, evidence, critic-report, and review-submission identity chain into dev at c90801f97646238a3d7b3bfb064c799038d40c68."
+  - "The router, PR policy, schemas, examples, and tests now fail closed on stale or forged evidence transitions covered by issue #72."
+  - "Issue #72 is closed as completed with the exact integrated and lane head SHAs recorded in GitHub."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/123"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/issues/72"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29057089023"
+  - ".agent-workflow/sprints/2026-07-09-issue-72-exact-head/lanes/closeout/issue-72-exact-head-evidence.closeout.yaml"
+  - ".agent-workflow/sprints/2026-07-09-issue-72-exact-head/critic/issue-72-exact-head-evidence.critic.yaml"
+incomplete_items: []
+residual_risks:
+  - "PR #123 had no GitHub APPROVED review, so the external-review invariant was not satisfied even though the lane critic artifact and required checks passed."
+  - "The integrated work remains on dev until a separately versioned release is promoted to main."
+follow_up_issues: [121, 135]
+lessons_learned:
+  - "A completed sprint must be terminalized immediately; otherwise live branch drift can make historical evidence block global routing."
+rationale: >-
+  The issue is closed, the exact lane head is merged into dev, and the integrated
+  revision passed validation and compliance workflows. The outcome is accepted
+  with the missing independent GitHub approval retained as an explicit risk.
