@@ -1,0 +1,124 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-package-file-set
+status: approved
+scope:
+  sprint_id: 2026-07-10-package-file-set
+  issue_ids: [130]
+  lane_ids: [issue-130-package-file-set]
+  northstar_ids: [FR-007, FR-012, AC-007, AC-012]
+  summary: Integrate a reviewed package-file-selection fix into dev without publishing or deploying a new package version.
+  non_goals:
+    - Publish npm, tag Git, create a GitHub release, or promote dev to main.
+    - Modify runtime, GitOps, environment, or production state.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: null
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-130
+  decision_notes: One issue, lane, leased worktree, worker session, branch, and PR target dev; release promotion is explicitly deferred.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [full package test result, release-preflight result]
+    - name: policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected: [issue/lane/contract/current-head policy result]
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 15
+      evidence_expected: [compliance workflow result]
+  artifacts:
+    - Focused package-file-set regression output.
+    - Manifest and archive entry comparison recorded in lane closeout.
+  required_events: [pull_request, push]
+environments:
+  - name: not-applicable
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: none
+    protection_rules: []
+    expected_revision_source: null
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: []
+  remediation_policy: No runtime or GitOps state is changed by this package-source sprint.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps: []
+observability:
+  dashboards: []
+  logs: [GitHub Actions validate, policy, and compliance job logs]
+  metrics: []
+  traces: []
+  runtime_checks:
+    - Compare manifest and archive file sets from clean and contaminated lane worktrees.
+    - Install and invoke the package surface through the existing npm install test.
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: "Revert the single issue #130 merge commit on dev; no immutable package or runtime state changes."
+  known_good_ref: "32038e3a0637192699af09ad60da48031b7575bc"
+  procedure: "Revert the issue #130 integration commit on dev and rerun required workflows."
+  validation_steps:
+    - Run make test on the reverted dev head in a clean worktree.
+    - Confirm manifest and package behavior matches the pre-lane known-good ref.
+release_health:
+  stabilization_window: until required dev push workflows finish
+  signals:
+    - name: exact-head required checks
+      source: GitHub check rollup on the integrated dev revision
+      threshold: validate, pull-request-policy, and compliance all SUCCESS
+      blocking: true
+    - name: contaminated-worktree regression
+      source: tests/test_package_file_set.sh evidence at implementation and integrated heads
+      threshold: all ignored/untracked exclusion and tracked-input assertions pass
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-package-file-set/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Inspect the lane closeout file-list evidence and confirm .claude/scheduled_tasks.lock and other fixtures are absent.
+    - Confirm tracked discovery links and intended package inputs remain present without dereferencing host targets.
+    - Confirm no version, npm, GitHub release, main, or runtime state changed.
+  approval_gate: Independent repository admin or maintainer approval on exact critic-report head S.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A file selector regression could create incomplete packages while tests appear clean.
+    mitigation: Require positive tracked-set and negative contamination assertions plus archive inspection.
+  - id: RISK-02
+    severity: high
+    statement: Symlink dereference could leak host-local contents into an archive.
+    mitigation: Assert tracked link identity and archive link behavior without following external targets.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T03:07:48Z"
+prepared_at: "2026-07-10T03:07:48Z"
+planner: root-verdify-skills-controller
