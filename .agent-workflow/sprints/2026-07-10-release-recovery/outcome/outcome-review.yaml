@@ -1,0 +1,25 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-10-release-recovery
+decision: accepted
+reviewed_at: '2026-07-10T20:54:42Z'
+reviewer: codex-root under Jason Vallery delegated authority
+intended_outcome: Repair the relative-tarball consumer path that stopped the first
+  1.3.0 publish run, then repromote and verify the still-unpublished exact release.
+delivered_outcomes:
+- The exact reviewed lane merged to protected dev as 2f6843dd24e7d955c8328963aeb4086b3fad1688
+  with trusted checks green.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/201
+- git:ec8c8e50e66cbdea7ef59e8f43932ecd2bc27998
+- git:2f6843dd24e7d955c8328963aeb4086b3fad1688
+incomplete_items: []
+residual_risks: []
+follow_up_issues: []
+lessons_learned:
+- Terminal authority belongs on protected dev and must remain bound to exact review
+  and integration evidence.
+rationale: The issue-backed lane met its acceptance contract and was independently
+  reviewed, checked, and merged.
