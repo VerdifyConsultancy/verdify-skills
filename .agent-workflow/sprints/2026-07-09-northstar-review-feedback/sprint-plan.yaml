@@ -1,0 +1,103 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-09-northstar-review-feedback
+status: active
+goal: Reconstruct, approve, and lock iteration 25 as the protected North Star for the integrated Verdify Skills, Agent Platform, Orbit, and Gravity self-building platform.
+baseline_sha: "c90801f97646238a3d7b3bfb064c799038d40c68"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [119]
+scope:
+  - Register Jason's explicit final-lock instruction as evidence without rewriting the earlier review-feedback record.
+  - Restore the archived iteration-25 draft and reconcile every North Star, interview, gate, cross-link, issue, and learning-proposal reference to the approved state.
+  - Codify all ten approved July 9 planning defaults for the four-project self-building platform.
+  - Deliver the lock through the repaired D-I-E-S evidence chain and an independent current-head GitHub approval.
+non_goals:
+  - Implement Agent Platform, Orbit, Gravity, package, installer, or runtime features.
+  - Publish npm, promote dev to main, or mutate any runtime environment.
+  - Apply proposal-only learning-capture changes.
+  - Reintroduce deprecated fields, compatibility aliases, or retired runtime paths.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: Jason's explicit iteration-25 final-lock instruction is registered as distinct, discoverable North Star evidence while the earlier feedback evidence remains historically accurate.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [schema-valid evidence item and registry, evidence query output]
+  - id: SPR-AC-02
+    statement: Product, architecture, design, structured plan, and loop artifacts consistently encode all ten approved defaults and identify the four projects as one integrated self-building platform.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [semantic cross-link audit, artifact validation, stale-wording scan]
+  - id: SPR-AC-03
+    statement: Iteration 25 records Jason's final approval, an approved North Star gate, no pending-lock risk, and a committed router snapshot that agrees with a fresh project-definition discovery route.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [structured approval inspection, gate validation, committed route record, fresh route parity]
+  - id: SPR-AC-04
+    statement: The interview packet records all resolved decisions, contains no P0 or other blocking human question, and preserves only nonblocking owner-routed research items with proposed defaults.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [interview audit, question-state inspection]
+  - id: SPR-AC-05
+    statement: Verified cross-repository gaps remain linked to their owning issues, staged learning proposals remain proposal-only, and public evidence omits installer reproduction detail retained only in the private advisory.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [issue reconciliation, learning packet validation, public evidence redaction and digest audit]
+  - id: SPR-AC-06
+    statement: Worker implementation and closeout first prove repository, schema, North Star semantic, dispatch, scope, and evidence prerequisites; the later critic-report-only head must then pass current checks and independent admin approval before integration.
+    lane_ids: [issue-119-northstar-review-feedback]
+    evidence_expected: [full test suite, lane closeout, critic report, GitHub checks and review]
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A partial lock could leave product, architecture, interview, gate, or structured state disagreeing about whether iteration 25 is authoritative.
+    mitigation: Update the complete protected artifact set atomically in I and run schema, semantic, cross-link, and stale-language audits.
+  - id: RISK-02
+    severity: high
+    statement: Downstream implementation gates could be mistaken for unresolved North Star lock questions.
+    mitigation: Keep their safety constraints and owners, but classify them as nonblocking for the lock and blocking only for the affected implementation or promotion action.
+lanes:
+  - lane_id: issue-119-northstar-review-feedback
+    issue_ids: [119]
+    contract_path: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/contracts/issue-119-northstar-review-feedback.contract.yaml
+    branch: lane/119-northstar-review-feedback
+    owner: root
+    reviewer: fresh-independent-critic
+    summary: Register the final-lock evidence, reconcile iteration 25, record Jason's approval, update the interview, and prove the protected handoff.
+dependency_order:
+  - [issue-119-northstar-review-feedback]
+deployment_expectations:
+  - No runtime deployment is required for this protected planning lane.
+  - Integration targets dev; main promotion and npm publication remain separate generated release work.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Locked North Star coherence and evidence-chain validation
+      due: before external approval
+      evidence_expected:
+        - Every protected artifact and the final-lock evidence validate at the implementation head.
+        - A fresh critic validates the immutable D-I-E-S chain and the zero-blocking-question interview state.
+  human_review_milestones:
+    - id: HR-01
+      name: Independent current-head GitHub approval
+      owner: James or another repository admin or maintainer other than the PR author
+      trigger: Critic-report-only head is pushed and all required checks pass.
+      review_packet_path: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/review/review-inbox-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As Jason, I can verify that my approved defaults are the locked planning authority and that no unanswered P0 decision was silently inferred.
+      issue_ids: [119]
+      lane_ids: [issue-119-northstar-review-feedback]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05, SPR-AC-06]
+  reporting_summary:
+    included:
+      - "Issue #119 final-lock evidence, iteration-25 protected artifacts, interview packet, gate, issue reconciliation, and exact-head delivery evidence."
+    deferred:
+      - All downstream product implementation, platform readiness, connector activation, package publication, runtime deployment, and proposal application.
+    ownership:
+      - lane_id: issue-119-northstar-review-feedback
+        owner: root
+        responsibility: Reconstruct, validate, publish, and obtain independent review for the iteration-25 lock.
+    next_review: Fresh critic review followed by an external admin or maintainer approval on the exact final lane head.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T23:20:09Z"

@@ -1,0 +1,39 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260709-orbit-current-state-audit
+reference: northstar://evidence/NSE-20260709-orbit-current-state-audit
+title: Orbit current-state, connector, security, and privacy audit
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-09T18:48:04Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-worktrees/2026-07-09-northstar-review-feedback/issue-119/.agent-workflow/northstar/research-inbox/2026-07-09-orbit-current-state-audit.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-orbit-current-state-audit-2026-07-09-orbit-current-state-audit-md"
+  sha256: 654ba78ebe18b0cc5bd80f10731fdb22b71dfaf7562c65ce40271814cca2f2ba
+summary: Fresh committed-repo, pod, connector, trust-boundary, privacy, and issue-coverage
+  evidence for the Orbit pilot.
+tags:
+- connectors
+- orbit
+- pilot
+- privacy
+- security
+claims:
+- Orbit runs as one Ready repo pod with Codex, Claude, OpenClaw, and Hermes as shared-identity
+  runtime adapters rather than isolated services.
+- Orbit currently has no authorized Google account, enterprise document connector,
+  or verified live personal-information connector.
+- Personal context and engineering actuation share an unsafe trust domain and raw
+  personal material remains in source Git.
+- Orbit issues 193 through 196 now own the uncovered trust-domain, private-data, source-governance,
+  and enterprise-connector gaps.
+planning_relevance:
+- Defines Orbit product scope, connector-plane architecture, pilot readiness, and
+  cross-repository security gates.
+limitations:
+- Connector and headless-loop state must be reverified at implementation and release
+  gates.
+- No raw personal data or secret values are retained in this evidence item.

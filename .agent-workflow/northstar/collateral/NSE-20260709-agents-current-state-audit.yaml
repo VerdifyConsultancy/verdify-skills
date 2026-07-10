@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260709-agents-current-state-audit
+reference: northstar://evidence/NSE-20260709-agents-current-state-audit
+title: Agents current-state and four-pilot authority audit
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-09T18:38:21Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-worktrees/2026-07-09-northstar-review-feedback/issue-119/.agent-workflow/northstar/research-inbox/2026-07-09-agents-current-state-audit.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-agents-current-state-audit-2026-07-09-agents-current-state-audit-md"
+  sha256: 5964af5beb56633d5049826da73f3986a29ea16e8de7d31a38fa772b4076aaf6
+summary: Fresh repository, GitHub, runtime, issue-coverage, and North Star authority
+  evidence for the Agent Platform pilot.
+tags:
+- agents
+- governance
+- integration
+- pilot
+- platform
+claims:
+- Agents main is 7bc69090126e7cc6c244c4c0b499b55a2cd96c0d and its locked North Star
+  conflicts with the accepted four-pilot root-planner model.
+- The live Agents runtime is broadly Ready but has GitOps, checkout freshness, Verdify
+  version, loop executor, and capability-contract gaps.
+- Existing Agents issues cover most runtime gaps; issue 2890 now owns the uncovered
+  North Star reframing.
+- The live MCP surface does not expose a root-planner capability/task contract or
+  task_worker operation.
+planning_relevance:
+- Defines the Agent Platform role, root-planner interface requirements, current pilot
+  gate, and cross-repository issue map.
+limitations:
+- Point-in-time evidence must be refreshed at implementation and release gates.
+- Unsafe security probes were not repeated.

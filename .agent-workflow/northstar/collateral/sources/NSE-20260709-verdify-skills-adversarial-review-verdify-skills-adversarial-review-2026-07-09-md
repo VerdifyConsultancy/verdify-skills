@@ -1,0 +1,39 @@
+# Public evidence summary: Verdify Skills adversarial review
+
+Date: 2026-07-09
+Status: redacted public planning evidence
+Private security record: GHSA-4452-3c6p-3q26
+
+This public source preserves only the planning conclusions needed for the North
+Star. The full adversarial report contains installer reproduction material and
+remains restricted to the unpublished private security advisory and authorized
+local evidence.
+
+## Verified planning conclusions
+
+- Package publication and installation must be treated as one trusted,
+  exact-artifact, atomic, recoverable transaction.
+- Validation must use trusted code and declared integrity data, preserve
+  managed-path ownership, fail closed on conflicts, and retain rollback
+  evidence.
+- Lifecycle transitions, evidence cardinality, critic independence, route
+  coherence, and executable evaluation need stronger merge-blocking checks.
+- Provider integrations must negotiate supported capabilities and return typed
+  unsupported or degraded outcomes instead of assuming one runtime operation.
+- Verdify Skills, Agent Platform, Orbit, and Gravity need explicit ownership,
+  versioned interfaces, current-state evidence, and owning-repository issues.
+- Deprecated and duplicate capability should be removed after coordinated
+  consumer convergence rather than preserved through indefinite compatibility
+  shims.
+
+## Public acceptance intent
+
+- Test the exact artifact that would be published.
+- Require trusted staging, integrity and conflict checks, atomic promotion,
+  recoverable rollback, provenance, and consumer verification.
+- Keep sensitive security reproduction, exploit mechanics, and detailed
+  validation evidence out of public planning artifacts until the private
+  advisory follows its approved disclosure process.
+
+This summary intentionally contains no reproduction commands, proof-of-concept
+material, vulnerable code-path detail, or raw private evidence.

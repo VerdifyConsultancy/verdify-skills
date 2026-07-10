@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-06-24T14:52:36Z'
+updated_at: '2026-07-09T23:28:41Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1404,3 +1404,189 @@ evidence:
   - 'Supports the northstar-question-resolution skill and issue #4.'
   - Supports using a resolution register plus North Star evidence ingestion before
     northstar-planning updates artifacts.
+- id: NSE-20260709-agents-current-state-audit
+  reference: northstar://evidence/NSE-20260709-agents-current-state-audit
+  title: Agents current-state and four-pilot authority audit
+  evidence_type: observation
+  evidence_status: observed
+  ingested_at: '2026-07-09T18:38:21Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-agents-current-state-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-agents-current-state-audit-2026-07-09-agents-current-state-audit-md"
+  source_uri:
+  source_sha256: 5964af5beb56633d5049826da73f3986a29ea16e8de7d31a38fa772b4076aaf6
+  summary: Fresh repository, GitHub, runtime, issue-coverage, and North Star authority
+    evidence for the Agent Platform pilot.
+  tags:
+  - agents
+  - governance
+  - integration
+  - pilot
+  - platform
+  claims:
+  - Agents main is 7bc69090126e7cc6c244c4c0b499b55a2cd96c0d and its locked North Star
+    conflicts with the accepted four-pilot root-planner model.
+  - The live Agents runtime is broadly Ready but has GitOps, checkout freshness, Verdify
+    version, loop executor, and capability-contract gaps.
+  - Existing Agents issues cover most runtime gaps; issue 2890 now owns the uncovered
+    North Star reframing.
+  - The live MCP surface does not expose a root-planner capability/task contract or
+    task_worker operation.
+  planning_relevance:
+  - Defines the Agent Platform role, root-planner interface requirements, current
+    pilot gate, and cross-repository issue map.
+- id: NSE-20260709-gravity-current-state-audit
+  reference: northstar://evidence/NSE-20260709-gravity-current-state-audit
+  title: Gravity current-state, readiness, API, MCP, and citation audit
+  evidence_type: observation
+  evidence_status: observed
+  ingested_at: '2026-07-09T18:48:04Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-gravity-current-state-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-gravity-current-state-audit-2026-07-09-gravity-current-state-audit-md"
+  source_uri:
+  source_sha256: 24ea6cf8ed3d8aa1f871e9d755a3854b46320bc6b4e75c71ad957001b71f4efb
+  summary: Fresh source, GitHub, Argo, workload, API, evidence-spine, MCP, and issue-coverage
+    evidence for the active Gravity pilot.
+  tags:
+  - api
+  - evidence
+  - gravity
+  - mcp
+  - pilot
+  - readiness
+  claims:
+  - Gravity main and live Argo run 1bb5507a7f608f16ba421620aa8cf7edf8278590 and represent
+    the active restarted project.
+  - Gravity search and stdio MCP are implemented, but cross-pilot transport is not
+    integrated and live search hits currently omit evidence-span citations.
+  - Canonical readiness, state-of-union, router, sprint, and ADR records lag the live
+    code and runtime.
+  - Gravity issues 406 and 407 now own the uncovered four-pilot authority and citation-hydration
+    gaps.
+  planning_relevance:
+  - Defines Gravity product authority, versioned API plus MCP adapter direction, integration
+    gate, and evidence capability contract.
+- id: NSE-20260709-jason-iteration-25-final-lock-approval
+  reference: northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval
+  title: Jason iteration 25 final lock approval
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-07-09T23:28:41Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-jason-iteration-25-final-lock-approval.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-jason-iteration-25-final-lock-approval-jason-final-lock-approval-source-md"
+  source_uri:
+  source_sha256: c457864b1f5ee21df8211551537d9290eecf545814d58fcab3b8c643d6601e8c
+  summary: Distinct human authority to lock the reconciled iteration-25 North Star
+    after issue 72 is integrated.
+  tags:
+  - final-lock
+  - governance
+  - review-feedback
+  claims:
+  - Jason explicitly directed the controller to fix issue 72 and then lock iteration
+    25.
+  - The final-lock instruction is separate from the earlier ten-answer review-feedback
+    evidence.
+  - The lock includes updating the interview packet and asking only genuinely remaining
+    questions.
+  planning_relevance: []
+- id: NSE-20260709-jason-review-feedback
+  reference: northstar://evidence/NSE-20260709-jason-review-feedback
+  title: Jason review feedback for the integrated four-project North Star
+  evidence_type: source_doc
+  evidence_status: reported
+  ingested_at: '2026-07-09T18:35:29Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-jason-review-feedback.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-jason-review-feedback-2026-07-09-jason-review-feedback-md"
+  source_uri:
+  source_sha256: bf731d82aa175fcb9b04428b6106b8983d0718561be9f8a862322b24b95b5033
+  summary: Authoritative product, governance, compatibility, pilot, Gravity, Orbit,
+    and schedule decisions supplied after the July 9 adversarial review.
+  tags:
+  - agents
+  - governance
+  - gravity
+  - orbit
+  - review-feedback
+  - skills
+  claims:
+  - Every adversarial-review recommendation is adopted as the new planning default
+    without constituting final North Star lock.
+  - The pilot is the integrated Verdify Skills, Agent Platform, Orbit, and Gravity
+    system rather than a single non-Gravity repository.
+  - Verdify Skills is internal-first, has no backward-compatibility obligation, and
+    should remove deprecated capability.
+  - Jason and James may approve releases while Jason-only North Star lock authority
+    remains unchanged.
+  - Current Gravity repository main is the active source of truth and should expose
+    a versioned read-only API with an MCP adapter.
+  - Orbit is both a personal information assistant and engineering chief of staff
+    with broad authorized information scope.
+  - The delivery objective is fastest safe convergence to a self-building four-project
+    platform.
+  planning_relevance:
+  - Resolves North Star questions and supersedes older proposed defaults for pilot
+    scope, compatibility, Orbit boundaries, and Gravity framing.
+  - Defines human authority and the next milestone outcome.
+- id: NSE-20260709-orbit-current-state-audit
+  reference: northstar://evidence/NSE-20260709-orbit-current-state-audit
+  title: Orbit current-state, connector, security, and privacy audit
+  evidence_type: observation
+  evidence_status: observed
+  ingested_at: '2026-07-09T18:48:04Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-orbit-current-state-audit.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-orbit-current-state-audit-2026-07-09-orbit-current-state-audit-md"
+  source_uri:
+  source_sha256: 654ba78ebe18b0cc5bd80f10731fdb22b71dfaf7562c65ce40271814cca2f2ba
+  summary: Fresh committed-repo, pod, connector, trust-boundary, privacy, and issue-coverage
+    evidence for the Orbit pilot.
+  tags:
+  - connectors
+  - orbit
+  - pilot
+  - privacy
+  - security
+  claims:
+  - Orbit runs as one Ready repo pod with Codex, Claude, OpenClaw, and Hermes as shared-identity
+    runtime adapters rather than isolated services.
+  - Orbit currently has no authorized Google account, enterprise document connector,
+    or verified live personal-information connector.
+  - Personal context and engineering actuation share an unsafe trust domain and raw
+    personal material remains in source Git.
+  - Orbit issues 193 through 196 now own the uncovered trust-domain, private-data,
+    source-governance, and enterprise-connector gaps.
+  planning_relevance:
+  - Defines Orbit product scope, connector-plane architecture, pilot readiness, and
+    cross-repository security gates.
+- id: NSE-20260709-verdify-skills-adversarial-review
+  reference: northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+  title: Verdify Skills adversarial review 2026-07-09
+  evidence_type: adversarial_review
+  evidence_status: verified
+  ingested_at: '2026-07-09T18:35:29Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260709-verdify-skills-adversarial-review.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-verdify-skills-adversarial-review-verdify-skills-adversarial-review-2026-07-09-md"
+  source_uri:
+  source_sha256: 1b46e0c68feb7288b7230abb13e826418fbcbb42eb2b330c253d265708ba6701
+  summary: Redacted public planning summary of the July 9 adversarial review;
+    installer reproduction detail remains restricted to private advisory GHSA-4452-3c6p-3q26.
+  tags:
+  - adversarial-review
+  - governance
+  - gravity
+  - orbit
+  - package
+  - platform
+  - redacted-public-summary
+  - skills
+  claims:
+  - Package publication and installation require one trusted exact-artifact transaction
+    with atomic promotion, rollback, provenance, and consumer verification.
+  - Lifecycle transition, critic, route, evidence, and executable-evaluation invariants
+    require stronger merge-blocking validation.
+  - Cross-project integration requires explicit ownership, versioned capabilities,
+    current-state evidence, and owning-repository issues.
+  - Deprecated or duplicate capability should be removed after coordinated consumer
+    convergence rather than retained through indefinite compatibility shims.
+  planning_relevance:
+  - Supports the trusted publication, minimal skill graph, four-pilot contract,
+    governed connector, current Gravity, and lifecycle-coherence requirements in iteration 25.

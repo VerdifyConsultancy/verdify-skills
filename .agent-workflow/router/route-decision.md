@@ -1,10 +1,10 @@
 # Route decision
 
-- Current state: `NORTHSTAR_ARTIFACTS_INCOMPLETE`
-- Next skill: `northstar-planning`
-- Next mode: `artifact-loop`
+- Current state: `PROJECT_DEFINITION_INCOMPLETE`
+- Next skill: `project-definition`
+- Next mode: `discovery`
 
-Product and architecture North Star artifacts must be cross-linked and signed off before downstream lifecycle skills treat them as core planning authority.
+The earliest project-definition mode is not approved.
 
 ## Missing artifacts
 

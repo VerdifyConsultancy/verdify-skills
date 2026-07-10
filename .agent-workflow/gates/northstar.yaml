@@ -5,21 +5,22 @@ gate_id: northstar-final-lock
 sprint_id: null
 lane_id: null
 type: northstar
-status: cancelled
+status: approved
 question: Approve the Verdify Skills product and architecture North Star for the next milestone?
-owner: Jason and James
+owner: Jason
 evidence_required:
   - .agent-workflow/northstar/REVIEW_PLAN.md
   - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
   - .agent-workflow/northstar/northstar-artifacts.yaml
   - .agent-workflow/northstar/northstar-plan.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-jason-iteration-25-final-lock-approval.yaml
 allowed_decisions:
   - approved
   - changes_requested
   - rejected
-decision: changes_requested
-rationale: New learning-loop evidence and Jason's current alignment request returned the North Star to artifact-loop iteration; final lock approval is no longer being requested by this gate.
+decision: approved
+rationale: "Jason adopted every July 9 recommendation and ten-answer resolution as the planning default, then separately directed the controller to fix #72 and lock iteration 25. PR #123 integrated the required exact-head review substrate before this lock transaction."
 opened_at: "2026-06-23T03:13:40Z"
-resolved_at: "2026-06-23T06:22:49Z"
-resume_state: northstar-planning/artifact-loop
+resolved_at: "2026-07-09T23:20:09Z"
+resume_state: project-definition/discovery

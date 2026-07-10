@@ -1,7 +1,8 @@
 # North Star Interview
 
-Status: `ready`
-Generated at: `2026-06-23T04:30:38Z`
+Status: `final_lock_recorded`
+Generated at: `2026-07-09T23:28:41Z`
+Routed mode: `northstar-planning / signoff`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Product pair: `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
 Architecture pair: `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
@@ -9,87 +10,87 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 
 ## Review Summary
 
-The North Star is coherent enough for review, but the newly registered
-end-to-end SDLC evidence expands the product from a lifecycle skill package into
-a product/service operating model. The strongest additions are:
+Jason answered every material July 9 interview question, adopted every
+adversarial-review recommendation as the planning default, and then explicitly
+directed the controller to fix #72 and lock iteration 25. The earlier answer
+packet remains registered as
+`northstar://evidence/NSE-20260709-jason-review-feedback`; it is historically
+correct that those ten answers alone were not the lock. The later, separate
+signoff is registered as
+`northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval`.
 
-- deterministic controller/workflow ownership rather than an LLM conversation as
-  the outer loop;
-- a Q&A/interview loop before final North Star lock;
-- wave as an integrated product increment, with short-lived task branches and
-  worktrees underneath;
-- review-ready as immutable artifact plus deployed environment, provenance,
-  exact human tests, telemetry, risks, and rollback;
-- broader service surfaces: review inbox, diagnostics, session ledger,
-  readiness certification, policy-as-code, supply-chain evidence, and versioned
-  skill registry.
+PR #123 integrated the exact-head review substrate into `dev` before this lock
+transaction began. There are zero P0 or otherwise blocking human questions for
+iteration 25.
 
-No question below records approval. Answers should be preserved as feedback and
-routed through `northstar-planning` / `review-feedback` or `artifact-loop`.
+## Resolved Decisions
 
-## Proposed Priorities
-
-| Priority | Proposed focus | Rationale | Evidence |
+| Decision ID | Resolution | Planning effect | Evidence |
 | --- | --- | --- | --- |
-| P0 | Define the product/service boundary for Verdify Skills versus Agent Platform and Gravity. | The current North Star treats the skills repo as package plus workflow policy, while the new evidence frames a broader SDLC service model. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
-| P0 | Decide whether the deterministic controller/workflow engine is a hard architecture invariant. | This affects controller-loop skill design, session ledger schema, state transitions, and what agents are allowed to infer. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
-| P0 | Resolve task/branch/worktree/wave identity. | The new evidence gives a stronger default: short-lived task branches/worktrees; waves aggregate PRs and deployed evidence. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
-| P0 | Confirm the human review and risk-gate model. | Earlier direction says only final North Star lock gates planning; the broader SDLC still needs risk-based implementation and promotion gates. | all registered evidence |
-| P1 | Decide whether Backstage-like catalog concepts should be adopted or deferred. | Avoiding a custom catalog from scratch could shape Agent Platform integration and repo/application modeling. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
-| P1 | Decide the minimum supply-chain evidence contract. | SBOM, provenance, signatures, policy checks, and immutable artifact promotion affect release-verification and platform-readiness scope. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
-| P1 | Decide what a non-Gravity pilot must prove. | Platform readiness needs a concrete certification exercise before Gravity. | all registered evidence |
-| P2 | Decide measurement strategy for throughput and quality. | DORA-style delivery measures should not become simplistic productivity scoring. | `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc` |
+| NQI-D001 | Adopt every July 9 recommendation as the planning default. | Iteration 25 is the authority baseline rather than an optional proposal set. | `NSE-20260709-jason-review-feedback` |
+| NQI-D002 | Keep pre-lock safety work narrow, while requiring trusted installation and atomic publication. | Publication uses protected-base validation, exact packed bytes, atomic promotion, and rollback; unrelated features do not hide inside the safety lane. | July 9 feedback and adversarial review |
+| NQI-D003 | Verdify Skills is internal-first; public reference use is possible, but community growth is not a current objective. | Preserve the internal/proprietary posture for this milestone without creating a public compatibility promise. | `NSE-20260709-jason-review-feedback` |
+| NQI-D004 | No backwards compatibility is required; remove deprecated capability. | Consumer convergence ends in deletion, not indefinite aliases, facades, or dual schemas. | `NSE-20260709-jason-review-feedback` |
+| NQI-D005 | Verdify Skills, Agent Platform, Orbit, and Gravity are one integrated set of active pilots. | The root planner coordinates a four-project `PilotProject` portfolio while every project retains its own authority. | all `NSE-20260709-*` project evidence |
+| NQI-D006 | Jason or James may approve Verdify Skills releases; James publishes npm. | Release authority remains distinct from Jason-only North Star lock authority and from PR critic evidence. | `NSE-20260709-jason-review-feedback` |
+| NQI-D007 | The restarted current Gravity repository is active source truth. | Readiness gates trusted consumption and promotion; the prior instance is retired history. | Jason feedback and Gravity audit |
+| NQI-D008 | Gravity exposes a versioned tenant-scoped read-only HTTP API with a consumer-side MCP adapter. | Cited API/MCP parity, identity, typed denials, durability, health, and audit form the evidence boundary. | Jason feedback and Gravity audit |
+| NQI-D009 | Orbit is both personal assistant and engineering chief of staff across authorized personal, enterprise, meeting, conversation, and project context. | Broad information scope is core intent, bounded by separate trust domains, minimum connector scopes, ACL/provenance/freshness, retention, read audit, and human-gated writes. | Jason feedback and Orbit audit |
+| NQI-D010 | Move as soon as safely possible, prove self-building progress, and reuse the platform for customer consulting. | Optimize for the first complete four-project vertical slice; record every verified gap in its owning repository. | `NSE-20260709-jason-review-feedback` |
+| NQI-D011 | Fix #72, then lock iteration 25 and update the interview packet. | #72/PR #123 is integrated; iteration 25 is now approved and hands off to project definition. | `NSE-20260709-jason-iteration-25-final-lock-approval` |
 
-## Decisions Ready For Human Review
+## Accepted Foundations
 
-| Decision ID | Decision | Proposed default | Priority | Affected IDs |
-| --- | --- | --- | --- | --- |
-| NQI-D001 | What is Verdify Skills' product boundary? | Verdify Skills owns reusable skills, prompts, schemas, artifact contracts, CLI workflows, and validation. Agent Platform owns hosted controller UX, terminals, environments, and runtime orchestration. Gravity is a gated customer. | P0 | `PRQ-001`, `PRQ-007`, `ARQ-007`, `ARCH-004` |
-| NQI-D002 | Is deterministic controller architecture mandatory? | Yes. The controller-loop skill should specify a framework-neutral durable workflow engine that invokes bounded agents and never infers gates from chat. | P0 | `ARQ-005`, `ARCH-004`, `ARCH-009` |
-| NQI-D003 | What is the canonical branch/wave model? | One short-lived task/issue branch and worktree by default; a wave is metadata plus integrated PRs, preview/review environment, milestone, and traceability. | P0 | `PRQ-006`, `PRQ-011`, `ARQ-006`, `ARQ-011` |
-| NQI-D004 | How do planning gates relate to delivery gates? | The only North Star planning gate is final lock approval. Delivery still has risk-based gates for protected content, security, production, public APIs, destructive migrations, and policy exceptions. | P0 | `PRQ-002`, `PRQ-004`, `ARQ-002`, `ARCH-009` |
-| NQI-D005 | Is the Q&A interview loop canonical? | Yes. Add `northstar-interview` as a canonical lifecycle skill between evidence/planning and final lock review. | P0 | `PRQ-001`, `PRQ-007`, `SURF-002` |
-| NQI-D006 | Should Backstage concepts influence the Agent Platform catalog model? | Adopt the concepts as an architecture input, but do not commit to embedding Backstage until platform-readiness research validates fit. | P1 | `ARCH-005`, `IFACE-008` |
-| NQI-D007 | What is the minimum supply-chain evidence for review-ready work? | Require immutable artifact identity, CI status, test report, preview deployment, rollback notes, and traceability first; add SBOM/provenance/signing as platform-readiness scope before production. | P1 | `PRQ-004`, `PRQ-006`, `ARQ-006`, `ARCH-009` |
+- Deterministic durable controller state remains authoritative over chat.
+- One issue, lane, branch, worktree, worker session, and PR remains the default
+  execution unit; a wave is the integration, deployment, review, and outcome
+  unit.
+- Risk-based human review continues for protected product/architecture,
+  security, privacy, identity, production, destructive, public-interface,
+  material-cost, and exception decisions.
+- Review-ready requires immutable identity, current-head checks, CI/test proof,
+  deployment evidence when applicable, telemetry, risks, rollback, and a fresh
+  critic.
+- Agent Platform dispatch negotiates versioned capabilities and supported
+  worker strategies; runtime adapters are not product identities or authority.
+- Chief-of-staff experiences remain thin facades over governed lifecycle and
+  connector contracts.
 
-## Architecture Options And Tradeoffs
+## Remaining Nonblocking Owner Work
 
-| Topic | Option A | Option B | Proposed direction | Tradeoff |
-| --- | --- | --- | --- | --- |
-| Controller substrate | LangGraph-first durable agent graph | Framework-neutral workflow contract with LangGraph as candidate | Framework-neutral contract first | Keeps portability and avoids designing around one library; delays concrete implementation choices. |
-| Software catalog | Build custom catalog in Agent Platform | Reuse/extend Backstage concepts | Reuse concepts, defer technology choice | Reduces product invention risk; requires integration research. |
-| Wave identity | One branch per wave | Task branches/worktrees; wave as metadata and integration/review unit | Task branches/worktrees | Aligns with trunk-based development and current worktree policy; requires stronger traceability metadata. |
-| Human gates | Gate every uncertain question | Gate only final North Star lock plus risk-based delivery changes | Final-lock-only for planning; risk gates for delivery | Keeps planning loop moving while preserving consequential human control. |
-| Review-ready threshold | CI green is enough | CI plus deployed immutable artifact, evidence bundle, rollback, telemetry | Full evidence bundle | Slower to reach review-ready; prevents humans reviewing untestable branches. |
-| Supply chain | Basic CI evidence | SBOM, provenance, signing, policy-as-code | Phase in through platform readiness | Avoids overloading the first package milestone; keeps production path credible. |
-| Browser terminal | Always-on terminal per agent | Time-limited audited terminal with just-in-time authorization | JIT/audited only | Less convenient; materially safer. |
+These are not questions Jason must answer before lock. Each retains a proposed
+default and named owner for project-definition, architecture, security, or
+platform readiness.
 
-## Interview Questions
+| Item | Owner / route | Locked default |
+| --- | --- | --- |
+| NSQ-009 learning sources, retention, and redaction | Skills maintainer and security owner | Use explicit research/validation/review evidence plus redacted session summaries; proposal-only output; no scheduled loop without readiness proof. |
+| NSQ-010 namespace naming | Platform and security owner | Use collision-safe owner/repository identity with environment suffixes and validate against Kubernetes and Agent Platform conventions. |
+| NSQ-011 controller model selection | Platform architecture owner | Keep the controller model-neutral and select Codex, Claude, or successors per supported capability and failure mode. |
+| NSQ-012 broader infrastructure-domain authority | Jason, platform owner, and security owner | Grant only named domain agents explicit scoped authority with audit, approval, and rollback; repo agents stay namespace-scoped by default. |
+| NSQ-013 mounts, DNS/routes, and base-image requests | Platform, storage, and networking owners | Use typed platform control requests or PR-reviewed desired state; owning operators approve before mutation. |
+| Orbit sprint-transaction reconciliation | Orbit #198 | Reconcile or terminalize W27B before exact-head dispatch; retain #193-#197 for distinct connector, trust, and North Star work. |
+| Agent Platform legacy sprint reconciliation | Agents #2889 | Designate one active transaction and archive or validate legacy plans before fail-closed routing. |
+| Gravity lifecycle/readiness reconciliation | Gravity #406 | Reconcile current active source, readiness, and exact transaction evidence while #407 retains cited API/MCP parity scope. |
 
-| ID | Priority | Question | Proposed default | Options / tradeoffs | Affected IDs | Evidence | Answer shape |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| NQI-001 | P0 | What should Verdify Skills own versus Agent Platform and Gravity? | Skills repo owns reusable lifecycle skills, schemas, CLI commands, artifact contracts, validation, and repo-local instructions. Agent Platform owns hosted controller UX/runtime, environment views, terminals, review inbox UI, and integrations. Gravity is a gated customer. | A: Skills-only package is simpler but may underspecify service behavior. B: Skills + service contract is more useful but broader. C: Full platform in skills repo is too coupled. | `PRQ-001`, `PRQ-007`, `ARCH-004` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve default or edit boundaries |
-| NQI-002 | P0 | Should the deterministic workflow controller be a non-negotiable architecture principle? | Yes. The controller owns states, gates, retries, permissions, history, and stop conditions; agents reason within states. | A: Hard invariant improves safety and auditability. B: LLM-led loop is faster to prototype but brittle. C: Hybrid is acceptable only if deterministic state remains authoritative. | `ARQ-005`, `ARCH-004`, `ARCH-009` | `NSE-20260623-end-to-end-agent-based-sdlc` | choose one |
-| NQI-003 | P0 | Should `northstar-interview` become a canonical lifecycle skill before final lock? | Yes. Use it after new evidence or before final review when priorities, tradeoffs, or human decisions need structured answers. | A: Canonical skill increases package surface but makes the human planning interface repeatable. B: Keep as reference under `northstar-planning` reduces skill count but hides the workflow. | `PRQ-001`, `PRQ-007`, `SURF-002` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve canonical skill or keep embedded |
-| NQI-004 | P0 | Is the branch/wave identity default now resolved? | Yes: one short-lived task/issue branch and worktree; waves aggregate PRs, review environments, milestones, and traceability. | A: Resolves transcript conflict and aligns with worktree policy. B: Wave branches simplify labels but increase integration risk. | `PRQ-006`, `PRQ-011`, `ARQ-006`, `ARQ-011` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve default or specify exception |
-| NQI-005 | P0 | How should we express `DESIGN_COMMITTED` relative to the final-lock-only planning gate? | Treat final North Star lock for a milestone as the current `DESIGN_COMMITTED` equivalent; later protected changes use PR/review/change-control. | A: One term avoids confusion. B: Keep both terms if `DESIGN_COMMITTED` means a stronger downstream state. | `PRQ-002`, `ARQ-001`, `northstar-artifacts.yaml` | all registered evidence | choose term and semantics |
-| NQI-006 | P0 | Which changes always need human review in the broader SDLC, even if ordinary planning questions do not gate? | Protected North Star content, security boundaries, permissions/secrets/identity, production networking, public APIs, destructive migrations, irreversible operations, privacy-sensitive data, material cost/architecture changes, and policy exceptions. | A: Risk-based gates reduce review burden. B: Human approval for every change is safer but slows throughput. C: More automation requires stronger policy evidence. | `PRQ-004`, `ARQ-002`, `ARCH-009` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve list or modify |
-| NQI-007 | P0 | What minimum proof must the non-Gravity pilot produce before Gravity readiness can pass? | A complete intake -> North Star/Q&A -> task planning -> worktree -> CI -> preview -> review -> fix/replan -> signoff loop with ledger, telemetry, rollback, and review evidence. | A: Full lifecycle proof is slower but credible. B: Narrower proof starts Gravity sooner but risks discovering platform flaws in Gravity. | `MS-004`, `WAVE-002`, `PRQ-003` | all registered evidence | approve default or define smaller pilot |
-| NQI-008 | P1 | Should Backstage concepts be adopted for application/catalog modeling? | Use Backstage's component/system/API/resource model as a reference architecture, not a committed dependency yet. | A: Reference concepts reduce custom modeling risk. B: Embedding Backstage may accelerate UI but adds dependency and integration work. C: Custom model maximizes control but duplicates mature patterns. | `ARCH-005`, `IFACE-008` | `NSE-20260623-end-to-end-agent-based-sdlc` | choose reference, embed, or defer |
-| NQI-009 | P1 | What supply-chain evidence is required for review-ready versus production-ready? | Review-ready requires immutable artifact ID, CI/test evidence, preview deployment, traceability, rollback notes. Production-ready adds SBOM, provenance, signatures, and policy verification. | A: Phase in keeps first pilot manageable. B: Full supply chain from day one improves trust but expands platform scope. | `PRQ-004`, `PRQ-006`, `ARQ-006`, `ARCH-009` | `NSE-20260623-end-to-end-agent-based-sdlc` | choose phased or full |
-| NQI-010 | P1 | Should diagnostic access to production data be categorically prohibited for agents? | Agents should use read-only telemetry APIs and masked/replicated data; live customer data requires audited break-glass human authorization. | A: Stronger privacy and audit posture. B: Broader read access improves debugging speed but increases risk. | `ARQ-003`, `ARCH-007`, `ARCH-008` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve default or specify exceptions |
-| NQI-011 | P1 | What is the canonical review inbox output shape? | One packet per change: why, requirement IDs, architecture IDs, PRs/commits, CI, artifact digest, review URL, test procedure, expected results, telemetry, risks, migration/data effects, rollback, recommendation, and human questions. | A: Rich packet optimizes human attention. B: Minimal PR summary is faster but may miss evidence. | `SURF-004`, `IFACE-004`, `PRQ-004` | all registered evidence | approve fields or trim |
-| NQI-012 | P1 | Should skill distribution include lockfiles and compatibility metadata? | Yes, but after the current package kernel: versioned skills plus compatibility metadata, conformance tests, and target-repo lockfiles. | A: Improves safe upgrades. B: Adds packaging complexity. | `PRQ-013`, `ARQ-014`, `WAVE-004` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve roadmap item or defer |
-| NQI-013 | P1 | Which personas are missing from the current product North Star? | Add or strengthen security/policy reviewer, auditor/historian, support/maintainability owner, developer experience owner, diagnostic user, and release owner. | A: More complete review coverage. B: More personas increase planning overhead. | `PRODUCT-002`, `PRODUCT-004`, `ARCH-002` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve additions or select subset |
-| NQI-014 | P1 | Should policy-as-code become a named architecture requirement? | Yes, as the enforcement layer for gates, RBAC, supply chain, environment promotion, and exceptions. | A: More enforceable than instructions. B: Requires choosing/adapting policy engine later. | `ARQ-002`, `ARQ-003`, `ARCH-009` | `NSE-20260623-end-to-end-agent-based-sdlc` | approve requirement or defer |
-| NQI-015 | P2 | Which metrics should the platform optimize after pilots? | DORA-style flow plus quality, safety, rework, approval latency, rollback confidence, and North Star coverage. Avoid raw activity/productivity scoring. | A: Outcome-oriented metrics reduce perverse incentives. B: More detailed telemetry takes longer to build. | `ARCH-008`, `PRQ-015` | `NSE-20260623-end-to-end-agent-based-sdlc` | rank metrics |
-| NQI-016 | P2 | Is one wave per day a goal, metric, or discarded hypothesis? | Keep it as a later optimization hypothesis only after actual pilot data exists. | A: Avoids premature speed target. B: A target can help sizing but may distort quality gates. | `WAVE-002`, `MS-004` | all registered evidence | choose hypothesis/goal/discard |
+## Remaining Questions For Jason
+
+None for iteration-25 lock.
+
+Future material changes start a new evidence iteration. The five deferred
+questions above may be answered by their named owners under the locked defaults
+without reopening this North Star unless their answer changes product intent,
+architecture safety, or human authority.
 
 ## Answer Capture Rules
 
-- Preserve answers in this file or as a new registered evidence item.
-- Accepted changes route to `$northstar-planning` in `review-feedback` or
-  `artifact-loop` mode.
-- Do not record final lock approval unless Jason/James explicitly provide it.
-- When an answer changes protected scope, create a proposed North Star patch and
-  leave `.agent-workflow/gates/northstar.yaml` open until approval.
+- The final lock lives in `northstar-artifacts.yaml`, `northstar-plan.yaml`, and
+  `.agent-workflow/gates/northstar.yaml`, backed by the separate final-lock
+  evidence item.
+- Canonical product and architecture resolutions live in the approved paired
+  markdown artifacts; implementation remains in GitHub Issues and one-lane PRs.
+- Learning proposals remain staged until their configured approval path applies
+  them.
+- A future contradiction or material decision routes through evidence intake
+  and `northstar-planning / review-feedback` as a new iteration; it does not
+  silently mutate iteration 25.
