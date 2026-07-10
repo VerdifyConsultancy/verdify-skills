@@ -1392,10 +1392,9 @@ module Verdify
       end
 
       active_plans = plans.reject { |path| verified_terminal_plans.key?(path) }
-      completed_plans = plans.select { |path| verified_terminal_plans[path] == "complete" }
-      routeable_plans = active_plans.empty? ? completed_plans.first(1) : active_plans
+      routeable_plans = active_plans
       if requested_sprint_id
-        selected = (active_plans + completed_plans).uniq.select { |path| plan_documents.fetch(path)["sprint_id"] == requested_sprint_id }
+        selected = active_plans.select { |path| plan_documents.fetch(path)["sprint_id"] == requested_sprint_id }
         if selected.empty?
           evidence << { "source" => sprint_root_relative, "finding" => "requested active sprint #{requested_sprint_id.inspect} was not found" }
           return route_hash(repo, "SPRINT_SELECTION_REQUIRED", "project-router", "route", "The requested sprint is not an active committed transaction.", evidence, missing, open_gates)
