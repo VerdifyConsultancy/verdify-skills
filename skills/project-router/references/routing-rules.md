@@ -25,3 +25,16 @@
 ## Staleness
 
 Treat artifacts as stale when their baseline SHA, referenced issue state, contract version, or architecture decision no longer matches the intended target. Staleness routes to the owning skill, not to ad hoc repair by a downstream role.
+
+## Invalid authority
+
+Before reading status, approval, or handoff fields, select the expected schema in
+router code, safely parse the artifact, and run schema plus semantic validation.
+Wrong schema or kind, missing required fields, invalid YAML, semantic failure,
+and undeclared lifecycle handoffs route to the artifact's producing skill. Do
+not expose raw invalid content in evidence and do not let `route_hash` turn an
+untrusted handoff into an exception.
+
+Route-decision YAML and Markdown are ignored generated cache. A fresh route
+computation owns current lifecycle position; the cached `generated_at` field is
+never authority.

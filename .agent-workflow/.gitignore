@@ -1,5 +1,6 @@
 github/snapshot.json
 runtime/
 *.tmp
+northstar/collateral/sources/
 router/route-decision.yaml
 router/route-decision.md

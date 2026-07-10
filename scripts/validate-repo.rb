@@ -75,6 +75,7 @@ class RepoValidator
     validate_host_links
     validate_workflow
     validate_cli_lifecycle_alignment
+    validate_derived_route_cache
     validate_github_templates
     validate_evaluations
     validate_scripts
@@ -234,6 +235,22 @@ class RepoValidator
     standalone.each do |entry|
       error(path, "#{entry['name']} standalone entry must have category standalone") unless entry["category"] == "standalone"
       error(path, "#{entry['name']} standalone entry must not declare lifecycle order") if entry.key?("order")
+    end
+  end
+
+  def validate_derived_route_cache
+    paths = %w[
+      .agent-workflow/router/route-decision.yaml
+      .agent-workflow/router/route-decision.md
+    ]
+    stdout, _stderr, status = Open3.capture3("git", "-C", ROOT.to_s, "ls-files", "--", *paths)
+    unless status.success?
+      error(ROOT.join(".agent-workflow/router"), "could not inspect derived route cache tracking")
+      return
+    end
+
+    stdout.lines.map(&:strip).reject(&:empty?).each do |relative|
+      error(ROOT.join(relative), "derived route cache must be ignored and untracked")
     end
   end
 

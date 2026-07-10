@@ -20,7 +20,38 @@
 | Gravity core extraction | Validated Gravity extraction plan plus source-object/provenance evidence |
 | Local worktree owner | Machine-local lane lease |
 | Session and wave history | Controller session ledger |
+| Current lifecycle route | Fresh `bin/verdify route` computation over validated authority inputs |
 
-A Project view, local dashboard, YAML status file, or GitHub snapshot is derived unless listed above. Derived state must be refreshed or regenerated rather than treated as an alternate truth.
+A Project view, local dashboard, YAML status file, GitHub snapshot, or
+`.agent-workflow/router/route-decision.{yaml,md}` file is derived unless listed
+above. Route files are ignored, untracked local views; regenerate them with
+`bin/verdify route --write` instead of committing or reconciling them as an
+alternate authority. `generated_at` is provenance only. The stable YAML fields
+`current_state`, `next_skill`, `next_mode`, and `reason` must agree with the
+generated Markdown view.
+
+## Route authority validation
+
+The router selects the expected schema in code. An artifact cannot substitute
+its own `schema_ref`, kind, status vocabulary, or handoff contract. Before any
+authority field is consumed, the router safely parses the artifact, applies its
+expected schema, then applies semantic validation. Invalid content produces
+only a typed, bounded diagnostic and routes to the owning producer.
+
+| Authority input | Expected schema | Repair route |
+|---|---|---|
+| Transcript replan | `transcript-replan.schema.yaml` | `transcript-replan / ingest` |
+| North Star evidence registry | `northstar-evidence-registry.schema.yaml` | `northstar-research-ingest / ingest-research` |
+| North Star plan | `northstar-plan.schema.yaml` | `northstar-planning / synthesis` |
+| North Star artifacts | `northstar-artifacts.schema.yaml` | `northstar-planning / artifact-loop` |
+| Project definition | `project-definition.schema.yaml` | `project-definition / discovery` |
+| Architecture | `architecture.schema.yaml` | `architecture-contracts / north-star-architecture` |
+| Each module contract | `module-contract.schema.yaml` | `architecture-contracts / module-contracts` |
+| State of union | `state-of-union.schema.yaml` | `state-of-union / strategy-review` |
+| Repository hygiene | `repo-hygiene.schema.yaml` | `repo-hygiene / assess` |
+
+Dynamic handoffs must also name a skill and mode declared by
+`config/lifecycle.yaml`. An undeclared pair routes to the artifact producer and
+never becomes a router exception or downstream transition.
 
 When authoritative records disagree, stop the transition, reconstruct current state, and use a decision or scope-change gate. Do not edit intent retroactively merely to make an implementation appear compliant.

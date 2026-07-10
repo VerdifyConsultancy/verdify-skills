@@ -12,7 +12,7 @@ Dependency-light Ruby (`lib/verdify/`). Run `bin/verdify <command> --help` for o
 |---|---|---|
 | `doctor` | Check target-repo prerequisites | operator |
 | `init` | Initialize `.agent-workflow` in a target repo (`project-config`) | install |
-| `route [--sprint ID] [--write]` | Determine + write the next skill/mode; fail closed on invalid D/I/E/S lane evidence, review submissions, or controller packet history (`route-decision`) | project-router |
+| `route [--sprint ID] [--write]` | Determine the next skill/mode; validate upstream authority with code-selected schemas; fail closed on illegal handoffs and invalid D/I/E/S, review, or delivery evidence; optionally generate ignored YAML/Markdown views | project-router |
 | `artifact validate --file P [--schema P]` | Validate an artifact against its `schema_ref` | every skill |
 | `northstar ingest-research --file --title --summary [--id --type --status --source-uri --tag --claim --relevance --limitation]` | Register research as evidence | northstar-research-ingest |
 | `northstar evidence list [--query --tag --json]` | Query the evidence registry | northstar-research-ingest, planning |
