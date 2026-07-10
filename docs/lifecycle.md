@@ -156,9 +156,12 @@ lane contract, implementation I, tests, CI, and closeout evidence, then commits
 only its report as S. It approves, approves with risks, requests fixes, blocks,
 or escalates, but does not silently repair implementation. For a PR targeting
 `dev`, the required transport-neutral `critic-gate` validates the exact current
-S and independent identities without requiring author GitHub approval. A
-release promotion targeting `main` separately requires a real current-head
-approval from an allowed non-author owner.
+S and independent identities without requiring author GitHub approval for an
+ordinary lane. A change to protected delivery/control-plane paths additionally
+requires a current non-author code-owner approval because its candidate can
+define the workflow job that emits the status. A release promotion targeting
+`main` separately requires a real current-head approval from an allowed
+non-author owner.
 
 ## 18. Release verification
 

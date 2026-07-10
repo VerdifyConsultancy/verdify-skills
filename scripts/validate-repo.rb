@@ -38,6 +38,23 @@ STANDARD_LIFECYCLE_STATES = %w[
 REQUIRED_PR_SECTIONS = [
   "Backlog issue", "Lane contract", "Outcome", "Scope proof", "Evidence", "Risk and deployment impact"
 ].freeze
+PROTECTED_CODEOWNER_LINES = [
+  "/.github/CODEOWNERS @jvallery @jrvallery",
+  "/.github/workflows/** @jvallery @jrvallery",
+  "/config/** @jvallery @jrvallery",
+  "/lib/verdify.rb @jvallery @jrvallery",
+  "/lib/verdify/** @jvallery @jrvallery",
+  "/schemas/** @jvallery @jrvallery",
+  "/scripts/delivery-gate.rb @jvallery @jrvallery",
+  "/scripts/github-delivery-controls.rb @jvallery @jrvallery",
+  "/scripts/pr-policy.rb @jvallery @jrvallery",
+  "/scripts/validate-repo.rb @jvallery @jrvallery"
+].freeze
+DELIVERY_OWNER_RESTRICTIONS = {
+  "users" => %w[jvallery jrvallery],
+  "teams" => [],
+  "apps" => []
+}.freeze
 
 class RepoValidator
   attr_reader :errors, :warnings
@@ -617,17 +634,32 @@ class RepoValidator
       error(controls_path, "release owners must be jvallery and jrvallery") unless Array(controls["owners"]).sort == %w[jrvallery jvallery]
       pre_dev = controls.dig("phases", "pre-release", "branches", "dev") || {}
       pre_main = controls.dig("phases", "pre-release", "branches", "main") || {}
+      steady_dev = controls.dig("phases", "steady-state", "branches", "dev") || {}
       steady_main = controls.dig("phases", "steady-state", "branches", "main") || {}
-      error(controls_path, "dev must require zero approvals and no code-owner review") unless pre_dev.dig("required_pull_request_reviews", "required_approving_review_count") == 0 && pre_dev.dig("required_pull_request_reviews", "require_code_owner_reviews") == false
-      error(controls_path, "dev must require critic-gate") unless Array(pre_dev.dig("required_status_checks", "contexts")).include?("critic-gate")
-      error(controls_path, "main must require one stale-dismissing code-owner approval") unless pre_main.dig("required_pull_request_reviews", "required_approving_review_count") == 1 && pre_main.dig("required_pull_request_reviews", "dismiss_stale_reviews") == true && pre_main.dig("required_pull_request_reviews", "require_code_owner_reviews") == true
+      { "pre-release" => { "dev" => pre_dev, "main" => pre_main }, "steady-state" => { "dev" => steady_dev, "main" => steady_main } }.each do |phase, branches|
+        branches.each do |branch, rules|
+          reviews = rules["required_pull_request_reviews"] || {}
+          expected_count = branch == "dev" ? 0 : 1
+          unless reviews["required_approving_review_count"] == expected_count &&
+                 reviews["dismiss_stale_reviews"] == true &&
+                 reviews["require_code_owner_reviews"] == true
+            error(controls_path, "#{phase} #{branch} must require #{expected_count} approvals with stale dismissal and code-owner review")
+          end
+          unless rules["restrictions"] == DELIVERY_OWNER_RESTRICTIONS
+            error(controls_path, "#{phase} #{branch} updates must be restricted to jvallery and jrvallery users with no teams or apps")
+          end
+        end
+      end
+      error(controls_path, "dev must retain critic-gate with a zero ordinary review count") unless [pre_dev, steady_dev].all? { |rules| Array(rules.dig("required_status_checks", "contexts")).include?("critic-gate") && rules.dig("required_pull_request_reviews", "required_approving_review_count") == 0 }
       error(controls_path, "pre-release main must use delivery-policy without pull-request-policy") unless Array(pre_main.dig("required_status_checks", "contexts")).include?("delivery-policy") && !Array(pre_main.dig("required_status_checks", "contexts")).include?("pull-request-policy")
       error(controls_path, "steady-state main must restore pull-request-policy") unless Array(steady_main.dig("required_status_checks", "contexts")).include?("pull-request-policy")
     end
 
     codeowners = ROOT.join(".github/CODEOWNERS")
     owner_lines = codeowners.file? ? codeowners.read.lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") } : []
-    error(codeowners, "must assign all repository paths to jvallery and jrvallery") unless owner_lines == ["* @jvallery @jrvallery"]
+    unless owner_lines == PROTECTED_CODEOWNER_LINES
+      error(codeowners, "must protect exactly CODEOWNERS, all workflows, config, Verdify policy libraries/schemas, and delivery-control scripts with jvallery and jrvallery while leaving ordinary lane paths unowned")
+    end
   end
 
   def validate_evaluations

@@ -27,7 +27,9 @@ not approve its own output.
    critic reviewed closeout-only evidence head E from a separate worktree, and
    the critic report is the only later branch change at S.
 5. For a lane targeting `dev`, confirm the required `critic-gate` succeeds on
-   exact S with an approving critic outcome. For a promotion targeting `main`,
+   exact S with an approving critic outcome. If the diff touches a protected
+   delivery/control-plane CODEOWNERS path, also confirm current approval from
+   `jvallery` or `jrvallery` other than the author. For a promotion targeting `main`,
    confirm `jvallery` or `jrvallery`, other than the PR author, supplied the
    latest effective current-head `APPROVED` review. Required checks and
    PR-policy fields must be current in either phase.
@@ -44,7 +46,8 @@ Read `references/reconcile-and-merge.md` before deciding the lane outcome.
    same lane and their correct implementation/evidence/report revisions.
 3. **Classify outcome.**
    - `merge_ready`: the exact D/I/E/S chain validates, the phase-appropriate gate on S is
-     current, required checks pass, the final evidence packet is complete, and
+     current, protected control-plane changes have current code-owner approval,
+     required checks pass, the final evidence packet is complete, and
      no protected gate is open.
    - `return_for_fix`: critic requests changes, checks fail on implementation
      or policy evidence, or PR metadata is stale.
@@ -76,8 +79,9 @@ Stop when:
 - no fresh critic report or complete final evidence packet exists;
 - critic/worker agent or session identities are not distinct;
 - the report, closeout, PR, or phase-appropriate gate refer to different heads;
-- `critic-gate` is not successful for `dev`, or the latest effective allowed
-  owner review is not `APPROVED` on a `main` release head;
+- `critic-gate` is not successful for `dev`, a protected control-plane change
+  lacks current code-owner approval, or the latest effective allowed owner
+  review is not `APPROVED` on a `main` release head;
 - required checks are failing for implementation reasons;
 - merge conflicts or shared registration conflicts need manual reconciliation;
 - the action would merge to a protected release branch, deploy runtime changes,

@@ -1,3 +1,12 @@
-# Repository-wide release ownership. Main promotion accepts either owner only
-# when the reviewer is not the pull request author.
-* @jvallery @jrvallery
+# Protected delivery and control-plane paths. Ordinary lane paths intentionally
+# remain unowned so dev can use critic-gate with a zero review count.
+/.github/CODEOWNERS @jvallery @jrvallery
+/.github/workflows/** @jvallery @jrvallery
+/config/** @jvallery @jrvallery
+/lib/verdify.rb @jvallery @jrvallery
+/lib/verdify/** @jvallery @jrvallery
+/schemas/** @jvallery @jrvallery
+/scripts/delivery-gate.rb @jvallery @jrvallery
+/scripts/github-delivery-controls.rb @jvallery @jrvallery
+/scripts/pr-policy.rb @jvallery @jrvallery
+/scripts/validate-repo.rb @jvallery @jrvallery

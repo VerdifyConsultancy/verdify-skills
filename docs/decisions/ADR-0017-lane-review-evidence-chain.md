@@ -39,6 +39,11 @@ baseline B -> approved dispatch D -> implementation I -> closeout evidence E -> 
   exact D/I/E/S chain, independent worker/critic identities, and an `approve` or
   `approve_with_risks` outcome at current head S. It is transport-neutral and
   does not require the PR author to submit an impossible GitHub self-approval.
+- On GitHub Free the candidate can define a workflow job under an existing
+  required-context name. CODEOWNERS therefore protects all workflow and trusted
+  delivery-control surfaces, and those paths additionally require a current
+  non-author owner approval. Ordinary unowned lane paths retain the zero-review
+  critic-status path. Protected-branch updates are restricted to the two owners.
 - A `main` release promotion is a different authority boundary: the latest
   effective review must be `APPROVED` on the current head by `jvallery` or
   `jrvallery`, not the PR author or a workflow identity, with no unresolved
@@ -85,7 +90,8 @@ this decision.
 - `bin/verdify route` fails closed on invalid closeout or critic chains and
   requires an open non-draft PR, live required-check success including
   `critic-gate`, a clean merge state, and exact current-head approving critic
-  status before `dev` integration. Human GitHub approval remains mandatory for
+  status before ordinary `dev` integration. Protected control-plane changes
+  also require code-owner approval. Human GitHub approval remains mandatory for
   `main` release promotion.
 - Standard PR policy requires explicit implementation, evidence, and exact
   current-head metadata and validates it against the committed artifacts and

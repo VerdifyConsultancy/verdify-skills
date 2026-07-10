@@ -60,9 +60,19 @@ repository confirmation and snapshot.
 
 Protected `dev` requires PRs, strict `validate`, `pull-request-policy`,
 `compliance / compliance`, and `critic-gate` checks, resolved conversations,
-admin enforcement, and no force push or deletion. Its approving review count is
-zero and code-owner review is false because independent criticism is represented
-by the exact-head status rather than an impossible author self-review.
+admin enforcement, stale-review dismissal, code-owner review, and no force push
+or deletion. Its approving review count remains zero: ordinary lane paths match
+no CODEOWNERS pattern and advance on the exact-head critic status without a
+GitHub review. Protected delivery/control-plane paths do match CODEOWNERS and
+therefore require a current non-author approval from `jvallery` or `jrvallery`.
+
+CODEOWNERS protects itself, every workflow, all config and schemas, the Verdify
+policy library, and the delivery-gate, PR-policy, branch-control, and repository
+validation scripts. This prevents a candidate from replacing `critic-gate` with
+a no-op job under the same required context without triggering owner review.
+GitHub Free cannot enforce an organization-required immutable workflow, so this
+selective owner gate is the compensating control; it does not add review friction
+to ordinary implementation paths.
 
 Protected `main` requires:
 
@@ -73,6 +83,10 @@ Protected `main` requires:
 - resolved conversations;
 - no direct pushes;
 - no force pushes or branch deletion;
+
+Both `dev` and `main` restrict protected-branch updates to the `jvallery` and
+`jrvallery` users, with no team or GitHub App bypass. This prevents another
+administrator or contributor from merging a candidate-forged required context.
 
 Pre-release intentionally omits trusted-base `pull-request-policy` from main
 protection because current main has the incompatible 1.2.1 validator. Current

@@ -91,6 +91,9 @@ authorization or gate, and hand off to
 Approval means the implementation head satisfies the contract, the evidence and
 report suffixes contain only their canonical artifacts, worker and critic
 identities are independent, and `critic-gate` succeeds on final report head S.
+When the diff touches CODEOWNERS-protected delivery/control-plane paths, a
+current non-author owner approval is additionally required because the
+candidate can define the workflow context producer on GitHub Free.
 Any new commit invalidates the status until the full chain is rebuilt and
 re-reviewed. This does not satisfy or weaken the separate human owner approval
 required for a `main` release PR.

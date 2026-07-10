@@ -107,6 +107,16 @@ def enabled(value)
   value.is_a?(Hash) ? value["enabled"] == true : value == true
 end
 
+def normalized_restrictions(value)
+  return nil if value.nil?
+
+  {
+    "users" => Array(value["users"]).map { |user| user.is_a?(Hash) ? user["login"] : user }.compact.map(&:to_s).sort,
+    "teams" => Array(value["teams"]).map { |team| team.is_a?(Hash) ? team["slug"] : team }.compact.map(&:to_s).sort,
+    "apps" => Array(value["apps"]).map { |app| app.is_a?(Hash) ? app["slug"] : app }.compact.map(&:to_s).sort
+  }
+end
+
 def normalized_protection(document)
   return nil if document.nil?
 
@@ -126,7 +136,7 @@ def normalized_protection(document)
       "required_approving_review_count" => reviews["required_approving_review_count"].to_i,
       "require_last_push_approval" => reviews["require_last_push_approval"] == true
     },
-    "restrictions" => document["restrictions"],
+    "restrictions" => normalized_restrictions(document["restrictions"]),
     "required_conversation_resolution" => enabled(document["required_conversation_resolution"]),
     "allow_force_pushes" => enabled(document["allow_force_pushes"]),
     "allow_deletions" => enabled(document["allow_deletions"])

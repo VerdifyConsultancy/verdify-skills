@@ -19,7 +19,11 @@ cat > "$REPO_DIR/main.json" <<'JSON'
     "required_approving_review_count": 0,
     "require_last_push_approval": false
   },
-  "restrictions": null,
+  "restrictions": {
+    "users": [{"login": "legacy-owner"}],
+    "teams": [{"slug": "legacy-team"}],
+    "apps": [{"slug": "legacy-app"}]
+  },
   "required_conversation_resolution": {"enabled": false},
   "allow_force_pushes": {"enabled": false},
   "allow_deletions": {"enabled": false}
@@ -28,6 +32,60 @@ JSON
 cp "$REPO_DIR/main.json" "$TMP/main.before.json"
 
 CONTROL=(ruby "$ROOT/scripts/github-delivery-controls.rb" --repository VerdifyConsultancy/verdify-skills --mock-api "$MOCK")
+
+ruby -ryaml -e '
+  root = ARGV.fetch(0)
+  owner_logins = %w[@jvallery @jrvallery]
+  entries = File.readlines(File.join(root, ".github/CODEOWNERS"), chomp: true).filter_map do |line|
+    line = line.strip
+    next if line.empty? || line.start_with?("#")
+    pattern, *owners = line.split
+    abort "unexpected CODEOWNERS owner set" unless owners == owner_logins
+    [pattern.delete_prefix("/"), owners]
+  end
+  matcher = lambda do |path|
+    entries.select do |pattern, _owners|
+      pattern.end_with?("/**") ? path.start_with?(pattern.delete_suffix("**")) : path == pattern
+    end.last
+  end
+  protected_paths = %w[
+    .github/CODEOWNERS
+    .github/workflows/delivery-gate.yml
+    .github/workflows/new/no-op-critic-gate.yml
+    config/github-delivery-controls.yaml
+    config/github-primitives.yaml
+    lib/verdify.rb
+    lib/verdify/lane_review_validator.rb
+    schemas/critic-report.schema.yaml
+    scripts/delivery-gate.rb
+    scripts/github-delivery-controls.rb
+    scripts/pr-policy.rb
+    scripts/validate-repo.rb
+  ]
+  protected_paths.each { |path| abort "unowned protected path: #{path}" unless matcher.call(path)&.last == owner_logins }
+  %w[README.md docs/guide.md skills/example/SKILL.md implementation.txt].each do |path|
+    abort "ordinary lane path unexpectedly owned: #{path}" if matcher.call(path)
+  end
+
+  controls = YAML.safe_load_file(File.join(root, "config/github-delivery-controls.yaml"), permitted_classes: [], aliases: false)
+  restrictions = {"users"=>%w[jvallery jrvallery], "teams"=>[], "apps"=>[]}
+  controls.fetch("phases").each_value do |phase|
+    dev = phase.fetch("branches").fetch("dev")
+    main = phase.fetch("branches").fetch("main")
+    dev_reviews = dev.fetch("required_pull_request_reviews")
+    main_reviews = main.fetch("required_pull_request_reviews")
+    abort unless dev_reviews.values_at("required_approving_review_count", "dismiss_stale_reviews", "require_code_owner_reviews") == [0, true, true]
+    abort unless main_reviews.values_at("required_approving_review_count", "dismiss_stale_reviews", "require_code_owner_reviews") == [1, true, true]
+    abort unless dev.fetch("restrictions") == restrictions && main.fetch("restrictions") == restrictions
+    abort unless dev.dig("required_status_checks", "contexts").include?("critic-gate")
+    # A candidate no-op critic-gate rewrite hits CODEOWNERS and cannot satisfy
+    # either branch rule without an owner review. Ordinary paths remain
+    # unowned, zero-review, and still require critic-gate on dev.
+    abort unless matcher.call(".github/workflows/delivery-gate.yml") && dev_reviews["require_code_owner_reviews"]
+    abort unless main_reviews["require_code_owner_reviews"] && main_reviews["required_approving_review_count"] == 1
+    abort if matcher.call("implementation.txt")
+  end
+' "$ROOT"
 
 "${CONTROL[@]}" --phase pre-release --mode dry-run > "$TMP/dry-run.json"
 ruby -rjson -e '
@@ -58,7 +116,8 @@ ruby -rjson -e '
   dev=verify["branches"].find { |branch| branch["branch"] == "dev" }.fetch("desired")
   main=verify["branches"].find { |branch| branch["branch"] == "main" }.fetch("desired")
   abort unless dev.dig("required_pull_request_reviews", "required_approving_review_count") == 0
-  abort unless dev.dig("required_pull_request_reviews", "require_code_owner_reviews") == false
+  abort unless dev.dig("required_pull_request_reviews", "dismiss_stale_reviews") == true
+  abort unless dev.dig("required_pull_request_reviews", "require_code_owner_reviews") == true
   abort unless dev.dig("required_status_checks", "contexts") == ["compliance / compliance", "critic-gate", "pull-request-policy", "validate"]
   abort unless main.dig("required_pull_request_reviews", "required_approving_review_count") == 1
   abort unless main.dig("required_pull_request_reviews", "dismiss_stale_reviews") == true
@@ -67,6 +126,7 @@ ruby -rjson -e '
   [dev, main].each do |branch|
     abort unless branch["enforce_admins"] && branch["required_conversation_resolution"]
     abort unless branch["allow_force_pushes"] == false && branch["allow_deletions"] == false
+    abort unless branch["restrictions"] == {"users"=>%w[jrvallery jvallery], "teams"=>[], "apps"=>[]}
   end
 ' "$TMP/apply.json" "$TMP/verify.json"
 
@@ -103,6 +163,7 @@ ruby -rjson -e '
   abort unless d.dig("enforce_admins") == false
   abort unless d.dig("required_pull_request_reviews", "required_approving_review_count") == 0
   abort unless d.dig("required_status_checks", "contexts") == ["compliance / compliance", "pull-request-policy", "validate"]
+  abort unless d["restrictions"] == {"users"=>["legacy-owner"], "teams"=>["legacy-team"], "apps"=>["legacy-app"]}
 ' "$REPO_DIR/main.json"
 
 echo "GitHub delivery control tests passed."
