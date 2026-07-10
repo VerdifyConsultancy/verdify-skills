@@ -1,6 +1,6 @@
 ---
 name: release-verification
-description: Assembles review-ready evidence packets, records observability diagnostics for planning/review/release health, integrates externally approved lane heads, validates the whole system, verifies the intended revision in an authorized deployment environment, and completes human outcome review. Use after critic review, when a lane or wave claims review-ready status, when planning or state-of-union needs live deployment/log health evidence, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
+description: Assembles review-ready evidence packets, records observability diagnostics for planning/review/release health, integrates externally approved lane heads, validates the whole system, verifies the intended revision in an authorized deployment environment, completes outcome review, and emits the protected-dev terminal receipt. Use after critic review, when a lane or wave claims review-ready status, when planning or state-of-union needs live deployment/log health evidence, after all required lanes are ready for integration, for deployment incidents, or when a merged release still needs runtime proof and acceptance.
 compatibility: Requires fresh integration context, GitHub checks/reviews, repository release tooling, and separately authorized deployment access. Production credentials must not come from worker lanes.
 metadata:
   author: Verdify
@@ -9,7 +9,7 @@ metadata:
 
 # Release Verification
 
-Combine accepted lane outputs, prove runtime reality, and close the human outcome loop. Keep integration, deployment, and outcome as explicit modes even though they share one skill.
+Combine accepted lane outputs, prove runtime reality, and close the outcome loop. Keep integration, deployment, outcome, and terminal receipt as explicit modes even though they share one skill.
 
 ## Mode 0: review inbox packet
 
@@ -80,7 +80,12 @@ Read `references/deployment-verification.md`,
 
 ## Mode 3: outcome review
 
-Explain to the human what changed, what evidence proves it, what remains incomplete, what risks remain, and which follow-up issues were created. Record accepted, accepted-with-risks, rejected, or incomplete. Only then reconcile sprint/issue status according to policy.
+Record what changed, what evidence proves it, what remains incomplete, what risks
+remain, and which follow-up issues were created. The authorized outcome owner may
+accept automatically inside a recorded preauthorization envelope. Require a
+human only for a protected decision named by the common contract. Record
+accepted, accepted-with-risks, rejected, or incomplete; do not terminalize from
+this controller artifact alone.
 
 Write `.agent-workflow/sprints/<sprint-id>/outcome/outcome-review.yaml` and validate against `../../schemas/outcome-review.schema.yaml`. Read `references/outcome-review.md`.
 
@@ -88,10 +93,32 @@ Preserve review, diagnostic, integration, deployment, rollback, and outcome
 artifact refs plus GitHub check/deployment/release refs for controller-loop
 session-ledger events.
 
+## Mode 4: terminal receipt
+
+1. Confirm P is complete and approving, R is verified, O is accepted, every
+   D/I/E/S chain is valid, each implementation PR is merged into `dev`, and the
+   uniquely ordered latest required checks came from their trusted workflow
+   files at exact S.
+2. Create `receipt/<sprint-id>/<base-prefix>` at the exact protected `dev` head
+   and run `bin/verdify sprint receipt --sprint <id> --controller-ref
+   controller/<id> --base <exact-dev-sha>`.
+3. Open the generated receipt-only PR with its exact marker and five canonical
+   paths. It receives no new lane, critic, or routine human approval. Enable
+   auto-merge after protected-base receipt and policy gates pass.
+4. A one-time `issue-135-recovery-v1` bundle may contain only the six IDs
+   compiled into the validator and must use PR #213's merge commit as its exact
+   base. Future receipt PRs contain exactly one sprint.
+5. After merge, verify the receipt commit and later `dev` ancestry, rerun global
+   project-router, and record the new route. A rejected receipt is fixed forward
+   without rolling back already integrated implementation.
+
+Read `references/terminal-receipt.md`.
+
 ## Boundaries
 
 - A merged PR is not deployment proof.
 - A controller evidence branch is not an integration candidate.
+- A controller branch, tag, custom status, or workflow URL is not terminal sprint authority.
 - A healthy process is not acceptance proof.
 - Do not let the worker self-deploy with production credentials.
 - Do not close unresolved follow-up work by hiding it in release notes.

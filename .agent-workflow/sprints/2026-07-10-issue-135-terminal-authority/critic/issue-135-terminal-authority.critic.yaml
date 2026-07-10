@@ -1,0 +1,77 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-issue-135-terminal-authority
+lane_id: issue-135-terminal-authority
+pull_request: 213
+worker_agent: codex-root-issue135-receipt
+worker_session_id: root-135-terminal-receipt-20260710d
+critic_agent: codex-issue135-receipt-critic
+implementation_head_sha: "de525fcab4a224f2f42c274bab142c07f498db81"
+evidence_head_sha: "afd11be669dbaf9b20a0d041b0d4c73e3c4212c1"
+reviewed_head_sha: "afd11be669dbaf9b20a0d041b0d4c73e3c4212c1"
+closeout_path: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/lanes/closeout/issue-135-terminal-authority.closeout.yaml
+closeout_sha256: "2c19f2578f9bd495d7060c543299f59bb9982aa5de68a676969c5e51115e98bd"
+critic_session_id: critic-135-terminal-receipt-20260710g
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-issue-135-terminal-authority/critic-receipt-e4
+outcome: approve_with_risks
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - "The authority matrix, ADR-0017, schema, router, and release-verification skill name the protected-dev SprintTerminalReceipt as post-cutover terminal authority; the rejected tag, ruleset, custom-status, and workflow-attestation implementation is absent."
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - "Protected-base validation derives the complete lane set and D/I/E/S identity from reviewed dev history, byte-binds controller copies and local R/O, rejects stale or unmerged PRs, requires each merge in verified R, and validates the highest-ID trusted exact-S checks."
+      - "Independent negative probes for forged issue scope, hand-authored plan changes, divergent R/O, overlapping newer checks, explicit packet blockers/security findings, and escalated or deferred blocking questions all fail closed."
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - "A receipt must be the sole direct-parent PR head at its exact recorded dev base, use the exact marker and branch, and change only the five canonical terminal paths; one fully valid receipt fixture crosses both pr-policy and delivery-gate."
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - "Both protected-base policy entrypoints reject ordinary dev work when integrated_unterminated_sprints is nonempty and admit only the receipt transaction whose sprint/path set resolves that exact base state."
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - "terminal_at? reconstructs the protected-base plan and complete lane cardinality, validates canonical COMPLETE status and R/O bindings, and remains valid after unrelated later dev commits; the router advances without sprint ambiguity."
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - "Controller-loop and release-verification define automatic generation, opening, monitoring, auto-merge, and post-merge routing for the deterministic receipt without another lane, critic, or routine human gate."
+  - criterion_id: LANE-AC-07
+    assessment: satisfied
+    evidence:
+      - "The common contract advances deterministic success automatically and reserves human stops for protected decisions; complete/approve packets cannot retain missing evidence, blockers, unresolved security findings, or any unanswered blocking question."
+  - criterion_id: LANE-AC-08
+    assessment: satisfied
+    evidence:
+      - "Recovery is limited to the six compiled sprint IDs, issue-135-recovery-v1, and PR #213's exact merge base; normal mode remains one sprint and both policies require the exact complete path set."
+  - criterion_id: LANE-AC-09
+    assessment: satisfied
+    evidence:
+      - "Exact I/E focused checks are green and E changes only the canonical closeout; exact-S GitHub checks remain a mandatory integration precondition after this report commit."
+evidence_assessment:
+  - "Independence verified: critic agent/session/worktree differ from worker codex-root-issue135-receipt / root-135-terminal-receipt-20260710d."
+  - "Git chain verified: B 1cd75f4556d88d2ddbfaf70e719d1380e962f51c -> D 6289755e33272298a595990562ca3e37960d035d -> I de525fcab4a224f2f42c274bab142c07f498db81 -> E afd11be669dbaf9b20a0d041b0d4c73e3c4212c1 is linear."
+  - "D adds only the approved sprint plan, wave release plan, and lane contract. E adds only the canonical closeout, whose SHA-256 is recorded above."
+  - "Implementation scope is contract-owned or has durable controller coordination: config/lifecycle.yaml at issue comment 4938734413, tests/test_packed_artifact.sh at 4937883828, and lib/verdify/semantic_validator.rb at 4939236471. No prohibited path changed."
+  - "ruby tests/test_sprint_terminal_receipt.rb passed: 20 runs, 62 assertions, zero failures/errors/skips."
+  - "ruby tests/test_lane_review_validator.rb passed: 52 runs, 129 assertions, zero failures/errors/skips."
+  - "bash tests/test_pr_policy.sh and bash tests/test_delivery_gate.sh passed, including the valid receipt transaction through both protected policy entrypoints."
+  - "ruby scripts/validate-repo.rb passed with 28 skills and 49 schemas."
+  - "Additional independent E checks passed: CLI lifecycle, schema/semantic suite, git diff check, and redacted gitleaks scan."
+  - "Live GitHub-shaped evidence was verified: REST represents a merged PR as state=closed plus merged=true, and PR #212 exposes exact github-actions app/workflow/event/head bindings with repeated check runs ordered by numeric check-run ID."
+  - "Every request_fixes finding from rejected S b98dab8fb2369605b55e617129a970fb6cfd98aa is removed or converted to a failing regression; no critical or high finding remains."
+integration_risks:
+  - "The diff changes CODEOWNERS-protected policy code. Integration must use the narrow recorded repository-admin exception required by the current GitHub limitation and must not generalize it to ordinary lanes."
+  - "The final report commit S must be the live PR head and all required GitHub checks, including critic-gate, must pass at exact S before merge."
+  - "The six-sprint recovery receipt and post-merge global route proof can run only after this validator is accepted on dev; failure must stop and fix the same receipt transaction."
+residual_risks:
+  - "Live PR, check-run, controller-ref, and branch-protection reads are point-in-time and can drift before integration; exact-S CI and the protected merge boundary remain authoritative."
+  - "The bounded recovery receipt has full deterministic fixtures but has not yet been executed against the six live controller histories."
+  - "Any commit after this critic-only report invalidates the review chain and requires a new evidence head and critic assessment."
+reviewed_at: "2026-07-10T20:40:30Z"

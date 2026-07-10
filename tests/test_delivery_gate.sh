@@ -21,10 +21,16 @@ def git(repo, *args)
   stdout.strip
 end
 
-def run_gate(root, event, repo, reviews: nil, success: true)
+def git_bytes(repo, *args)
+  stdout, stderr, status = Open3.capture3("git", "-C", repo, *args)
+  raise "git #{args.join(' ')} failed: #{stderr}" unless status.success?
+  stdout
+end
+
+def run_gate(root, event, repo, reviews: nil, success: true, env: {})
   command = ["ruby", File.join(root, "scripts/delivery-gate.rb"), "--event", event, "--repo", repo]
   command.concat(["--reviews", reviews]) if reviews
-  stdout, stderr, status = Open3.capture3(*command)
+  stdout, stderr, status = Open3.capture3(env, *command)
   if success && !status.success?
     raise "expected delivery gate success: #{stdout}\n#{stderr}"
   elsif !success && status.success?
@@ -74,7 +80,26 @@ def build_chain(root, directory, critic_agent: "critic-agent", critic_session: "
   contract["branch"] = "lane/test"
   contract["approval"] = { "status" => "approved", "approver" => "owner", "approved_at" => "2026-07-10T00:00:00Z" }
   File.write(File.join(directory, contract_rel), YAML.dump(contract))
-  File.write(File.join(directory, "#{sprint}/sprint-plan.yaml"), "kind: SprintPlan\n")
+  plan = Verdify::SchemaValidator.load_document(
+    File.join(root, "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml")
+  )
+  plan["sprint_id"] = "test-sprint"
+  plan["status"] = "approved"
+  plan["baseline_sha"] = baseline
+  plan["issue_ids"] = [121]
+  plan["github"]["repository"] = "example/test"
+  plan_lane = plan.fetch("lanes").first
+  plan_lane["lane_id"] = "test-lane"
+  plan_lane["issue_ids"] = [121]
+  plan_lane["contract_path"] = contract_rel
+  plan_lane["branch"] = "lane/test"
+  plan.fetch("acceptance_criteria").each { |criterion| criterion["lane_ids"] = ["test-lane"] }
+  plan.dig("review_plan", "user_stories_for_review").each do |story|
+    story["issue_ids"] = [121]
+    story["lane_ids"] = ["test-lane"]
+  end
+  plan["approval"] = { "status" => "approved", "approver" => "owner", "approved_at" => "2026-07-10T00:00:00Z" }
+  File.write(File.join(directory, "#{sprint}/sprint-plan.yaml"), YAML.dump(plan))
   FileUtils.mkdir_p(File.join(directory, sprint, "release"))
   File.write(File.join(directory, "#{sprint}/release/wave-release-plan.yaml"), "kind: WaveReleasePlan\n")
   git(directory, "add", sprint)
@@ -117,17 +142,123 @@ def build_chain(root, directory, critic_agent: "critic-agent", critic_session: "
   File.write(File.join(directory, critic_rel), YAML.dump(critic))
   git(directory, "add", critic_rel)
   git(directory, "commit", "-qm", "critic report")
-  { head: git(directory, "rev-parse", "HEAD"), contract: contract_rel }
+  {
+    head: git(directory, "rev-parse", "HEAD"), contract: contract_rel,
+    baseline: baseline, implementation: implementation, evidence: evidence,
+    closeout: closeout_rel, critic: critic_rel
+  }
 end
 
-def event(path, head:, body:, base: "dev", source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills")
+def build_receipt_chain(root, directory)
+  chain = build_chain(root, directory)
+  sprint_id = "test-sprint"
+  sprint_root = ".agent-workflow/sprints/#{sprint_id}"
+  report = chain.fetch(:head)
+
+  git(directory, "checkout", "-qb", "dev", chain.fetch(:baseline))
+  git(directory, "merge", "--no-ff", "-qm", "merge lane PR", "lane/test")
+  merge_sha = git(directory, "rev-parse", "HEAD")
+  FileUtils.mkdir_p(File.join(directory, "schemas"))
+  FileUtils.cp(File.join(root, "schemas/sprint-terminal-receipt.schema.yaml"), File.join(directory, "schemas/sprint-terminal-receipt.schema.yaml"))
+  git(directory, "add", "schemas/sprint-terminal-receipt.schema.yaml")
+  git(directory, "commit", "-qm", "activate terminal receipt")
+  base = git(directory, "rev-parse", "HEAD")
+
+  git(directory, "checkout", "-qb", "controller/#{sprint_id}", chain.fetch(:baseline))
+  %W[
+    #{sprint_root}/sprint-plan.yaml
+    #{sprint_root}/release/wave-release-plan.yaml
+    #{chain.fetch(:contract)}
+    #{chain.fetch(:closeout)}
+    #{chain.fetch(:critic)}
+  ].each do |relative|
+    destination = File.join(directory, relative)
+    FileUtils.mkdir_p(File.dirname(destination))
+    File.binwrite(destination, git_bytes(directory, "show", "#{report}:#{relative}"))
+  end
+  git(directory, "add", sprint_root)
+  git(directory, "commit", "-qm", "assemble controller evidence")
+
+  packet_path = "#{sprint_root}/review/review-inbox-packet.yaml"
+  packet = Verdify::SchemaValidator.load_document(
+    File.join(root, "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml")
+  )
+  packet["status"] = "ready"
+  packet["scope"]["sprint_id"] = sprint_id
+  packet["scope"]["lane_ids"] = ["test-lane"]
+  packet["scope"]["issue_ids"] = [121]
+  packet["traceability"]["repository"] = "example/test"
+  packet["traceability"]["base_ref"] = "dev"
+  packet["traceability"]["head_ref"] = "controller/#{sprint_id}"
+  packet["traceability"]["review_submissions"] = [{
+    "pull_request" => 456, "review_submission_head_sha" => report,
+    "reviewer_login" => "critic-agent", "reviewer_id" => 1
+  }]
+  packet.fetch("pull_requests").first["identifier"] = "#456"
+  packet["evidence_completeness"]["verdict"] = "complete"
+  packet["evidence_completeness"]["missing_required"] = []
+  packet["evidence_completeness"]["blockers"] = []
+  packet["security"]["unresolved_findings"] = []
+  packet["recommendation"]["outcome"] = "approve"
+  FileUtils.mkdir_p(File.dirname(File.join(directory, packet_path)))
+  File.write(File.join(directory, packet_path), YAML.dump(packet))
+  git(directory, "add", packet_path)
+  git(directory, "commit", "-qm", "packet P")
+
+  release_path = "#{sprint_root}/release/release-verification.yaml"
+  release = Verdify::SchemaValidator.load_document(
+    File.join(root, "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml")
+  )
+  release["sprint_id"] = sprint_id
+  release["integrated_sha"] = base
+  release["deployment"]["observed_revision"] = base
+  File.write(File.join(directory, release_path), YAML.dump(release))
+  git(directory, "add", release_path)
+  git(directory, "commit", "-qm", "release R")
+
+  outcome_path = "#{sprint_root}/outcome/outcome-review.yaml"
+  outcome = Verdify::SchemaValidator.load_document(
+    File.join(root, "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/outcome/outcome-review.yaml")
+  )
+  outcome["sprint_id"] = sprint_id
+  FileUtils.mkdir_p(File.dirname(File.join(directory, outcome_path)))
+  File.write(File.join(directory, outcome_path), YAML.dump(outcome))
+  git(directory, "add", outcome_path)
+  git(directory, "commit", "-qm", "outcome O")
+
+  git(directory, "checkout", "-qb", "receipt/#{sprint_id}/#{base[0, 12]}", base)
+  pull = {
+    "number" => 456, "head_sha" => report, "head_ref" => "lane/test", "base_ref" => "dev",
+    "state" => "closed", "merged" => true, "merge_commit_sha" => merge_sha
+  }
+  checks = Verdify::SprintTerminalReceipt::REQUIRED_CHECKS.map.with_index do |(name, workflow), index|
+    {
+      "id" => index + 1, "name" => name, "status" => "completed", "conclusion" => "success",
+      "app_slug" => "github-actions", "workflow_path" => workflow, "workflow_event" => "pull_request",
+      "workflow_head_sha" => report, "created_at" => nil, "started_at" => "2026-07-10T00:00:01Z",
+      "completed_at" => "2026-07-10T00:00:02Z"
+    }
+  end
+  validator = Verdify::SprintTerminalReceipt.new(
+    repo: directory, pull_request_loader: ->(_number) { pull }, check_run_loader: ->(_sha) { checks }
+  )
+  validator.write!(
+    sprint_id: sprint_id, controller_ref: "controller/#{sprint_id}", receipt_base_sha: base,
+    mode: "normal", generator: "policy-integration-test"
+  )
+  git(directory, "add", *Verdify::SprintTerminalReceipt.paths(sprint_id).values)
+  git(directory, "commit", "-qm", "terminal receipt")
+  { base: base, head: git(directory, "rev-parse", "HEAD"), report: report, merge: merge_sha, checks: checks }
+end
+
+def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills")
   repository = { "full_name" => "VerdifyConsultancy/verdify-skills" }
   payload = {
     "number" => 456,
     "repository" => repository,
     "pull_request" => {
       "number" => 456, "state" => "open", "body" => body, "user" => { "login" => author },
-      "base" => { "ref" => base, "sha" => "b" * 40, "repo" => { "full_name" => base_repo } },
+      "base" => { "ref" => base, "sha" => base_sha, "repo" => { "full_name" => base_repo } },
       "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } }
     }
   }
@@ -140,6 +271,63 @@ body = "## Lane contract\n\n- Lane: `test-lane`\n- Contract: `#{chain[:contract]
 dev_event = File.join(tmp, "dev.json")
 event(dev_event, head: chain[:head], body: body)
 run_gate(root, dev_event, valid_repo)
+
+receipt_body = "<!-- verdify-terminal-receipt:test-sprint:#{'b' * 40} -->\n"
+event(dev_event, head: chain[:head], body: receipt_body, source: "receipt/test-sprint/#{('b' * 40)[0, 12]}")
+receipt_error = run_gate(root, dev_event, valid_repo, success: false)
+raise "incomplete receipt transaction was not rejected" unless receipt_error.include?("marker and sprint set") || receipt_error.include?("mixed or incomplete paths")
+event(dev_event, head: chain[:head], body: body)
+
+# One fully valid terminal receipt transaction must cross both script entrypoints.
+# Only the external GitHub API evidence is replaced; the receipt generator,
+# protected-base reconstruction, path policy, and both gates run unmodified.
+receipt_repo = File.join(tmp, "receipt")
+receipt = build_receipt_chain(root, receipt_repo)
+github_mock = File.join(tmp, "terminal-github-mock.rb")
+File.write(github_mock, <<~'MOCK')
+  require ENV.fetch("VERDIFY_LIB")
+  module Verdify
+    class GitRepository
+      def github_terminal_pull_request_evidence(number)
+        {
+          "number" => Integer(number), "head_sha" => ENV.fetch("TERMINAL_REPORT_SHA"),
+          "head_ref" => "lane/test", "base_ref" => "dev", "state" => "closed",
+          "merged" => true, "merge_commit_sha" => ENV.fetch("TERMINAL_MERGE_SHA")
+        }
+      end
+
+      def github_check_run_evidence(ref)
+        SprintTerminalReceipt::REQUIRED_CHECKS.map.with_index do |(name, workflow), index|
+          {
+            "id" => index + 1, "name" => name, "status" => "completed", "conclusion" => "success",
+            "app_slug" => "github-actions", "workflow_path" => workflow, "workflow_event" => "pull_request",
+            "workflow_head_sha" => ref, "created_at" => nil, "started_at" => "2026-07-10T00:00:01Z",
+            "completed_at" => "2026-07-10T00:00:02Z"
+          }
+        end
+      end
+    end
+  end
+MOCK
+receipt_env = {
+  "RUBYOPT" => "-r#{github_mock}", "VERDIFY_LIB" => File.join(root, "lib/verdify"),
+  "TERMINAL_REPORT_SHA" => receipt.fetch(:report), "TERMINAL_MERGE_SHA" => receipt.fetch(:merge)
+}
+receipt_body = <<~BODY
+  <!-- verdify-terminal-receipt:test-sprint:#{receipt.fetch(:base)} -->
+
+  Closes #135
+BODY
+event(
+  dev_event, head: receipt.fetch(:head), body: receipt_body, base_sha: receipt.fetch(:base),
+  source: "receipt/test-sprint/#{receipt.fetch(:base)[0, 12]}"
+)
+run_gate(root, dev_event, receipt_repo, env: receipt_env)
+stdout, stderr, status = Open3.capture3(
+  receipt_env, "ruby", File.join(root, "scripts/pr-policy.rb"), "--event", dev_event, "--repo", receipt_repo
+)
+raise "valid receipt PR policy failed: #{stdout}\n#{stderr}" unless status.success?
+event(dev_event, head: chain[:head], body: body)
 
 File.write(File.join(valid_repo, "post-report.txt"), "stale\n")
 git(valid_repo, "add", "post-report.txt")

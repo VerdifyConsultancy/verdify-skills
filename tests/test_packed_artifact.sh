@@ -89,9 +89,9 @@ grep -q '^## 1.3.0 - 2026-07-10$' "$ROOT/CHANGELOG.md"
 for skill in "$ROOT"/skills/*/SKILL.md; do
   relative="${skill#$ROOT/}"
   case "$relative" in
-    skills/controller-merge/SKILL.md|skills/independent-critic/SKILL.md|skills/release-verification/SKILL.md)
-      # Issue #121 owns transport-neutral delivery-governance changes in these
-      # skills; the version-only release assertion remains strict for all others.
+    skills/controller-loop/SKILL.md|skills/controller-merge/SKILL.md|skills/independent-critic/SKILL.md|skills/project-router/SKILL.md|skills/release-verification/SKILL.md)
+      # Issues #121 and #135 own transport-neutral delivery governance and
+      # terminal-receipt changes in these skills; all others remain strict.
       continue
       ;;
   esac

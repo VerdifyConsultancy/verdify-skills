@@ -9,6 +9,7 @@ test: validate manifest-check
 	ruby tests/test_schema_validator.rb
 	bash tests/test_cli.sh
 	ruby tests/test_lane_review_validator.rb
+	ruby tests/test_sprint_terminal_receipt.rb
 	bash tests/test_pr_policy.sh
 	bash tests/test_delivery_gate.sh
 	bash tests/test_github_delivery_controls.sh

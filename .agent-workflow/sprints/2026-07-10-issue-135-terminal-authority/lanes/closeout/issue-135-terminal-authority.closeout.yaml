@@ -1,0 +1,125 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-issue-135-terminal-authority
+lane_id: issue-135-terminal-authority
+status: ready_for_critic
+issue_ids: [135]
+pull_request: 213
+baseline_sha: 1cd75f4556d88d2ddbfaf70e719d1380e962f51c
+implementation_head_sha: de525fcab4a224f2f42c274bab142c07f498db81
+validated_head_sha: de525fcab4a224f2f42c274bab142c07f498db81
+contract_hash: ba9e594532b1ae1755044aca13e1fbc0cbbb6b396149c889bdf5a84c5920c05e
+changed_paths:
+  - COMMON_OPERATING_CONTRACT.md
+  - MANIFEST.sha256
+  - Makefile
+  - config/authority-matrix.yaml
+  - config/lifecycle.yaml
+  - docs/decisions/ADR-0017-lane-review-evidence-chain.md
+  - docs/lifecycle.md
+  - lib/verdify.rb
+  - lib/verdify/cli.rb
+  - lib/verdify/git_repository.rb
+  - lib/verdify/semantic_validator.rb
+  - lib/verdify/sprint_terminal_receipt.rb
+  - schemas/sprint-terminal-receipt.schema.yaml
+  - scripts/delivery-gate.rb
+  - scripts/pr-policy.rb
+  - skills/controller-loop/SKILL.md
+  - skills/project-router/SKILL.md
+  - skills/release-verification/SKILL.md
+  - skills/release-verification/references/terminal-receipt.md
+  - tests/test_delivery_gate.sh
+  - tests/test_packed_artifact.sh
+  - tests/test_pr_policy.sh
+  - tests/test_sprint_terminal_receipt.rb
+validation_results:
+  - id: receipt-suite
+    command: ruby tests/test_sprint_terminal_receipt.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: tests/test_sprint_terminal_receipt.rb
+  - id: delivery-gate-suite
+    command: bash tests/test_delivery_gate.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: tests/test_delivery_gate.sh
+  - id: pull-request-policy-suite
+    command: bash tests/test_pr_policy.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: tests/test_pr_policy.sh
+  - id: lane-review-suite
+    command: ruby tests/test_lane_review_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: tests/test_lane_review_validator.rb
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: tests/test_cli.sh
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: scripts/validate-repo.rb
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: Makefile
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="1cd75f4556d88d2ddbfaf70e719d1380e962f51c..HEAD"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T20:35:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [repository-validation, receipt-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [receipt-suite, lane-review-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [receipt-suite, pull-request-policy-suite, delivery-gate-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [receipt-suite, pull-request-policy-suite, delivery-gate-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [receipt-suite, cli-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [repository-validation, cli-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-07
+    evidence_ids: [repository-validation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-08
+    evidence_ids: [receipt-suite, pull-request-policy-suite, delivery-gate-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-09
+    evidence_ids: [full-suite, changed-commit-secret-scan, repository-validation]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Protected control-plane changes need the recorded narrow admin exception until a dedicated non-spoofable attestor removes that repository limitation.
+  - The exact six-sprint recovery receipt is intentionally executed and verified only after this validator is merged to protected dev.
+worktree_clean: true
+worker_agent: codex-root-issue135-receipt
+worker_session_id: root-135-terminal-receipt-20260710d
+completed_at: "2026-07-10T20:35:16Z"
+limitations:
+  - Implementation validation does not pre-merge or simulate GitHub auto-merge for the live recovery PR; the controller performs that separate post-merge verification.
+  - The single critic cycle drove focused regressions for exact plan transition, complete lane cardinality, controller-to-local R/O bytes, canonical COMPLETE status, highest-ID check ordering, REST merged-state normalization, exact receipt path parsing through both policy scripts, explicit packet blockers, unresolved blocking questions, failed migrations, rollback readiness, exact controller branch resolution, and canonical S/dev identity.
+  - Coordination for the necessary release semantic-validator path is recorded at https://github.com/VerdifyConsultancy/verdify-skills/issues/135#issuecomment-4939236471.

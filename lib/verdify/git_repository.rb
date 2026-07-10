@@ -68,6 +68,10 @@ module Verdify
       value.empty? ? nil : value
     end
 
+    def first_change_sha(path, ref: "HEAD")
+      git("rev-list", "--reverse", ref.to_s, "--", path.to_s).first.lines.map(&:strip).find { |sha| !sha.empty? }
+    end
+
     def file_at(ref, path)
       git("show", "#{ref}:#{path}").first.b
     end
@@ -131,6 +135,66 @@ module Verdify
       raise CommandError, "Could not read GitHub pull request evidence: #{e.message}"
     end
 
+    def github_terminal_pull_request_evidence(number)
+      slug = github_slug
+      raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
+
+      first = github_api_json("repos/#{slug}/pulls/#{Integer(number)}")
+      final = github_api_json("repos/#{slug}/pulls/#{Integer(number)}")
+      observed_heads = [first.dig("head", "sha"), final.dig("head", "sha")]
+      unless observed_heads.all? { |sha| sha.to_s.match?(/\A[0-9a-f]{40}\z/i) } && observed_heads.uniq.length == 1
+        raise CommandError, "Pull request head changed or was missing while terminal evidence was collected"
+      end
+      {
+        "number" => Integer(number),
+        "head_sha" => final.dig("head", "sha"),
+        "head_ref" => final.dig("head", "ref"),
+        "base_ref" => final.dig("base", "ref"),
+        "state" => final["merged"] == true ? "merged" : final["state"],
+        "draft" => final["draft"],
+        "merged" => final["merged"] == true,
+        "merge_commit_sha" => final["merge_commit_sha"],
+        "author" => final.dig("user", "login"),
+        "author_id" => final.dig("user", "id")
+      }
+    rescue JSON::ParserError, ArgumentError => e
+      raise CommandError, "Could not read GitHub terminal pull request evidence: #{e.message}"
+    end
+
+    def github_check_run_evidence(ref)
+      slug = github_slug
+      raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
+
+      payload = github_api_json("repos/#{slug}/commits/#{ref}/check-runs?filter=latest&per_page=100")
+      workflow_runs = {}
+      Array(payload["check_runs"]).map do |check|
+        run_id = check["details_url"].to_s[%r{/actions/runs/(\d+)}, 1]
+        run = if run_id
+                workflow_runs[run_id] ||= github_api_json("repos/#{slug}/actions/runs/#{run_id}")
+              else
+                {}
+              end
+        workflow_path = run["path"].to_s.split("@", 2).first
+        {
+          "id" => check["id"],
+          "name" => check["name"],
+          "status" => check["status"],
+          "conclusion" => check["conclusion"],
+          "created_at" => check["created_at"],
+          "started_at" => check["started_at"],
+          "completed_at" => check["completed_at"],
+          "app_slug" => check.dig("app", "slug"),
+          "details_url" => check["details_url"],
+          "run_id" => run_id&.to_i,
+          "workflow_path" => workflow_path,
+          "workflow_event" => run["event"],
+          "workflow_head_sha" => run["head_sha"]
+        }
+      end
+    rescue JSON::ParserError => e
+      raise CommandError, "Could not read GitHub check-run evidence: #{e.message}"
+    end
+
     def github_collaborator_permission(login)
       slug = github_slug
       raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
@@ -191,6 +255,30 @@ module Verdify
     def remote_url
       result = git("remote", "get-url", "origin", allow_failure: true)
       result.last.success? ? result.first.strip : nil
+    end
+
+    def github_api_json(path)
+      gh = capture("gh", "api", path.to_s, allow_failure: true)
+      return JSON.parse(gh.first) if gh.last.success?
+      github_api_json_with_curl(path)
+    rescue CommandError, JSON::ParserError
+      github_api_json_with_curl(path)
+    end
+
+    def github_api_json_with_curl(path)
+      url = "https://api.github.com/#{path}"
+      stdout, stderr, status = capture(
+        "curl", "-fsSL",
+        "-H", "Accept: application/vnd.github+json",
+        "-H", "X-GitHub-Api-Version: 2022-11-28",
+        url,
+        allow_failure: true
+      )
+      raise CommandError, "GitHub API request failed for #{path}: #{stderr.strip}" unless status.success?
+
+      JSON.parse(stdout)
+    rescue JSON::ParserError => e
+      raise CommandError, "GitHub API returned invalid JSON for #{path}: #{e.message}"
     end
 
     def github_slug

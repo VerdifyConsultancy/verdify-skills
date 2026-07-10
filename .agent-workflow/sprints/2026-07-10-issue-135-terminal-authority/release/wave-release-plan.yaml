@@ -1,0 +1,132 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-issue-135-terminal-authority
+status: approved
+scope:
+  sprint_id: 2026-07-10-issue-135-terminal-authority
+  issue_ids: [135]
+  lane_ids: [issue-135-terminal-authority]
+  northstar_ids: [NSM-007, NSM-008, NSM-009, NSM-010]
+  summary: Integrate the receipt-based lifecycle repair to dev, then auto-merge one bounded recovery receipt PR and verify routing convergence.
+  non_goals: [main or npm release, application runtime deployment, controller branch integration, terminal tags or rulesets]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-135
+  decision_notes: One implementation lane targets dev; deterministic post-merge receipt evidence uses a generated receipt-only PR, not another implementation lane.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [repository validation, receipt regressions, package tests]
+    - name: delivery-gate
+      required: true
+      event_triggers: [pull_request, push, other]
+      timeout_minutes: 15
+      evidence_expected: [implementation D/I/E/S mode, deterministic receipt mode, next-merge blocker]
+  artifacts: [receipt schema, receipt bundle, route decision, protected-base policy evidence]
+  required_events: [pull_request, push]
+environments:
+  - name: github-control-plane
+    environment_type: review
+    required: true
+    namespace: null
+    url: https://github.com/VerdifyConsultancy/verdify-skills
+    quota_policy: null
+    limit_policy: null
+    network_policy: GitHub operations are limited to the implementation PR, deterministic receipt PR, checks, auto-merge, and accepted dev refs.
+    ttl: null
+    secrets_scope: Existing scoped GitHub auth; no new secret or credential value is required.
+    protection_rules: [one fresh implementation critic, protected-base checks, receipt-only path gate, temporary protected-path exception]
+    expected_revision_source: merged implementation dev SHA followed by merged recovery receipt dev SHA
+gitops:
+  controller: none
+  desired_state_refs: [.agent-workflow/sprints/<sprint-id>/terminal/terminal-receipt.yaml]
+  sync_order:
+    - phase: integration
+      wave: 1
+      resource: issue 135 implementation PR
+      purpose: Merge exact approving S to protected dev after required checks and recorded exception.
+    - phase: closeout
+      wave: 2
+      resource: bounded terminal receipt PR
+      purpose: Generate exact terminal artifacts for the five stale transactions plus issue 135 and enable auto-merge.
+    - phase: verification
+      wave: 3
+      resource: project router
+      purpose: Prove accepted dev has no stale completed sprint ambiguity and routes to the truthful next skill.
+  reconciliation_checks: [origin/dev exactness, receipt-only changed paths, receipt gate success, merged receipt ancestry, global route]
+  remediation_policy: Stop and fix the receipt candidate if any evidence binding or path check fails; no implementation rollback is needed for a rejected receipt PR.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+    - id: STEP-01
+      action: Merge PR 213 after one fresh approving critic and required checks.
+      success_criteria: Exact S is integrated to dev with the temporary protected-path exception recorded.
+      rollback_trigger: Critic, CI, or contract mismatch.
+    - id: STEP-02
+      action: Generate, open, and enable auto-merge for one bounded recovery receipt PR.
+      success_criteria: Protected-base receipt policy passes and the PR merges without another critic or human gate.
+      rollback_trigger: Any receipt, path, evidence, or base mismatch.
+    - id: STEP-03
+      action: Re-run global routing from fresh origin/dev.
+      success_criteria: Completed transactions are terminal and the next truthful lifecycle stage is selected without --sprint.
+      rollback_trigger: Any hidden active work, invalid receipt, or route ambiguity.
+observability:
+  dashboards: [GitHub pull requests and checks]
+  logs: [redacted CLI output, receipt validation output, CI runs]
+  metrics: [integrated unterminated sprints, receipt PRs open, receipts merged, route ambiguities]
+  traces: [sprint ID, controller P/R/O SHAs, implementation PR head/merge, receipt commit/PR/merge]
+  runtime_checks: [receipt policy, auto-merge state, origin/dev ancestry, global route]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the implementation merge only if protected-base receipt policy or router behavior is invalid; rejected receipt PRs are simply fixed forward.
+  known_good_ref: "1cd75f4556d88d2ddbfaf70e719d1380e962f51c"
+  procedure: Stop receipt generation, retain controller evidence, revert the single implementation merge if needed, and rerun the pre-change route.
+  validation_steps: [validate repository, inspect PR paths/checks, verify dev ancestry, run global route]
+release_health:
+  stabilization_window: through implementation merge, receipt auto-merge, and repeated route verification
+  signals:
+    - name: receipt integrity
+      source: protected-base receipt gate
+      threshold: Every receipt field and changed path matches exact controller/dev evidence.
+      blocking: true
+    - name: routing convergence
+      source: fresh project-router output
+      threshold: No integrated completed transaction remains active or hidden.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/review/review-inbox-packet.yaml
+  human_test_steps: [inspect receipt schema and merge blocker, confirm no custom tag/workflow authority, inspect global route]
+  approval_gate: One fresh implementation critic; deterministic receipts add no critic or human gate.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: Receipt generation could copy invalid controller evidence into accepted dev.
+    mitigation: Reuse shared semantic and live PR/check validation under protected-base policy before merge.
+  - id: RISK-02
+    severity: medium
+    statement: The recovery bundle is broader than normal one-sprint receipts.
+    mitigation: Bind it to the exact six IDs and one accepted base, then reject multi-sprint normal receipts.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T18:15:19Z"
+prepared_at: "2026-07-10T18:15:19Z"
+planner: root-issue135-receipt-replan

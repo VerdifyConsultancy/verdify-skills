@@ -117,8 +117,9 @@ own output.
 
 Persists outer-loop lifecycle state, wave state, child sessions, events, gates,
 handoffs, and the append-oriented session ledger independently of model
-conversation history. It supervises loops through durable events and pauses at
-human gates.
+conversation history. It supervises loops through durable events, advances
+automatically inside the approved authority/risk/rollback envelope, and pauses
+only for typed protected decisions outside it.
 
 ## 14. Platform readiness
 
@@ -179,7 +180,15 @@ review packet is complete and approving, integration merges or queues each lane
 PR individually in dependency order, runs whole-system validation, and never
 uses the controller evidence branch as its candidate. A separately authorized deployment role proves the expected
 commit/image/configuration in the target environment. Outcome review records
-human acceptance, remaining risk, follow-up issues, and lessons learned.
+authorized acceptance, remaining risk, follow-up issues, and lessons learned.
+After P/R/O is complete, the controller generates a typed
+`SprintTerminalReceipt` on a one-commit receipt branch rooted at the exact
+protected `dev` head. Protected-base policy verifies controller P/R/O,
+D/I/E/S, merged PR ancestry, exact trusted checks, and the receipt-only path
+set. That deterministic PR auto-merges without another lane, critic, or routine
+human gate. Later implementation is blocked while integrated work lacks its
+receipt, and `project-router` uses the merged receipt as post-cutover terminal
+authority.
 
 The cycle returns to `project-router`.
 
