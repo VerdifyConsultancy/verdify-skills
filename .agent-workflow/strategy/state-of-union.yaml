@@ -4,8 +4,8 @@ schema_version: "1.0"
 strategy_id: iteration-25-recovery-and-trusted-release
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: "45150ee76b770c2e97345dfdfa9196b4acebcc3b"
-assessed_at: "2026-07-10T02:32:25Z"
+baseline_sha: "ce912de11605879188d32675293fb1a49a25a56d"
+assessed_at: "2026-07-10T02:47:25Z"
 inputs:
   - id: IN-001
     type: north-star
@@ -34,8 +34,8 @@ inputs:
     evidence_status: verified
   - id: IN-006
     type: git
-    location: "dev@45150ee76b770c2e97345dfdfa9196b4acebcc3b"
-    summary: Clean integration head containing approved foundations and terminal sprint recovery.
+    location: "dev@ce912de11605879188d32675293fb1a49a25a56d"
+    summary: Clean integration head containing approved foundations, terminal sprint recovery, and committed-strategy baseline routing.
     evidence_status: verified
   - id: IN-007
     type: git
@@ -245,11 +245,11 @@ delivery_health:
 issue_inventory:
   - issue: 143
     title: Accept an artifact-only state-of-union commit over its assessed baseline
-    state: OPEN
-    classification: candidate
-    rationale: The current exact-HEAD comparison makes every durable approved strategy stale immediately after commit.
+    state: CLOSED
+    classification: done
+    rationale: PR #147 accepts only committed strategy-artifact suffixes over a full ancestor baseline and rejects unrelated changes.
     dependencies: []
-    action: Apply the narrow control-plane bootstrap fix before normal sprint routing.
+    action: No action after this strategy refresh proves the integrated route.
   - issue: 130
     title: Ignore host-local and untracked files in manifests and archives
     state: OPEN
@@ -384,12 +384,6 @@ issue_inventory:
     dependencies: []
     action: No action.
 gaps:
-  - id: GAP-005
-    type: delivery
-    statement: The router cannot consume a committed state-of-union artifact until issue #143 accepts an artifact-only assessed-baseline suffix.
-    owner: issue #143
-    blocking: false
-    apply_through: github_issue
   - id: GAP-001
     type: delivery
     statement: Package and manifest selection is host-dependent until issue #130 is integrated.
@@ -469,11 +463,10 @@ recommended_sequence:
     depends_on: [SEQ-003, SEQ-004]
 next_sprint_candidates:
   - outcome: Reproducible package selection followed by selective unpublished-work recovery.
-    issue_ids: [143, 130, 126]
+    issue_ids: [130, 126]
     readiness: ready
     rationale: Both issues are fully specified, align with approved module boundaries, and can run in dependency-ordered waves without a material human decision.
     required_actions:
-      - Integrate the issue #143 control-plane bootstrap before creating the normal sprint transaction.
       - Sprint-planning must create separate issue lanes and make #126 depend on #130.
       - The #126 lane must use northstar-research-ingest for recovered research and must not replay obsolete architecture or proposed schemas as accepted code.
       - Review milestones must prove host-file exclusion, exact package set, timeline-historian validation, evidence hashes, and the final recovery ledger.
@@ -507,9 +500,8 @@ handoff:
   next_skill: sprint-planning
   next_mode: issue-readiness
   reason: Issues #130 and #126 are the dependency-ordered, issue-backed recovery slice required before exact release and live delivery-control work.
-  required_before_handoff:
-    - Issue #143 must accept the committed strategy artifact-only suffix without accepting unrelated post-assessment changes.
+  required_before_handoff: []
 approval:
   status: approved
   approver: "Jason (continue the repository recovery and publish-to-main objective)"
-  approved_at: "2026-07-10T02:32:25Z"
+  approved_at: "2026-07-10T02:47:25Z"
