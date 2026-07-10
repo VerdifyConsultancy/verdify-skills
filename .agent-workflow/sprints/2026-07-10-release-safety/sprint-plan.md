@@ -14,6 +14,8 @@ fully recovered `dev` baseline. The lane may integrate release machinery to
 
 ## Required Proof
 
+- Root and all 28 skill metadata versions equal `1.3.0`, with no skill body or
+  behavior change.
 - One tarball path and digest across every consumer test and publish input.
 - Fresh install, reinstall, upgrade from `1.2.1`, Node 18, collision,
   corruption, rollback, and installed-command behavior.
