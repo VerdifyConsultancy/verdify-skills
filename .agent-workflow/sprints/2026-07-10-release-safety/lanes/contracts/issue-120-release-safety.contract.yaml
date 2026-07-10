@@ -13,6 +13,7 @@ non_goals:
   - Publish npm, push a tag, create or modify a GitHub release, merge main, or use live npm credentials from the worker.
   - Apply branch protection, CODEOWNERS, critic-gate, or main-target policy owned by issue #121.
   - Change scripts/package-file-list.rb or replace issue #130 immutable Git-object staging.
+  - Change any skill content except the required mechanical metadata.version value in each skills/*/SKILL.md frontmatter.
   - Implement issue #174 historian digest hardening or unrelated lifecycle/router work.
   - Put private advisory identifiers or exploit reproduction details in public artifacts.
 baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
@@ -54,6 +55,7 @@ ownership:
     - docs/vendoring-standard.md
     - docs/skill-packs.md
     - docs/release-transaction.md
+    - skills/*/SKILL.md
   prohibited_paths:
     - scripts/package-file-list.rb
     - scripts/pr-policy.rb
@@ -68,7 +70,10 @@ ownership:
     - .agent-workflow/architecture/**
     - .agent-workflow/strategy/**
     - .agent-workflow/hygiene/**
-    - skills/**
+    - skills/*/agents/**
+    - skills/*/assets/**
+    - skills/*/references/**
+    - skills/*/scripts/**
     - evaluations/**
     - packs/**
   coordination_required_paths:
@@ -92,9 +97,9 @@ dependencies:
       coordination: Final release PR approval and main promotion wait for delivery-control code and live rule reconciliation.
 acceptance_criteria:
   - id: LANE-AC-01
-    statement: Version identity is 1.3.0 and one pack operation creates the sole npm tarball used by every consumer test and the eventual workflow publish command.
+    statement: Root and all 28 skill metadata versions are 1.3.0 with no other skill diff, and one pack operation creates the sole npm tarball used by every consumer test and the eventual workflow publish command.
     sprint_acceptance_ids: [SPR-AC-01]
-    evidence_required: [tarball path and digests, npm pack invocation count, workflow publish command, VERSION/package/changelog consistency]
+    evidence_required: [tarball path and digests, npm pack invocation count, workflow publish command, VERSION/package/changelog/28-skill consistency, skill-body diff audit]
   - id: LANE-AC-02
     statement: The exact tarball passes fresh install, same-version reinstall, upgrade from published 1.2.1, Node 18, collision, corruption, rollback, and installed-command tests in isolated targets.
     sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
@@ -158,6 +163,7 @@ validation_commands:
     required: true
 required_evidence:
   - Exact tarball filename, SHA-256, npm integrity, package name/version, source SHA, and one-pack invocation proof.
+  - Exact audit proving all 28 skills changed only their metadata.version field from 1.2.1 to 1.3.0.
   - Install/reinstall/upgrade/minimum-runtime/collision/corruption/rollback results against that exact tarball.
   - Transactional pack conflict reproduction showing zero newly created links or manifest residue.
   - ZIP expected/actual set comparison and missing/extra/duplicate/unsafe/member-type mutation failures.
@@ -174,6 +180,7 @@ escalation_conditions:
   - A required release identity cannot be represented without weakening provenance, trusted publishing, or immutable version semantics.
   - Testing requires live npm credentials, tag/release mutation, main promotion, production access, or private advisory disclosure.
   - The worker must change scripts/package-file-list.rb, protected North Star/project/architecture authority, or issue #121 delivery controls.
+  - Any skill needs a behavioral/content change rather than the mechanical metadata.version update required by repository validation.
   - npm 1.3.0 is already published or v1.3.0 already exists before authorized final promotion.
   - The exact artifact cannot run on Node 18 without a material public compatibility or dependency decision.
 definition_of_done:

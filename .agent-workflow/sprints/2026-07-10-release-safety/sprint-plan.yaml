@@ -11,7 +11,7 @@ github:
   project: null
 issue_ids: [120]
 scope:
-  - Bump the recovered package from published version 1.2.1 to new minor version 1.3.0 and record the release scope.
+  - Bump the recovered package and all 28 required skill metadata versions from published version 1.2.1 to new minor version 1.3.0 and record the release scope.
   - Build one npm tarball once, derive its integrity and identity, and use that same file for install, reinstall, upgrade, collision, corruption, rollback, minimum-runtime, and publish inputs.
   - Make installed-package validation truthful and runnable from the packed artifact.
   - Make ZIP verification reject missing, altered, and unlisted regular files while preserving issue #130 immutable Git-index staging.
@@ -21,6 +21,7 @@ scope:
 non_goals:
   - Merge the final dev-to-main release before issue #121 delivery controls are integrated and applied live.
   - Change dev/main branch protection, CODEOWNERS, or critic-gate policy owned by issue #121.
+  - Change any skill behavior, body content, agent metadata, references, scripts, assets, or evaluations beyond the mechanical SKILL.md metadata.version value.
   - Publish from a worker session, use npm credentials, create tags/releases, or mutate production/runtime services.
   - Change scripts/package-file-list.rb or weaken issue #130 immutable object staging.
   - Resolve the private GitHub Support purge request in public repository artifacts.
@@ -28,7 +29,7 @@ acceptance_criteria:
   - id: SPR-AC-01
     statement: One exact npm tarball is created once and every artifact test plus publish command consumes that same path, digest, version, and source revision.
     lane_ids: [issue-120-release-safety]
-    evidence_expected: [single-pack test, tarball SHA-512/SHA-256 identity, workflow publish-path audit]
+    evidence_expected: [single-pack test, tarball SHA-512/SHA-256 identity, workflow publish-path audit, 28-skill version parity]
   - id: SPR-AC-02
     statement: Fresh install, same-version reinstall, 1.2.1-to-1.3.0 upgrade, minimum Node runtime, collision, corruption, and rollback tests leave deterministic package and pack state.
     lane_ids: [issue-120-release-safety]
