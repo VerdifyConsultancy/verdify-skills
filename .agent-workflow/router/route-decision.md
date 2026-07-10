@@ -1,14 +1,14 @@
 # Route decision
 
-- Current state: `ARCHITECTURE_INCOMPLETE`
-- Next skill: `architecture-contracts`
-- Next mode: `north-star-architecture`
+- Current state: `SPRINT_TRANSACTION_AMBIGUOUS`
+- Next skill: `project-router`
+- Next mode: `route`
 
-Approved architecture is missing or incomplete.
+Multiple committed sprint transactions are active; rerun route with --sprint ID.
 
 ## Missing artifacts
 
-- .agent-workflow/architecture/architecture.yaml
+None.
 
 ## Open gates
 

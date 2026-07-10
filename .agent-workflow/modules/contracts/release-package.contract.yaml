@@ -1,0 +1,79 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: release-package
+contract_version: "1.0"
+status: approved
+purpose: Reconcile review and deployment evidence and build, verify, publish, recover, and identify one exact package artifact through the dev-to-main release boundary.
+requirement_ids: [FR-006, FR-007, FR-012, NFR-005, NFR-006, NFR-007, NFR-009]
+owned_paths:
+  - skills/release-verification/**
+  - .github/**
+  - scripts/gen-manifest.sh
+  - scripts/package.sh
+  - scripts/pr-policy.rb
+  - scripts/release-preflight.rb
+  - scripts/verify-package.sh
+  - npm/**
+  - package.json
+  - VERSION
+  - MANIFEST.sha256
+  - Makefile
+  - schemas/release-verification.schema.yaml
+  - schemas/review-inbox-packet.schema.yaml
+  - schemas/outcome-review.schema.yaml
+  - schemas/observability-diagnostic-packet.schema.yaml
+  - schemas/status.schema.yaml
+  - tests/test_npm_install.sh
+  - tests/test_pr_policy.sh
+  - tests/test_release_preflight.sh
+  - .agent-workflow/sprints/*/review/**
+  - .agent-workflow/sprints/*/outcome/**
+  - .agent-workflow/sprints/*/release/release-verification.yaml
+  - .agent-workflow/sprints/*/release/observability-diagnostic-packet.yaml
+prohibited_paths: [.agent-workflow/northstar/**, .agent-workflow/sprints/*/lanes/contracts/**, skills/lane-delivery/**]
+inputs:
+  - name: accepted_candidate
+    schema: Dev revision, critic/review/check evidence, new version, exact tarball, wave release plan, and release ledger
+    producer: GitHub, lane-assurance, planning-hygiene, release automation
+  - name: deployment_evidence
+    schema: Target revision, environment, health, observability, rollback, human tests, and outcome state
+    producer: Target deployment controller and outcome owner
+outputs:
+  - name: package_release
+    schema: Exact package, manifest, integrity, provenance, tag, GitHub release, npm record, and transaction state
+    consumers: [package consumers, target repositories, operators]
+  - name: release_verification
+    schema: release-verification, review-inbox, diagnostic, and outcome schemas
+    consumers: [human reviewers, project-router, state-of-union]
+public_interfaces:
+  - name: package archive and npm package
+    location: scripts/package.sh and package.json
+    compatibility: Versions are immutable; approved replacements may remove deprecated behavior and require an explicit new version.
+  - name: generated release promotion
+    location: .github/workflows/release-pr.yml
+    compatibility: Only dev-to-main, genuinely new-version candidates may use the privileged release path.
+dependencies:
+  hard: [governance-routing, lane-assurance]
+  soft: [planning-hygiene, quality-enablement]
+invariants:
+  - The tested tarball is the published tarball and its exact file set is reproducible from tracked release inputs.
+  - Version, source, integrity, provenance, tag, GitHub release, npm state, and ledger agree.
+  - Merge, publication, deployment, runtime health, and outcome acceptance remain distinct states.
+runtime_resources: [Ephemeral build/test directories, GitHub Actions, npm Trusted Publishing, GitHub Releases, target deployment evidence.]
+validation_commands:
+  - id: release-preflight
+    command: bash tests/test_release_preflight.sh
+    purpose: Verify version and unpublished-package gates.
+  - id: installed-package
+    command: bash tests/test_npm_install.sh
+    purpose: Verify the installed consumer surface.
+  - id: package-policy
+    command: bash tests/test_pr_policy.sh
+    purpose: Verify implementation and release PR policy.
+required_evidence: [Exact tarball digest and file set, install/upgrade tests, checks, independent release approval, provenance, tag/release/npm/ledger reconciliation]
+definition_of_done: [Package and release state are one-to-one, partial publication is resumable, review/deployment/outcome state is explicit]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

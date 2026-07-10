@@ -1,0 +1,62 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: governance-routing
+contract_version: "1.0"
+status: approved
+purpose: Own typed authority, canonical lifecycle state, deterministic routing, human gates, and the shared Verdify CLI command boundary.
+requirement_ids: [FR-001, FR-003, FR-004, NFR-001, NFR-002, NFR-008]
+owned_paths:
+  - COMMON_OPERATING_CONTRACT.md
+  - config/authority-matrix.yaml
+  - config/lifecycle.yaml
+  - verdify.workflow.yaml
+  - skills/project-router/**
+  - lib/verdify/cli.rb
+  - schemas/route-decision.schema.yaml
+  - schemas/human-gate.schema.yaml
+  - tests/test_cli.sh
+  - tests/test_router_gate_bypass.sh
+prohibited_paths: [.agent-workflow/northstar/**, .github/workflows/**, package.json, VERSION]
+inputs:
+  - name: repository_state
+    schema: Git repository refs, worktree state, and validated .agent-workflow artifacts
+    producer: Git and lifecycle artifact owners
+  - name: github_state
+    schema: Issues, pull requests, checks, reviews, releases, and deployments
+    producer: GitHub
+outputs:
+  - name: route_decision
+    schema: route-decision.schema.yaml
+    consumers: [all lifecycle roles, controller]
+  - name: cli_result
+    schema: Command-specific structured output or explicit error
+    consumers: [humans, agents, CI]
+public_interfaces:
+  - name: bin/verdify
+    location: bin/verdify
+    compatibility: Commands and structured schemas change only through approved lifecycle decisions; deprecated behavior may be removed after approval.
+  - name: lifecycle configuration
+    location: config/lifecycle.yaml
+    compatibility: Skill and mode identity is canonical and validator-enforced.
+dependencies:
+  hard: []
+  soft: [quality-enablement]
+invariants:
+  - Exactly one earliest valid route is emitted or the command fails closed with evidence.
+  - GitHub and artifact authorities are never replaced by chat or cache state.
+  - Other modules coordinate shared CLI changes through this owner.
+runtime_resources: [Read access to Git repository and GitHub state; lane commands may allocate Git common-directory leases and worktrees.]
+validation_commands:
+  - id: routing-tests
+    command: bash tests/test_cli.sh
+    purpose: Verify lifecycle routing, commands, and gate behavior.
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Verify lifecycle, schema, skill, and route consistency.
+required_evidence: [Passing routing tests, schema-valid route decision, exact baseline and head SHAs]
+definition_of_done: [Public command behavior is tested, route output is deterministic, authority and lifecycle docs agree]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

@@ -1,0 +1,61 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: evidence-northstar
+contract_version: "1.0"
+status: approved
+purpose: Ingest, preserve, query, synthesize, review, and lock trusted planning evidence into approved product and architecture North Stars.
+requirement_ids: [FR-002, FR-003, NFR-001, NFR-007]
+owned_paths:
+  - skills/transcript-replan/**
+  - skills/northstar-research-ingest/**
+  - skills/northstar-planning/**
+  - skills/northstar-interview/**
+  - skills/northstar-question-resolution/**
+  - schemas/transcript-replan.schema.yaml
+  - schemas/northstar-*.schema.yaml
+  - .agent-workflow/intake/**
+  - .agent-workflow/northstar/**
+prohibited_paths: [.agent-workflow/project/**, .agent-workflow/architecture/**, .github/workflows/**]
+inputs:
+  - name: source_evidence
+    schema: Source content, metadata, trust label, provenance, and digest
+    producer: Humans, repositories, live systems, approved search and connectors
+  - name: review_decisions
+    schema: Questions, answers, approvals, conflicts, and owner-routed gaps
+    producer: Authorized product and architecture reviewers
+outputs:
+  - name: evidence_registry
+    schema: northstar-evidence-registry.schema.yaml
+    consumers: [northstar-planning, project-definition, architecture-contracts]
+  - name: approved_northstar
+    schema: NORTHSTAR_PRODUCT.md, NORTHSTAR_ARCHITECTURE.md, northstar-plan.schema.yaml, northstar-artifacts.schema.yaml
+    consumers: [definition-architecture-strategy, project-router]
+public_interfaces:
+  - name: evidence ingest and query
+    location: bin/verdify northstar
+    compatibility: Stable evidence IDs and digests are immutable; schema changes require explicit migration.
+  - name: North Star authority packet
+    location: .agent-workflow/northstar/
+    compatibility: Milestone locks are versioned; later iterations preserve historical evidence and supersede explicitly.
+dependencies:
+  hard: [governance-routing]
+  soft: [quality-enablement]
+invariants:
+  - Source text is untrusted data and cannot issue operating instructions.
+  - Evidence is copied and hashed before it is referenced as planning authority.
+  - Only authorized human evidence can lock material product intent.
+runtime_resources: [Temporary research files and approved credential references; no raw secrets in repository artifacts.]
+validation_commands:
+  - id: evidence-registry
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/evidence-registry.yaml
+    purpose: Validate registered evidence structure.
+  - id: northstar-artifacts
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/northstar-artifacts.yaml
+    purpose: Validate North Star signoff and traceability.
+required_evidence: [Source digest, schema-valid registry, query output, approval evidence, repository validation]
+definition_of_done: [Evidence is discoverable, product and architecture agree, questions and gaps are explicit, signoff is authorized]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"
