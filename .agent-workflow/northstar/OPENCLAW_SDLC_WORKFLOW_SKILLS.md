@@ -1,18 +1,29 @@
 # OpenClaw SDLC Workflow Skills Design
 
-Status: `proposed`
+Status: `superseded_by_iteration_25`
 Date: `2026-06-23`
 Repository: `verdify-skills`
-Planning authority: current draft North Star, iteration `21`
+Planning authority: historical design input; approved iteration `25` is current
+
+> **Supersession note (2026-07-09).** This file preserves the iteration 21
+> OpenClaw-specific design as evidence. Approved and locked iteration 25,
+> supported by `NSE-20260709-jason-iteration-25-final-lock-approval`, generalizes the useful
+> workflow-facade patterns to optional Orbit, OpenClaw, Hermes, Codex, and
+> Claude adapters beneath the root planning outer loop. OpenClaw is not a
+> required product layer, identity, authority, compatibility target, or
+> separate lifecycle. Current requirements and interfaces live in
+> `NORTHSTAR_PRODUCT.md`, `NORTHSTAR_ARCHITECTURE.md`, and
+> `northstar-artifacts.yaml`.
 
 ## Purpose
 
-This design turns the current North Star, registered research, and agentic SDLC
-evidence into an OpenClaw-managed set of workflows that can drive a project
-repository from ideation through production deployment.
+This historical design turned the iteration 21 North Star, registered research,
+and agentic SDLC evidence into an OpenClaw-managed workflow proposal. Its
+reusable contribution is the thin-facade pattern, not an OpenClaw dependency.
 
-OpenClaw is the external planning and conversation layer. It may expose these
-workflows as user-facing skills, but it does not become the source of truth.
+In the current architecture, the root planner owns the portfolio outer loop and
+optional conversational adapters may expose these workflows as user-facing
+facades, but no adapter becomes the source of truth.
 GitHub remains the backlog and delivery control plane, `.agent-workflow`
 remains the durable lifecycle record, and Verdify lifecycle skills remain the
 bounded executable contracts.
@@ -401,8 +412,8 @@ Initial Verdify contract:
 
 ## Initial Implementation Slice
 
-The first practical slice is not production autonomy. It is a non-Gravity pilot
-that exercises:
+The superseded iteration-21 proposal did not start with production autonomy. Its
+first slice was a non-Gravity pilot that exercised:
 
 1. `sdlc-bootstrap-repo`
 2. `sdlc-ideation-intake`

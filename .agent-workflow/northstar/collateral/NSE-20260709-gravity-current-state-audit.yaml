@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260709-gravity-current-state-audit
+reference: northstar://evidence/NSE-20260709-gravity-current-state-audit
+title: Gravity current-state, readiness, API, MCP, and citation audit
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-09T18:48:04Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-worktrees/2026-07-09-northstar-review-feedback/issue-119/.agent-workflow/northstar/research-inbox/2026-07-09-gravity-current-state-audit.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-gravity-current-state-audit-2026-07-09-gravity-current-state-audit-md"
+  sha256: 24ea6cf8ed3d8aa1f871e9d755a3854b46320bc6b4e75c71ad957001b71f4efb
+summary: Fresh source, GitHub, Argo, workload, API, evidence-spine, MCP, and issue-coverage
+  evidence for the active Gravity pilot.
+tags:
+- api
+- evidence
+- gravity
+- mcp
+- pilot
+- readiness
+claims:
+- Gravity main and live Argo run 1bb5507a7f608f16ba421620aa8cf7edf8278590 and represent
+  the active restarted project.
+- Gravity search and stdio MCP are implemented, but cross-pilot transport is not integrated
+  and live search hits currently omit evidence-span citations.
+- Canonical readiness, state-of-union, router, sprint, and ADR records lag the live
+  code and runtime.
+- Gravity issues 406 and 407 now own the uncovered four-pilot authority and citation-hydration
+  gaps.
+planning_relevance:
+- Defines Gravity product authority, versioned API plus MCP adapter direction, integration
+  gate, and evidence capability contract.
+limitations:
+- Live counts and health must be refreshed at implementation and release gates.

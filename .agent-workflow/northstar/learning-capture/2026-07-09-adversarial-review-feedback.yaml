@@ -1,0 +1,200 @@
+---
+schema_ref: northstar-learning-proposals.schema.yaml
+kind: NorthStarLearningProposals
+schema_version: "1.0"
+project_id: verdify-skills
+status: staged
+generated_at: "2026-07-09T18:48:04Z"
+updated_at: "2026-07-09T23:28:41Z"
+source_ids:
+  - NSE-20260709-verdify-skills-adversarial-review
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-jason-iteration-25-final-lock-approval
+  - NSE-20260709-agents-current-state-audit
+  - NSE-20260709-orbit-current-state-audit
+  - NSE-20260709-gravity-current-state-audit
+redaction_policy:
+  secrets_handling: Do not copy, expose, or summarize raw secrets, tokens, keys, passwords, private credentials, or unsafe installer reproduction details into learning proposals.
+  sensitive_data_handling: Refer to the private advisory, registered evidence IDs, issue URLs, artifact paths, and summarized findings; do not reproduce personal source data, message bodies, document bodies, or raw operational logs.
+  retained_source_scope: Retain only reviewable evidence references, affected artifact paths, issue identifiers, verifier results, and the distilled lesson required to route each proposal.
+proposals:
+  - id: NLP-003
+    title: Treat package publication and installation as one trusted artifact transaction
+    source_refs:
+      - northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+      - northstar://evidence/NSE-20260709-jason-review-feedback
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/120
+      - https://github.com/VerdifyConsultancy/verdify-skills/security/advisories/GHSA-4452-3c6p-3q26
+    observed_issue_or_opportunity: The review found that package tests, publication, and installation do not yet form one exact-artifact trust transaction, and installer validation crosses an unsafe target-content boundary.
+    verification: The adversarial review was independently registered, Jason accepted the trusted atomic publication default, issue 120 was created for the complete release transaction, and the sensitive trust-boundary detail was routed to a private advisory.
+    proposed_destination: tool_cli_fix
+    proposed_change: Test the exact packed artifact, bind publication to its digest, stage installation into a fresh location, validate with trusted code and manifest data, atomically promote, retain rollback evidence, and never execute preexisting target content during validation.
+    expected_benefit: Makes CI evidence apply to the bytes actually published and closes a high-impact installer trust gap without expanding pre-lock safety work beyond the publication boundary.
+    risk_class: protected
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - bin/verdify
+      - lib/verdify
+      - package.json
+      - .github/workflows
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/120
+      - https://github.com/VerdifyConsultancy/verdify-skills/security/advisories/GHSA-4452-3c6p-3q26
+    loop_readiness:
+      recurs: This is a one-time package and installer hardening change followed by per-release deterministic checks, not a recurring autonomous learning loop.
+      verifier: Independent security review, exact-pack tests, clean-target and occupied-target install tests, atomic-promotion failure injection, rollback proof, and package digest comparison.
+      durable_state: GitHub issue 120, the private advisory, pull requests, release evidence, and package/install test artifacts.
+      stop_condition: Stop when the advisory acceptance criteria and issue 120 acceptance criteria are proven against the exact release artifact.
+      budget: No autonomous budget; bounded implementation lanes and CI only.
+      objective_done_criteria: Exact bytes pass tests, installation never executes preexisting target content, atomic promotion is proven, and rollback restores the prior good state.
+      permissions: Protected package, installer, workflow, and release changes require lane isolation, fresh critic review, and Jason-or-James release approval.
+      manual_run_evidence: The July 9 manual adversarial review reproduced and triaged the boundary; no unsafe reproduction detail is retained here.
+      ready_for_scheduling: false
+  - id: NLP-004
+    title: Negotiate provider capabilities before selecting a worker or transport
+    source_refs:
+      - northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+      - northstar://evidence/NSE-20260709-agents-current-state-audit
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/12
+      - https://github.com/jvallery/agents/issues/2497
+    observed_issue_or_opportunity: Verdify orchestration names an adapter that the live Agent Platform does not expose, while the live MCP surface has no root-planner project contract or supported semantic worker operation.
+    verification: The current package and live Agent Platform capability list were compared; issue 12 was reopened and reframed around capability negotiation, with the platform-side provider work retained in the Agents backlog.
+    proposed_destination: skill_update
+    proposed_change: Make orchestration discover versioned provider capabilities, select a supported dispatch strategy, record the negotiated operation, and return typed unsupported or degraded states with issue or gate routing.
+    expected_benefit: Keeps Skills portable across Agent Platform evolution and optional OpenClaw, Hermes, Codex, or Claude adapters without hard-coded dead paths.
+    risk_class: high
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - skills/sprint-orchestrator
+      - schemas/agent-platform-control-request.schema.yaml
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/12
+      - https://github.com/jvallery/agents/issues/2497
+    loop_readiness:
+      recurs: Capability negotiation occurs per orchestration run, but this proposal does not authorize an autonomous recurring loop.
+      verifier: Contract tests against supported, unsupported, degraded, stale, and version-mismatch provider fixtures plus one live Agent Platform integration proof.
+      durable_state: Provider capability records, control requests, GitHub issues, lane contracts, session ledger events, and integration evidence.
+      stop_condition: Stop when the planner selects only advertised operations and all unsupported paths fail with typed evidence and routing.
+      budget: Bounded implementation and integration-test lanes; no standing loop budget.
+      objective_done_criteria: One real lane dispatch succeeds through an advertised capability and one missing capability produces a deterministic non-success outcome.
+      permissions: Discovery is read-only; dispatch remains subject to the provider authorization, lane lease, issue, review, and deployment gates.
+      manual_run_evidence: The July 9 audit proved the current live mismatch and identified existing provider-side issues.
+      ready_for_scheduling: false
+  - id: NLP-005
+    title: Validate North Star, transition, route, and handoff coherence as one lifecycle invariant
+    source_refs:
+      - northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/72
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/73
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/74
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/75
+    observed_issue_or_opportunity: Individual artifacts can validate while the lifecycle still contains contradictory statuses, stale routes, unsupported handoffs, self-certification, or transitions that do not match the approved graph.
+    verification: "The review mapped uncovered invariant classes to issues 71 through 75, and #72/PR #123 subsequently supplied the v2 exact-head dispatch, closeout, critic, and external-review substrate. Broader lifecycle coherence validation remains proposal-only work."
+    proposed_destination: tool_cli_fix
+    proposed_change: Add repository-wide lifecycle coherence validation that checks graph membership, state transitions, required critic independence, transport-neutral handoffs, evaluator evidence, and route agreement across durable artifacts.
+    expected_benefit: Prevents locally valid files from collectively authorizing an impossible or unsafe lifecycle state.
+    risk_class: high
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - bin/verdify
+      - lib/verdify
+      - schemas
+      - skills/project-router
+      - skills/controller-loop
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/72
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/73
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/74
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/75
+    loop_readiness:
+      recurs: Coherence validation runs deterministically in CI and before routing or integration; it is not a self-improving recurring loop.
+      verifier: Fixture corpus covering valid paths and contradictory graph, transition, critic, transport, evaluator, and handoff states.
+      durable_state: Validation output, CI checks, issue records, lane closeouts, critic reports, and route decisions.
+      stop_condition: Stop when all supported lifecycle fixtures pass and every invalid fixture fails at the correct boundary.
+      budget: Deterministic CI runtime only; no model budget.
+      objective_done_criteria: Route, transition, critic, evaluator, and handoff artifacts cannot disagree without a failing validation result.
+      permissions: Read-only validation may run broadly; automatic repair is out of scope and must route to owning issues or planning feedback.
+      manual_run_evidence: The July 9 review found coherent examples and contradictory examples across the current package and pilot records.
+      ready_for_scheduling: false
+  - id: NLP-006
+    title: Delete deprecated capability and keep runtime adapters thin
+    source_refs:
+      - northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+      - northstar://evidence/NSE-20260709-jason-review-feedback
+      - northstar://evidence/NSE-20260709-orbit-current-state-audit
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/98
+    observed_issue_or_opportunity: Compatibility shims, duplicated workflow surfaces, and runtime-specific skills make an internal-first package heavier while OpenClaw, Hermes, Codex, and Claude are replaceable adapters rather than product authorities.
+    verification: Jason explicitly removed the backward-compatibility requirement, the review identified overlapping surfaces, and the Orbit audit confirmed the named runtimes currently share one pod and identity rather than representing independent product layers.
+    proposed_destination: product_shape_update
+    proposed_change: Define one supported minimal skill graph, merge or remove overlapping/deprecated capabilities, keep personal-assistant facades thin, and require a new explicit decision before retaining compatibility behavior.
+    expected_benefit: Reduces package size, cognitive load, routing ambiguity, validator surface, and long-term maintenance cost.
+    risk_class: medium
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - skills
+      - schemas
+      - docs
+      - package.json
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/98
+    loop_readiness:
+      recurs: Inventory simplification is milestone work; unsupported-surface checks may later become deterministic CI.
+      verifier: Inventory diff, route coverage, schema-reference scan, documentation link checks, package manifest checks, and full tests after removals or merges.
+      durable_state: North Star, issue decisions, deprecation-removal lanes, pull requests, critic reports, and package inventory evidence.
+      stop_condition: Stop when every packaged skill and schema has one supported owner and use case and no deprecated route, alias, or compatibility shim remains.
+      budget: Bounded audit and removal lanes; no autonomous recurring budget.
+      objective_done_criteria: Package, docs, routing, validation, and tests agree on one supported inventory with no deprecated capability.
+      permissions: Removal requires explicit issue scope, dependency audit, lane isolation, fresh critic review, and release approval.
+      manual_run_evidence: The July 9 review and Jason's answer establish the product default; implementation inventory remains future lane work.
+      ready_for_scheduling: false
+  - id: NLP-007
+    title: Standardize a common PilotProject contract for portfolio orchestration
+    source_refs:
+      - northstar://evidence/NSE-20260709-jason-review-feedback
+      - northstar://evidence/NSE-20260709-agents-current-state-audit
+      - northstar://evidence/NSE-20260709-orbit-current-state-audit
+      - northstar://evidence/NSE-20260709-gravity-current-state-audit
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/119
+      - https://github.com/jvallery/agents/issues/2889
+      - https://github.com/jvallery/orbit/issues/198
+      - https://github.com/VerdifyConsultancy/gravity/issues/406
+    observed_issue_or_opportunity: The four active pilots expose different planning, capability, readiness, evidence, and runtime shapes, while older North Stars assign conflicting hierarchy and outer-loop ownership.
+    verification: Fresh audits of Agent Platform, Orbit, and Gravity were registered and reconciled with Jason's direction; owning-repository North Star and integration gaps were filed in GitHub.
+    proposed_destination: artifact_schema
+    proposed_change: Define a versioned PilotProject contract for project identity, current revision, lifecycle state, supported capabilities and versions, authorized operations, gates, runtime health, evidence and outcome references, tenancy, idempotency, audit, freshness, and typed failure states.
+    expected_benefit: Gives the root planner one resumable contract for coordinating four co-equal pilots without absorbing their product, backlog, runtime, deployment, or outcome ownership.
+    risk_class: high
+    approval_required: true
+    routing_decision: stage
+    affected_artifacts:
+      - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+      - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+      - schemas
+      - skills/controller-loop
+      - skills/project-router
+      - https://github.com/VerdifyConsultancy/verdify-skills/issues/119
+      - https://github.com/jvallery/agents/issues/2890
+      - https://github.com/jvallery/agents/issues/2889
+      - https://github.com/jvallery/orbit/issues/193
+      - https://github.com/jvallery/orbit/issues/198
+      - https://github.com/VerdifyConsultancy/gravity/issues/406
+    loop_readiness:
+      recurs: The contract is read on every portfolio iteration, but schema design and adoption are bounded milestone work.
+      verifier: Schema fixtures for all four pilots, version mismatch and stale-state tests, provider-specific adapters, and one integrated planning-to-runtime slice.
+      durable_state: Versioned schema, pilot artifacts, issue links, controller state, session ledger, review packets, and outcome evidence.
+      stop_condition: Stop when all four pilots validate against the common contract and the root planner completes one resumable integrated slice without ownership ambiguity.
+      budget: Bounded schema, adapter, and pilot-integration lanes; no standing autonomous budget.
+      objective_done_criteria: Each pilot reports comparable current state and capabilities while retaining local authority, and cross-project gaps route deterministically to owning repos.
+      permissions: Read-only status and discovery can be broad; mutation and dispatch remain subject to each pilot's authorization, issues, gates, and human controls.
+      manual_run_evidence: The July 9 manual outer-loop pass produced the first four-pilot responsibility model and issue map.
+      ready_for_scheduling: false
+review:
+  status: not_requested
+  reviewers: [Skills maintainer, security owner, pilot owners]
+  approvals: []
+handoff:
+  next_skill: project-definition
+  next_mode: discovery
+  reason: Keep all five lessons staged and unapplied while the approved iteration-25 North Star advances to project-definition discovery; do not mutate skills or schedule recurring automation from this packet.

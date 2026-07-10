@@ -1,0 +1,46 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260709-jason-review-feedback
+reference: northstar://evidence/NSE-20260709-jason-review-feedback
+title: Jason review feedback for the integrated four-project North Star
+evidence_type: source_doc
+evidence_status: reported
+ingested_at: '2026-07-09T18:35:29Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-worktrees/2026-07-09-northstar-review-feedback/issue-119/.agent-workflow/northstar/research-inbox/2026-07-09-jason-review-feedback.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-jason-review-feedback-2026-07-09-jason-review-feedback-md"
+  sha256: bf731d82aa175fcb9b04428b6106b8983d0718561be9f8a862322b24b95b5033
+summary: Authoritative product, governance, compatibility, pilot, Gravity, Orbit,
+  and schedule decisions supplied after the July 9 adversarial review.
+tags:
+- agents
+- governance
+- gravity
+- orbit
+- review-feedback
+- skills
+claims:
+- Every adversarial-review recommendation is adopted as the new planning default without
+  constituting final North Star lock.
+- The pilot is the integrated Verdify Skills, Agent Platform, Orbit, and Gravity system
+  rather than a single non-Gravity repository.
+- Verdify Skills is internal-first, has no backward-compatibility obligation, and
+  should remove deprecated capability.
+- Jason and James may approve releases while Jason-only North Star lock authority
+  remains unchanged.
+- Current Gravity repository main is the active source of truth and should expose
+  a versioned read-only API with an MCP adapter.
+- Orbit is both a personal information assistant and engineering chief of staff with
+  broad authorized information scope.
+- The delivery objective is fastest safe convergence to a self-building four-project
+  platform.
+planning_relevance:
+- Resolves North Star questions and supersedes older proposed defaults for pilot scope,
+  compatibility, Orbit boundaries, and Gravity framing.
+- Defines human authority and the next milestone outcome.
+limitations:
+- Runtime and implementation assertions still require repository or live-state verification.
+- This feedback is planning approval, not final North Star lock.
