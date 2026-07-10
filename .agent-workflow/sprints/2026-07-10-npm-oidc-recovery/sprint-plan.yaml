@@ -1,0 +1,84 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-10-npm-oidc-recovery
+status: approved
+goal: Pin an OIDC-capable npm 11 CLI in both publish jobs, then independently review the exact recovery before another 1.3.0 release retry.
+baseline_sha: "b5c106c3ee62f8530f85a00b4576c8e28cbfb92c"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [207]
+scope:
+  - Replace both publish workflow npm 11.4.2 pins with exact reviewed npm 11.15.0 pins.
+  - Enforce two identical publish pins at or above npm 11.5.1 while preserving the latest and next prohibition.
+  - Preserve the unpublished 1.3.0 state for controller-owned retry and verification.
+non_goals:
+  - Change the release-PR workflow npm pin, Node version, package contents, release transaction, provenance, or rollback behavior.
+  - Publish, tag, create a GitHub release, merge, or mutate branch protection from the worker lane.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: Candidate and privileged publish jobs install the same exact npm 11.15.0 CLI, satisfying the npm trusted-publishing minimum of 11.5.1.
+    lane_ids: [issue-207-npm-oidc-cli]
+    evidence_expected: [workflow pin count, identical exact pins, semantic minimum check]
+  - id: SPR-AC-02
+    statement: Packed-artifact, workflow, repository, and secret-scan validation remain green while deterministic latest and next prohibitions remain enforced.
+    lane_ids: [issue-207-npm-oidc-cli]
+    evidence_expected: [actionlint, packed artifact suite, full repository suite, secret scan]
+  - id: SPR-AC-03
+    statement: npm version 1.3.0, tag v1.3.0, and GitHub release v1.3.0 remain absent through worker and critic review.
+    lane_ids: [issue-207-npm-oidc-cli]
+    evidence_expected: [registry query, tag query, release query, D/I/E/S chain]
+risks:
+  - id: RISK-01
+    severity: high
+    statement: An npm CLI below the trusted-publishing floor can sign provenance but fail registry authentication before creating the version.
+    mitigation: Pin exact npm 11.15.0 in both publish jobs and enforce the official minimum documented at https://docs.npmjs.com/trusted-publishers/.
+  - id: RISK-02
+    severity: high
+    statement: A recovery lane could accidentally mutate an immutable npm, tag, or release authority.
+    mitigation: Deny release mutation to worker and critic, query all authorities before handoff, and leave retry to ROOT.
+lanes:
+  - lane_id: issue-207-npm-oidc-cli
+    issue_ids: [207]
+    contract_path: .agent-workflow/sprints/2026-07-10-npm-oidc-recovery/lanes/contracts/issue-207-npm-oidc-cli.contract.yaml
+    branch: lane/207-npm-oidc-cli
+    owner: codex-npm-oidc-recovery
+    reviewer: fresh-independent-critic
+    summary: Pin and validate an OIDC-capable npm CLI in both publish jobs without release mutation.
+dependency_order:
+  - [issue-207-npm-oidc-cli]
+deployment_expectations:
+  - Worker and critic make no npm, tag, GitHub release, main, branch-protection, credential, or retained-artifact mutation.
+  - ROOT merges reviewed code to dev, generates and approves the dev-to-main recovery PR through protected controls, and verifies release separately.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Trusted-publishing CLI regression
+      due: before worker closeout
+      evidence_expected: [exact two-pin count, identical npm 11.15.0 pins, semantic minimum check, packed artifact suite green]
+  human_review_milestones:
+    - id: HR-01
+      name: Independent OIDC recovery review
+      owner: Fresh critic and release controller
+      trigger: Exact D/I/E chain and required validation pass.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-npm-oidc-recovery/review/review-inbox-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As a release owner, I can retry 1.3.0 knowing both npm publish jobs use a reviewed CLI that supports trusted OIDC publishing.
+      issue_ids: [207]
+      lane_ids: [issue-207-npm-oidc-cli]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03]
+  reporting_summary:
+    included: [npm OIDC CLI recovery, deterministic pin regression, independent criticism]
+    deferred: [controller-owned merge, npm publish, tag, release, and completed-ledger verification]
+    ownership:
+      - lane_id: issue-207-npm-oidc-cli
+        owner: codex-npm-oidc-recovery
+        responsibility: Implement and validate the bounded publish workflow pin fix only.
+    next_review: Fresh critic at exact E, then protected dev integration and release recovery.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T12:28:43Z"
