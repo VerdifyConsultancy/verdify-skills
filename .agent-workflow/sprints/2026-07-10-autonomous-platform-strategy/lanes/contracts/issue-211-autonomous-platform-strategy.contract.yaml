@@ -1,0 +1,132 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-autonomous-platform-strategy
+lane_id: issue-211-autonomous-platform-strategy
+title: Publish the evidence-backed four-project autonomous platform strategy
+status: approved
+issue_ids: [211]
+coupling_justification: null
+objective: Convert the supplied planning objective, fresh four-project audits, and primary-source research into the canonical current strategy and a durable issue-backed operating plan.
+desired_outcome: A reviewed plan clearly states what works, what remains unsafe or immature, and how Verdify Skills, Agent Platform, Gravity, and Orbit combine into a gated autonomous development system.
+non_goals:
+  - Implement any recommended platform, Gravity, Orbit, or lifecycle feature lane.
+  - Reopen the locked iteration-25 North Star or self-certify implementation, deployment, or unattended readiness.
+  - Mutate live runtimes, credentials, release authority, or branch protection.
+baseline_sha: "314516e1ba110fa981a235b21f09750bcbc42500"
+branch: lane/211-autonomous-platform-strategy
+module_contracts: [northstar-evidence, lifecycle-routing, execution-strategy]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 8
+  critic_ttl_hours: 4
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [planning-evidence, lifecycle-routing, execution-strategy]
+  owned_paths:
+    - .agent-workflow/intake/transcript-replan.md
+    - .agent-workflow/intake/transcript-replan.yaml
+    - .agent-workflow/northstar/collateral/NSE-20260710-autonomous-development-platform-best-practices.yaml
+    - .agent-workflow/northstar/collateral/sources/NSE-20260710-autonomous-development-platform-best-practices-2026-07-10-autonomous-development-platform-best
+    - .agent-workflow/northstar/evidence-registry.yaml
+    - .agent-workflow/northstar/research-inbox/2026-07-10-autonomous-development-platform-best-practices.md
+    - .agent-workflow/router/route-decision.md
+    - .agent-workflow/router/route-decision.yaml
+    - .agent-workflow/strategy/state-of-union.md
+    - .agent-workflow/strategy/state-of-union.yaml
+    - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
+    - MANIFEST.sha256
+  prohibited_paths:
+    - .github/**
+    - bin/**
+    - lib/**
+    - scripts/**
+    - schemas/**
+    - skills/**
+    - packs/**
+    - VERSION
+    - package.json
+  coordination_required_paths: []
+  owned_interfaces:
+    - North Star evidence registry entry NSE-20260710-autonomous-development-platform-best-practices.
+    - Canonical state-of-union strategy handoff.
+    - Issue-backed four-project autonomous platform operating plan.
+dependencies:
+  hard: []
+  soft:
+    - lane_id: issue-116-one-autonomous-sdlc
+      coordination: Preserve issue 116 as the implementation and rollout umbrella after this strategy issue closes.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: Transcript intake and Brave-backed primary-source research are registered, schema-valid, queryable, and leave the locked North Star unchanged.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [transcript schema validation, evidence registry query, North Star diff review]
+  - id: LANE-AC-02
+    statement: Canonical strategy and Markdown plan accurately distinguish each project's planning, implementation, merged, deployed, and live-verified maturity and blockers.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [four-project audit findings, state-of-union schema validation, claim traceability]
+  - id: LANE-AC-03
+    statement: The plan defines the target architecture, root and project loops, risk policy, gates, metrics, stop conditions, dependency sequence, and one complete four-project vertical slice.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [operating model review, issue mapping, vertical-slice acceptance test]
+  - id: LANE-AC-04
+    statement: All repository and delivery regressions pass with changed-file secret scanning and fresh independent criticism.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [repository validation, artifact schema validation, make test, diff check, gitleaks, clean worktree]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate repository structure, skills, schemas, and manifest.
+    required: true
+  - id: transcript-validation
+    command: bin/verdify artifact validate --file .agent-workflow/intake/transcript-replan.yaml
+    purpose: Validate routed planning intake.
+    required: true
+  - id: strategy-validation
+    command: bin/verdify artifact validate --file .agent-workflow/strategy/state-of-union.yaml
+    purpose: Validate the canonical strategy artifact.
+    required: true
+  - id: evidence-query
+    command: bin/verdify northstar evidence list --repo . --query autonomous-development --json
+    purpose: Prove registered research is queryable.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run all repository, schema, package, delivery, and release regressions.
+    required: true
+  - id: diff-check
+    command: git diff --check 314516e1ba110fa981a235b21f09750bcbc42500..HEAD
+    purpose: Reject malformed patch content.
+    required: true
+  - id: secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="314516e1ba110fa981a235b21f09750bcbc42500..HEAD"
+    purpose: Scan every lane commit while redacting any finding.
+    required: true
+required_evidence:
+  - Fresh current-state audits for all four projects with lifecycle state separated.
+  - Brave-discovered primary sources and queryable registered evidence.
+  - Canonical state-of-union and matching durable platform plan.
+  - GitHub issue reconciliation for routing recurrence and durable execution architecture.
+  - Exact D/I/E/S chain, current GitHub checks, and fresh critic assessment.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - Evidence contradicts the locked four-project North Star or requires a protected North Star change.
+  - The strategy requires code, runtime, credential, branch protection, or release mutation.
+  - Any maturity claim cannot be tied to current authoritative evidence.
+definition_of_done:
+  - D contains only the approved sprint plan, wave plan, and lane contract.
+  - I changes only contract-owned evidence, intake, routing, strategy, documentation, and manifest paths.
+  - Required validation passes at I, E adds only the closeout, and a fresh critic adds only S.
+  - Exact S passes required GitHub checks and integrates to dev through the pull request.
+  - Issue 211 closes while issue 116 remains the implementation umbrella.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T13:37:41Z"
