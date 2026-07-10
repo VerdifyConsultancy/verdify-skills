@@ -542,12 +542,12 @@ actions:
   type: update_issue
   target: VerdifyConsultancy/verdify-skills#116
   owner: Root planner
-  status: proposed
+  status: applied
 - id: ACT-004
   type: update_issue
   target: VerdifyConsultancy/verdify-skills#76
   owner: Root planner
-  status: proposed
+  status: applied
 - id: ACT-005
   type: run_diagnostic
   target: Current Agent Platform, Gravity, and Orbit repository/GitHub/runtime audits

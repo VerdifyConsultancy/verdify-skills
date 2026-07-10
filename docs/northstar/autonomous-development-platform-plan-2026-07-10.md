@@ -440,8 +440,8 @@ Exit: repeatable onboarding without a second lifecycle or manual hidden state.
 1. Reopened Verdify Skills #135 with the verified 1.3.0 recurrence.
 2. Created Agent Platform #2905 for the durable-execution build-versus-adopt
    architecture spike.
-3. Register this strategy and research under Verdify Skills #116.
-4. Reframe Verdify #76 around evidence-driven simplification after the vertical
+3. Registered this strategy and research under Verdify Skills #116.
+4. Reframed Verdify #76 around evidence-driven simplification after the vertical
    slice.
 5. Plan issue #135 as the next single-issue sprint after strategy review.
 
