@@ -1,14 +1,14 @@
 # Route decision
 
-- Current state: `REVIEW_INBOX_REQUIRED`
-- Next skill: `release-verification`
-- Next mode: `review-inbox`
+- Current state: `GATE_STATE_UNCOMMITTED`
+- Next skill: `project-router`
+- Next mode: `route`
 
-Lanes with approving critic outcomes need a review inbox packet before integration or human review.
+Durable gate state must be committed, present, and schema-valid before routing.
 
 ## Missing artifacts
 
-- .agent-workflow/sprints/2026-07-10-package-file-set/review/review-inbox-packet.yaml
+None.
 
 ## Open gates
 

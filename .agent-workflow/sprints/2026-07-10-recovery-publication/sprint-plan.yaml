@@ -2,7 +2,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: "1.0"
 sprint_id: 2026-07-10-recovery-publication
-status: approved
+status: complete
 goal: Selectively recover all useful unpublished Verdify Skills work and its provenance onto the current dev baseline without replaying stale trees or losing retrieval handles.
 baseline_sha: "17b3762f024186a336556f60c27268006a8d59b6"
 github:

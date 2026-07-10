@@ -2,8 +2,8 @@ schema_ref: status.schema.yaml
 kind: SprintStatus
 schema_version: "1.0"
 sprint_id: 2026-07-10-recovery-publication
-state: READY
-updated_at: "2026-07-10T04:50:00Z"
+state: COMPLETE
+updated_at: "2026-07-10T05:54:00Z"
 active_lanes: []
 blockers: []
-next_action: Dispatch issue-126-recovery-publication from baseline 17b3762 using the approved selective-recovery contract.
+next_action: Plan issue #120 exact-artifact release safety from integrated dev commit da2f433.

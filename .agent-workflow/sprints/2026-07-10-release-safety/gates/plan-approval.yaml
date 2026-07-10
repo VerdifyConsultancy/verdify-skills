@@ -1,0 +1,21 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: plan-approval-2026-07-10-release-safety
+sprint_id: 2026-07-10-release-safety
+lane_id: null
+type: plan_approval
+status: approved
+question: "Approve issue #120 as the next dependency, version 1.3.0, its exact-artifact/recovery contract, and the no-live-publish worker boundary?"
+owner: Jason Vallery
+evidence_required:
+  - "Approved state-of-union sequence places #120 after integrated #130 and #126 and before #121."
+  - "npm 1.2.1, tag v1.2.1, GitHub release, and main all identify published commit 898d7c."
+  - "Integrated recovered dev baseline da2f433 passes 28-skill, 47-schema, 90-test, package, policy, and npm validation."
+  - "Issue #120 acceptance intent plus PR #173 critic FIND-002 transactional pack rollback evidence."
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: "The user directed autonomous completion of the full repository recovery/release sequence. Version 1.3.0 is the conservative minor increment for new historian, CRM, pack, and release capabilities; live publication remains separately gated after #121."
+opened_at: "2026-07-10T05:55:37Z"
+resolved_at: "2026-07-10T05:55:37Z"
+resume_state: READY

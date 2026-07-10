@@ -2,24 +2,16 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-07-10T04:46:13Z'
+generated_at: '2026-07-10T05:59:56Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: REVIEW_INBOX_REQUIRED
-next_skill: release-verification
-next_mode: review-inbox
-reason: Lanes with approving critic outcomes need a review inbox packet before integration
-  or human review.
+current_state: GATE_STATE_UNCOMMITTED
+next_skill: project-router
+next_mode: route
+reason: Durable gate state must be committed, present, and schema-valid before routing.
 evidence:
-- source: ".agent-workflow/intake/transcript-replan.yaml"
-  finding: transcript-replan status is "routed"
-- source: ".agent-workflow/northstar/evidence-registry.yaml"
-  finding: registered North Star evidence count is 44
-- source: ".agent-workflow/northstar/northstar-plan.yaml"
-  finding: northstar-plan status is "approved"
-- source: ".agent-workflow/northstar/northstar-artifacts.yaml"
-  finding: northstar-artifacts status is "approved"
-- source: ".agent-workflow/sprints/2026-07-10-package-file-set/sprint-plan.yaml"
-  finding: active sprint 2026-07-10-package-file-set has status approved
-missing_artifacts:
-- ".agent-workflow/sprints/2026-07-10-package-file-set/review/review-inbox-packet.yaml"
+- source: ".agent-workflow"
+  finding: ".agent-workflow/sprints/2026-07-10-release-safety/gates/local-worktree-fallback.yaml:
+    gate is uncommitted; .agent-workflow/sprints/2026-07-10-release-safety/gates/plan-approval.yaml:
+    gate is uncommitted"
+missing_artifacts: []
 open_gates: []

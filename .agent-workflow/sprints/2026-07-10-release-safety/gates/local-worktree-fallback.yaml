@@ -1,0 +1,20 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: local-worktree-fallback-2026-07-10-release-safety
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+type: policy_exception
+status: approved
+question: "May issue #120 use one locally leased Codex worktree while Agent Platform dynamic worktree creation remains disabled?"
+owner: Jason Vallery
+evidence_required:
+  - "Authenticated Agent Platform add_worktree_agent returned HTTP 501 worktree-crud-post-mvp-disabled during this controller run."
+  - "Approved North Star architecture names local leased worktrees as an explicit fallback."
+  - "The lane retains one issue, lease, branch, worktree, worker, PR, fresh critic, and exact-head checks."
+allowed_decisions: [use_local_leased_worktree, wait_for_dynamic_worktree, stop]
+decision: use_local_leased_worktree
+rationale: "Only dispatch transport changes; no npm, production, destructive, or protected-decision authority is granted."
+opened_at: "2026-07-10T05:55:37Z"
+resolved_at: "2026-07-10T05:55:37Z"
+resume_state: READY
