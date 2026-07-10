@@ -10,7 +10,7 @@ The package has four layers:
 ```mermaid
 flowchart TB
     subgraph L1["1 · Skills (role procedures)"]
-      S["25 lifecycle skills + issue-triage"]
+      S["25 lifecycle skills + standalone/registry skills"]
     end
     subgraph L2["2 · Schemas and versioned artifacts"]
       A[".agent-workflow/*.yaml — intent, contracts, gates, status, evidence"]
@@ -34,6 +34,6 @@ The skill package never attempts to become a second issue tracker or a hidden wo
 ## See also
 
 - [`skills/README.md`](skills/README.md) — the skills reference manual (per-skill pages, diagrams, handoffs)
-- [`skills/schemas-catalog.md`](skills/schemas-catalog.md) — the 46 schemas, owners, and producers/consumers
+- [`skills/schemas-catalog.md`](skills/schemas-catalog.md) — the 47 schemas, owners, and producers/consumers
 - [`skills/tools-and-mcp.md`](skills/tools-and-mcp.md) — `bin/verdify` CLI, Agent Platform MCP/API, GitHub primitives
 - [`authority-model.md`](authority-model.md) — which artifact type owns which truth

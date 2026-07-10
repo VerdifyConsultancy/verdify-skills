@@ -1,6 +1,6 @@
 # Schema Catalog
 
-The 46 canonical artifact schemas under [`../../schemas/`](../../schemas/). Every
+The 47 canonical artifact schemas under [`../../schemas/`](../../schemas/). Every
 durable `.agent-workflow` artifact declares a `schema_ref` equal to its schema
 filename and validates against JSON Schema draft 2020-12. Validate any artifact with:
 
@@ -98,6 +98,7 @@ owner **CLI/validator** are produced by `bin/verdify` or consumed cross-skill.
 |---|---|---|---|
 | `compliance-assessment` | CLI/validator (compliance gate) | assessor → CI | Executable operating-contract compliance result. |
 | `evidence-manifest` | CLI/validator | packaging → audit | Hash manifest for an evidence bundle. |
+| `skill-pack` | CLI/validator | pack registry → host installer | Installable subsets of the flat skill registry. |
 
 See [`../authority-model.md`](../authority-model.md) for which artifact type owns
 which truth when sources disagree.

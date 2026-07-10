@@ -21,6 +21,51 @@ git -C "$REPO" check-ignore -q .agent-workflow/northstar/collateral/sources/exam
 "$ROOT/bin/verdify" route --repo "$REPO" --write --json > "$TMP/route.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["next_skill"] == "project-definition" && d["next_mode"] == "discovery"' "$TMP/route.json"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/router/route-decision.yaml" >/dev/null
+"$ROOT/bin/verdify" pack list --json > "$TMP/packs.json"
+ruby -rjson -e '
+  d = JSON.parse(File.read(ARGV[0]))
+  names = d["packs"].map { |pack| pack["name"] }
+  expected = %w[crm-email fleet-operations governance-review northstar-strategy research-analysis sdlc-core]
+  abort unless d["count"] == expected.length && names.sort == expected
+  crm = d["packs"].find { |pack| pack["name"] == "crm-email" }
+  abort unless crm["required_skills"] == ["crm-email"] && crm["category"] == "integration"
+' "$TMP/packs.json"
+PACK_REPO="$TMP/pack-project"
+mkdir -p "$PACK_REPO"
+git -C "$PACK_REPO" init -q -b main
+git -C "$PACK_REPO" config user.name "Verdify Test"
+git -C "$PACK_REPO" config user.email "verdify-test@example.invalid"
+printf '# Pack project\n' > "$PACK_REPO/README.md"
+git -C "$PACK_REPO" add README.md
+git -C "$PACK_REPO" commit -qm "initial"
+"$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack research-analysis --host all >/dev/null
+[[ -L "$PACK_REPO/.agents/skills/northstar-research-ingest" ]]
+[[ -L "$PACK_REPO/.claude/skills/northstar-question-resolution" ]]
+[[ ! -e "$PACK_REPO/.agents/skills/project-router" ]]
+[[ -f "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+"$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" >/dev/null
+"$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack crm-email --host all >/dev/null
+[[ -L "$PACK_REPO/.agents/skills/crm-email" ]]
+[[ -L "$PACK_REPO/.claude/skills/crm-email" ]]
+[[ -f "$PACK_REPO/.agent-skills/verdify-packs/crm-email.yaml" ]]
+"$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/crm-email.yaml" >/dev/null
+
+"$ROOT/skills/crm-email/scripts/crm_request.rb" --help > "$TMP/crm-help.txt"
+grep -q -- "--dry-run" "$TMP/crm-help.txt"
+printf '%s\n' '{"subject":"Fixture","body":"No external write"}' > "$TMP/crm-request.json"
+"$ROOT/skills/crm-email/scripts/crm_request.rb" \
+  --base-url http://127.0.0.1:1 \
+  --method POST \
+  --path /api/email/drafts \
+  --body "$TMP/crm-request.json" \
+  --dry-run > "$TMP/crm-dry-run.json"
+ruby -rjson -rdigest -e '
+  result = JSON.parse(File.read(ARGV[0]))
+  body = File.read(ARGV[1])
+  abort unless result["dry_run"] == true && result["method"] == "POST"
+  abort unless result["body_sha256"] == Digest::SHA256.hexdigest(body)
+  abort if File.read(ARGV[0]).include?(body)
+' "$TMP/crm-dry-run.json" "$TMP/crm-request.json"
 
 REPO_WITH_EVIDENCE="$TMP/project-with-evidence"
 mkdir -p "$REPO_WITH_EVIDENCE/docs/northstar/evidence"

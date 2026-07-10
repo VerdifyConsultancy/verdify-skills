@@ -1,0 +1,35 @@
+schema_ref: skill-pack.schema.yaml
+kind: VerdifySkillPack
+schema_version: "1.0"
+name: governance-review
+display_name: Governance Review
+description: Review and audit skills for issue triage, independent criticism, consensus audit, evidence review, and release or outcome verification.
+category: governance
+maturity: beta
+includes:
+  required:
+    - issue-triage
+    - independent-critic
+    - consensus-audit-workflow
+    - release-verification
+  optional:
+    - state-of-union
+    - repo-hygiene
+provides:
+  capabilities:
+    - issue-triage
+    - independent-review
+    - consensus-audit
+    - release-proof
+    - outcome-review
+depends_on:
+  packs: []
+  tools:
+    - git
+    - github
+conflicts: []
+install:
+  hosts:
+    - codex
+    - claude
+  default_profile: reviewer

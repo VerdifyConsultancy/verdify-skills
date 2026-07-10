@@ -1,0 +1,228 @@
+
+Agentic Loop Execution and SDLC Best Practices for OpenAI Codex and Anthropic Claude
+Executive summary
+For software engineering agents, the best loop is not “more autonomy” in the abstract; it is bounded autonomy with explicit evidence and stop conditions. In practice, OpenAI Codex-like systems work best when the loop is tightly grounded in a repository, test harness, sandbox, and approval model, because the model is specifically optimized for coding, tool use, and long-running execution in coding environments. Anthropic Claude works best when teams are deliberate about whether they want a direct model + explicit tool loop through the Messages API or a hosted harness through Claude Managed Agents / Claude Code, because Claude’s platform separates model prompting, client/server tool execution, permissions, and managed orchestration more explicitly. 
+
+The most robust SDLC pattern for both vendors is: define measurable success criteria first, design a planner-executor-validator loop with least privilege, implement with versioned prompts and pinned model snapshots where possible, test with evals plus adversarial and chaos scenarios, deploy behind spend/rate controls and sandboxing, and monitor traces, tool outcomes, security events, and rollback triggers continuously. OpenAI’s documentation emphasizes eval-driven development, tracing, guardrails, human review, prompt caching, and compaction; Anthropic’s documentation emphasizes measurable success criteria, tool schema quality, prompt caching, permission modes, OpenTelemetry-based monitoring, and explicit rate/spend governance. 
+
+Training-side alignment matters, but it does not replace runtime controls. OpenAI’s instruction-following line is grounded in RLHF, while Anthropic’s Claude line combines RLHF with Constitutional AI. Those approaches improve helpfulness and harmlessness, but both vendors explicitly warn that agents remain vulnerable to prompt injection, unintended tool use, and private-data leakage, which means approvals, schema constraints, logging, auditing, and kill-switches are still required in production. 
+
+Scope, assumptions, and definitions
+Several deployment details were unspecified by the request: exact model IDs, cloud provider, data residency regime, compliance scope, and whether the team wi[118;1:3ull use local IDE/CLI surfaces, direct APIs, or vendor-hosted agent runtimes. This report therefore assumes the most common options: OpenAI via Codex surfaces and/or the Responses API with the Agents SDK, and Anthropic via the Messages API, Claude Code, or Claude Managed Agents. Where behavior differs materially by surface, the report calls that out explicitly. 
+
+In the literature, an agentic loop is an iterative cycle in which a model reasons about the task, chooses actions, observes tool or environment feedback, updates state, and either continues or stops. ReAct is the canonical “reasoning + acting” template; Toolformer formalizes tool selection as part of the model’s behavior; Reflexion adds verbal self-critique and retry; and SWE-bench demonstrates why software engineering agents must interact with real repositories, tests, and execution environments rather than only emitting code. 
+
+Common architectures that matter in production are: a single-loop ReAct agent for bounded tasks; a planner-executor-validator architecture for deterministic engineering work; a critic/reflection loop for repair and retry; and a hierarchical or managed harness for long-horizon tasks where the platform handles some orchestration for you. For software delivery, the planner-executor-validator pattern is the safest default because it cleanly separates intent formation, tool execution, and acceptance testing. 
+
+Pass and goal met
+
+Fail but recoverable
+
+Sensitive or ambiguous
+
+Approved
+
+Rejected
+
+Task request
+
+Plan decomposition
+
+Select tools and permissions
+
+Execute step
+
+Collect observations
+
+Validate against tests and policy
+
+Stop and publish artifact
+
+Reflect and repair
+
+Human review
+
+Abort and log incident
+
+
+
+Show code
+A good loop therefore needs four explicit stop rules: goal reached, budget exhausted, risk threshold exceeded, or human rejection. Both vendors provide building blocks for this: OpenAI through guardrails, human review, tracing, approvals, background/state handling, and sandboxed runtime controls; Anthropic through tool-use stop reasons, permission modes, prompt-injection defenses, auto-mode classifiers, rate/spend limits, and managed-agent infrastructure. 
+
+Platform differences that should change your loop design
+OpenAI Codex is explicitly a coding agent: it can read, edit, and run code locally or in cloud environments, uses repo-scoped instruction files such as AGENTS.md, supports sandbox/approval presets, and is tuned for long-running coding work with compaction and prompt-caching optimization. OpenAI’s own guidance recommends Codex-tuned models for agentic coding and suggests medium reasoning effort as the default interactive balance, reserving higher effort for harder, longer-horizon work. This makes OpenAI especially strong for loops whose unit of progress is a patch, test result, or pull request. 
+
+Anthropic Claude is a broader assistant platform with two distinct operating modes: direct model access through the Messages API, where your application executes client-side tools after stop_reason: "tool_use", and managed or semi-managed harnesses through Claude Managed Agents or Claude Code, where runtime, permissions, and telemetry are more platform-provided. Anthropic recommends the most capable Opus-tier models for complex ambiguous tool use, faster Haiku models for straightforward work, and typically medium effort as the default starting point for agentic coding on Sonnet-class models, with higher effort for harder autonomous tasks. This makes Claude particularly strong when you want flexible tool orchestration, rich long-context reasoning, or a clean upgrade path from explicit loops to hosted agent infrastructure. 
+
+The loop-design implication is straightforward. For Codex-like models, prefer longer execution windows, richer repo context, automated test/repair loops, and stronger environment pinning. For Claude-like models, invest more in tool schema design, permission policy, response-format constraints, explicit prompt structure, and a conscious decision between “I own orchestration” and “the vendor owns orchestration.” In both cases, avoid free-form tool interfaces and unbounded browsing or shell access. 
+
+SDLC practices by stage
+The table below is a synthesis of vendor documentation, alignment/safety literature, and software-agent benchmarks. It is deliberately prescriptive rather than descriptive. 
+
+SDLC stage	OpenAI Codex recommendation	Anthropic Claude recommendation
+Requirements	Turn requirements into executable acceptance criteria, test commands, safety boundaries, and repo instructions; store stable project policy in AGENTS.md. 
+Define measurable success criteria first; store coding norms in CLAUDE.md and reusable workflows in Skills. 
+Design	Use planner-executor-validator with sandbox + approvals as first-class design objects. Separate trusted policy from untrusted input. 
+Choose upfront between Messages API loop and Managed Agents / Claude Code. Specify tool schemas, permission modes, and thinking effort during design, not later. 
+Implementation	Pin model snapshots where possible, enable compaction/prompt caching for long sessions, keep workspace-write + on-request as the default local autonomy posture. 
+Use prompt caching for static prefixes, adaptive/extended thinking only where it materially helps, and clear tool descriptions with JSON schemas. 
+Testing	Build evals early from traces; test patch correctness, tool success, refusal boundaries, and regression on real issues such as SWE-bench-like tasks. 
+Use benchmark tests plus console eval tooling; add adversarial prompt-injection, permission-boundary, and retry-exhaustion scenarios. 
+Deployment	Prefer least privilege, network-off by default, secret removal before agent phase in cloud runtimes, spend alerts, and audit-log export. 
+Use workspace spend/rate limits, permission rules, Auto mode only for medium-risk work, and OTel export to your SIEM/observability stack. 
+Monitoring	Use traces, request IDs, approval denials, rate-limit headers, and Codex analytics / compliance APIs. 
+Use Claude Code analytics, OTel metrics/events/traces, Usage/Cost API, and Compliance API. 
+Maintenance	Treat prompts, skills, tool contracts, and eval sets as versioned code; repin or re-evaluate whenever model aliases change or deprecations occur. 
+Use model aliases for development but pin full model names for reproducible releases; maintain migration checklists when upgrading Claude generations. 
+
+Across both platforms, the key SDLC shift is that the harness itself becomes part of the product: prompts, tool contracts, validators, approval policies, memory/compaction policy, and telemetry pipelines should be reviewed, tested, and versioned exactly like application code. OpenAI says this explicitly in its “agent improvement loop” material, and Anthropic’s testing guidance likewise treats evaluation as central to iterative prompt and system design. 
+
+Safety, security, governance, and testing
+For governance, start with rate limits, spend limits, and explicit approval policies. OpenAI exposes project and organization rate-limit controls, spend alerts, audit logs, and human-review nodes; Anthropic exposes rate/spend limits, workspace-level controls, permission rules, Usage/Cost reporting, and Compliance / Admin APIs. This means the correct control plane is not just “the prompt.” It is a combination of policy, credential scope, runtime permissions, and telemetry. 
+
+On alignment, OpenAI’s production lineage is strongly associated with RLHF, while Anthropic’s Claude stack adds Constitutional AI and a public “constitution.” The practical implication is not that one platform removes the need for safeguards; it is that both support rubric-based critique and policy-driven prompting, but neither should be trusted without external validation, approvals, and auditability. 
+
+For security, design as if prompt injection is unavoidable in principle. OpenAI recommends keeping untrusted text out of developer instructions, constraining downstream flow with structured outputs, enabling tool approvals, and running guardrails and trace graders. Anthropic recommends layered defenses against jailbreaks and prompt injection, and its Claude Code product explicitly warns that permission enforcement is outside the model, not inside it. NCSC and OWASP reinforce the deeper point: current LLMs do not enforce a hard boundary between instructions and data, so teams must rely on containment and blast-radius reduction rather than hoping for a silver bullet. 
+
+For privacy and regulated data, keep retention choices explicit. OpenAI’s Responses API stores application state for 30 days by default unless store=false and/or Zero Data Retention applies; background mode temporarily stores response data to support polling; tracing is unavailable under ZDR. Anthropic offers ZDR and HIPAA-ready arrangements for eligible features, says retained data is not used for training without express permission, and documents that some features are not ZDR-eligible. If you need high-assurance privacy, choose the smallest feature set that remains ZDR-compatible and disable unnecessary tracing or sensitive trace capture. 
+
+For supply-chain risk, treat agent-produced artifacts like any other release artifact: require signed provenance, SBOMs, and policy enforcement in CI. SLSA provides a practical framework for build integrity; Sigstore provides keyless signing and transparency logs; GitHub artifact attestations provide cryptographically signed build provenance. This matters more for agents because the system that writes code may also modify dependencies, workflows, or deployment manifests. 
+
+Testing should cover five layers. Unit tests verify deterministic tool wrappers and validators. Integration tests verify tool-call contracts, permission gates, and artifact generation. Task-evals measure acceptance criteria on real issue distributions. Adversarial / red-team tests probe jailbreaks, prompt injection, data exfiltration, and unsafe tool use. Chaos tests deliberately inject transient API failures, 429s, corrupted tool outputs, stale caches, and partial network loss to ensure the loop degrades safely rather than silently drifting. This structure aligns well with OpenAI’s eval-driven guidance, Anthropic’s success-criteria framework, OpenAI’s red-teaming work, and classic SRE error-budget practice. 
+
+Useful metrics are: task pass rate; patch acceptance / merge rate; unit/integration pass rate; tool success rate; retry-exhaustion rate; 429 rate; p95/p99 latency for model and tool steps; cache-hit rate; cost per successful task; false-positive and false-negative rate for safety gates; human-override rate; and incident/rollback rate. Anthropic’s monitoring docs provide specific metrics and events for sessions, tokens, costs, lines changed, permission decisions, and retry exhaustion; OpenAI provides traces, rate-limit headers, request IDs, and governance dashboards. 
+
+Performance, reproducibility, monitoring, and incident response
+Performance tuning is mostly about controlling context growth and choosing the right intelligence tier. OpenAI recommends Codex-tuned models for agentic coding, medium reasoning effort for interactive work, compaction for long-running sessions, and prompt caching to reduce latency and input cost substantially. Anthropic recommends starting complex ambiguous tool work on Opus-class models, using medium effort for agentic coding on Sonnet-class models, enabling prompt caching and cache pre-warming where static prefixes are large, omitting visible thinking when you want lower latency, and using Batch or Priority/Standard service tiers according to SLA needs. 
+
+For reproducibility, version three things together: the exact model identifier or snapshot, the prompt/instruction package, and the evaluation dataset. OpenAI explicitly documents pinned snapshots for consistent behavior and warns that prompting behavior can change between snapshots; Anthropic supports model aliases for convenience but full model names for exact selection, and its release notes provide migration guidance. In practical terms, release every agent change as a tuple such as {model_id, prompt_bundle_hash, tool_schema_hash, eval_set_version, container_digest} and require green evals before promotion. 
+
+Requirements and risk register
+
+Prompt, tool, and policy repo
+
+Unit and integration tests
+
+Task evals and adversarial tests
+
+Sandboxed agent canary
+
+Signed build and provenance attestation
+
+Deploy with rate, spend, and permission limits
+
+Tracing, OTel, analytics, SIEM
+
+Incident review and eval backfill
+
+
+
+Show code
+A practical dashboard should include task success, merge/acceptance rate, p95 end-to-end runtime, p95 tool latency, 429 share, transient-error retry share, tool-denial share, spend per successful task, cache-hit rate, and security events. As starting thresholds rather than vendor defaults, many teams can begin with: alert if 429s exceed 1% of requests for 15 minutes; if tool failures exceed 5% for 15 minutes; if p95 runtime or tool latency doubles from the trailing 7-day baseline; if daily cost exceeds 150% of the 14-day moving average; if permission denials spike above 20% of sessions; and if any exfiltration-like event or confirmed prompt-injection incident occurs. For reliability governance, freeze new releases when more than 25% of the monthly error budget burns in a day. These are opinionated defaults grounded in the observable signals exposed by the vendors and standard SRE error-budget practice. 
+
+An incident response playbook should be short and decisive. First, trigger a kill switch: reject new sessions, revoke or rotate automation tokens, drop the agent to read-only / plan mode, and disable networked or destructive tools. Second, preserve evidence: export traces, OTel events, request IDs, audit logs, tool transcripts, and produced artifacts. Third, contain blast radius by quarantining affected repos, containers, or workspaces. Fourth, restore with a pinned last-known-good prompt/model/tool bundle. Fifth, backfill the incident into adversarial evals so the same failure becomes a release gate. Sixth, run a lightweight retrospective that classifies root cause as prompt, tool schema, permission policy, model behavior, dependency, or operator workflow. 
+
+Orchestration patterns and example pseudocode
+A good Codex-like orchestration pattern is a repo-grounded repair loop with explicit validation and approval gates:
+
+python
+Copy
+# Pseudocode for an OpenAI Codex-style agent loop
+state = {
+    "model": "pinned-codex-model",   # prefer a pinned snapshot in release branches
+    "sandbox": "workspace-write",
+    "approval_policy": "on-request",
+    "budget_steps": 20,
+    "budget_cost_usd": 25.00,
+    "attempt": 0,
+}
+
+load_repo_instructions("AGENTS.md")
+enable_tracing(workflow="repo_repair_loop", include_sensitive_data=False)
+enable_context_compaction(threshold="long_context")
+enable_prompt_caching()
+set_store_false_if_privacy_required()
+
+while state["attempt"] < state["budget_steps"]:
+    plan = model.plan(task, repo_context, failing_tests)
+
+    if is_sensitive(plan):   # deploy, secret access, network write, prod mutation
+        human_review(plan)
+
+    result = execute_in_sandbox(plan)
+    validation = run(["unit_tests", "lint", "targeted_integration_tests"])
+
+    log_step(plan, result, validation)
+
+    if validation.passed and acceptance_criteria_met():
+        publish_patch_with_attestation()
+        break
+
+    if exceeded_cost_or_risk_budget() or repeated_guardrail_failures():
+        abort_and_escalate()
+
+    task = reflect_and_repair(plan, result, validation)
+    state["attempt"] += 1
+
+flush_traces()
+This pattern matches OpenAI’s documented emphasis on repo instructions, sandbox/approval controls, tracing, eval-driven improvement, compaction, and prompt caching. It is the best default when the agent’s main output is a patch plus evidence. 
+
+A good Claude-style orchestration pattern is a tool-loop that makes the permission boundary explicit and handles tool_use as a first-class turn outcome:
+
+python
+Copy
+# Pseudocode for a Claude Messages API loop
+system = load_project_policy("CLAUDE.md") + load_skill("debug_or_code_review")
+messages = [{"role": "user", "content": user_request}]
+tools = [read_repo, run_tests, search_code, create_patch]
+
+for step in range(MAX_STEPS):
+    response = client.messages.create(
+        model="claude-sonnet-or-opus-pinned",
+        system=system,
+        messages=messages,
+        tools=tools,
+        thinking={"type": "adaptive"},
+        output_config={"effort": "medium"},
+        service_tier="auto"
+    )
+
+    if response.stop_reason != "tool_use":
+        final = response.content
+        validate_final(final)
+        break
+
+    tool_results = []
+    for call in response.tool_calls:
+        if violates_policy(call):
+            deny_and_log(call)
+            maybe_escalate_to_human()
+            continue
+
+        result = execute_tool(call)   # client-side tools
+        tool_results.append(as_tool_result(call, result))
+
+    messages.append({"role": "assistant", "content": response.content})
+    messages.append({"role": "user", "content": tool_results})
+
+    if too_many_denials() or budget_exceeded():
+        terminate_session()
+        escalate()
+This aligns with Anthropic’s Messages API semantics, its model/tool-selection guidance, its adaptive-thinking recommendations for agentic coding, and its explicit permission architecture in Claude Code and Managed Agents. If you do not want to own this orchestration, move to Claude Managed Agents and keep your role focused on environment policy, credentials, and evaluation. 
+
+Open questions and limitations
+The largest unresolved variable is deployment surface. OpenAI Codex on local CLI/IDE, Codex cloud, and the API/Agents SDK do not expose identical controls; Anthropic Claude via Messages API, Claude Code, and Managed Agents also differ meaningfully in permissions, observability, and operational ownership. Because the request did not specify one of these paths, the report gives cross-surface guidance rather than a single implementation blueprint. 
+
+The second unresolved variable is model cadence. Both vendors support aliases and also change model generations, effort parameters, and feature maturity over time. For production, teams should pin release models and treat model upgrades as normal SDLC changes that require rerunning the full eval and red-team suite. 
+
+References
+OpenAI Codex docs, best practices, sandboxing, governance, approvals, and AGENTS.md guidance. 
+OpenAI Responses / Agents / tracing / guardrails / data controls / prompt caching / compaction / rate limits / admin APIs. 
+Anthropic tool use, prompt caching, extended thinking, model choice, rate limits, data retention, service tiers, and Managed Agents. 
+Claude Code docs on overview, CLAUDE.md, skills, permissions, security, analytics, monitoring, and costs. 
+Seminal agent-architecture papers: ReAct, Toolformer, Reflexion. 
+Alignment papers and artifacts: InstructGPT / RLHF and Constitutional AI / Claude’s Constitution. 
+Evaluation and benchmark references: SWE-bench, HELM, OpenAI eval guidance, Anthropic success-criteria guidance. 
+Security and governance references: NIST GenAI Profile, OWASP GenAI risks, UK NCSC prompt-injection guidance, OpenAI red-teaming paper. 
+Supply-chain and provenance references: SLSA, Sigstore, GitHub artifact attestations. 
+Reliability reference: Google SRE error-budget guidance. 

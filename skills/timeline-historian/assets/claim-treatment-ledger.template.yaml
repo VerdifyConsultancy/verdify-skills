@@ -1,0 +1,10 @@
+schema: timeline-historian.claim-treatment-ledger.v1
+generated_at: "<iso8601>"
+treatments:
+  - treatment_id: "treatment-001"
+    claim_id: "claim-001"
+    treatment: "not-evaluated"
+    reviewer: "<agent or human>"
+    reviewed_at: "<iso8601>"
+    evidence_anchors: []
+    rationale: "Initial placeholder before critical review."

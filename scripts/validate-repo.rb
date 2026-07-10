@@ -28,6 +28,7 @@ REQUIRED_SKILLS = %w[
   independent-critic controller-merge release-verification sprint-handoff adversarial-audit consensus-audit-workflow issue-triage
 ].freeze
 STANDALONE_SKILLS = %w[issue-triage].freeze
+REGISTRY_SKILL_CATEGORIES = %w[registry standalone].freeze
 STANDARD_LIFECYCLE_STATES = %w[
   NOT_STARTED ORIENTING DEFINING ARCHITECTING PLANNING AWAITING_APPROVAL READY IMPLEMENTING
   VALIDATING BLOCKED DECISION_REQUIRED READY_FOR_CRITIC CHANGES_REQUESTED READY_FOR_INTEGRATION
@@ -53,6 +54,7 @@ class RepoValidator
     validate_schemas
     validate_lifecycle_config
     validate_skills
+    validate_skill_packs
     validate_host_links
     validate_workflow
     validate_cli_lifecycle_alignment
@@ -146,7 +148,7 @@ class RepoValidator
   end
 
   def validate_parseable_files
-    Dir[ROOT.join("{config,schemas,.github,skills,examples}/**/*.{yaml,yml}")].sort.each { |p| load_yaml(p) }
+    Dir[ROOT.join("{config,schemas,.github,skills,packs,examples}/**/*.{yaml,yml}")].sort.each { |p| load_yaml(p) }
     Dir[ROOT.join("{evaluations,examples}/**/*.json")].sort.each { |p| load_json(p) }
   end
 
@@ -237,11 +239,9 @@ class RepoValidator
   def validate_skills
     actual = Dir[ROOT.join("skills/*/SKILL.md")].sort.map { |p| Pathname.new(p).dirname.basename.to_s }
     missing = REQUIRED_SKILLS - actual
-    extra = actual - REQUIRED_SKILLS
     error(ROOT.join("skills"), "missing skills: #{missing.join(', ')}") unless missing.empty?
-    error(ROOT.join("skills"), "unexpected top-level skills: #{extra.join(', ')}") unless extra.empty?
 
-    REQUIRED_SKILLS.each do |name|
+    actual.each do |name|
       dir = ROOT.join("skills", name)
       skill = dir.join("SKILL.md")
       next unless skill.file?
@@ -259,9 +259,14 @@ class RepoValidator
       error(skill, "metadata.lifecycle-order must be omitted; config/lifecycle.yaml is canonical") unless lifecycle_order.nil?
       if STANDALONE_SKILLS.include?(name)
         error(skill, "standalone skill must declare metadata.category: standalone") unless frontmatter.dig("metadata", "category") == "standalone"
-      else
+      elsif REQUIRED_SKILLS.include?(name)
         error(skill, "lifecycle skill must not declare standalone category") if frontmatter.dig("metadata", "category") == "standalone"
         error(skill, "lifecycle skill missing from config/lifecycle.yaml") unless canonical_lifecycle_skills.include?(name)
+      else
+        category = frontmatter.dig("metadata", "category")
+        unless REGISTRY_SKILL_CATEGORIES.include?(category)
+          error(skill, "package registry skill must declare metadata.category: #{REGISTRY_SKILL_CATEGORIES.join(' or ')}")
+        end
       end
       error(skill, "missing agents/openai.yaml") unless dir.join("agents/openai.yaml").file?
       error(skill, "skill should have at least one reference") if Dir[dir.join("references/*")].empty?
@@ -446,6 +451,53 @@ class RepoValidator
     end
   end
 
+  def validate_skill_packs
+    pack_paths = Dir[ROOT.join("packs/*/pack.yaml")].sort.map { |path| Pathname.new(path) }
+    error(ROOT.join("packs"), "expected at least one skill pack") if pack_paths.empty?
+    names = []
+    known_skills = Dir[ROOT.join("skills/*/SKILL.md")].sort.map { |p| Pathname.new(p).dirname.basename.to_s }
+    pack_paths.each do |path|
+      pack = load_yaml(path)
+      next unless pack.is_a?(Hash)
+
+      validate_pack_schema(path, pack)
+      dir_name = path.dirname.basename.to_s
+      name = pack["name"].to_s
+      names << name
+      error(path, "name must match directory") unless name == dir_name
+      error(path, "invalid pack name") unless name.match?(SKILL_NAME_PATTERN) && !name.include?("--") && name.length <= 64
+
+      required = Array(pack.dig("includes", "required")).map(&:to_s)
+      optional = Array(pack.dig("includes", "optional")).map(&:to_s)
+      missing = (required + optional) - known_skills
+      overlap = required & optional
+      error(path, "references unknown skills: #{missing.join(', ')}") unless missing.empty?
+      error(path, "skills cannot be both required and optional: #{overlap.join(', ')}") unless overlap.empty?
+      error(path, "must include project-router when sdlc lifecycle skills are packaged") if name == "sdlc-core" && !required.include?("project-router")
+    end
+    error(ROOT.join("packs"), "pack names must be unique") unless names.uniq.length == names.length
+
+    pack_names = names
+    pack_paths.each do |path|
+      pack = load_yaml(path)
+      next unless pack.is_a?(Hash)
+      missing_packs = Array(pack.dig("depends_on", "packs")).map(&:to_s) - pack_names
+      error(path, "depends_on.packs references unknown packs: #{missing_packs.join(', ')}") unless missing_packs.empty?
+      conflicts = Array(pack["conflicts"]).map(&:to_s)
+      unknown_conflicts = conflicts - pack_names
+      error(path, "conflicts references unknown packs: #{unknown_conflicts.join(', ')}") unless unknown_conflicts.empty?
+      error(path, "conflicts must not include itself") if conflicts.include?(pack["name"])
+    end
+  end
+
+  def validate_pack_schema(path, pack)
+    schema_path = ROOT.join("schemas/skill-pack.schema.yaml")
+    Verdify::SchemaValidator.validate_file(path, schema_path).each { |message| error(path, message) }
+    Verdify::SemanticValidator.validate(pack).each { |message| error(path, message) }
+  rescue Verdify::Error => e
+    error(path, e.message)
+  end
+
   def validate_workflow
     path = ROOT.join("verdify.workflow.yaml")
     workflow = load_yaml(path)
@@ -551,7 +603,7 @@ class RepoValidator
   end
 
   def validate_evaluations
-    REQUIRED_SKILLS.each do |skill|
+    Dir[ROOT.join("skills/*/SKILL.md")].sort.map { |p| Pathname.new(p).dirname.basename.to_s }.each do |skill|
       path = ROOT.join("evaluations", skill, "evals.json")
       unless path.file?
         error(path, "missing evaluation pack")
@@ -701,7 +753,8 @@ class RepoValidator
       errors.sort.each { |item| puts "  - #{item}" }
       exit 1
     end
-    puts "Verdify repository validation passed (#{REQUIRED_SKILLS.length} skills, #{@schema_ids.length} schemas)."
+    skill_count = Dir[ROOT.join("skills/*/SKILL.md")].length
+    puts "Verdify repository validation passed (#{skill_count} skills, #{@schema_ids.length} schemas)."
   end
 end
 
