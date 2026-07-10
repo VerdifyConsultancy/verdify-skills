@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+mode: normal
+recovery_bundle:
+receipt_base_sha: 52fbcbe957e69e81db014989bfdcf26b6863669f
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-issue-215-receipt-ci-auth
+  head_sha: 2c41a3acf3b864c5efa1dd060b89f9445748bacb
+  packet_commit_sha: c163c8d803914cd70432f86b72d9eef2ac210fef
+  release_commit_sha: c45fba07108309ad0f992a0eac3ba45c530d4000
+  outcome_commit_sha: 2c41a3acf3b864c5efa1dd060b89f9445748bacb
+  packet_path: ".agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/review/review-inbox-packet.yaml"
+  packet_sha256: c64ef0f2520bb68c9bab97778d1f5c443f5034f54682b1048b142c0a942b206b
+  release_sha256: f92e9a623f56aaf22383bf71c5078e941d63da266b0976da5d0e91cca955d5ca
+  outcome_sha256: 3154959fd9a3c2276df313eeb067594d8d64a4fc0269c8dceeacb098590daf19
+lanes:
+- lane_id: issue-215-receipt-ci-auth
+  issue_ids:
+  - 215
+  branch: lane/215-receipt-ci-auth
+  pull_request: 217
+  dispatch_head_sha: 749b23d94c1704525432427cf540b74bbda00525
+  implementation_head_sha: 8c04bb373c2217f9ef58a4c0139e54fdd72568c5
+  evidence_head_sha: c3405f47e6a311f282ece7d7e62a73c5489c52d6
+  critic_report_head_sha: 655d5a116023f2930dd7dca88456f2bfeba139af
+  merge_commit_sha: 52fbcbe957e69e81db014989bfdcf26b6863669f
+artifacts:
+  plan_sha256: c5a30503af35d6052ff25de09fc65fd42459fdfb95470fcfb620e5456fde1b21
+  status_sha256: 44097c9482e173c9a4d9253b3d9a14fb167bb750522394c7ff7042995d2ff848
+  release_sha256: f92e9a623f56aaf22383bf71c5078e941d63da266b0976da5d0e91cca955d5ca
+  outcome_sha256: 3154959fd9a3c2276df313eeb067594d8d64a4fc0269c8dceeacb098590daf19
+terminal:
+  integrated_sha: 52fbcbe957e69e81db014989bfdcf26b6863669f
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-10T23:04:39Z'
+generator: codex-root-issue215-controller

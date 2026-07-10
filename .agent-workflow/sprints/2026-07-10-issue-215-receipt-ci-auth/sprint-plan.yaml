@@ -3,59 +3,86 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: '1.0'
 sprint_id: 2026-07-10-issue-215-receipt-ci-auth
-status: approved
-goal: Make terminal-receipt GitHub evidence reads authenticated, least-privilege, bounded, and fail-closed so valid receipt transactions pass CI without administrative exceptions.
+status: complete
+goal: Make terminal-receipt GitHub evidence reads authenticated, least-privilege,
+  bounded, and fail-closed so valid receipt transactions pass CI without administrative
+  exceptions.
 baseline_sha: fbe821899caf546e9b7b8daa718ea2ec74918091
 github:
   repository: VerdifyConsultancy/verdify-skills
-  milestone: null
-  project: null
-issue_ids: [215]
+  milestone:
+  project:
+issue_ids:
+- 215
 scope:
-- Pass the job-scoped GitHub token only to the three policy steps that validate candidate or trusted receipt evidence.
-- Grant only read-only actions, checks, contents, and pull-request permissions required to prove workflow and pull-request identity.
-- Select each required check name's uniquely ordered highest check ID before loading workflow-run metadata and deduplicate shared workflow-run reads.
-- Preserve malformed or duplicate check-ID rejection, exact workflow path/event/head/app/conclusion binding, and all protected-base receipt invariants.
-- Prevent an authenticated GitHub API failure from silently retrying through anonymous curl; report only allowlisted status, request, and rate-limit diagnostics.
-- Add focused workflow invariants, API request-bound regressions, and an equivalent six-receipt CI scenario.
+- Pass the job-scoped GitHub token only to the three policy steps that validate candidate
+  or trusted receipt evidence.
+- Grant only read-only actions, checks, contents, and pull-request permissions required
+  to prove workflow and pull-request identity.
+- Select each required check name's uniquely ordered highest check ID before loading
+  workflow-run metadata and deduplicate shared workflow-run reads.
+- Preserve malformed or duplicate check-ID rejection, exact workflow path/event/head/app/conclusion
+  binding, and all protected-base receipt invariants.
+- Prevent an authenticated GitHub API failure from silently retrying through anonymous
+  curl; report only allowlisted status, request, and rate-limit diagnostics.
+- Add focused workflow invariants, API request-bound regressions, and an equivalent
+  six-receipt CI scenario.
 non_goals:
-- Add any GitHub write permission, personal token, persisted credential, or secret output.
-- Remove live GitHub evidence, relax required checks, or accept a lower-fidelity check identity.
-- Generalize the issue into provider auth, GitHub client replacement, issue 70 change classes, or unrelated workflow refactoring.
+- Add any GitHub write permission, personal token, persisted credential, or secret
+  output.
+- Remove live GitHub evidence, relax required checks, or accept a lower-fidelity check
+  identity.
+- Generalize the issue into provider auth, GitHub client replacement, issue 70 change
+  classes, or unrelated workflow refactoring.
 - Add another critic or human approval to deterministic terminal-receipt PRs.
-- Change application runtime, publish the package, promote main, or start later platform lanes.
+- Change application runtime, publish the package, promote main, or start later platform
+  lanes.
 acceptance_criteria:
 - id: SPR-AC-01
-  statement: The three receipt-validation steps receive github.token and the workflows declare exactly the read permissions required by pull-request, check-run, and workflow-run evidence.
-  lane_ids: [issue-215-receipt-ci-auth]
+  statement: The three receipt-validation steps receive github.token and the workflows
+    declare exactly the read permissions required by pull-request, check-run, and
+    workflow-run evidence.
+  lane_ids:
+  - issue-215-receipt-ci-auth
   evidence_expected:
   - workflow structural assertions
   - no write permission
   - no token output or persistence
 - id: SPR-AC-02
-  statement: Required check identity still uses the uniquely ordered highest check ID for every required name, while workflow metadata loads are limited to those selected checks and deduplicated by run ID.
-  lane_ids: [issue-215-receipt-ci-auth]
+  statement: Required check identity still uses the uniquely ordered highest check
+    ID for every required name, while workflow metadata loads are limited to those
+    selected checks and deduplicated by run ID.
+  lane_ids:
+  - issue-215-receipt-ci-auth
   evidence_expected:
   - request-count regression
   - duplicate and malformed ID rejection
   - workflow path, event, head, app, and conclusion regressions
 - id: SPR-AC-03
-  statement: An authenticated GitHub API failure fails closed with actionable allowlisted status and rate metadata and never falls back to an anonymous request.
-  lane_ids: [issue-215-receipt-ci-auth]
+  statement: An authenticated GitHub API failure fails closed with actionable allowlisted
+    status and rate metadata and never falls back to an anonymous request.
+  lane_ids:
+  - issue-215-receipt-ci-auth
   evidence_expected:
   - authenticated failure fixture
   - redaction assertion
   - anonymous fallback compatibility only when no token is present
 - id: SPR-AC-04
-  statement: A six-receipt equivalent scenario stays below the fail-closed request bound and passes both protected policy entrypoints under Actions-authenticated evidence.
-  lane_ids: [issue-215-receipt-ci-auth]
+  statement: A six-receipt equivalent scenario stays below the fail-closed request
+    bound and passes both protected policy entrypoints under Actions-authenticated
+    evidence.
+  lane_ids:
+  - issue-215-receipt-ci-auth
   evidence_expected:
   - six-receipt integration fixture
   - bounded request ledger
   - green exact-head policy and delivery CI
 - id: SPR-AC-05
-  statement: Focused tests, full package tests, workflow lint, secret scan, one fresh critic, exact-head CI, and post-merge receipt validation all pass without weakening the terminal contract.
-  lane_ids: [issue-215-receipt-ci-auth]
+  statement: Focused tests, full package tests, workflow lint, secret scan, one fresh
+    critic, exact-head CI, and post-merge receipt validation all pass without weakening
+    the terminal contract.
+  lane_ids:
+  - issue-215-receipt-ci-auth
   evidence_expected:
   - D/I/E/S evidence
   - make test
@@ -66,31 +93,45 @@ acceptance_criteria:
 risks:
 - id: RISK-01
   severity: high
-  statement: Token scoping or diagnostics could expose credentials or grant unnecessary authority.
-  mitigation: Use github.token only in the three validation-step environments, declare read-only permissions, forbid persistence, and test that errors expose only an allowlist.
+  statement: Token scoping or diagnostics could expose credentials or grant unnecessary
+    authority.
+  mitigation: Use github.token only in the three validation-step environments, declare
+    read-only permissions, forbid persistence, and test that errors expose only an
+    allowlist.
 - id: RISK-02
   severity: high
-  statement: Request optimization could skip a higher or malformed check and accept untrusted evidence.
-  mitigation: Retain every matching check for ordering validation, select only after uniqueness is proven, and keep all workflow/app/head/conclusion checks fail-closed.
+  statement: Request optimization could skip a higher or malformed check and accept
+    untrusted evidence.
+  mitigation: Retain every matching check for ordering validation, select only after
+    uniqueness is proven, and keep all workflow/app/head/conclusion checks fail-closed.
 - id: RISK-03
   severity: medium
-  statement: The fixed CI path could still exceed a request allowance as receipt history grows.
-  mitigation: Bind workflow metadata reads to required check names, deduplicate run IDs, assert a per-receipt bound, and record request counts in tests.
+  statement: The fixed CI path could still exceed a request allowance as receipt history
+    grows.
+  mitigation: Bind workflow metadata reads to required check names, deduplicate run
+    IDs, assert a per-receipt bound, and record request counts in tests.
 lanes:
 - lane_id: issue-215-receipt-ci-auth
-  issue_ids: [215]
-  contract_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/contracts/issue-215-receipt-ci-auth.contract.yaml
+  issue_ids:
+  - 215
+  contract_path: ".agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/contracts/issue-215-receipt-ci-auth.contract.yaml"
   branch: lane/215-receipt-ci-auth
   owner: codex-issue215-worker
   reviewer: fresh-independent-critic
-  summary: Authenticate and bound terminal-receipt GitHub evidence reads without weakening check identity or adding write authority.
+  summary: Authenticate and bound terminal-receipt GitHub evidence reads without weakening
+    check identity or adding write authority.
 dependency_order:
-- [issue-215-receipt-ci-auth]
+- - issue-215-receipt-ci-auth
 deployment_expectations:
-- The lane changes repository policy workflows and validation libraries only; it targets protected dev and has no application runtime deployment.
-- Exact-head pull-request checks must exercise the new workflow token scopes and protected-base validation paths.
-- After integration, ROOT creates the normal deterministic terminal receipt and verifies its policy, delivery, and critic checks are green with authenticated evidence.
-- A protected-path merge exception may be used only for the exact critic-approved head if the current GitHub identity cannot satisfy non-author CODEOWNERS review; the exception must be recorded and protections immediately restored.
+- The lane changes repository policy workflows and validation libraries only; it targets
+  protected dev and has no application runtime deployment.
+- Exact-head pull-request checks must exercise the new workflow token scopes and protected-base
+  validation paths.
+- After integration, ROOT creates the normal deterministic terminal receipt and verifies
+  its policy, delivery, and critic checks are green with authenticated evidence.
+- A protected-path merge exception may be used only for the exact critic-approved
+  head if the current GitHub identity cannot satisfy non-author CODEOWNERS review;
+  the exception must be recorded and protections immediately restored.
 review_plan:
   qa_milestones:
   - id: QA-01
@@ -115,18 +156,27 @@ review_plan:
     name: One independent implementation criticism
     owner: Fresh critic
     trigger: Exact implementation and closeout heads pass every required local validation.
-    review_packet_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/review/review-inbox-packet.yaml
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/review/review-inbox-packet.yaml"
   - id: HR-02
     name: Preauthorized protected-path integration exception
     owner: Jason Vallery
-    trigger: Use only if exact approving S has green CI and GitHub still cannot satisfy non-author CODEOWNERS review with an available identity.
-    review_packet_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/gates/protected-path-merge-exception.yaml
+    trigger: Use only if exact approving S has green CI and GitHub still cannot satisfy
+      non-author CODEOWNERS review with an available identity.
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/gates/protected-path-merge-exception.yaml"
   user_stories_for_review:
   - id: US-01
-    statement: As ROOT, I can terminalize completed sprints through authenticated CI without valid evidence failing at the anonymous GitHub API ceiling.
-    issue_ids: [215]
-    lane_ids: [issue-215-receipt-ci-auth]
-    acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05]
+    statement: As ROOT, I can terminalize completed sprints through authenticated
+      CI without valid evidence failing at the anonymous GitHub API ceiling.
+    issue_ids:
+    - 215
+    lane_ids:
+    - issue-215-receipt-ci-auth
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+    - SPR-AC-03
+    - SPR-AC-04
+    - SPR-AC-05
   reporting_summary:
     included:
     - least-privilege workflow token scopes
@@ -140,8 +190,10 @@ review_plan:
     ownership:
     - lane_id: issue-215-receipt-ci-auth
       owner: codex-issue215-worker
-      responsibility: Implement and validate the bounded GitHub evidence authentication repair.
-    next_review: One fresh critic at exact evidence head, then protected-dev integration and a deterministic normal terminal receipt.
+      responsibility: Implement and validate the bounded GitHub evidence authentication
+        repair.
+    next_review: One fresh critic at exact evidence head, then protected-dev integration
+      and a deterministic normal terminal receipt.
 approval:
   status: approved
   approver: Jason Vallery
