@@ -777,6 +777,28 @@ class LaneReviewValidatorTest < Minitest::Test
     FileUtils.rm_rf(chain[:root]) if chain
   end
 
+  def test_route_ignores_multiple_verified_complete_sprints
+    chain = build_chain(route_ready: true)
+    first_sprint = "2026-06-22-a"
+    second_sprint = "2026-06-23-b"
+    write_completed_sprint(chain[:root], first_sprint)
+    git(chain[:root], "add", ".agent-workflow/sprints/#{first_sprint}")
+    git(chain[:root], "commit", "-qm", "complete first sprint")
+
+    first_plan = File.join(chain[:root], ".agent-workflow/sprints/#{first_sprint}/sprint-plan.yaml")
+    write_completed_sprint(chain[:root], second_sprint, plan_source: first_plan)
+    git(chain[:root], "add", ".agent-workflow/sprints/#{second_sprint}")
+    git(chain[:root], "commit", "-qm", "complete second sprint")
+
+    stdout, = capture_io { Verdify::CLI.run(["route", "--repo", chain[:root], "--json"]) }
+    decision = JSON.parse(stdout)
+
+    assert_equal "STATE_OF_UNION_MISSING", decision["current_state"]
+    assert_equal "state-of-union", decision["next_skill"]
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
   def test_route_rejects_committed_invalid_sprint_plan
     chain = build_chain(route_ready: true)
     plan_path = File.join(chain[:root], ".agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml")
@@ -945,6 +967,31 @@ class LaneReviewValidatorTest < Minitest::Test
       "blockers" => [],
       "next_action" => "Follow the verified lifecycle route."
     }
+  end
+
+  def write_completed_sprint(root, sprint_id, plan_source: nil)
+    sprint_root = File.join(root, ".agent-workflow/sprints", sprint_id)
+    FileUtils.mkdir_p(File.join(sprint_root, "release"))
+    FileUtils.mkdir_p(File.join(sprint_root, "outcome"))
+
+    plan_path = File.join(sprint_root, "sprint-plan.yaml")
+    source = plan_source || plan_path
+    plan = YAML.safe_load(File.read(source), permitted_classes: [], aliases: false)
+    plan["sprint_id"] = sprint_id
+    plan["status"] = "complete"
+    File.write(plan_path, YAML.dump(plan))
+
+    File.write(File.join(sprint_root, "status.yaml"), YAML.dump(valid_sprint_status(sprint_id, "COMPLETE")))
+    [
+      "release/release-verification.yaml",
+      "outcome/outcome-review.yaml"
+    ].each do |relative|
+      document = Verdify::SchemaValidator.load_document(
+        Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a", relative)
+      )
+      document["sprint_id"] = sprint_id
+      File.write(File.join(sprint_root, relative), YAML.dump(document))
+    end
   end
 
   def valid_gate(gate_id, sprint_id, status)

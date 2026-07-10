@@ -2,7 +2,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: "1.0"
 sprint_id: 2026-07-09-northstar-review-feedback
-status: active
+status: complete
 goal: Reconstruct, approve, and lock iteration 25 as the protected North Star for the integrated Verdify Skills, Agent Platform, Orbit, and Gravity self-building platform.
 baseline_sha: "c90801f97646238a3d7b3bfb064c799038d40c68"
 github:

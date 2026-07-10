@@ -1,14 +1,14 @@
 # Route decision
 
-- Current state: `SPRINT_TRANSACTION_AMBIGUOUS`
-- Next skill: `project-router`
-- Next mode: `route`
+- Current state: `STATE_OF_UNION_MISSING`
+- Next skill: `state-of-union`
+- Next mode: `strategy-review`
 
-Multiple committed sprint transactions are active; rerun route with --sprint ID.
+Approved foundations exist, but no strategy/backlog reconciliation has been recorded.
 
 ## Missing artifacts
 
-None.
+- .agent-workflow/strategy/state-of-union.yaml
 
 ## Open gates
 

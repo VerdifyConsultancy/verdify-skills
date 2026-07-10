@@ -2,7 +2,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: "1.0"
 sprint_id: 2026-07-09-issue-72-exact-head
-status: active
+status: complete
 goal: Repair lane evidence identity so implementation, closeout, critic, external approval, integration, deployment, and outcome revisions are independently verifiable.
 baseline_sha: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
 github:
