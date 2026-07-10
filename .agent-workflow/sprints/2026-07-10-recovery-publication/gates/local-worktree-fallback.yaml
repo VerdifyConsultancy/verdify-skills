@@ -1,0 +1,21 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: local-worktree-fallback-2026-07-10-recovery-publication
+sprint_id: 2026-07-10-recovery-publication
+lane_id: issue-126-recovery-publication
+type: policy_exception
+status: approved
+question: "May issue #126 use one locally leased Codex worktree after the live Agent Platform rejected dynamic worktree creation as disabled?"
+owner: Jason Vallery
+evidence_required:
+  - "The authenticated Agent Platform add_worktree_agent request returned HTTP 501 worktree-crud-post-mvp-disabled."
+  - "NORTHSTAR_ARCHITECTURE.md names an approved local leased worktree as an explicit dispatch fallback when dynamic worktrees are unavailable."
+  - "The issue #126 lane contract requires one branch, worktree, session, PR, worker closeout, fresh critic, and exact-head checks."
+  - "The user directed autonomous overnight completion and authorized ROOT to manage the repository pull requests."
+allowed_decisions: [use_local_leased_worktree, wait_for_dynamic_worktree, stop]
+decision: use_local_leased_worktree
+rationale: "The fallback changes only worker transport. It preserves the approved issue, contract, lease, worktree isolation, validation, critic, and integration controls and grants no production or destructive authority."
+opened_at: "2026-07-10T05:02:23Z"
+resolved_at: "2026-07-10T05:02:23Z"
+resume_state: READY
