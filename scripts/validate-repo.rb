@@ -610,12 +610,18 @@ class RepoValidator
 
     policy_workflow = ROOT.join(".github/workflows/policy.yml")
     policy_body = policy_workflow.file? ? policy_workflow.read : ""
+    policy_document = load_yaml(policy_workflow)
     error(policy_workflow, "must check out the protected base policy engine") unless policy_body.include?("github.event.pull_request.base.sha") && policy_body.include?("path: trusted-policy")
     error(policy_workflow, "must check out candidate history separately") unless policy_body.include?("path: candidate") && policy_body.include?("fetch-depth: 0")
     error(policy_workflow, "must pass the candidate only as --repo input") unless policy_body.include?("trusted-policy/scripts/pr-policy.rb") && policy_body.include?("--repo \"$GITHUB_WORKSPACE/candidate\"")
+    expected_read_permissions = { "actions" => "read", "checks" => "read", "contents" => "read", "pull-requests" => "read" }
+    error(policy_workflow, "must declare only the required read permissions") unless policy_document.is_a?(Hash) && policy_document["permissions"] == expected_read_permissions
+    policy_validation_step = Array(policy_document.dig("jobs", "pull-request-policy", "steps")).find { |step| step["name"] == "Check Verdify pull request contract" } if policy_document.is_a?(Hash)
+    error(policy_workflow, "receipt validation step must receive github.token as GH_TOKEN") unless policy_validation_step&.dig("env", "GH_TOKEN") == "${{ github.token }}"
 
     delivery_workflow = ROOT.join(".github/workflows/delivery-gate.yml")
     delivery_body = delivery_workflow.file? ? delivery_workflow.read : ""
+    delivery_document = load_yaml(delivery_workflow)
     %w[delivery-policy critic-gate pull_request pull_request_review workflow_dispatch].each do |token|
       error(delivery_workflow, "must declare #{token}") unless delivery_body.include?(token)
     end
@@ -623,6 +629,14 @@ class RepoValidator
     error(delivery_workflow, "must not request pull-request review write permission") if delivery_body.match?(/pull-requests:\s*write/) || delivery_body.match?(/pull_request_review:\s*write/)
     error(delivery_workflow, "non-PR contexts must discover and validate the exact release PR") unless delivery_body.scan("--prepare-release-event").length == 2 && delivery_body.scan("open-release-pulls.json").length >= 4
     error(delivery_workflow, "bootstrap mode must not bypass delivery policy or critic approval") if delivery_body.include?("--bootstrap")
+    error(delivery_workflow, "must declare only the required read permissions") unless delivery_document.is_a?(Hash) && delivery_document["permissions"] == expected_read_permissions
+    {
+      "delivery-policy" => "Check candidate-side delivery route",
+      "critic-gate" => "Validate current-head critic or release approval"
+    }.each do |job, name|
+      step = Array(delivery_document.dig("jobs", job, "steps")).find { |item| item["name"] == name } if delivery_document.is_a?(Hash)
+      error(delivery_workflow, "#{name} must receive github.token as GH_TOKEN") unless step&.dig("env", "GH_TOKEN") == "${{ github.token }}"
+    end
     delivery_body.scan(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/).flatten.each do |action|
       error(delivery_workflow, "action must use an immutable commit pin: #{action}") unless action.match?(/@[0-9a-f]{40}\z/i)
     end

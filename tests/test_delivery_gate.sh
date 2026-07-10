@@ -296,8 +296,8 @@ File.write(github_mock, <<~'MOCK')
         }
       end
 
-      def github_check_run_evidence(ref)
-        SprintTerminalReceipt::REQUIRED_CHECKS.map.with_index do |(name, workflow), index|
+      def github_check_run_evidence(ref, required_names:)
+        SprintTerminalReceipt::REQUIRED_CHECKS.slice(*required_names).map.with_index do |(name, workflow), index|
           {
             "id" => index + 1, "name" => name, "status" => "completed", "conclusion" => "success",
             "app_slug" => "github-actions", "workflow_path" => workflow, "workflow_event" => "pull_request",

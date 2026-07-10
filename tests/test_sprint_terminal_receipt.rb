@@ -317,6 +317,194 @@ class SprintTerminalReceiptTest < Minitest::Test
     assert_equal "merged", evidence["state"]
   end
 
+  def test_check_run_loader_hydrates_only_each_required_names_highest_id
+    repo = github_repository_fixture
+    head = "a" * 40
+    checks = [
+      raw_check("validate", 10, 101),
+      raw_check("validate", 20, 102),
+      raw_check("pull-request-policy", 30, 103),
+      raw_check("unrelated", 40, 104)
+    ]
+    requests = []
+    repo.define_singleton_method(:github_api_json) do |path|
+      requests << path
+      if path.include?("/check-runs?")
+        { "check_runs" => checks }
+      else
+        run_id = path[%r{/actions/runs/(\d+)}, 1]
+        { "path" => ".github/workflows/run-#{run_id}.yml@refs/heads/dev", "event" => "pull_request", "head_sha" => head }
+      end
+    end
+
+    evidence = repo.github_check_run_evidence(head, required_names: %w[validate pull-request-policy])
+
+    assert_equal 3, evidence.length
+    assert_nil evidence.find { |check| check["id"] == 10 }["workflow_path"]
+    assert_equal ".github/workflows/run-102.yml", evidence.find { |check| check["id"] == 20 }["workflow_path"]
+    assert_equal [102, 103], requests.filter_map { |path| path[%r{/actions/runs/(\d+)}, 1]&.to_i }
+    refute evidence.any? { |check| check["name"] == "unrelated" }
+  end
+
+  def test_check_run_loader_deduplicates_shared_selected_workflow_run
+    repo = github_repository_fixture
+    head = "b" * 40
+    checks = [raw_check("delivery-policy", 20, 501), raw_check("critic-gate", 30, 501)]
+    requests = []
+    repo.define_singleton_method(:github_api_json) do |path|
+      requests << path
+      path.include?("/check-runs?") ? { "check_runs" => checks } : {
+        "path" => ".github/workflows/delivery-gate.yml@refs/heads/dev", "event" => "pull_request", "head_sha" => head
+      }
+    end
+
+    evidence = repo.github_check_run_evidence(head, required_names: %w[delivery-policy critic-gate])
+
+    assert_equal 2, evidence.length
+    assert_equal 1, requests.count { |path| path.include?("/actions/runs/501") }
+    assert evidence.all? { |check| check["workflow_path"] == ".github/workflows/delivery-gate.yml" }
+  end
+
+  def test_check_run_loader_retains_invalid_id_sets_without_hydration
+    repo = github_repository_fixture
+    head = "c" * 40
+    current_checks = []
+    requests = []
+    repo.define_singleton_method(:github_api_json) do |path|
+      requests << path
+      path.include?("/check-runs?") ? { "check_runs" => current_checks } : {
+        "path" => ".github/workflows/validate.yml", "event" => "pull_request", "head_sha" => head
+      }
+    end
+    validator = Verdify::SprintTerminalReceipt.new(repo: repo)
+
+    {
+      "duplicate" => [raw_check("validate", 8, 601), raw_check("validate", 8, 602)],
+      "malformed" => [raw_check("validate", "not-an-id", 603), raw_check("validate", 9, 604)]
+    }.each do |label, fixture|
+      current_checks.replace(fixture)
+      requests.clear
+      evidence = repo.github_check_run_evidence(head, required_names: ["validate"])
+      errors = []
+      validator.send(:validate_trusted_checks, evidence, PR, head, errors)
+
+      assert_equal 2, evidence.length, label
+      refute requests.any? { |path| path.include?("/actions/runs/") }, label
+      assert errors.any? { |error| error.include?("uniquely ordered latest trusted validate check") }, label
+    end
+  end
+
+  def test_six_receipt_evidence_uses_42_requests_below_fail_closed_ceiling
+    repo = github_repository_fixture
+    required = Verdify::SprintTerminalReceipt::REQUIRED_CHECKS.keys
+    run_ids = [701, 702, 703, 704, 704]
+    check_payload = required.map.with_index { |name, index| raw_check(name, index + 1, run_ids.fetch(index)) }
+    requests = []
+    current_head = nil
+    repo.define_singleton_method(:github_api_json) do |path|
+      requests << path
+      case path
+      when %r{/pulls/}
+        {
+          "state" => "closed", "merged" => true, "merge_commit_sha" => "f" * 40, "draft" => false,
+          "head" => { "sha" => current_head, "ref" => "lane/test" },
+          "base" => { "ref" => "dev" }, "user" => { "login" => "worker", "id" => 1 }
+        }
+      when %r{/check-runs\?}
+        { "check_runs" => check_payload }
+      else
+        run_id = path[%r{/actions/runs/(\d+)}, 1]
+        workflow = run_id == "704" ? ".github/workflows/delivery-gate.yml" : ".github/workflows/run-#{run_id}.yml"
+        { "path" => "#{workflow}@refs/heads/dev", "event" => "pull_request", "head_sha" => current_head }
+      end
+    end
+
+    6.times do |index|
+      current_head = format("%040x", index + 1)
+      repo.github_terminal_pull_request_evidence(500 + index)
+      repo.github_check_run_evidence(current_head, required_names: required)
+    end
+
+    assert_equal 12, requests.count { |path| path.include?("/pulls/") }
+    assert_equal 6, requests.count { |path| path.include?("/check-runs?") }
+    assert_equal 24, requests.count { |path| path.include?("/actions/runs/") }
+    assert_equal 42, requests.length
+    assert_operator requests.length, :<=, 6 * Verdify::SprintTerminalReceipt::MAX_GITHUB_EVIDENCE_REQUESTS_PER_LANE
+  end
+
+  def test_authenticated_api_failure_never_calls_curl_and_only_reports_allowlisted_diagnostics
+    repo = github_repository_fixture
+    token = "test-token-value-that-must-not-escape"
+    response = <<~RESPONSE
+      HTTP/2.0 403 Forbidden
+      X-RateLimit-Remaining: 0
+      X-RateLimit-Resource: core
+      X-RateLimit-Reset: 1783722000
+      X-GitHub-Request-Id: SAFE:123
+      X-Arbitrary-Secret: do-not-report-this
+
+      {"message":"rate limit for #{token}"}
+    RESPONSE
+    commands = []
+    failure_status = command_status(false)
+    repo.define_singleton_method(:capture) do |*command, allow_failure: false|
+      commands << command
+      [response, "gh: forbidden (HTTP 403)", failure_status]
+    end
+
+    error = with_gh_token(token) do
+      assert_raises(Verdify::CommandError) { repo.github_api_json("repos/example/test") }
+    end
+
+    assert_equal ["gh"], commands.map(&:first).uniq
+    assert_includes error.message, "status=403"
+    assert_includes error.message, "rate_remaining=0"
+    assert_includes error.message, "rate_resource=core"
+    assert_includes error.message, "rate_reset=1783722000"
+    assert_includes error.message, "request_id=SAFE:123"
+    assert_includes error.message, "[REDACTED]"
+    refute_includes error.message, token
+    refute_includes error.message, "X-Arbitrary-Secret"
+    refute_includes error.message, "do-not-report-this"
+  end
+
+  def test_api_without_token_preserves_anonymous_curl_compatibility
+    repo = github_repository_fixture
+    commands = []
+    failure_status = command_status(false)
+    success_status = command_status(true)
+    repo.define_singleton_method(:capture) do |*command, allow_failure: false|
+      commands << command
+      if command.first == "gh"
+        ["", "gh unavailable", failure_status]
+      else
+        ['{"ok":true}', "", success_status]
+      end
+    end
+
+    payload = with_gh_token(nil) { repo.github_api_json("repos/example/test") }
+
+    assert_equal({ "ok" => true }, payload)
+    assert_equal %w[gh curl], commands.map(&:first)
+  end
+
+  def test_api_without_token_still_fails_closed_when_anonymous_read_fails
+    repo = github_repository_fixture
+    commands = []
+    failure_status = command_status(false)
+    repo.define_singleton_method(:capture) do |*command, allow_failure: false|
+      commands << command
+      ["", "public read failed", failure_status]
+    end
+
+    error = with_gh_token(nil) do
+      assert_raises(Verdify::CommandError) { repo.github_api_json("repos/example/test") }
+    end
+
+    assert_equal %w[gh curl], commands.map(&:first)
+    assert_includes error.message, "GitHub API request failed"
+  end
+
   def test_receipt_path_parser_returns_the_sprint_segment
     path = ".agent-workflow/sprints/test-sprint/terminal/terminal-receipt.yaml"
     assert_equal "test-sprint", Verdify::SprintTerminalReceipt.sprint_id_from_receipt_path(path)
@@ -324,6 +512,40 @@ class SprintTerminalReceiptTest < Minitest::Test
   end
 
   private
+
+  def github_repository_fixture
+    @root = Dir.mktmpdir("verdify-github-evidence-")
+    system("git", "-C", @root, "init", "-q", exception: true)
+    repo = Verdify::GitRepository.new(@root)
+    repo.define_singleton_method(:github_slug) { "example/test" }
+    repo
+  end
+
+  def raw_check(name, id, run_id)
+    {
+      "id" => id,
+      "name" => name,
+      "status" => "completed",
+      "conclusion" => "success",
+      "created_at" => "2026-07-10T00:00:00Z",
+      "started_at" => "2026-07-10T00:00:01Z",
+      "completed_at" => "2026-07-10T00:00:02Z",
+      "app" => { "slug" => "github-actions" },
+      "details_url" => "https://github.com/example/test/actions/runs/#{run_id}/job/1"
+    }
+  end
+
+  def command_status(success)
+    Object.new.tap { |status| status.define_singleton_method(:success?) { success } }
+  end
+
+  def with_gh_token(value)
+    previous = ENV["GH_TOKEN"]
+    value.nil? ? ENV.delete("GH_TOKEN") : ENV["GH_TOKEN"] = value
+    yield
+  ensure
+    previous.nil? ? ENV.delete("GH_TOKEN") : ENV["GH_TOKEN"] = previous
+  end
 
   def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil, packet_blocked: false, packet_blocking_question: false, release_failed: false)
     @root = Dir.mktmpdir("verdify-terminal-receipt-")

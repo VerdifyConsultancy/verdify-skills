@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pull-requests: read
   checks: read
@@ -49,6 +50,7 @@ jobs:
             > "${RUNNER_TEMP}/release-event.json"
       - name: Check candidate-side delivery route
         env:
+          GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: |
@@ -121,6 +123,7 @@ jobs:
             > "${RUNNER_TEMP}/reviews.json"
       - name: Validate current-head critic or release approval
         env:
+          GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: |
