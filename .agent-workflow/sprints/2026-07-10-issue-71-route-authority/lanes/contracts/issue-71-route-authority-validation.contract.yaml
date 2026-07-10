@@ -1,0 +1,192 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-71-route-authority
+lane_id: issue-71-route-authority-validation
+title: Fail-closed route authority validation and derived cache repair
+status: approved
+issue_ids: [71]
+coupling_justification: null
+objective: Validate every upstream lifecycle authority artifact and dynamic handoff before routing consumes it, then remove committed route views from the authority surface.
+desired_outcome: Malformed, semantically invalid, or globally impossible lifecycle state routes safely to its producer with bounded evidence, while valid state preserves current behavior and local route views cannot become stale committed authority.
+non_goals:
+- Rebuild LaneReviewValidator, release/outcome snapshot validation, terminal receipts, or GitHub evidence validation.
+- Implement issue 73 evidence completeness, issue 75 eval execution, issue 74 consumer enforcement, or issues 43 and 70 loop/risk policy.
+- Change any schema, protected North Star or architecture artifact, sprint history, delivery workflow, branch protection, package version, or runtime.
+- Add network-dependent live route comparison to routine repository validation.
+baseline_sha: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
+branch: lane/71-route-authority-validation
+module_contracts: [governance-routing, execution-control, lane-assurance]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [route-authority-loading, lifecycle-handoff-validation, derived-route-cache, repository-validation]
+  owned_paths:
+  - lib/verdify/cli.rb
+  - scripts/validate-repo.rb
+  - Makefile
+  - tests/test_cli.sh
+  - tests/test_schema_validator.rb
+  - tests/test_npm_install.sh
+  - tests/test_router_gate_bypass.sh
+  - tests/test_route_authority.sh
+  - .agent-workflow/.gitignore
+  - .agent-workflow/router/route-decision.yaml
+  - .agent-workflow/router/route-decision.md
+  - examples/minimal-project/.agent-workflow/.gitignore
+  - skills/project-router/SKILL.md
+  - skills/project-router/references/artifact-readiness.md
+  - skills/project-router/references/routing-rules.md
+  - skills/repo-bootstrap/assets/repo-bootstrap.fixture.yaml
+  - docs/authority-model.md
+  - docs/skills/per-skill/project-router.md
+  - docs/skills/tools-and-mcp.md
+  - MANIFEST.sha256
+  prohibited_paths:
+  - .github/**
+  - config/**
+  - schemas/**
+  - VERSION
+  - package.json
+  - CHANGELOG.md
+  - lib/verdify/git_repository.rb
+  - lib/verdify/lane_review_validator.rb
+  - lib/verdify/sprint_terminal_receipt.rb
+  - scripts/pr-policy.rb
+  - scripts/delivery-gate.rb
+  - scripts/github-delivery-controls.rb
+  - .agent-workflow/northstar/**
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/strategy/**
+  - .agent-workflow/hygiene/**
+  - skills/independent-critic/**
+  - skills/controller-merge/**
+  - skills/release-verification/**
+  coordination_required_paths: []
+  owned_interfaces:
+  - Expected-schema selection and fail-closed parsing for upstream route authority artifacts.
+  - Typed producer route selection and bounded validation evidence.
+  - Dynamic lifecycle handoff legality.
+  - Local route YAML and Markdown generation without committed authority.
+dependencies:
+  hard:
+  - lane_id: issue-215-receipt-ci-auth
+    required_output: Issue 215 is terminal on protected dev with authenticated normal-receipt checks green.
+  soft:
+  - lane_id: issue-73-evidence-completeness
+    coordination: Issue 73 owns acceptance-criterion evidence completeness; this lane must not expand critic semantics.
+  - lane_id: issue-70-risk-policy
+    coordination: Issue 70 owns lightweight transitions and human-gate policy; this lane changes route truth only.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: One reusable loader accepts a code-selected expected schema, parses YAML safely, applies SchemaValidator and SemanticValidator, and returns only a validated document or bounded typed failure.
+  sprint_acceptance_ids: [SPR-AC-01, SPR-AC-02]
+  evidence_required: [loader tests, schema substitution rejection, sanitized error assertions]
+- id: LANE-AC-02
+  statement: Transcript replan, evidence registry, North Star plan and artifacts, project definition, architecture, every module contract, state of union, and repository hygiene use their explicit expected schemas before authority fields are read.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [caller-to-schema matrix, malformed producer fixtures]
+- id: LANE-AC-03
+  statement: Invalid YAML, wrong kind or schema, required-field loss, semantic failure, and illegal handoff skill or mode route to the producing lifecycle skill without crash or advancement.
+  sprint_acceptance_ids: [SPR-AC-02]
+  evidence_required: [negative route matrix, producer mapping assertions, bounded evidence]
+- id: LANE-AC-04
+  statement: Existing valid artifacts and declared handoffs retain their current route, and specialized sprint, critic, review, release, outcome, and terminal-receipt validators remain unchanged and green.
+  sprint_acceptance_ids: [SPR-AC-03]
+  evidence_required: [valid complete fixture, existing route suites, terminal receipt suite]
+- id: LANE-AC-05
+  statement: The two route-decision files are removed from the Git index, ignored in repository and minimal-project workspaces, and repository validation rejects either path if re-tracked.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [git ls-files output, git check-ignore assertions, validator regression]
+- id: LANE-AC-06
+  statement: route --write still emits schema-valid YAML and Markdown whose current_state, next_skill, next_mode, and reason agree, while generated_at remains non-authoritative.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [generated pair test, stable-field comparison, timestamp exclusion assertion]
+- id: LANE-AC-07
+  statement: Source, installed-package, manifest, repository, diff, and changed-commit secret validations pass at the exact implementation head.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [focused test logs, make test, install test, manifest check, redacted gitleaks result]
+- id: LANE-AC-08
+  statement: Exact implementation and report heads have a complete D/I/E/S chain, one fresh critic with no unresolved blocker, required GitHub checks, protected-dev integration evidence, and a valid normal terminal receipt.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [closeout, critic report, exact-head checks, merge SHA, terminal receipt]
+validation_commands:
+- id: route-authority-suite
+  command: bash tests/test_route_authority.sh
+  purpose: Prove fail-closed artifact loading, producer routing, legal handoffs, and derived cache behavior.
+  required: true
+- id: router-gate-suite
+  command: bash tests/test_router_gate_bypass.sh
+  purpose: Preserve existing route gate and no-bypass behavior.
+  required: true
+- id: cli-suite
+  command: bash tests/test_cli.sh
+  purpose: Preserve CLI route behavior and validate generated output.
+  required: true
+- id: schema-validator-suite
+  command: ruby tests/test_schema_validator.rb
+  purpose: Preserve schema and semantic validator behavior.
+  required: true
+- id: repository-validation
+  command: ruby scripts/validate-repo.rb
+  purpose: Validate repository shape and enforce untracked route cache paths.
+  required: true
+- id: manifest-check
+  command: make manifest-check
+  purpose: Prove package integrity after tracked route artifacts are removed.
+  required: true
+- id: full-suite
+  command: make test
+  purpose: Run the complete package, lifecycle, policy, delivery, and receipt regression suite.
+  required: true
+- id: installed-package-suite
+  command: bash tests/test_npm_install.sh
+  purpose: Prove installed package routing and ignored cache behavior.
+  required: true
+- id: route-cache-index-check
+  command: test -z "$(git ls-files .agent-workflow/router/route-decision.yaml .agent-workflow/router/route-decision.md)" && git check-ignore -q .agent-workflow/router/route-decision.yaml && git check-ignore -q .agent-workflow/router/route-decision.md
+  purpose: Prove route views are untracked ignored derived cache.
+  required: true
+- id: changed-commit-secret-scan
+  command: gitleaks git --no-banner --redact --log-opts="af3e6b7e7b23b600e62c1aedf042ab9a5d244deb..HEAD"
+  purpose: Scan every lane commit without exposing detected match values.
+  required: true
+required_evidence:
+- A caller-to-schema-to-producer matrix for every upstream route authority artifact.
+- Negative fixtures for invalid YAML, wrong schema or kind, missing fields, semantic failure, and impossible handoffs.
+- Bounded sanitized error evidence and proof that valid complete fixtures retain current routing.
+- Empty git index results and ignore assertions for both route-decision files.
+- Generated YAML/Markdown stable-field agreement with generated_at excluded from authority.
+- Focused, installed-package, manifest, full-suite, fresh critic, exact-head CI, merge, and terminal receipt evidence.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Any route authority input cannot be mapped to a fixed expected schema and producing skill.
+- Correct behavior would require weakening a specialized critic, release, outcome, or terminal-receipt validator.
+- Error reporting would expose unbounded artifact values, stack traces, secrets, or arbitrary remote content.
+- Cache parity would require live GitHub or network access during routine repository validation.
+- Removing tracked route views breaks a supported packaged interface that cannot be preserved by local generation.
+- Work outside the owned paths or issue 71 acceptance becomes necessary.
+definition_of_done:
+- Every lane and sprint acceptance criterion has committed deterministic evidence.
+- The approved dispatch inputs remain byte-identical to dispatch commit D.
+- Every named authority caller validates through the expected schema and semantic contract before consuming status or handoff fields.
+- Focused tests, validate-repo, manifest-check, installed-package tests, make test, diff check, index/ignore checks, and redacted secret scan pass.
+- Worker closeout records exact D/I/E and a different fresh critic approves exact evidence head with no unresolved high or critical finding.
+- Exact critic-report head passes required GitHub checks and any protected-path exception is narrow, durable, and immediately restored.
+- The implementation merges to protected dev and a normal terminal receipt validates, merges, and leaves global routing truthful.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-10T23:22:14Z'
