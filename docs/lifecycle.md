@@ -154,16 +154,22 @@ A fresh critic with a different agent and session uses a separate detached
 worktree or clean clone at E. It compares requirements, issue, module contract,
 lane contract, implementation I, tests, CI, and closeout evidence, then commits
 only its report as S. It approves, approves with risks, requests fixes, blocks,
-or escalates, but does not silently repair implementation. A repository admin or
-maintainer other than the PR author must separately approve S on GitHub.
+or escalates, but does not silently repair implementation. For a PR targeting
+`dev`, the required transport-neutral `critic-gate` validates the exact current
+S and independent identities without requiring author GitHub approval for an
+ordinary lane. A change to protected delivery/control-plane paths additionally
+requires a current non-author code-owner approval because its candidate can
+define the workflow job that emits the status. A release promotion targeting
+`main` separately requires a real current-head approval from an allowed
+non-author owner.
 
 ## 18. Release verification
 
 A fresh release-verification role first assembles a review inbox packet when
 work claims review-ready status, and a diagnostic packet when strategy, review,
 release, readiness, incident, or feedback decisions depend on runtime evidence.
-The review packet binds every lane PR's I/E/S chain, exact externally approved S
-head, checks, preview or review deployment, telemetry, security disposition,
+The review packet binds every lane PR's I/E/S chain, exact current-head critic
+status, checks, preview or review deployment, telemetry, security disposition,
 rollback, risks, questions, recommendation, and feedback route. It is the sole
 path in packet commit P on an evidence-only controller branch. The diagnostic
 packet binds correlation

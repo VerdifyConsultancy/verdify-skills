@@ -1,7 +1,7 @@
 ---
 name: independent-critic
 description: Performs fresh-context, evidence-based review of a completed Verdify lane against its issue, requirements, module and lane contracts, diff, tests, CI, and worker closeout. Use after worker closeout and before review-inbox packet assembly or integration; never reuse the worker's session or worktree.
-compatibility: Requires read access to the repository, pull request, checks, contracts, and evidence, plus narrowly scoped permission to commit only the canonical critic report. A separate detached worktree or clean clone is required; advancing approval comes afterward from a repository admin or maintainer other than the PR author.
+compatibility: Requires read access to the repository, pull request, checks, contracts, and evidence, plus narrowly scoped permission to commit only the canonical critic report. A separate detached worktree or clean clone is required; the required critic status validates dev integration, while main release approval remains a distinct human action.
 metadata:
   author: Verdify
   version: "1.3.0"
@@ -51,47 +51,33 @@ Review the lane; do not become its implementer.
 6. Search for architecture drift and cross-lane integration risk.
 7. Classify each finding by severity and cite concrete file, line, command, criterion, or evidence.
 8. Write `.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` with `worker_agent`/`worker_session_id` backlinks, distinct `critic_agent`/`critic_session_id`, the PR, implementation head, evidence/reviewed head, canonical closeout path, and closeout SHA-256; validate it against `../../schemas/critic-report.schema.yaml`.
-9. Commit that report as the only changed path after the evidence head, push it, and update the PR's exact current-head metadata. This report commit is the final PR head for review submission.
+9. Commit that report as the only changed path after the evidence head, push it, and update the PR's exact current-head metadata. This report commit is the final PR head for current-head gate evaluation.
 10. Preserve critic session ID, review worktree, PR/head SHA, findings, outcome,
    and artifact refs for the session ledger.
-11. Hand the final report head to an authorized repository admin or maintainer other than the PR author for a commit-bound GitHub approval. Do not commit anything afterward.
+11. Hand final report head S to the transport-neutral `critic-gate`; it must
+    validate the exact current head and approving outcome. Do not commit
+    anything afterward. A later `main` release promotion separately goes to an
+    allowed owner other than its author for a real commit-bound GitHub approval.
 
 Read `references/critic-rubric.md` and `references/evidence-review.md`.
 
-## GitHub review submission
+## Current-head critic status
 
-An advancing PR approval is valid only when all authorization checks are true:
+A `dev` integration status is valid only when all authorization checks are true:
 
 - the critic report validates, its reviewed head equals the closeout-only evidence head, and its implementation plus worker-agent/session backlinks match the closeout;
 - the implementation-to-evidence suffix changes only the closeout and the evidence-to-report suffix changes only the critic report;
 - the live PR head equals the commit containing the critic report;
 - the lane contract, issue, PR, required checks, and evidence are available for
   the current head;
-- the submitting GitHub account has current repository `admin` or `maintain`
-  permission and is not the PR author;
+- the critic agent and session both differ from the worker identities;
+- the outcome is `approve` or `approve_with_risks`;
 - no unresolved material scope, security, migration, deployment, or human-only
   approval gate remains open.
 
-The authorized admin/maintainer uses this command, with the body file containing
-the critic outcome, findings, evidence summary, limitations, and artifact refs:
-
-```bash
-gh pr review <pr-number> --approve --body-file <critic-review-body.md>
-gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>
-```
-
-Map critic outcomes to GitHub review events as follows:
-
-| Critic outcome | GitHub review event | Command |
-| --- | --- | --- |
-| `approve` | Approve | `gh pr review <pr-number> --approve --body-file <critic-review-body.md>` |
-| `approve_with_risks` | Approve, only when residual-risk acceptance is authorized by policy or handoff; otherwise use `needs_human_review` | `gh pr review <pr-number> --approve --body-file <critic-review-body.md>` |
-| `request_fixes` | Request changes | `gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>` |
-| `block_integration` | Request changes | `gh pr review <pr-number> --request-changes --body-file <critic-review-body.md>` |
-| `needs_human_review` | No advancing approval | Record the critic report and route to the named human reviewer. |
-
-If any authorization check fails, do not treat a comment or self-review as
-approval. Finish the critic report, record the missing authorization or gate, and hand off to
+If any authorization check fails, do not treat a comment, stale status, or
+self-review as approval. Finish the critic report, record the missing
+authorization or gate, and hand off to
 `sprint-orchestrator`, `release-verification`, or the configured human reviewer.
 
 ## Outcomes
@@ -102,12 +88,20 @@ approval. Finish the critic report, record the missing authorization or gate, an
 - `block_integration`
 - `needs_human_review`
 
-Approval means the implementation head satisfies the contract, the evidence and report suffixes contain only their canonical artifacts, and a distinct repository admin/maintainer's latest effective GitHub review is `APPROVED` on the final report head. Any new commit or later change-request review invalidates approval until the full chain is rebuilt and re-reviewed.
+Approval means the implementation head satisfies the contract, the evidence and
+report suffixes contain only their canonical artifacts, worker and critic
+identities are independent, and `critic-gate` succeeds on final report head S.
+When the diff touches CODEOWNERS-protected delivery/control-plane paths, a
+current non-author owner approval is additionally required because the
+candidate can define the workflow context producer on GitHub Free.
+Any new commit invalidates the status until the full chain is rebuilt and
+re-reviewed. This does not satisfy or weaken the separate human owner approval
+required for a `main` release PR.
 
 ## Handoff
 
 - Fixes -> `lane-delivery` through the orchestrator
 - Material contract problem -> `sprint-planning` or `architecture-contracts`
-- Approving critic outcome -> external admin/maintainer approval on S, then
+- Approving critic outcome -> exact-head `critic-gate`, then
   `sprint-orchestrator` and `release-verification` packet-only P when
   dependencies are ready

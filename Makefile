@@ -8,7 +8,10 @@ test: validate manifest-check
 	bash tests/test_package_file_set.sh
 	ruby tests/test_schema_validator.rb
 	bash tests/test_cli.sh
+	ruby tests/test_lane_review_validator.rb
 	bash tests/test_pr_policy.sh
+	bash tests/test_delivery_gate.sh
+	bash tests/test_github_delivery_controls.sh
 	bash tests/test_release_preflight.sh
 	bash tests/test_release_transaction.sh
 	bash tests/test_packed_artifact.sh

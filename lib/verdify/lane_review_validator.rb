@@ -199,6 +199,28 @@ module Verdify
       )
     end
 
+    def validate_critic_status(result:, pull_request_head_sha:)
+      errors = result.errors.dup
+      pull_head = pull_request_head_sha.to_s
+      report_head = result.critic_report_head_sha.to_s
+      errors << "live pull request head must be a full 40-character commit SHA" unless full_sha?(pull_head)
+      errors << "live pull request head must equal the critic report head" unless pull_head == report_head
+      unless result.critic && %w[approve approve_with_risks].include?(result.critic["outcome"])
+        errors << "critic outcome must approve integration"
+      end
+
+      Result.new(
+        errors: errors.uniq,
+        contract: result.contract,
+        closeout: result.closeout,
+        critic: result.critic,
+        implementation_head_sha: result.implementation_head_sha,
+        evidence_head_sha: result.evidence_head_sha,
+        critic_report_head_sha: result.critic_report_head_sha,
+        dispatch_head_sha: result.dispatch_head_sha
+      )
+    end
+
     private
 
     def absolute_path(path)

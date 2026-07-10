@@ -14,8 +14,10 @@ Combine accepted lane outputs, prove runtime reality, and close the human outcom
 ## Mode 0: review inbox packet
 
 1. Verify each lane's dispatch D, PR identity, I/E/S chain, distinct worker/critic agent and
-   session identities, exact critic-report head S, and distinct repository
-   admin/maintainer's latest effective `APPROVED` review on S, plus linked
+   session identities, exact critic-report head S, and successful current-head
+   `critic-gate` for `dev`. Protected delivery/control-plane diffs additionally
+   require current non-author code-owner approval. A `main` promotion separately requires the latest
+   effective `APPROVED` review by an allowed non-author owner. Also verify linked
    issues, lane/sprint IDs, North Star IDs, checks, preview or review deployment,
    telemetry, rollback, risks, and open human questions.
 2. Block review-ready status when the exact SHA, required checks, required
@@ -50,7 +52,7 @@ Read `references/observability-diagnostics.md`.
 ## Mode 1: integration
 
 1. Start a fresh integration session.
-2. Using a protected-base or atomically installed validator, verify every required lane has a valid implementation/evidence/critic-report chain, a distinct admin/maintainer's latest `APPROVED` GitHub review on the live final PR head, live `SUCCESS` for every configured required check, clean issue/contract reconciliation, and no unresolved blocker.
+2. Using a protected-base or atomically installed validator, verify every required lane has a valid implementation/evidence/critic-report chain, live current-head `SUCCESS` for `critic-gate` and every configured required check, phase-appropriate code-owner approval, clean issue/contract reconciliation, and no unresolved blocker. When the target is `main`, also require the real current-head non-author owner approval; never substitute a workflow review.
 3. Determine dependency-aware merge order. Merge or queue every lane PR
    individually against its approved base; never merge the controller evidence
    branch. Use the repository merge queue when configured.

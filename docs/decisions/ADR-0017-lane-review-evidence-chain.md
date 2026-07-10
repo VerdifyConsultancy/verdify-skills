@@ -19,7 +19,7 @@ Lane review uses four distinct revision roles:
 
 ```text
 baseline B -> approved dispatch D -> implementation I -> closeout evidence E -> critic report S
-                                                                     GitHub review targets S
+                                                                     dev critic status targets S
 ```
 
 - `D` is the first commit after `B`. `bin/verdify lane create` seeds the
@@ -35,14 +35,22 @@ baseline B -> approved dispatch D -> implementation I -> closeout evidence E -> 
 - `S` follows `E`. Every commit in `E..S` is linear and changes only the exact
   canonical critic-report path. The report does not try to record `S` inside
   itself; Git derives the report head.
-- A repository admin or maintainer other than the PR author submits an
-  `APPROVED` GitHub pull-request review against `S`. The review packet records
-  that lane's `review_submission_head_sha`, reviewer login, and immutable
-  GitHub user ID. Live verification requires the PR head, report head, and
-  review commit to equal `S`, and rejects a later effective change-request.
-- Any later PR commit invalidates the submission and prevents integration.
+- For a lane PR targeting `dev`, the required `critic-gate` status validates the
+  exact D/I/E/S chain, independent worker/critic identities, and an `approve` or
+  `approve_with_risks` outcome at current head S. It is transport-neutral and
+  does not require the PR author to submit an impossible GitHub self-approval.
+- On GitHub Free the candidate can define a workflow job under an existing
+  required-context name. CODEOWNERS therefore protects all workflow and trusted
+  delivery-control surfaces, and those paths additionally require a current
+  non-author owner approval. Ordinary unowned lane paths retain the zero-review
+  critic-status path. Protected-branch updates are restricted to the two owners.
+- A `main` release promotion is a different authority boundary: the latest
+  effective review must be `APPROVED` on the current head by `jvallery` or
+  `jrvallery`, not the PR author or a workflow identity, with no unresolved
+  change request. Any later commit invalidates the phase-appropriate gate.
 
-After every required lane has an approved S, `release-verification` assembles a
+After every required lane has an approving current-head critic status,
+`release-verification` assembles a
 separate controller evidence history from the SprintPlan baseline. The
 controller history may copy only the approved sprint transaction, canonical
 closeouts, critic reports, and release evidence; it never contains lane
@@ -80,9 +88,11 @@ this decision.
 - `bin/verdify lane review` uses the committed closeout rather than active lease
   state as the worker identity authority.
 - `bin/verdify route` fails closed on invalid closeout or critic chains and
-  requires an open non-draft PR, live required-check success, a clean merge
-  state, and live commit-bound GitHub approval from a repository
-  admin/maintainer other than the PR author before integration.
+  requires an open non-draft PR, live required-check success including
+  `critic-gate`, a clean merge state, and exact current-head approving critic
+  status before ordinary `dev` integration. Protected control-plane changes
+  also require code-owner approval. Human GitHub approval remains mandatory for
+  `main` release promotion.
 - Standard PR policy requires explicit implementation, evidence, and exact
   current-head metadata and validates it against the committed artifacts and
   Git chain. `Evidence head SHA: pending` is allowed only while the current
@@ -104,9 +114,9 @@ this decision.
 ## Consequences
 
 Workers stop after the closeout-only commit. Critics may write only the
-canonical critic report after review. A shared worker/PR-author identity cannot
-approve its own work; an independent repository admin or maintainer must
-approve `S`. Evidence-only paths are fixed by the canonical sprint layout, not
+canonical critic report after review. A shared worker/critic identity cannot
+satisfy `critic-gate`; no workflow may manufacture the real owner approval
+required for `main`. Evidence-only paths are fixed by the canonical sprint layout, not
 supplied by an artifact, and the contract itself is hashed from its committed
 snapshot at `I` rather than trusted from the working tree. D prevents a worker
 from weakening the approved contract or wave policy inside an implementation

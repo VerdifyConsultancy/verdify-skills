@@ -51,6 +51,31 @@ class LaneReviewValidatorTest < Minitest::Test
     FileUtils.rm_rf(chain[:root]) if chain
   end
 
+  def test_transport_neutral_critic_status_accepts_only_approving_current_report_head
+    chain = build_chain
+    review_validator = validator(chain)
+    result = review_validator.validate_critic(tip_sha: chain[:report_head])
+    status = review_validator.validate_critic_status(result: result, pull_request_head_sha: chain[:report_head])
+    assert status.valid?, status.errors.join("\n")
+
+    stale = review_validator.validate_critic_status(result: result, pull_request_head_sha: "f" * 40)
+    refute stale.valid?
+    assert stale.errors.any? { |error| error.include?("critic report head") }
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
+  def test_transport_neutral_critic_status_rejects_non_approving_outcome
+    chain = build_chain(critic_outcome: "request_fixes")
+    review_validator = validator(chain)
+    result = review_validator.validate_critic(tip_sha: chain[:report_head])
+    status = review_validator.validate_critic_status(result: result, pull_request_head_sha: chain[:report_head])
+    refute status.valid?
+    assert status.errors.any? { |error| error.include?("critic outcome") }
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
   def test_rejects_self_review_without_lease_state
     chain = build_chain(critic_session_id: "worker-session")
     result = validator(chain).validate_critic(tip_sha: chain[:report_head])
@@ -383,6 +408,27 @@ class LaneReviewValidatorTest < Minitest::Test
     assert_equal "READY_FOR_INTEGRATION", decision["current_state"]
     assert_equal "release-verification", decision["next_skill"]
     assert_equal "integration", decision["next_mode"]
+  ensure
+    cleanup_chain(chain)
+  end
+
+  def test_route_accepts_transport_neutral_critic_status_for_dev_without_github_approval
+    chain = build_chain(route_ready: true, lane_branch: "lane/issue-123-api", integration_base: "dev")
+    prepare_controller_packet(chain, github_remote: true, delete_local_lane: true)
+    fixture = default_gh_fixture(chain)
+    fixture["pr_view"]["reviews"] = []
+    fixture["pr_view"]["statusCheckRollup"] << fixture["pr_view"]["statusCheckRollup"].first.merge(
+      "databaseId" => 101,
+      "name" => "critic-gate",
+      "workflowName" => "delivery-gate"
+    )
+    stdout = nil
+    with_fake_gh(chain, fixture) do
+      stdout, = capture_io { Verdify::CLI.run(["route", "--repo", chain[:root], "--json"]) }
+    end
+    decision = JSON.parse(stdout)
+    assert_equal "READY_FOR_INTEGRATION", decision["current_state"]
+    assert_includes decision["reason"], "transport-neutral critic status"
   ensure
     cleanup_chain(chain)
   end
@@ -926,7 +972,7 @@ class LaneReviewValidatorTest < Minitest::Test
       "pulls" => [Marshal.load(Marshal.dump(rest)), Marshal.load(Marshal.dump(rest))],
       "pr_view" => {
         "author" => { "login" => "worker" },
-        "baseRefName" => "main",
+        "baseRefName" => chain[:integration_base] || "main",
         "headRefName" => chain[:lane_branch],
         "headRefOid" => pr_head,
         "isDraft" => false,
@@ -1104,7 +1150,7 @@ class LaneReviewValidatorTest < Minitest::Test
     }
   end
 
-  def build_chain(critic_session_id: "critic-session", critic_agent: "critic-agent", closeout_status: "ready_for_critic", extra_worker_evidence_path: false, extra_critic_evidence_path: false, worker_evidence_merge: false, closeout_sha256: nil, post_review_change: false, route_ready: false, lane_branch: "main", mutate_dispatch_during_implementation: false)
+  def build_chain(critic_session_id: "critic-session", critic_agent: "critic-agent", critic_outcome: "approve", closeout_status: "ready_for_critic", extra_worker_evidence_path: false, extra_critic_evidence_path: false, worker_evidence_merge: false, closeout_sha256: nil, post_review_change: false, route_ready: false, lane_branch: "main", integration_base: "main", mutate_dispatch_during_implementation: false)
     root = Dir.mktmpdir("verdify-lane-review-")
     git(root, "init", "-q", "-b", "main")
     git(root, "config", "user.name", "Verdify Test")
@@ -1135,7 +1181,7 @@ class LaneReviewValidatorTest < Minitest::Test
       FileUtils.cp(example_root.join("sprints/2026-06-22-a/release/wave-release-plan.yaml"), release_plan_path)
       release_plan = YAML.safe_load(File.read(release_plan_path), permitted_classes: [], aliases: false)
       release_plan["github"]["repository"] = "example/test"
-      release_plan["branch_model"]["base_ref"] = "main"
+      release_plan["branch_model"]["base_ref"] = integration_base
       release_plan["github"]["required_checks"] = ["validate"]
       File.write(release_plan_path, YAML.dump(release_plan))
       git(root, "add", ".agent-workflow/sprints/2026-06-22-a")
@@ -1229,7 +1275,7 @@ class LaneReviewValidatorTest < Minitest::Test
       "closeout_sha256" => closeout_sha256 || Digest::SHA256.file(closeout_path).hexdigest,
       "critic_session_id" => critic_session_id,
       "review_worktree" => root,
-      "outcome" => "approve",
+      "outcome" => critic_outcome,
       "findings" => [],
       "acceptance_assessment" => [
         { "criterion_id" => "LANE-AC-01", "assessment" => "satisfied", "evidence" => ["test"] }
@@ -1267,7 +1313,8 @@ class LaneReviewValidatorTest < Minitest::Test
       implementation_head: implementation,
       evidence_head: evidence,
       report_head: report,
-      post_review_head: post_review_head
+      post_review_head: post_review_head,
+      integration_base: integration_base
     }
   end
 
@@ -1297,6 +1344,7 @@ class LaneReviewValidatorTest < Minitest::Test
       Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml")
     )
     packet["traceability"]["repository"] = "example/test"
+    packet["traceability"]["base_ref"] = chain[:integration_base] || "main"
     submission = packet["traceability"]["review_submissions"].first
     submission["pull_request"] = 456
     submission["review_submission_head_sha"] = chain[:report_head]

@@ -1,0 +1,144 @@
+name: delivery-gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  delivery-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out candidate delivery policy
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          fetch-depth: 0
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+      - name: Discover the current release PR for non-PR events
+        if: github.event.pull_request == null
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "${REF_NAME}" == "dev" ]] || { echo "release bootstrap must run at dev" >&2; exit 1; }
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/pulls?state=open&base=main&per_page=100" \
+            | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
+            > "${RUNNER_TEMP}/open-release-pulls.json"
+          ruby candidate/scripts/delivery-gate.rb \
+            --prepare-release-event "${RUNNER_TEMP}/open-release-pulls.json" \
+            --expected-head "${HEAD_SHA}" \
+            > "${RUNNER_TEMP}/release-event.json"
+      - name: Check candidate-side delivery route
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          set -euo pipefail
+          EVENT_PATH="${GITHUB_EVENT_PATH}"
+          if [[ "${EVENT_NAME}" != pull_request* ]]; then
+            EVENT_PATH="${RUNNER_TEMP}/release-event.json"
+          fi
+          ruby candidate/scripts/pr-policy.rb \
+            --event "${EVENT_PATH}" \
+            --repo "${GITHUB_WORKSPACE}/candidate"
+
+  critic-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out protected-base gate
+        if: github.event.pull_request != null
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-policy
+          fetch-depth: 1
+      - name: Check out candidate evidence history
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          fetch-depth: 0
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+      - name: Discover the current release PR for non-PR events
+        if: github.event.pull_request == null
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "${REF_NAME}" == "dev" ]] || { echo "release bootstrap must run at dev" >&2; exit 1; }
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/pulls?state=open&base=main&per_page=100" \
+            | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
+            > "${RUNNER_TEMP}/open-release-pulls.json"
+          ruby candidate/scripts/delivery-gate.rb \
+            --prepare-release-event "${RUNNER_TEMP}/open-release-pulls.json" \
+            --expected-head "${HEAD_SHA}" \
+            > "${RUNNER_TEMP}/release-event.json"
+      - name: Read review history without review mutation permission
+        if: github.event.pull_request == null || github.event.pull_request.base.ref == 'main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          EVENT_PATH="${GITHUB_EVENT_PATH}"
+          if [[ "${EVENT_NAME}" != pull_request* ]]; then
+            EVENT_PATH="${RUNNER_TEMP}/release-event.json"
+          fi
+          PR_NUMBER="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("pull_request", "number")' "${EVENT_PATH}")"
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100" \
+            | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
+            > "${RUNNER_TEMP}/reviews.json"
+      - name: Validate current-head critic or release approval
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          set -euo pipefail
+          EVENT_PATH="${GITHUB_EVENT_PATH}"
+          if [[ "${EVENT_NAME}" != pull_request* ]]; then
+            EVENT_PATH="${RUNNER_TEMP}/release-event.json"
+          fi
+          ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/delivery-gate.rb"
+          if [[ -f "${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb" ]]; then
+            ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb"
+          fi
+          REVIEWS=()
+          BASE_REF="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("pull_request", "base", "ref")' "${EVENT_PATH}")"
+          if [[ "${BASE_REF}" == "main" ]]; then
+            REVIEWS=(--reviews "${RUNNER_TEMP}/reviews.json")
+          fi
+          ruby "${ENGINE}" \
+            --event "${EVENT_PATH}" \
+            --repo "${GITHUB_WORKSPACE}/candidate" \
+            "${REVIEWS[@]}"

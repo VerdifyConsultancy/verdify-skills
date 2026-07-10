@@ -38,6 +38,23 @@ STANDARD_LIFECYCLE_STATES = %w[
 REQUIRED_PR_SECTIONS = [
   "Backlog issue", "Lane contract", "Outcome", "Scope proof", "Evidence", "Risk and deployment impact"
 ].freeze
+PROTECTED_CODEOWNER_LINES = [
+  "/.github/CODEOWNERS @jvallery @jrvallery",
+  "/.github/workflows/** @jvallery @jrvallery",
+  "/config/** @jvallery @jrvallery",
+  "/lib/verdify.rb @jvallery @jrvallery",
+  "/lib/verdify/** @jvallery @jrvallery",
+  "/schemas/** @jvallery @jrvallery",
+  "/scripts/delivery-gate.rb @jvallery @jrvallery",
+  "/scripts/github-delivery-controls.rb @jvallery @jrvallery",
+  "/scripts/pr-policy.rb @jvallery @jrvallery",
+  "/scripts/validate-repo.rb @jvallery @jrvallery"
+].freeze
+DELIVERY_OWNER_RESTRICTIONS = {
+  "users" => %w[jvallery jrvallery],
+  "teams" => [],
+  "apps" => []
+}.freeze
 
 class RepoValidator
   attr_reader :errors, :warnings
@@ -135,11 +152,12 @@ class RepoValidator
       README.md COMMON_OPERATING_CONTRACT.md AGENTS.md CLAUDE.md WORKFLOW.md AUTOMATION.md
       CONTRIBUTING.md SECURITY.md CHANGELOG.md VERSION Makefile verdify.workflow.yaml
       package.json npm/bin/verdify.js
-      config/authority-matrix.yaml config/github-primitives.yaml config/lifecycle.yaml
-      bin/verdify scripts/validate-repo.rb scripts/setup-agent-hosts.rb scripts/pr-policy.rb scripts/release-preflight.rb
+      config/authority-matrix.yaml config/github-primitives.yaml config/github-delivery-controls.yaml config/lifecycle.yaml
+      bin/verdify scripts/validate-repo.rb scripts/setup-agent-hosts.rb scripts/pr-policy.rb scripts/delivery-gate.rb
+      scripts/github-delivery-controls.rb scripts/release-preflight.rb
       scripts/bootstrap-agent-session.sh scripts/verify-package.sh .github/pull_request_template.md
       .github/ISSUE_TEMPLATE/problem.yml .github/ISSUE_TEMPLATE/decision.yml
-      .github/workflows/validate.yml .github/workflows/policy.yml .github/workflows/release-pr.yml
+      .github/workflows/validate.yml .github/workflows/policy.yml .github/workflows/delivery-gate.yml .github/workflows/release-pr.yml
       .github/workflows/publish-npm.yml
     ].each do |relative|
       path = ROOT.join(relative)
@@ -596,9 +614,51 @@ class RepoValidator
     error(policy_workflow, "must check out candidate history separately") unless policy_body.include?("path: candidate") && policy_body.include?("fetch-depth: 0")
     error(policy_workflow, "must pass the candidate only as --repo input") unless policy_body.include?("trusted-policy/scripts/pr-policy.rb") && policy_body.include?("--repo \"$GITHUB_WORKSPACE/candidate\"")
 
+    delivery_workflow = ROOT.join(".github/workflows/delivery-gate.yml")
+    delivery_body = delivery_workflow.file? ? delivery_workflow.read : ""
+    %w[delivery-policy critic-gate pull_request pull_request_review workflow_dispatch].each do |token|
+      error(delivery_workflow, "must declare #{token}") unless delivery_body.include?(token)
+    end
+    error(delivery_workflow, "must bootstrap on dev push") unless delivery_body.include?("branches: [dev]")
+    error(delivery_workflow, "must not request pull-request review write permission") if delivery_body.match?(/pull-requests:\s*write/) || delivery_body.match?(/pull_request_review:\s*write/)
+    error(delivery_workflow, "non-PR contexts must discover and validate the exact release PR") unless delivery_body.scan("--prepare-release-event").length == 2 && delivery_body.scan("open-release-pulls.json").length >= 4
+    error(delivery_workflow, "bootstrap mode must not bypass delivery policy or critic approval") if delivery_body.include?("--bootstrap")
+    delivery_body.scan(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/).flatten.each do |action|
+      error(delivery_workflow, "action must use an immutable commit pin: #{action}") unless action.match?(/@[0-9a-f]{40}\z/i)
+    end
+
+    controls_path = ROOT.join("config/github-delivery-controls.yaml")
+    controls = load_yaml(controls_path)
+    if controls.is_a?(Hash)
+      error(controls_path, "repository identity must be exact") unless controls["repository"] == "VerdifyConsultancy/verdify-skills"
+      error(controls_path, "release owners must be jvallery and jrvallery") unless Array(controls["owners"]).sort == %w[jrvallery jvallery]
+      pre_dev = controls.dig("phases", "pre-release", "branches", "dev") || {}
+      pre_main = controls.dig("phases", "pre-release", "branches", "main") || {}
+      steady_dev = controls.dig("phases", "steady-state", "branches", "dev") || {}
+      steady_main = controls.dig("phases", "steady-state", "branches", "main") || {}
+      { "pre-release" => { "dev" => pre_dev, "main" => pre_main }, "steady-state" => { "dev" => steady_dev, "main" => steady_main } }.each do |phase, branches|
+        branches.each do |branch, rules|
+          reviews = rules["required_pull_request_reviews"] || {}
+          expected_count = branch == "dev" ? 0 : 1
+          unless reviews["required_approving_review_count"] == expected_count &&
+                 reviews["dismiss_stale_reviews"] == true &&
+                 reviews["require_code_owner_reviews"] == true
+            error(controls_path, "#{phase} #{branch} must require #{expected_count} approvals with stale dismissal and code-owner review")
+          end
+          unless rules["restrictions"] == DELIVERY_OWNER_RESTRICTIONS
+            error(controls_path, "#{phase} #{branch} updates must be restricted to jvallery and jrvallery users with no teams or apps")
+          end
+        end
+      end
+      error(controls_path, "dev must retain critic-gate with a zero ordinary review count") unless [pre_dev, steady_dev].all? { |rules| Array(rules.dig("required_status_checks", "contexts")).include?("critic-gate") && rules.dig("required_pull_request_reviews", "required_approving_review_count") == 0 }
+      error(controls_path, "pre-release main must use delivery-policy without pull-request-policy") unless Array(pre_main.dig("required_status_checks", "contexts")).include?("delivery-policy") && !Array(pre_main.dig("required_status_checks", "contexts")).include?("pull-request-policy")
+      error(controls_path, "steady-state main must restore pull-request-policy") unless Array(steady_main.dig("required_status_checks", "contexts")).include?("pull-request-policy")
+    end
+
     codeowners = ROOT.join(".github/CODEOWNERS")
-    if codeowners.file? && codeowners.read.lines.any? { |line| line.strip.match?(/\A[^#].*@[\w-]+/) }
-      warning(codeowners, "contains active owners; verify they are valid for the destination repository")
+    owner_lines = codeowners.file? ? codeowners.read.lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") } : []
+    unless owner_lines == PROTECTED_CODEOWNER_LINES
+      error(codeowners, "must protect exactly CODEOWNERS, all workflows, config, Verdify policy libraries/schemas, and delivery-control scripts with jvallery and jrvallery while leaving ordinary lane paths unowned")
     end
   end
 
@@ -630,10 +690,11 @@ class RepoValidator
 
   def validate_scripts
     script_paths = %w[
-      bin/verdify scripts/setup-agent-hosts.rb scripts/validate-repo.rb scripts/pr-policy.rb
-      scripts/release-preflight.rb
+      bin/verdify scripts/setup-agent-hosts.rb scripts/validate-repo.rb scripts/pr-policy.rb scripts/delivery-gate.rb
+      scripts/github-delivery-controls.rb scripts/release-preflight.rb
       scripts/bootstrap-agent-session.sh scripts/launch-codex.sh scripts/launch-claude.sh scripts/package.sh scripts/verify-package.sh
-      npm/bin/verdify.js tests/test_npm_install.sh tests/test_release_preflight.sh
+      npm/bin/verdify.js tests/test_npm_install.sh tests/test_release_preflight.sh tests/test_delivery_gate.sh
+      tests/test_github_delivery_controls.sh
     ].map { |relative| ROOT.join(relative) }
     script_paths += Dir[ROOT.join("skills/*/scripts/*")].sort.map { |path| Pathname.new(path) }.select(&:file?)
 

@@ -256,6 +256,8 @@ fi
 VERSION="$(cat "$ROOT/VERSION")"
 PACKAGE="$(ruby -rjson -e 'data=JSON.parse(File.read(ARGV.fetch(0))); puts "#{data.fetch("name")}@#{data.fetch("version")}"' "$ROOT/package.json")"
 cat > "$TMP/release.md" <<EOF
+<!-- verdify-release-candidate:$PACKAGE -->
+
 ## Backlog issue
 
 Closes #456
@@ -284,6 +286,9 @@ EOF
 
 ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release.md" --base "$BASE" --head "$HEAD" --base-ref main --head-ref dev
 
+ruby -rjson -e 'repo={"full_name"=>"VerdifyConsultancy/verdify-skills"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"main","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"dev","repo"=>repo},"labels"=>[]},"repository"=>repo}.to_json)' "$TMP/release.md" "$BASE" "$HEAD" > "$TMP/release-same-repo.json"
+ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/release-same-repo.json"
+
 # The policy program and configuration come from the trusted base checkout,
 # while release identity must come from the separately checked-out candidate.
 RELEASE_CANDIDATE="$TMP/release-candidate"
@@ -297,6 +302,8 @@ git -C "$RELEASE_CANDIDATE" add package.json VERSION
 git -C "$RELEASE_CANDIDATE" commit -qm "candidate release version"
 RELEASE_CANDIDATE_HEAD="$(git -C "$RELEASE_CANDIDATE" rev-parse HEAD)"
 cat > "$TMP/release-candidate.md" <<EOF
+<!-- verdify-release-candidate:@verdify/candidate@9.9.9 -->
+
 ## Backlog issue
 
 Closes #457
@@ -371,5 +378,32 @@ if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/fork-release.json" > /dev/nul
   exit 1
 fi
 grep -q 'cross-repository pull requests cannot use the privileged release path' "$TMP/fork-release.err"
+
+# Main is release-only, and every other ordinary base is rejected.
+ruby -rjson -e 'repo={"full_name"=>"example/test"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"main","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"feature","repo"=>repo},"labels"=>[]},"repository"=>repo}.to_json)' "$TMP/valid.md" "$BASE" "$HEAD" > "$TMP/ordinary-main.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/ordinary-main.json" >/dev/null 2>&1; then
+  echo "expected ordinary PR to main to be rejected" >&2
+  exit 1
+fi
+ruby -rjson -e 'repo={"full_name"=>"example/test"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"staging","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"feature","repo"=>repo},"labels"=>[]},"repository"=>repo}.to_json)' "$TMP/valid.md" "$BASE" "$HEAD" > "$TMP/ordinary-staging.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/ordinary-staging.json" >/dev/null 2>&1; then
+  echo "expected ordinary PR to a non-dev base to be rejected" >&2
+  exit 1
+fi
+
+# Only the exact durable marker is allowed; malformed, duplicate, or unresolved
+# template comments fail closed.
+cp "$TMP/release.md" "$TMP/release-bad-marker.md"
+ruby -0pi -e 'sub(/verdify-release-candidate:/, "verdify-release-candidate:wrong-")' "$TMP/release-bad-marker.md"
+if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release-bad-marker.md" --base "$BASE" --head "$HEAD" --base-ref main --head-ref dev >/dev/null 2>&1; then
+  echo "expected malformed release marker to be rejected" >&2
+  exit 1
+fi
+cp "$TMP/release.md" "$TMP/release-placeholder.md"
+printf '\n<!-- unresolved -->\n' >> "$TMP/release-placeholder.md"
+if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release-placeholder.md" --base "$BASE" --head "$HEAD" --base-ref main --head-ref dev >/dev/null 2>&1; then
+  echo "expected unresolved release placeholder to be rejected" >&2
+  exit 1
+fi
 
 echo "PR policy tests passed."
