@@ -105,6 +105,68 @@ fi
 [[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-question-resolution" ]]
 [[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-interview" ]]
 
+snapshot_pack_operator_state() {
+  local repo="$1"
+  local output="$2"
+  ruby -rdigest -rjson -e '
+    root, output = ARGV
+    paths = %w[
+      .agents/skills/northstar-research-ingest
+      .agents/skills/northstar-question-resolution
+      .agents/skills/northstar-interview
+      .agent-skills/verdify-packs/research-analysis.yaml
+    ]
+    snapshot = lambda do |path|
+      stat = File.lstat(path)
+      value = {"mode" => stat.mode & 0o7777}
+      if stat.symlink?
+        value.merge("type" => "symlink", "target" => File.readlink(path))
+      elsif stat.file?
+        value.merge("type" => "file", "sha256" => Digest::SHA256.file(path).hexdigest)
+      elsif stat.directory?
+        children = Dir.children(path).sort.to_h { |name| [name, snapshot.call(File.join(path, name))] }
+        value.merge("type" => "directory", "children" => children)
+      else
+        abort "unsupported fixture type: #{path}"
+      end
+    end
+    document = paths.to_h { |relative| [relative, snapshot.call(File.join(root, relative))] }
+    File.write(output, JSON.generate(document) + "\n")
+  ' "$repo" "$output"
+}
+
+seed_pack_operator_state() {
+  local repo="$1"
+  mkdir -p "$repo/.agents/skills/northstar-research-ingest/nested"
+  printf 'first operator directory\n' > "$repo/.agents/skills/northstar-research-ingest/nested/owner.txt"
+  printf 'symlink destination\n' > "$repo/operator-source.txt"
+  ln -s ../../operator-source.txt "$repo/.agents/skills/northstar-question-resolution"
+  printf 'last operator regular file\n' > "$repo/.agents/skills/northstar-interview"
+  chmod 0600 "$repo/.agents/skills/northstar-interview"
+  mkdir -p "$repo/.agent-skills/verdify-packs/research-analysis.yaml"
+  printf 'operator manifest directory\n' > "$repo/.agent-skills/verdify-packs/research-analysis.yaml/owner.txt"
+}
+
+# No backup failure may mutate any operator target. Write, manifest, and
+# rollback failures must restore every original byte, type, link target, and
+# mode; an injected restore error is reported only after the target is safe.
+PACK_FAILURES=(backup-0 backup-1 backup-3 write-2 before-manifest after-manifest before-manifest,restore-0)
+for failure in "${PACK_FAILURES[@]}"; do
+  SAFE_REPO="$TMP/pack-safe-${failure//,/-}"
+  make_pack_repo "$SAFE_REPO"
+  seed_pack_operator_state "$SAFE_REPO"
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.before.json"
+  if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE="$failure" \
+    "$ROOT/bin/verdify" pack install --repo "$SAFE_REPO" --pack research-analysis --host codex --force \
+      >"$TMP/$failure.out" 2>"$TMP/$failure.err"; then
+    echo "expected injected pack failure at $failure" >&2
+    exit 1
+  fi
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.after.json"
+  cmp "$TMP/$failure.before.json" "$TMP/$failure.after.json"
+done
+grep -q 'verified backups retained at' "$TMP/before-manifest,restore-0.err"
+
 "$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack crm-email --host all >/dev/null
 [[ -L "$PACK_REPO/.agents/skills/crm-email" ]]
 [[ -L "$PACK_REPO/.claude/skills/crm-email" ]]

@@ -61,13 +61,33 @@ ARCHIVE="$(VERDIFY_PACKAGE_SKIP_TESTS=1 bash "$ROOT/scripts/package.sh" "$OUT")"
 bash "$ROOT/scripts/verify-package.sh" "$ARCHIVE" >/dev/null
 
 SIDECAR="$TARBALL.release-candidate.json"
-ruby -rbase64 -rdigest -rjson -rpathname -rshellwords -e '
+ruby -rbase64 -rdigest -rjson -rpathname -rrubygems/package -rshellwords -rzlib -e '
   root, out, source_sha, source_clean, pack_json, tarball, archive, sidecar = ARGV
   pack = JSON.parse(File.read(pack_json)).fetch(0)
   package = JSON.parse(File.read(File.join(root, "package.json")))
+  tarball_sha1 = Digest::SHA1.file(tarball).hexdigest
   tarball_sha512 = Digest::SHA512.file(tarball).digest
   computed_integrity = "sha512-#{Base64.strict_encode64(tarball_sha512)}"
+  abort "npm shasum does not match exact tarball" unless pack.fetch("shasum") == tarball_sha1
   abort "npm integrity does not match exact tarball" unless pack.fetch("integrity") == computed_integrity
+  member_digests = {}
+  Zlib::GzipReader.open(tarball) do |gzip|
+    Gem::Package::TarReader.new(gzip) do |tar|
+      tar.each do |entry|
+        next unless entry.file?
+        abort "unexpected npm member root: #{entry.full_name}" unless entry.full_name.start_with?("package/")
+        member_digests[entry.full_name.delete_prefix("package/")] = Digest::SHA256.hexdigest(entry.read)
+      end
+    end
+  end
+  files = pack.fetch("files").map do |entry|
+    metadata = entry.slice("path", "size", "mode")
+    metadata["sha256"] = member_digests.fetch(entry.fetch("path"))
+    metadata
+  end.sort_by { |entry| entry.fetch("path") }
+  abort "npm pack file inventory differs from exact tarball" unless files.length == member_digests.length
+  checksum = archive + ".sha256"
+  candidate_identity = "v#{package.fetch("version")}-#{source_sha}"
   document = {
     "schema_version" => "1.0",
     "package" => {"name" => package.fetch("name"), "version" => package.fetch("version")},
@@ -79,17 +99,19 @@ ruby -rbase64 -rdigest -rjson -rpathname -rshellwords -e '
       "sha512" => Digest::SHA512.file(tarball).hexdigest,
       "integrity" => computed_integrity,
       "npm_shasum" => pack.fetch("shasum"),
-      "files" => pack.fetch("files").map { |entry| entry.slice("path", "size", "mode") }.sort_by { |entry| entry.fetch("path") }
+      "files" => files
     },
     "archive" => {
       "filename" => File.basename(archive),
       "size" => File.size(archive),
       "sha256" => Digest::SHA256.file(archive).hexdigest,
-      "checksum_filename" => File.basename(archive) + ".sha256"
+      "checksum_filename" => File.basename(checksum),
+      "checksum_sha256" => Digest::SHA256.file(checksum).hexdigest
     },
     "build" => {
+      "candidate_identity" => candidate_identity,
       "npm_pack_invocations" => 1,
-      "npm_pack_command" => ["npm", "pack", "--json", "--pack-destination", out],
+      "npm_pack_command" => ["npm", "pack", "--json", "--pack-destination", "."],
       "package_file_list_blob" => `git -C #{root.shellescape} rev-parse HEAD:scripts/package-file-list.rb`.strip
     }
   }
@@ -112,3 +134,4 @@ printf 'sidecar=%s\n' "$SIDECAR"
 printf 'archive=%s\n' "$ARCHIVE"
 printf 'checksum=%s\n' "$ARCHIVE.sha256"
 printf 'source_sha=%s\n' "$SOURCE_SHA"
+printf 'bundle_name=%s\n' "verdify-release-candidate-v$(cat "$ROOT/VERSION")-$SOURCE_SHA"

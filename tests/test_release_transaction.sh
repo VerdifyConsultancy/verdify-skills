@@ -5,32 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-SOURCE_SHA="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-INTEGRITY="sha512-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
-SIDECAR="$TMP/candidate.json"
-ruby -rjson -e '
-  path, source, integrity = ARGV
-  document = {
-    "schema_version"=>"1.0",
-    "package"=>{"name"=>"@verdify-cli/cli", "version"=>"1.3.0"},
-    "source"=>{"commit"=>source, "clean"=>true},
-    "tarball"=>{
-      "filename"=>"verdify-cli-cli-1.3.0.tgz", "size"=>1,
-      "sha256"=>"b"*64, "sha512"=>"c"*128, "integrity"=>integrity,
-      "npm_shasum"=>"d"*40, "files"=>[{"path"=>"package.json", "size"=>1, "mode"=>420}]
-    },
-    "archive"=>{
-      "filename"=>"verdify-lifecycle-skills-v1.3.0.zip", "size"=>1,
-      "sha256"=>"e"*64, "checksum_filename"=>"verdify-lifecycle-skills-v1.3.0.zip.sha256"
-    },
-    "build"=>{
-      "npm_pack_invocations"=>1,
-      "npm_pack_command"=>["npm", "pack", "--json", "--pack-destination", "dist"],
-      "package_file_list_blob"=>"f"*40
-    }
-  }
-  File.write(path, JSON.pretty_generate(document) + "\n")
-' "$SIDECAR" "$SOURCE_SHA" "$INTEGRITY"
+CANDIDATE="$TMP/candidate"
+bash "$ROOT/scripts/build-release-candidate.sh" "$CANDIDATE" > "$TMP/candidate.outputs"
+SIDECAR="$(sed -n 's/^sidecar=//p' "$TMP/candidate.outputs")"
+SOURCE_SHA="$(sed -n 's/^source_sha=//p' "$TMP/candidate.outputs")"
+INTEGRITY="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("tarball", "integrity")' "$SIDECAR")"
 
 make_facts() {
   local state="$1"
@@ -101,6 +80,25 @@ assert_state partial_release github_released upload_release_assets
 assert_state github_released github_released upload_completed_ledger
 assert_state completed completed none
 
+# A later workflow attempt retrieves the retained bundle byte-for-byte. Recovery
+# after npm publication and after a partial asset upload must advance from public
+# authority facts without invoking the candidate builder again.
+for fixture in npm_published partial_release; do
+  retry="$TMP/retry-$fixture"
+  cp -R "$CANDIDATE" "$retry"
+  while IFS= read -r relative; do
+    cmp "$CANDIDATE/$relative" "$retry/$relative"
+  done < <(cd "$CANDIDATE" && find . -type f -print | sed 's#^./##' | sort)
+  make_facts "$fixture" "$TMP/retry-$fixture.facts.json"
+  retry_sidecar="$retry/$(basename "$SIDECAR")"
+  ruby "$ROOT/scripts/release-transaction.rb" \
+    --sidecar "$retry_sidecar" \
+    --facts "$TMP/retry-$fixture.facts.json" \
+    --ledger "$TMP/retry-$fixture.ledger.json" >/dev/null
+done
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["state"] == "npm_published" && d["next_action"] == "push_tag"' "$TMP/retry-npm_published.ledger.json"
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["state"] == "github_released" && d["next_action"] == "upload_release_assets"' "$TMP/retry-partial_release.ledger.json"
+
 FAILED_FACTS="$TMP/failed.facts.json"
 FAILED_LEDGER="$TMP/failed.ledger.json"
 make_facts mismatch "$FAILED_FACTS"
@@ -114,6 +112,62 @@ ruby -rjson -e '
   abort unless d["errors"].any? { |error| error.include?("npm integrity") }
 ' "$FAILED_LEDGER"
 "$ROOT/bin/verdify" artifact validate --file "$FAILED_LEDGER" >/dev/null
+
+# Every identity copied from the sidecar must be checked against local bytes or
+# the clean source before any authority result can authorize publication.
+IDENTITY_FIELDS=(
+  package.name package.version source.commit source.clean
+  tarball.filename tarball.size tarball.sha256 tarball.sha512 tarball.integrity tarball.npm_shasum
+  member.path member.size member.mode member.sha256
+  archive.filename archive.size archive.sha256 archive.checksum_filename archive.checksum_sha256
+  build.candidate_identity build.package_file_list_blob
+)
+make_facts artifact_verified "$TMP/identity.facts.json"
+for field in "${IDENTITY_FIELDS[@]}"; do
+  mutated="$CANDIDATE/mismatch-${field//./-}.json"
+  ruby -rjson -e '
+    source, output, field, previous = ARGV
+    d = JSON.parse(File.read(source))
+    case field
+    when "package.name" then d["package"]["name"] = "@wrong/cli"
+    when "package.version" then d["package"]["version"] = "9.9.9"
+    when "source.commit"
+      d["source"]["commit"] = previous
+      d["build"]["candidate_identity"] = "v#{d.dig("package", "version")}-#{previous}"
+    when "source.clean" then d["source"]["clean"] = false
+    when "tarball.filename" then d["tarball"]["filename"] = "missing.tgz"
+    when "tarball.size" then d["tarball"]["size"] += 1
+    when "tarball.sha256" then d["tarball"]["sha256"] = "0" * 64
+    when "tarball.sha512" then d["tarball"]["sha512"] = "0" * 128
+    when "tarball.integrity" then d["tarball"]["integrity"] = "sha512-#{"A" * 86}=="
+    when "tarball.npm_shasum" then d["tarball"]["npm_shasum"] = "0" * 40
+    when "member.path" then d["tarball"]["files"][0]["path"] = "wrong-member"
+    when "member.size" then d["tarball"]["files"][0]["size"] += 1
+    when "member.mode" then d["tarball"]["files"][0]["mode"] ^= 0o100
+    when "member.sha256" then d["tarball"]["files"][0]["sha256"] = "0" * 64
+    when "archive.filename" then d["archive"]["filename"] = "missing.zip"
+    when "archive.size" then d["archive"]["size"] += 1
+    when "archive.sha256" then d["archive"]["sha256"] = "0" * 64
+    when "archive.checksum_filename" then d["archive"]["checksum_filename"] = "missing.zip.sha256"
+    when "archive.checksum_sha256" then d["archive"]["checksum_sha256"] = "0" * 64
+    when "build.candidate_identity" then d["build"]["candidate_identity"] = "v1.3.0-#{"0" * 40}"
+    when "build.package_file_list_blob" then d["build"]["package_file_list_blob"] = "0" * 40
+    else abort "unknown mismatch field"
+    end
+    File.write(output, JSON.pretty_generate(d) + "\n")
+  ' "$SIDECAR" "$mutated" "$field" "$(git -C "$ROOT" rev-parse HEAD^)"
+  ledger="$TMP/mismatch-${field//./-}.ledger.json"
+  if ruby "$ROOT/scripts/release-transaction.rb" --sidecar "$mutated" --facts "$TMP/identity.facts.json" --ledger "$ledger" \
+    >"$TMP/mismatch-${field//./-}.out" 2>"$TMP/mismatch-${field//./-}.err"; then
+    echo "expected $field identity mismatch to fail closed" >&2
+    exit 1
+  fi
+  ruby -rjson -e '
+    d=JSON.parse(File.read(ARGV.fetch(0)))
+    abort unless d["state"] == "failed" && d["next_action"] == "manual_reconcile"
+    abort if d["next_action"] == "publish_npm"
+  ' "$ledger"
+done
 
 UNKNOWN_FACTS="$TMP/unknown.facts.json"
 UNKNOWN_LEDGER="$TMP/unknown.ledger.json"

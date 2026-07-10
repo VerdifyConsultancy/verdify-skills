@@ -6,17 +6,185 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 concurrency:
   group: npm-publish
   cancel-in-progress: false
 
 jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.candidate.outputs.artifact_id || steps.upload.outputs.artifact-id }}
+      artifact_run_id: ${{ steps.candidate.outputs.artifact_run_id }}
+      bundle_name: ${{ steps.candidate.outputs.bundle_name }}
+    steps:
+      # actions/checkout v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+
+      # actions/setup-node v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+
+      - name: Use reviewed npm
+        run: npm install --global npm@11.4.2
+
+      - name: Retrieve or build the final-main candidate
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          VERSION="$(cat VERSION)"
+          BUNDLE_NAME="verdify-release-candidate-v${VERSION}-${SOURCE_SHA}"
+          WORKFLOW_PATH=".github/workflows/publish-npm.yml"
+          mkdir -p dist
+
+          ARTIFACT_PAGES="$(mktemp)"
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/actions/artifacts?name=${BUNDLE_NAME}&per_page=100" > "${ARTIFACT_PAGES}"
+          REUSED=false
+          ARTIFACT_ID=""
+          ARTIFACT_RUN_ID=""
+          while IFS=$'\t' read -r candidate_id candidate_run_id; do
+            [ -n "${candidate_id}" ] || continue
+            RUN_JSON="$(mktemp)"
+            if ! gh api "repos/${REPOSITORY}/actions/runs/${candidate_run_id}" > "${RUN_JSON}"; then
+              continue
+            fi
+            if ! ruby -rjson -e '
+              run, repository, workflow, source = ARGV
+              d = JSON.parse(File.read(run))
+              abort unless d.dig("repository", "full_name") == repository
+              abort unless d["path"] == workflow && d["head_branch"] == "main" && d["head_sha"] == source
+              abort unless %w[push workflow_dispatch].include?(d["event"])
+            ' "${RUN_JSON}" "${REPOSITORY}" "${WORKFLOW_PATH}" "${SOURCE_SHA}"; then
+              continue
+            fi
+
+            rm -rf dist
+            mkdir -p dist
+            ARTIFACT_ZIP="$(mktemp)"
+            gh api "repos/${REPOSITORY}/actions/artifacts/${candidate_id}/zip" > "${ARTIFACT_ZIP}"
+            unzip -q "${ARTIFACT_ZIP}" -d dist
+            if ruby -rjson -rdigest -e '
+              dir, repository, workflow, run_id, artifact, source = ARGV
+              p = JSON.parse(File.read(File.join(dir, "candidate-provenance.json")))
+              abort unless p.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, workflow, artifact, source]
+              abort unless p.fetch("workflow_run_id").to_s == run_id
+              files = p.fetch("files")
+              abort if files.empty?
+              files.each do |name, digest|
+                path = File.join(dir, name)
+                abort unless File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
+              end
+              sidecar = p.fetch("sidecar_filename")
+              abort unless files.fetch(sidecar) == p.fetch("sidecar_sha256")
+            ' dist "${REPOSITORY}" "${WORKFLOW_PATH}" "${candidate_run_id}" "${BUNDLE_NAME}" "${SOURCE_SHA}"; then
+              REUSED=true
+              ARTIFACT_ID="${candidate_id}"
+              ARTIFACT_RUN_ID="${candidate_run_id}"
+              break
+            fi
+          done < <(ruby -rjson -e '
+            pages = JSON.parse(File.read(ARGV.fetch(0))).flatten
+            pages.flat_map { |page| Array(page["artifacts"]) }
+              .reject { |artifact| artifact["expired"] }
+              .sort_by { |artifact| artifact["created_at"].to_s }.reverse_each do |artifact|
+                run_id = artifact.dig("workflow_run", "id")
+                puts [artifact["id"], run_id].join("\t") if run_id
+              end
+          ' "${ARTIFACT_PAGES}")
+
+          if [ "${REUSED}" = false ]; then
+            rm -rf dist
+            mkdir -p dist
+            ruby scripts/release-preflight.rb --require-unpublished
+            TAG_RESULT="$(git ls-remote --tags origin "refs/tags/v${VERSION}" "refs/tags/v${VERSION}^{}")" || {
+              echo "could not query tag authority for v${VERSION}" >&2
+              exit 1
+            }
+            if [ -n "${TAG_RESULT}" ]; then
+              echo "v${VERSION} already exists; refusing to repack after authority mutation" >&2
+              exit 1
+            fi
+            RELEASE_ERROR="$(mktemp)"
+            if gh api "repos/${REPOSITORY}/releases/tags/v${VERSION}" >/dev/null 2>"${RELEASE_ERROR}"; then
+              echo "GitHub release v${VERSION} already exists; refusing to repack" >&2
+              exit 1
+            elif ! grep -Eqi '(HTTP 404|Not Found)' "${RELEASE_ERROR}"; then
+              echo "could not prove GitHub release v${VERSION} is absent" >&2
+              cat "${RELEASE_ERROR}" >&2
+              exit 1
+            fi
+
+            bash scripts/build-release-candidate.sh dist > dist/candidate.outputs
+            ruby -rjson -rdigest -e '
+              dir, repository, workflow, run_id, run_attempt, artifact, source = ARGV
+              files = Dir.children(dir).sort.to_h do |name|
+                path = File.join(dir, name)
+                [name, Digest::SHA256.file(path).hexdigest] if File.file?(path)
+              end.compact
+              sidecars = files.keys.grep(/\.release-candidate\.json\z/)
+              abort "expected one candidate sidecar" unless sidecars.length == 1
+              sidecar = sidecars.first
+              document = {
+                "schema_version"=>"1.0", "repository"=>repository, "workflow_path"=>workflow,
+                "workflow_run_id"=>Integer(run_id), "workflow_run_attempt"=>Integer(run_attempt),
+                "artifact_name"=>artifact, "source_sha"=>source,
+                "sidecar_filename"=>sidecar, "sidecar_sha256"=>files.fetch(sidecar), "files"=>files
+              }
+              File.write(File.join(dir, "candidate-provenance.json"), JSON.pretty_generate(document) + "\n")
+            ' dist "${REPOSITORY}" "${WORKFLOW_PATH}" "${GITHUB_RUN_ID}" "${GITHUB_RUN_ATTEMPT}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
+            ARTIFACT_RUN_ID="${GITHUB_RUN_ID}"
+          fi
+
+          SIDECAR="$(find dist -maxdepth 1 -type f -name '*.release-candidate.json' -print)"
+          [ "$(printf '%s\n' "${SIDECAR}" | grep -c .)" = 1 ]
+          TARBALL="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("tarball", "filename")' "${SIDECAR}")"
+          ARCHIVE="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "filename")' "${SIDECAR}")"
+          VERDIFY_TARBALL="${TARBALL}" VERDIFY_SIDECAR="${SIDECAR}" VERDIFY_ARCHIVE="${ARCHIVE}" \
+            bash tests/test_packed_artifact.sh
+
+          {
+            echo "reused=${REUSED}"
+            echo "artifact_id=${ARTIFACT_ID}"
+            echo "artifact_run_id=${ARTIFACT_RUN_ID}"
+            echo "bundle_name=${BUNDLE_NAME}"
+          } >> "${GITHUB_OUTPUT}"
+
+      # actions/upload-artifact v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: steps.candidate.outputs.reused == 'false'
+        id: upload
+        with:
+          name: ${{ steps.candidate.outputs.bundle_name }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 90
+
   publish:
+    needs: candidate
     runs-on: ubuntu-latest
     environment: npm
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
     steps:
       # actions/checkout v4.2.2
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -40,32 +208,57 @@ jobs:
       - name: Check release identity
         run: ruby scripts/release-preflight.rb
 
-      - name: Build and verify one release candidate
-        id: candidate
+      # actions/download-artifact v4.3.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ needs.candidate.outputs.artifact_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.candidate.outputs.artifact_run_id }}
+          path: dist
+          merge-multiple: true
+
+      - name: Verify retained candidate provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+          BUNDLE_NAME: ${{ needs.candidate.outputs.bundle_name }}
+          ARTIFACT_RUN_ID: ${{ needs.candidate.outputs.artifact_run_id }}
         run: |
           set -euo pipefail
-          bash scripts/build-release-candidate.sh dist | tee dist/candidate.outputs
-          while IFS='=' read -r key value; do
-            case "${key}" in
-              tarball|sidecar|archive|checksum|source_sha)
-                echo "${key}=${value}" >> "${GITHUB_OUTPUT}"
-                ;;
-            esac
-          done < dist/candidate.outputs
+          RUN_JSON="$(mktemp)"
+          gh api "repos/${REPOSITORY}/actions/runs/${ARTIFACT_RUN_ID}" > "${RUN_JSON}"
+          ruby -rjson -rdigest -e '
+            dir, run_file, repository, run_id, artifact, source = ARGV
+            run = JSON.parse(File.read(run_file))
+            abort unless run.dig("repository", "full_name") == repository
+            abort unless run["path"] == ".github/workflows/publish-npm.yml" && run["head_branch"] == "main" && run["head_sha"] == source
+            provenance = JSON.parse(File.read(File.join(dir, "candidate-provenance.json")))
+            abort unless provenance.values_at("repository", "workflow_path", "artifact_name", "source_sha") == [repository, ".github/workflows/publish-npm.yml", artifact, source]
+            abort unless provenance.fetch("workflow_run_id").to_s == run_id
+            provenance.fetch("files").each do |name, digest|
+              path = File.join(dir, name)
+              abort unless File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
+            end
+            sidecar = provenance.fetch("sidecar_filename")
+            abort unless provenance.fetch("files").fetch(sidecar) == provenance.fetch("sidecar_sha256")
+          ' dist "${RUN_JSON}" "${REPOSITORY}" "${ARTIFACT_RUN_ID}" "${BUNDLE_NAME}" "${SOURCE_SHA}"
 
       - name: Resume immutable release transaction
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          TARBALL: ${{ steps.candidate.outputs.tarball }}
-          SIDECAR: ${{ steps.candidate.outputs.sidecar }}
-          ARCHIVE: ${{ steps.candidate.outputs.archive }}
-          CHECKSUM: ${{ steps.candidate.outputs.checksum }}
-          SOURCE_SHA: ${{ steps.candidate.outputs.source_sha }}
+          SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           VERSION="$(cat VERSION)"
           TAG="v${VERSION}"
+          SIDECAR="$(find dist -maxdepth 1 -type f -name '*.release-candidate.json' -print)"
+          [ "$(printf '%s\n' "${SIDECAR}" | grep -c .)" = 1 ]
+          TARBALL="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("tarball", "filename")' "${SIDECAR}")"
+          ARCHIVE="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "filename")' "${SIDECAR}")"
+          CHECKSUM="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "checksum_filename")' "${SIDECAR}")"
           LEDGER="dist/release-transaction-v${VERSION}.json"
 
           git config user.name "github-actions[bot]"

@@ -58,36 +58,81 @@ completed_ledger_name = "release-transaction-v#{version}.json"
 errors = []
 completed_ledger_remote_digest = nil
 
-artifact_verified = false
-if options[:facts]
-  facts = JSON.parse(options.fetch(:facts).read)
-  artifact_verified = facts.fetch("artifact_verified", true)
-  npm = facts.fetch("npm", absent_npm)
-  tag = facts.fetch("tag", absent_tag(tag_name))
-  release = facts.fetch("github_release", absent_release)
-else
-  unless sidecar.dig("source", "clean") == true
-    errors << "candidate sidecar does not identify a clean source"
-  end
-  head, head_error, head_status = capture("git", "rev-parse", "HEAD", chdir: ROOT.to_s)
-  errors << "cannot read source HEAD: #{head_error.strip}" unless head_status.success?
-  errors << "candidate source commit does not match clean HEAD" if head_status.success? && head.strip != source_sha
-  status, status_error, status_result = capture("git", "status", "--porcelain", "--untracked-files=all", chdir: ROOT.to_s)
-  errors << "cannot inspect source worktree: #{status_error.strip}" unless status_result.success?
-  errors << "candidate source worktree is not clean" if status_result.success? && !status.empty?
+unless sidecar.dig("source", "clean") == true
+  errors << "candidate sidecar does not identify a clean source"
+end
+unless sidecar.dig("source", "commit").to_s.match?(/\A[0-9a-f]{40}\z/)
+  errors << "candidate source commit is invalid"
+end
+unless sidecar.dig("build", "candidate_identity") == "v#{version}-#{source_sha}"
+  errors << "candidate identity does not match package version and source"
+end
 
-  tarball_ok = system("ruby", ROOT.join("scripts/verify-npm-tarball.rb").to_s, "--tarball", tarball_path.to_s, "--sidecar", sidecar_path.to_s, out: File::NULL)
-  archive_ok = system("bash", ROOT.join("scripts/verify-package.sh").to_s, archive_path.to_s, out: File::NULL)
-  errors << "exact npm tarball verification failed" unless tarball_ok
-  errors << "exact release archive verification failed" unless archive_ok
+[tarball_path, archive_path, checksum_path].each do |path|
+  errors << "candidate path escapes artifact directory: #{path}" unless path.dirname == artifact_dir
+end
+
+head, head_error, head_status = capture("git", "rev-parse", "HEAD", chdir: ROOT.to_s)
+errors << "cannot read source HEAD: #{head_error.strip}" unless head_status.success?
+errors << "candidate source commit does not match clean HEAD" if head_status.success? && head.strip != source_sha
+status, status_error, status_result = capture("git", "status", "--porcelain", "--untracked-files=all", chdir: ROOT.to_s)
+errors << "cannot inspect source worktree: #{status_error.strip}" unless status_result.success?
+errors << "candidate source worktree is not clean" if status_result.success? && !status.empty?
+
+source_package_json, source_package_error, source_package_status = capture("git", "show", "#{source_sha}:package.json", chdir: ROOT.to_s)
+if source_package_status.success?
+  source_package = JSON.parse(source_package_json)
+  errors << "candidate package name does not match source commit" unless source_package["name"] == package_name
+  errors << "candidate package version does not match source commit" unless source_package["version"] == version
+else
+  errors << "cannot read package identity from source commit: #{source_package_error.strip}"
+end
+
+file_list_blob, file_list_error, file_list_status = capture("git", "rev-parse", "#{source_sha}:scripts/package-file-list.rb", chdir: ROOT.to_s)
+if file_list_status.success?
+  errors << "package-file-list blob does not match source commit" unless file_list_blob.strip == sidecar.dig("build", "package_file_list_blob")
+else
+  errors << "cannot read package-file-list blob from source commit: #{file_list_error.strip}"
+end
+
+tarball_ok = tarball_path.file? && system(
+  "ruby", ROOT.join("scripts/verify-npm-tarball.rb").to_s,
+  "--tarball", tarball_path.to_s,
+  "--sidecar", sidecar_path.to_s,
+  out: File::NULL,
+  err: File::NULL
+)
+errors << "exact npm tarball verification failed" unless tarball_ok
+
+archive_ok = archive_path.file? && system(
+  "bash", ROOT.join("scripts/verify-package.sh").to_s, archive_path.to_s,
+  out: File::NULL,
+  err: File::NULL
+)
+errors << "exact release archive verification failed" unless archive_ok
+if archive_path.file?
+  archive_digest = Digest::SHA256.file(archive_path).hexdigest
+  errors << "archive size does not match sidecar" unless archive_path.size == sidecar.dig("archive", "size")
+  errors << "archive SHA-256 does not match sidecar" unless archive_digest == sidecar.dig("archive", "sha256")
   if checksum_path.file?
-    expected_checksum = checksum_path.read.split.first
-    errors << "archive checksum sidecar does not match archive" unless expected_checksum == Digest::SHA256.file(archive_path).hexdigest
+    expected_line = "#{archive_digest}  #{archive_path.basename}\n"
+    errors << "archive checksum filename or digest does not match exact archive" unless checksum_path.read == expected_line
+    errors << "archive checksum file SHA-256 does not match sidecar" unless Digest::SHA256.file(checksum_path).hexdigest == sidecar.dig("archive", "checksum_sha256")
   else
     errors << "archive checksum sidecar is missing"
   end
-  artifact_verified = errors.empty?
+else
+  errors << "release archive is missing"
+end
 
+artifact_verified = errors.empty?
+if options[:facts]
+  facts = JSON.parse(options.fetch(:facts).read)
+  artifact_verified &&= facts.fetch("artifact_verified", true)
+  npm = facts.fetch("npm", absent_npm)
+  tag = facts.fetch("tag", absent_tag(tag_name))
+  release = facts.fetch("github_release", absent_release)
+elsif artifact_verified
   target = "#{package_name}@#{version}"
   npm_stdout, npm_stderr, npm_result = capture("npm", "view", target, "version", "dist.integrity", "gitHead", "--json", chdir: ROOT.to_s)
   if npm_result.success?
@@ -153,6 +198,12 @@ else
     release = { "status" => "unknown", "tag" => nil, "url" => nil, "required_assets_complete" => false, "completed_ledger_asset" => false }
     errors << "GitHub release authority query failed"
   end
+else
+  # Local identity failed, so no external authority is queried and no mutation
+  # action can be authorized from self-asserted sidecar data.
+  npm = absent_npm
+  tag = absent_tag(tag_name)
+  release = absent_release
 end
 
 errors << "npm package version does not match candidate" if npm["status"] == "published" && npm["version"] != version
@@ -211,15 +262,21 @@ ledger = {
     "candidate_sidecar_sha256" => Digest::SHA256.file(sidecar_path).hexdigest
   },
   "artifact" => {
+    "candidate_identity" => sidecar.dig("build", "candidate_identity"),
     "tarball_filename" => sidecar.dig("tarball", "filename"),
+    "tarball_size" => sidecar.dig("tarball", "size"),
     "tarball_sha256" => sidecar.dig("tarball", "sha256"),
     "tarball_sha512" => sidecar.dig("tarball", "sha512"),
     "npm_integrity" => sidecar.dig("tarball", "integrity"),
     "npm_shasum" => sidecar.dig("tarball", "npm_shasum"),
     "npm_pack_invocations" => sidecar.dig("build", "npm_pack_invocations"),
+    "package_file_list_blob" => sidecar.dig("build", "package_file_list_blob"),
+    "member_files_sha256" => Digest::SHA256.hexdigest(JSON.generate(sidecar.dig("tarball", "files"))),
     "archive_filename" => sidecar.dig("archive", "filename"),
+    "archive_size" => sidecar.dig("archive", "size"),
     "archive_sha256" => sidecar.dig("archive", "sha256"),
-    "checksum_filename" => sidecar.dig("archive", "checksum_filename")
+    "checksum_filename" => sidecar.dig("archive", "checksum_filename"),
+    "checksum_sha256" => sidecar.dig("archive", "checksum_sha256")
   },
   "authorities" => { "npm" => npm, "tag" => tag, "github_release" => release },
   "errors" => errors.uniq.sort

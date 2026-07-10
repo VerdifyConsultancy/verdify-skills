@@ -73,10 +73,13 @@ fail!("sidecar is missing: #{sidecar_path}") unless sidecar_path.file?
 sidecar = JSON.parse(sidecar_path.read)
 fail!("unsupported sidecar schema_version") unless sidecar["schema_version"] == "1.0"
 fail!("source commit is invalid") unless sidecar.dig("source", "commit").to_s.match?(/\A[0-9a-f]{40}\z/)
-fail!("source clean flag is missing") unless [true, false].include?(sidecar.dig("source", "clean"))
+fail!("candidate does not identify a clean source") unless sidecar.dig("source", "clean") == true
 fail!("pack-count proof must be exactly one") unless sidecar.dig("build", "npm_pack_invocations") == 1
 fail!("package-file-list blob identity is invalid") unless sidecar.dig("build", "package_file_list_blob").to_s.match?(/\A[0-9a-f]{40}\z/)
+expected_identity = "v#{sidecar.dig('package', 'version')}-#{sidecar.dig('source', 'commit')}"
+fail!("candidate identity does not match package version and source") unless sidecar.dig("build", "candidate_identity") == expected_identity
 
+actual_shasum = Digest::SHA1.file(tarball).hexdigest
 expected_sha256 = sidecar.dig("tarball", "sha256")
 expected_sha512 = sidecar.dig("tarball", "sha512")
 actual_sha256 = Digest::SHA256.file(tarball).hexdigest
@@ -87,6 +90,7 @@ fail!("tarball size does not match sidecar") unless tarball.size == sidecar.dig(
 fail!("tarball SHA-256 does not match sidecar") unless actual_sha256 == expected_sha256
 fail!("tarball SHA-512 does not match sidecar") unless actual_sha512 == expected_sha512
 fail!("tarball npm integrity does not match sidecar") unless actual_integrity == sidecar.dig("tarball", "integrity")
+fail!("tarball npm shasum does not match sidecar") unless actual_shasum == sidecar.dig("tarball", "npm_shasum")
 
 expected_entries = sidecar.dig("tarball", "files")
 fail!("sidecar file inventory is missing") unless expected_entries.is_a?(Array) && !expected_entries.empty?
@@ -106,8 +110,9 @@ Zlib::GzipReader.open(tarball.to_s) do |gzip|
       fail!("unsafe npm tar member: #{name.inspect}") if name.empty? || name.start_with?("/") || name.include?("\\") || name.split("/").any? { |part| part.empty? || part == "." || part == ".." }
       fail!("duplicate npm tar member: #{name}") if actual.key?(name)
       fail!("npm tar member is not a regular file: #{name}") unless entry.file?
-      actual[name] = { "size" => entry.header.size, "mode" => entry.header.mode }
-      contents[name] = entry.read if name == "package/package.json" || name == "package/VERSION" || name.match?(%r{\Apackage/skills/[^/]+/SKILL\.md\z})
+      content = entry.read
+      actual[name] = { "size" => entry.header.size, "mode" => entry.header.mode, "sha256" => Digest::SHA256.hexdigest(content) }
+      contents[name] = content if name == "package/package.json" || name == "package/VERSION" || name.match?(%r{\Apackage/skills/[^/]+/SKILL\.md\z})
     end
   end
 end
@@ -118,6 +123,7 @@ fail!("npm tar member set differs (missing=#{missing.sort.inspect}, extra=#{extr
 expected.each do |name, metadata|
   fail!("npm tar member size differs: #{name}") unless actual.fetch(name).fetch("size") == metadata.fetch("size")
   fail!("npm tar member mode differs: #{name}") unless actual.fetch(name).fetch("mode") == metadata.fetch("mode")
+  fail!("npm tar member digest differs: #{name}") unless actual.fetch(name).fetch("sha256") == metadata.fetch("sha256")
 end
 
 package = JSON.parse(contents.fetch("package/package.json"))

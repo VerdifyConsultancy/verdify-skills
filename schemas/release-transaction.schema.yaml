@@ -33,17 +33,23 @@ properties:
   artifact:
     type: object
     additionalProperties: false
-    required: [tarball_filename, tarball_sha256, tarball_sha512, npm_integrity, npm_shasum, npm_pack_invocations, archive_filename, archive_sha256, checksum_filename]
+    required: [candidate_identity, tarball_filename, tarball_size, tarball_sha256, tarball_sha512, npm_integrity, npm_shasum, npm_pack_invocations, package_file_list_blob, member_files_sha256, archive_filename, archive_size, archive_sha256, checksum_filename, checksum_sha256]
     properties:
+      candidate_identity: {type: string, pattern: '^v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?-[0-9a-f]{40}$'}
       tarball_filename: {type: string, minLength: 1}
+      tarball_size: {type: integer, minimum: 1}
       tarball_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
       tarball_sha512: {type: string, pattern: '^[0-9a-f]{128}$'}
       npm_integrity: {type: string, pattern: '^sha512-[A-Za-z0-9+/]+={0,2}$'}
       npm_shasum: {type: string, pattern: '^[0-9a-f]{40}$'}
       npm_pack_invocations: {const: 1}
+      package_file_list_blob: {type: string, pattern: '^[0-9a-f]{40}$'}
+      member_files_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
       archive_filename: {type: string, minLength: 1}
+      archive_size: {type: integer, minimum: 1}
       archive_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
       checksum_filename: {type: string, minLength: 1}
+      checksum_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
   authorities:
     type: object
     additionalProperties: false

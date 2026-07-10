@@ -62,15 +62,31 @@ grep -q ".agent-skills/verdify-skills/1.3.0" "$REPO/AGENTS.md"
 "$INSTALL/bin/verdify" doctor --repo "$REPO" --json > "$TMP/doctor.json" || true
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["checks"].any? { |c| c["name"] == "agent_workflow_initialized" && c["ok"] }' "$TMP/doctor.json"
 
-# Local public-metadata fixture for an installed 1.2.1 tree; the exact 1.3.0
-# tarball must replace its links and remove the old version in one successful run.
+# Install the real published 1.2.1 tarball, pinned to its registry digest, and
+# run its initializer before upgrading that exact repository to this 1.3.0
+# candidate.
 UPGRADE_REPO="$TMP/upgrade-project"
 make_repo "$UPGRADE_REPO"
-mkdir -p "$UPGRADE_REPO/.agent-skills/verdify-skills/1.2.1/skills/project-router"
-printf '{"name":"@verdify-cli/cli","version":"1.2.1"}\n' > "$UPGRADE_REPO/.agent-skills/verdify-skills/1.2.1/package.json"
-printf '%s\n' '---' 'name: project-router' '---' > "$UPGRADE_REPO/.agent-skills/verdify-skills/1.2.1/skills/project-router/SKILL.md"
-mkdir -p "$UPGRADE_REPO/.agents/skills"
-ln -s ../../.agent-skills/verdify-skills/1.2.1/skills/project-router "$UPGRADE_REPO/.agents/skills/project-router"
+OLD_PACKAGE_DIR="$TMP/published-1.2.1"
+OLD_TOOL="$TMP/tool-1.2.1"
+mkdir -p "$OLD_PACKAGE_DIR"
+npm pack --json --pack-destination "$OLD_PACKAGE_DIR" @verdify-cli/cli@1.2.1 > "$TMP/npm-pack-1.2.1.json"
+OLD_TARBALL="$OLD_PACKAGE_DIR/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch(0).fetch("filename")' "$TMP/npm-pack-1.2.1.json")"
+ruby -rbase64 -rdigest -rjson -e '
+  result, tarball = ARGV
+  artifact = JSON.parse(File.read(result)).fetch(0)
+  expected_integrity = "sha512-rbIHSLe2cbP5gZGxn1pjWCDvSKEE9UfPu5LxpwhycWJwWk9Kd69v31tNchr3Nf/xZgdjCliMvlAaaFkWwjRMtw=="
+  expected_shasum = "3afd4c64c21f7e4789d3bc56be9f85cd5b25557d"
+  actual_integrity = "sha512-#{Base64.strict_encode64(Digest::SHA512.file(tarball).digest)}"
+  abort unless artifact.fetch("integrity") == expected_integrity && actual_integrity == expected_integrity
+  abort unless artifact.fetch("shasum") == expected_shasum && Digest::SHA1.file(tarball).hexdigest == expected_shasum
+' "$TMP/npm-pack-1.2.1.json" "$OLD_TARBALL"
+npm install --ignore-scripts --no-audit --no-fund --prefix "$OLD_TOOL" "$OLD_TARBALL" > "$TMP/npm-install-1.2.1.log"
+OLD_CLI="$OLD_TOOL/node_modules/.bin/verdify"
+[[ "$("$OLD_CLI" --version)" == "1.2.1" ]]
+"$OLD_CLI" init --repo "$UPGRADE_REPO" > "$TMP/init-1.2.1.log"
+[[ -d "$UPGRADE_REPO/.agent-skills/verdify-skills/1.2.1" ]]
+[[ -L "$UPGRADE_REPO/.agents/skills/project-router" ]]
 $CLI init --repo "$UPGRADE_REPO" --force > "$TMP/upgrade.log"
 [[ ! -e "$UPGRADE_REPO/.agent-skills/verdify-skills/1.2.1" ]]
 [[ -d "$UPGRADE_REPO/.agent-skills/verdify-skills/1.3.0" ]]
@@ -145,13 +161,47 @@ fi
 [[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-interview" ]]
 [[ "$(cat "$ROLLBACK_REPO/.agent-skills/verdify-skills/1.3.0/operator.txt")" == "prior same-version install" ]]
 
-if [[ -n "${VERDIFY_NODE18_BIN:-}" ]]; then
-  "$VERDIFY_NODE18_BIN" "$PACKAGE_ROOT/npm/bin/verdify.js" --version > "$TMP/node18-version.txt"
-elif command -v fnm >/dev/null && fnm list 2>/dev/null | grep -q 'v18\.'; then
-  fnm exec --using=18 node "$PACKAGE_ROOT/npm/bin/verdify.js" --version > "$TMP/node18-version.txt"
-else
-  npm exec --yes --package=node@18 -- node "$PACKAGE_ROOT/npm/bin/verdify.js" --version > "$TMP/node18-version.txt"
-fi
+node18_cli() {
+  if [[ -n "${VERDIFY_NODE18_BIN:-}" ]]; then
+    "$VERDIFY_NODE18_BIN" "$PACKAGE_ROOT/npm/bin/verdify.js" "$@"
+  elif command -v fnm >/dev/null && fnm list 2>/dev/null | grep -q 'v18\.'; then
+    fnm exec --using=18 node "$PACKAGE_ROOT/npm/bin/verdify.js" "$@"
+  else
+    npm exec --yes --package=node@18 -- node "$PACKAGE_ROOT/npm/bin/verdify.js" "$@"
+  fi
+}
+
+node18_cli --version > "$TMP/node18-version.txt"
 [[ "$(cat "$TMP/node18-version.txt")" == "1.3.0" ]]
+node18_cli pack list --json > "$TMP/node18-packs.json"
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["count"] == 6' "$TMP/node18-packs.json"
+
+NODE18_REPO="$TMP/node18-project"
+make_repo "$NODE18_REPO"
+node18_cli init --repo "$NODE18_REPO" > "$TMP/node18-init.log"
+node18_cli doctor --repo "$NODE18_REPO" --json > "$TMP/node18-doctor.json" || true
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["checks"].any? { |check| check["name"] == "agent_workflow_initialized" && check["ok"] }' "$TMP/node18-doctor.json"
+
+NODE18_PACK_REPO="$TMP/node18-pack-project"
+make_repo "$NODE18_PACK_REPO"
+node18_cli dl research-analysis --repo "$NODE18_PACK_REPO" --host codex > "$TMP/node18-pack.log"
+[[ -L "$NODE18_PACK_REPO/.agents/skills/northstar-research-ingest" ]]
+[[ -f "$NODE18_PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+
+NODE18_ROLLBACK_REPO="$TMP/node18-rollback-project"
+make_repo "$NODE18_ROLLBACK_REPO"
+mkdir -p "$NODE18_ROLLBACK_REPO/.agents/skills/northstar-research-ingest"
+printf 'node 18 operator link\n' > "$NODE18_ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt"
+mkdir -p "$NODE18_ROLLBACK_REPO/.agent-skills/verdify-packs"
+printf 'node 18 operator manifest\n' > "$NODE18_ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE=before-manifest \
+  node18_cli dl research-analysis --repo "$NODE18_ROLLBACK_REPO" --host codex --force \
+    > "$TMP/node18-rollback.out" 2> "$TMP/node18-rollback.err"; then
+  echo "expected Node 18 rollback fixture to fail" >&2
+  exit 1
+fi
+[[ "$(cat "$NODE18_ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt")" == "node 18 operator link" ]]
+[[ "$(cat "$NODE18_ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "node 18 operator manifest" ]]
+[[ ! -e "$NODE18_ROLLBACK_REPO/.agents/skills/northstar-question-resolution" ]]
 
 echo "npm install tests passed."

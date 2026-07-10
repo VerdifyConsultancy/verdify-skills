@@ -117,6 +117,9 @@ fi
 
 ARCHIVE="$(VERDIFY_PACKAGE_SKIP_TESTS=1 bash "$FIXTURE/scripts/package.sh" "$TMP/package")"
 bash "$FIXTURE/scripts/verify-package.sh" "$ARCHIVE" >/dev/null
+REPEATED_ARCHIVE="$(VERDIFY_PACKAGE_SKIP_TESTS=1 bash "$FIXTURE/scripts/package.sh" "$TMP/package-repeat")"
+cmp "$ARCHIVE" "$REPEATED_ARCHIVE"
+cmp "$ARCHIVE.sha256" "$REPEATED_ARCHIVE.sha256"
 
 ARCHIVE_ROOT="verdify-lifecycle-skills-v$(cat "$FIXTURE/VERSION")"
 unzip -Z1 "$ARCHIVE" | ruby -e '

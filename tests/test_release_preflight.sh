@@ -62,6 +62,60 @@ PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" 
 CREATE_RESULT="$(PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --json)"
 ruby -rjson -e 'd=JSON.parse(ARGV.fetch(0)); abort unless d["decision"] == "create" && d["reason"] == "new_unpublished_version"' "$CREATE_RESULT"
 
+write_candidate_state() {
+  local fixture="$1"
+  local output="$2"
+  ruby -rjson -e '
+    fixture, output = ARGV
+    marker = "<!-- verdify-release-candidate:@verdify-cli/cli@1.1.1 -->"
+    issue = {"number"=>10, "state"=>"open", "body"=>marker}
+    pull = {"number"=>20, "state"=>"open", "merged_at"=>nil, "body"=>marker, "base"=>"main", "head"=>"dev"}
+    document = {"issues"=>[issue], "pull_requests"=>[pull]}
+    case fixture
+    when "open"
+    when "closed-unmerged"
+      issue["state"] = "closed"
+      pull["state"] = "closed"
+    when "merged"
+      pull["state"] = "closed"
+      pull["merged_at"] = "2026-07-10T00:00:00Z"
+    when "conflicting"
+      document["issues"] << issue.merge("number"=>11)
+      document["pull_requests"] << pull.merge("number"=>21, "body"=>"<!-- verdify-release-candidate:@verdify-cli/cli@9.9.9 -->")
+    else
+      abort "unknown candidate fixture"
+    end
+    File.write(output, JSON.generate(document) + "\n")
+  ' "$fixture" "$output"
+}
+
+for fixture in open closed-unmerged merged; do
+  state="$TMP/$fixture.candidates.json"
+  write_candidate_state "$fixture" "$state"
+  result="$(PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --candidate-state "$state" --json)"
+  ruby -rjson -e '
+    fixture, result = ARGV
+    d = JSON.parse(result)
+    candidate = d.fetch("candidate")
+    case fixture
+    when "open"
+      abort unless d["decision"] == "create" && candidate["issue_action"] == "reuse" && candidate["pull_request_action"] == "reuse"
+    when "closed-unmerged"
+      abort unless d["decision"] == "create" && candidate["issue_action"] == "reopen" && candidate["pull_request_action"] == "reopen"
+    when "merged"
+      abort unless d["decision"] == "skip" && d["reason"] == "candidate_already_merged" && candidate["pull_request_action"] == "stop_merged"
+    end
+  ' "$fixture" "$result"
+done
+
+write_candidate_state conflicting "$TMP/conflicting.candidates.json"
+if PATH="$FAKE_BIN:$PATH" ruby "$ROOT/scripts/release-preflight.rb" --root "$REPO" --release-pr-base "$BASE" --candidate-state "$TMP/conflicting.candidates.json" --json \
+  >"$TMP/conflicting.out" 2>"$TMP/conflicting.err"; then
+  echo "expected conflicting durable candidate identities to fail closed" >&2
+  exit 1
+fi
+ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["decision"] == "error" && d["reason"] == "candidate_identity_conflict"' "$TMP/conflicting.out"
+
 cat > "$FAKE_BIN/npm" <<'SH'
 #!/usr/bin/env bash
 printf '"1.1.1"\n'
@@ -104,9 +158,13 @@ fi
 ruby -e '
   workflow = File.read(ARGV.fetch(0))
   preflight = workflow.index("release-preflight.rb --release-pr-base") or abort "release PR preflight is missing"
+  reconcile = workflow.index("--candidate-state") or abort "durable candidate reconciliation is missing"
   mutations = [workflow.index("gh issue create"), workflow.index("gh pr edit"), workflow.index("gh pr create")]
   abort "release PR mutation precedes npm preflight" unless mutations.all? { |position| position && position > preflight }
+  abort "release PR mutation precedes candidate reconciliation" unless mutations.all? { |position| position > reconcile }
   abort "release PR author gate is missing" unless workflow.include?(%q{AUTHOR="$(gh api user --jq .login)"}) && workflow.include?(%q{!= "jrvallery"})
+  abort "candidate inventory is bounded or open-only" unless workflow.include?("--paginate --slurp") && workflow.include?("issues?state=all&per_page=100") && workflow.include?("pulls?state=all&per_page=100")
+  abort "title scans remain candidate identity authority" if workflow.include?("gh issue list") || workflow.include?("gh pr list")
 ' "$ROOT/.github/workflows/release-pr.yml"
 
 echo "release preflight tests passed."

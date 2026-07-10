@@ -2484,23 +2484,38 @@ module Verdify
         raise UsageError, "refusing to replace #{path}; pass --force" unless same || options[:force]
       end
 
-      backup_root = Pathname.new(Dir.mktmpdir("verdify-pack-rollback-"))
-      backups = []
-      created_dirs = []
       changed_targets = targets.reject { |target| target[:keep] }
+      operator_targets = changed_targets.select { |target| pack_path_present?(target.fetch(:path)) }
+      backup_root = Pathname.new(Dir.mktmpdir("verdify-pack-rollback-"))
+      backups = {}
+      created_paths = []
+      replaced_paths = []
+      created_dirs = []
+      committed = false
+      rollback_errors = []
 
       begin
-        changed_targets.each_with_index do |target, index|
+        # Copy and verify every operator-owned target before the first mutation.
+        # A backup failure therefore leaves the entire destination tree intact.
+        operator_targets.each_with_index do |target, index|
           path = target.fetch(:path)
-          next unless path.exist? || path.symlink?
-
+          inject_pack_failure!("backup-#{index}")
           backup = backup_root.join(index.to_s)
-          FileUtils.mv(path, backup)
-          backups << [path, backup]
+          snapshot = pack_path_snapshot(path)
+          copy_pack_backup!(path, backup, snapshot)
+          backups[path.to_s] = { path: path, backup: backup, snapshot: snapshot }
         end
 
-        changed_targets.each do |target|
+        changed_targets.each_with_index do |target, index|
           path = target.fetch(:path)
+          inject_pack_failure!("write-#{index}")
+          if (backup = backups[path.to_s])
+            raise Error, "pack target changed after backup: #{path}" unless pack_path_snapshot(path) == backup.fetch(:snapshot)
+
+            FileUtils.rm_rf(path)
+            replaced_paths << path
+          end
+
           missing = []
           cursor = path.dirname
           until cursor == repo_root || cursor.exist? || cursor.symlink?
@@ -2513,29 +2528,115 @@ module Verdify
           if target.fetch(:kind) == :symlink
             source = target.fetch(:source)
             File.symlink(source.relative_path_from(path.dirname), path)
+            created_paths << path unless backups.key?(path.to_s)
           end
         end
 
-        if ENV["VERDIFY_TESTING"] == "1" && ENV["VERDIFY_TEST_PACK_FAILURE"] == "before-manifest"
-          raise Error, "injected pack manifest failure"
-        end
+        inject_pack_failure!("before-manifest")
 
         manifest_target = changed_targets.find { |target| target.fetch(:kind) == :file }
-        Verdify.atomic_write(manifest_target.fetch(:path), manifest_target.fetch(:content)) if manifest_target
-      rescue StandardError
-        changed_targets.reverse_each do |target|
-          path = target.fetch(:path)
-          FileUtils.rm_rf(path) if path.exist? || path.symlink?
+        if manifest_target
+          Verdify.atomic_write(manifest_target.fetch(:path), manifest_target.fetch(:content))
+          manifest_path = manifest_target.fetch(:path)
+          created_paths << manifest_path unless backups.key?(manifest_path.to_s)
         end
-        backups.reverse_each do |path, backup|
-          FileUtils.mkdir_p(path.dirname)
-          FileUtils.mv(backup, path)
+        inject_pack_failure!("after-manifest")
+        committed = true
+      rescue StandardError => original_error
+        created_paths.reverse_each do |path|
+          FileUtils.rm_rf(path) if pack_path_present?(path)
+        rescue StandardError => rollback_error
+          rollback_errors << "remove created #{path}: #{rollback_error.message}"
         end
-        created_dirs.reverse_each { |dir| Dir.rmdir(dir) if dir.directory? && dir.children.empty? }
-        raise
+        replaced_paths.reverse_each.with_index do |path, index|
+          backup = backups.fetch(path.to_s)
+          begin
+            restore_pack_backup!(path, backup_root, backup.fetch(:backup), backup.fetch(:snapshot), index)
+          rescue StandardError => rollback_error
+            rollback_errors << "restore #{path}: #{rollback_error.message}"
+          end
+        end
+        created_dirs.reverse_each do |dir|
+          Dir.rmdir(dir) if dir.directory? && dir.children.empty?
+        rescue StandardError => rollback_error
+          rollback_errors << "remove directory #{dir}: #{rollback_error.message}"
+        end
+        unless rollback_errors.empty?
+          raise Error, "#{original_error.message}; rollback incomplete (#{rollback_errors.join('; ')}); verified backups retained at #{backup_root}"
+        end
+        raise original_error
       ensure
-        FileUtils.rm_rf(backup_root)
+        FileUtils.rm_rf(backup_root) if committed || rollback_errors.empty?
       end
+    end
+
+    def pack_path_present?(path)
+      path.exist? || path.symlink?
+    end
+
+    def pack_path_snapshot(path)
+      stat = path.lstat
+      mode = stat.mode & 0o7777
+      if stat.symlink?
+        [:symlink, mode, path.readlink.to_s]
+      elsif stat.file?
+        [:file, mode, stat.size, Digest::SHA256.file(path).hexdigest]
+      elsif stat.directory?
+        children = path.children.sort_by { |child| child.basename.to_s }.map do |child|
+          [child.basename.to_s, pack_path_snapshot(child)]
+        end
+        [:directory, mode, children]
+      else
+        raise UsageError, "pack target has unsupported file type: #{path}"
+      end
+    end
+
+    def copy_pack_backup!(path, backup, expected_snapshot)
+      staging = backup.sub_ext(".staging")
+      FileUtils.rm_rf(staging)
+      FileUtils.copy_entry(path, staging, true, false, true)
+      raise Error, "pack backup verification failed for #{path}" unless pack_path_snapshot(staging) == expected_snapshot
+
+      File.rename(staging, backup)
+      fsync_pack_backup!(backup)
+      raise Error, "pack backup changed while becoming durable for #{path}" unless pack_path_snapshot(backup) == expected_snapshot
+    ensure
+      FileUtils.rm_rf(staging) if staging && pack_path_present?(staging)
+    end
+
+    def fsync_pack_backup!(path)
+      if path.file? && !path.symlink?
+        File.open(path, "rb", &:fsync)
+      elsif path.directory? && !path.symlink?
+        path.children.each { |child| fsync_pack_backup!(child) }
+      end
+      File.open(path.dirname, File::RDONLY, &:fsync)
+    rescue Errno::EINVAL, Errno::ENOTSUP
+      # Some filesystems do not expose directory fsync; file contents were still
+      # flushed and the verified backup remains available for rollback.
+      nil
+    end
+
+    def restore_pack_backup!(path, backup_root, backup, expected_snapshot, index)
+      restore = backup_root.join("restore-#{index}")
+      FileUtils.rm_rf(restore)
+      FileUtils.copy_entry(backup, restore, true, false, true)
+      raise Error, "pack restore staging verification failed for #{path}" unless pack_path_snapshot(restore) == expected_snapshot
+
+      FileUtils.rm_rf(path) if pack_path_present?(path)
+      FileUtils.mkdir_p(path.dirname)
+      File.rename(restore, path)
+      raise Error, "pack restore verification failed for #{path}" unless pack_path_snapshot(path) == expected_snapshot
+      inject_pack_failure!("restore-#{index}")
+    ensure
+      FileUtils.rm_rf(restore) if restore && pack_path_present?(restore)
+    end
+
+    def inject_pack_failure!(point)
+      failures = ENV.fetch("VERDIFY_TEST_PACK_FAILURE", "").split(",")
+      return unless ENV["VERDIFY_TESTING"] == "1" && failures.include?(point)
+
+      raise Error, "injected pack transaction failure at #{point}"
     end
 
     def ensure_pack_parent_path!(repo_root, parent)

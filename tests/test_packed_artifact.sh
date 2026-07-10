@@ -11,13 +11,24 @@ for command in git npm ruby shasum tar; do
 done
 
 OUTPUTS="$TMP/candidate.outputs"
-bash "$ROOT/scripts/build-release-candidate.sh" "$TMP/candidate" > "$OUTPUTS"
-TARBALL="$(sed -n 's/^tarball=//p' "$OUTPUTS")"
-SIDECAR="$(sed -n 's/^sidecar=//p' "$OUTPUTS")"
-ARCHIVE="$(sed -n 's/^archive=//p' "$OUTPUTS")"
-SOURCE_SHA="$(sed -n 's/^source_sha=//p' "$OUTPUTS")"
+TARBALL="${VERDIFY_TARBALL:-}"
+SIDECAR="${VERDIFY_SIDECAR:-}"
+ARCHIVE="${VERDIFY_ARCHIVE:-}"
+BUILT_LOCALLY=false
+if [[ -z "$TARBALL" ]]; then
+  bash "$ROOT/scripts/build-release-candidate.sh" "$TMP/candidate" > "$OUTPUTS"
+  TARBALL="$(sed -n 's/^tarball=//p' "$OUTPUTS")"
+  SIDECAR="$(sed -n 's/^sidecar=//p' "$OUTPUTS")"
+  ARCHIVE="$(sed -n 's/^archive=//p' "$OUTPUTS")"
+  SOURCE_SHA="$(sed -n 's/^source_sha=//p' "$OUTPUTS")"
+  BUILT_LOCALLY=true
+else
+  SOURCE_SHA="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("source", "commit")' "$SIDECAR")"
+fi
 [[ -f "$TARBALL" && -f "$SIDECAR" && -f "$ARCHIVE" && -f "$ARCHIVE.sha256" ]]
-[[ "$(find "$TMP/candidate" -maxdepth 1 -type f -name '*.tgz' | wc -l | tr -d ' ')" == "1" ]]
+if [[ "$BUILT_LOCALLY" == true ]]; then
+  [[ "$(find "$TMP/candidate" -maxdepth 1 -type f -name '*.tgz' | wc -l | tr -d ' ')" == "1" ]]
+fi
 [[ "$SOURCE_SHA" == "$(git -C "$ROOT" rev-parse HEAD)" ]]
 
 ruby -rbase64 -rdigest -rjson -e '
@@ -27,14 +38,31 @@ ruby -rbase64 -rdigest -rjson -e '
   abort unless d.dig("build", "npm_pack_invocations") == 1
   abort unless d.dig("tarball", "sha256") == Digest::SHA256.file(tarball).hexdigest
   abort unless d.dig("tarball", "sha512") == Digest::SHA512.file(tarball).hexdigest
+  abort unless d.dig("tarball", "npm_shasum") == Digest::SHA1.file(tarball).hexdigest
   integrity = "sha512-#{Base64.strict_encode64(Digest::SHA512.file(tarball).digest)}"
   abort unless d.dig("tarball", "integrity") == integrity
   abort unless d.dig("archive", "sha256") == Digest::SHA256.file(archive).hexdigest
+  checksum = archive + ".sha256"
+  abort unless d.dig("archive", "checksum_sha256") == Digest::SHA256.file(checksum).hexdigest
   abort unless d.dig("build", "package_file_list_blob") == "23dadc1d138fdd5b8269ffc76d11d691f2faed9b"
+  abort unless d.dig("build", "candidate_identity") == "v1.3.0-#{source}"
+  abort unless d.dig("tarball", "files").all? { |entry| entry.fetch("sha256").match?(/\A[0-9a-f]{64}\z/) }
 ' "$SIDECAR" "$TARBALL" "$ARCHIVE" "$SOURCE_SHA"
 
 ruby "$ROOT/scripts/verify-npm-tarball.rb" --tarball "$TARBALL" --sidecar "$SIDECAR" >/dev/null
 bash "$ROOT/scripts/verify-package.sh" "$ARCHIVE" >/dev/null
+
+if [[ "$BUILT_LOCALLY" == true ]]; then
+  bash "$ROOT/scripts/build-release-candidate.sh" "$TMP/candidate-repeat" > "$TMP/candidate-repeat.outputs"
+  REPEAT_TARBALL="$(sed -n 's/^tarball=//p' "$TMP/candidate-repeat.outputs")"
+  REPEAT_SIDECAR="$(sed -n 's/^sidecar=//p' "$TMP/candidate-repeat.outputs")"
+  REPEAT_ARCHIVE="$(sed -n 's/^archive=//p' "$TMP/candidate-repeat.outputs")"
+  cmp "$TARBALL" "$REPEAT_TARBALL"
+  cmp "$SIDECAR" "$REPEAT_SIDECAR"
+  cmp "$ARCHIVE" "$REPEAT_ARCHIVE"
+  cmp "$ARCHIVE.sha256" "$REPEAT_ARCHIVE.sha256"
+fi
+
 ORIGINAL_SHA256="$(shasum -a 256 "$TARBALL" | awk '{print $1}')"
 VERDIFY_TARBALL="$TARBALL" VERDIFY_SIDECAR="$SIDECAR" bash "$ROOT/tests/test_npm_install.sh"
 [[ "$ORIGINAL_SHA256" == "$(shasum -a 256 "$TARBALL" | awk '{print $1}')" ]]
@@ -69,9 +97,27 @@ done
 [[ "$(grep -Ec '^[[:space:]]*npm pack --json --pack-destination' "$ROOT/scripts/build-release-candidate.sh")" == "1" ]]
 grep -Fq 'npm publish "${TARBALL}" --access public --provenance' "$ROOT/.github/workflows/publish-npm.yml"
 [[ "$(grep -Fc 'npm publish "${TARBALL}" --access public --provenance' "$ROOT/.github/workflows/publish-npm.yml")" == "1" ]]
-! grep -En 'uses: (actions/checkout|actions/setup-node|ruby/setup-ruby)@v' \
+! grep -En 'uses: (actions/checkout|actions/setup-node|actions/upload-artifact|actions/download-artifact|ruby/setup-ruby)@v' \
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
 ! grep -En 'npm@(latest|next)|npm install --global npm@[^0-9]' \
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
+ruby -e '
+  workflow = File.read(ARGV.fetch(0))
+  candidate = workflow.index("candidate:") or abort "unprivileged candidate job is missing"
+  tests = workflow.index("bash tests/test_packed_artifact.sh") or abort "full candidate matrix is missing"
+  publish = workflow.index("publish:", candidate + 1) or abort "privileged publish job is missing"
+  npm_publish = workflow.index(%q{npm publish "${TARBALL}" --access public --provenance}) or abort "exact tarball publish is missing"
+  abort "consumer matrix is not separated from privileged publish" unless candidate < tests && tests < publish && publish < npm_publish
+  abort "publish job repacks the candidate" unless workflow.scan("build-release-candidate.sh").length == 1
+  abort "stable candidate artifact name is missing" unless workflow.include?("verdify-release-candidate-v${VERSION}-${SOURCE_SHA}")
+  abort "candidate retention is not explicit" unless workflow.include?("retention-days: 90")
+  abort "cross-run artifact identity is not pinned" unless workflow.include?("artifact-ids:") && workflow.include?("run-id:")
+  %w[repository workflow_path workflow_run_id artifact_name source_sha sidecar_sha256].each do |field|
+    abort "candidate provenance is missing #{field}" unless workflow.include?(field)
+  end
+  abort "missing no-repack guard after npm mutation" unless workflow.include?("--require-unpublished")
+  abort "missing no-repack guard after tag mutation" unless workflow.include?("refusing to repack after authority mutation")
+  abort "missing no-repack guard after release mutation" unless workflow.include?("GitHub release v${VERSION} already exists; refusing to repack")
+' "$ROOT/.github/workflows/publish-npm.yml"
 
 echo "Packed artifact tests passed: $TARBALL ($ORIGINAL_SHA256)"
