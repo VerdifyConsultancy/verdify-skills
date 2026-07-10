@@ -26,8 +26,33 @@ printf 'controller state\n' > "$FIXTURE/.agent-workflow/local.yaml"
 printf 'installed copy\n' > "$FIXTURE/.agent-skills/local.txt"
 printf 'old archive\n' > "$FIXTURE/dist/old.zip"
 printf 'dependency\n' > "$FIXTURE/node_modules/local.js"
+mkdir -p "$FIXTURE/tracked-ancestor/nested"
+printf 'tracked repository bytes\n' > "$FIXTURE/tracked-ancestor/nested/value.txt"
+printf 'normal mode\n' > "$FIXTURE/mode-normal.txt"
+printf '#!/usr/bin/env sh\nexit 0\n' > "$FIXTURE/mode-executable.sh"
+chmod 0644 "$FIXTURE/mode-normal.txt"
+chmod 0755 "$FIXTURE/mode-executable.sh"
 git -C "$FIXTURE" add -f .
 git -C "$FIXTURE" commit -qm "package fixture"
+
+[[ "$(git -C "$FIXTURE" ls-files --stage -- mode-normal.txt | cut -d' ' -f1)" == "100644" ]]
+[[ "$(git -C "$FIXTURE" ls-files --stage -- mode-executable.sh | cut -d' ' -f1)" == "100755" ]]
+
+# Local chmod drift must not change staged or archived permissions.
+chmod 0755 "$FIXTURE/mode-normal.txt"
+chmod 0644 "$FIXTURE/mode-executable.sh"
+MODE_STAGE="$TMP/mode-stage"
+ruby "$FIXTURE/scripts/package-file-list.rb" --stage "$MODE_STAGE" "$FIXTURE" >/dev/null
+ruby -e '
+  path, expected = ARGV
+  actual = File.stat(path).mode & 0o777
+  abort "unexpected mode for #{path}: %04o" % actual unless actual == Integer(expected, 8)
+' "$MODE_STAGE/mode-normal.txt" 0644
+ruby -e '
+  path, expected = ARGV
+  actual = File.stat(path).mode & 0o777
+  abort "unexpected mode for #{path}: %04o" % actual unless actual == Integer(expected, 8)
+' "$MODE_STAGE/mode-executable.sh" 0755
 
 LINK_PATH=".agents/skills/project-router"
 [[ -L "$FIXTURE/$LINK_PATH" ]]
@@ -85,6 +110,16 @@ ruby -e '
   abort "discovery link was dereferenced" unless File.symlink?(link)
   abort "discovery link target changed" unless File.readlink(link) == expected
 ' "$EXTRACTED/$ARCHIVE_ROOT/$LINK_PATH" "$LINK_TARGET"
+ruby -e '
+  path, expected = ARGV
+  actual = File.stat(path).mode & 0o777
+  abort "unexpected archived mode for #{path}: %04o" % actual unless actual == Integer(expected, 8)
+' "$EXTRACTED/$ARCHIVE_ROOT/mode-normal.txt" 0644
+ruby -e '
+  path, expected = ARGV
+  actual = File.stat(path).mode & 0o777
+  abort "unexpected archived mode for #{path}: %04o" % actual unless actual == Integer(expected, 8)
+' "$EXTRACTED/$ARCHIVE_ROOT/mode-executable.sh" 0755
 
 ruby -e '
   root, selected_file, manifest_file = ARGV
@@ -95,5 +130,37 @@ ruby -e '
   actual = File.readlines(manifest_file, chomp: true).map { |line| line.split(/  /, 2).fetch(1) }
   abort "manifest paths differ from selected regular files" unless actual == expected
 ' "$FIXTURE" "$TMP/paths.before" "$TMP/manifest.before"
+
+# Replacing a tracked file's parent directory with an untracked symlink must
+# fail before any external bytes are selected, staged, hashed, or archived.
+EXTERNAL="$TMP/external-parent"
+mkdir -p "$EXTERNAL/nested"
+printf 'HOST EXTERNAL BYTES\n' > "$EXTERNAL/nested/value.txt"
+rm -rf "$FIXTURE/tracked-ancestor"
+ln -s "$EXTERNAL" "$FIXTURE/tracked-ancestor"
+
+ATTACK_STAGE="$TMP/attack-stage"
+mkdir -p "$ATTACK_STAGE"
+if ruby "$FIXTURE/scripts/package-file-list.rb" --stage "$ATTACK_STAGE" "$FIXTURE" >"$TMP/attack-stage.out" 2>"$TMP/attack-stage.err"; then
+  echo "selector accepted an untracked symlink ancestor" >&2
+  exit 1
+fi
+grep -q 'tracked path ancestor is a symlink: tracked-ancestor/nested/value.txt' "$TMP/attack-stage.err"
+[[ -z "$(find "$ATTACK_STAGE" -mindepth 1 -print -quit)" ]]
+
+if bash "$FIXTURE/scripts/gen-manifest.sh" "$FIXTURE" "$TMP/attack.manifest" >"$TMP/attack-manifest.out" 2>"$TMP/attack-manifest.err"; then
+  echo "manifest generation accepted an untracked symlink ancestor" >&2
+  exit 1
+fi
+grep -q 'tracked path ancestor is a symlink: tracked-ancestor/nested/value.txt' "$TMP/attack-manifest.err"
+[[ ! -e "$TMP/attack.manifest" ]]
+
+ATTACK_PACKAGE="$TMP/attack-package"
+if VERDIFY_PACKAGE_SKIP_TESTS=1 bash "$FIXTURE/scripts/package.sh" "$ATTACK_PACKAGE" >"$TMP/attack-package.out" 2>"$TMP/attack-package.err"; then
+  echo "package generation accepted an untracked symlink ancestor" >&2
+  exit 1
+fi
+grep -q 'tracked path ancestor is a symlink: tracked-ancestor/nested/value.txt' "$TMP/attack-package.err"
+[[ -z "$(find "$ATTACK_PACKAGE" -type f -name '*.zip' -print -quit)" ]]
 
 echo "Package file-set tests passed."

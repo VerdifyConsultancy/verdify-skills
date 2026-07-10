@@ -15,6 +15,24 @@ EXCLUDED_ROOTS = %w[
 EXCLUDED_FILES = %w[MANIFEST.sha256].freeze
 SUPPORTED_MODES = %w[100644 100755 120000].freeze
 
+def validate_tracked_path(root, path, mode)
+  current = root
+  path.split("/")[0...-1].each do |component|
+    current = File.join(current, component)
+    stat = File.lstat(current)
+    abort "tracked path ancestor is a symlink: #{path}" if stat.symlink?
+    abort "tracked path ancestor is not a directory: #{path}" unless stat.directory?
+  end
+
+  stat = File.lstat(File.join(root, path))
+  expected_symlink = mode == "120000"
+  abort "tracked file type does not match the Git index: #{path}" unless stat.symlink? == expected_symlink
+  abort "tracked path is not a regular file or symlink: #{path}" unless stat.file? || stat.symlink?
+  stat
+rescue Errno::ENOENT, Errno::ENOTDIR
+  abort "tracked path is missing or inaccessible: #{path}"
+end
+
 options = {null: false, stage: nil, tree: false}
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: scripts/package-file-list.rb [--null] [--stage DIR] [--tree] [SOURCE]"
@@ -70,6 +88,13 @@ end
 
 entries.sort_by!(&:first)
 
+# Validate the entire source topology before emitting paths or staging bytes. A
+# tracked leaf is not safe when an untracked symlink replaces one of its parent
+# directories, even though the leaf itself still appears to have the right type.
+validated_stats = entries.to_h do |path, mode|
+  [path, validate_tracked_path(root, path, mode)]
+end
+
 if options[:stage]
   destination = File.expand_path(options[:stage])
   FileUtils.mkdir_p(destination)
@@ -78,17 +103,14 @@ if options[:stage]
   entries.each do |path, mode|
     source = File.join(root, path)
     target = File.join(destination, path)
-    stat = File.lstat(source)
-    expected_symlink = mode == "120000"
-    abort "tracked file type does not match the Git index: #{path}" unless stat.symlink? == expected_symlink
-    abort "tracked path is not a regular file or symlink: #{path}" unless stat.file? || stat.symlink?
+    stat = validated_stats.fetch(path)
 
     FileUtils.mkdir_p(File.dirname(target))
     if stat.symlink?
       File.symlink(File.readlink(source), target)
     else
-      FileUtils.copy_file(source, target, true)
-      File.chmod(stat.mode & 0o7777, target)
+      FileUtils.copy_file(source, target)
+      File.chmod(mode == "100755" ? 0o755 : 0o644, target)
     end
   end
 end
