@@ -1,0 +1,10 @@
+---
+schema_ref: status.schema.yaml
+kind: SprintStatus
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+state: READY
+updated_at: '2026-07-10T21:29:02Z'
+active_lanes: []
+blockers: []
+next_action: Dispatch the single approved issue-215-receipt-ci-auth lane from protected dev baseline fbe821899caf546e9b7b8daa718ea2ec74918091.

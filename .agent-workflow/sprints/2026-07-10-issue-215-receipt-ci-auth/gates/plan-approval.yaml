@@ -1,0 +1,22 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: plan-approval-2026-07-10-issue-215-receipt-ci-auth
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+lane_id: null
+type: plan_approval
+status: approved
+question: Approve the one-issue receipt-CI authentication plan, read-only Actions permission, bounded request optimization, and protected-path integration envelope?
+owner: Jason Vallery
+evidence_required:
+- Verdify Skills issue 215 and its corrected least-privilege acceptance contract
+- pull request 214 failure logs and authenticated six-receipt validation
+- approved post-135 state of union on protected dev
+- single-lane sprint plan, contract, and wave release plan
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: Jason explicitly delegated autonomous execution and self-managed approvals for this program. The plan adds only the read permissions required to retain workflow identity, prohibits write authority and token exposure, requires one fresh implementation critic and green CI, and keeps later platform work outside scope.
+opened_at: '2026-07-10T21:29:02Z'
+resolved_at: '2026-07-10T21:29:02Z'
+resume_state: READY
