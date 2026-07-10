@@ -1,8 +1,9 @@
 # State of union
 
-Iteration 25 product, project, and architecture foundations are approved on
-`dev@45150ee76b770c2e97345dfdfa9196b4acebcc3b`. All historical sprint
-transactions are terminal, and global routing no longer needs a sprint selector.
+Iteration 25 product, project, architecture, strategy, and Wave 0 hygiene are
+approved on `dev@933150a4bf2c15e9a57f89409dd8caa51b491a29`. All historical
+sprint transactions are terminal, the repo-controller scope is active, and
+global routing no longer needs a sprint selector.
 
 The repository is not release-ready. `main`, npm latest, and GitHub latest
 release agree on `1.2.1`, while repeated generated `1.2.1` promotions from
@@ -26,7 +27,6 @@ execution order is:
    provenance, and final ref cleanup.
 
 The next handoff is `sprint-planning / issue-readiness` for separate #130 and
-#126 lanes, with #126 dependent on #130. Repo hygiene remains the mandatory
-router gate before that handoff. Agent Platform, Orbit, Gravity, route quality,
-eval, and simplification issues remain durable backlog but are outside this
-repository-recovery release.
+#126 lanes, with #126 dependent on #130. Agent Platform, Orbit, Gravity, route
+quality, eval, and simplification issues remain durable backlog but are outside
+this repository-recovery release.

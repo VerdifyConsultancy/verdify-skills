@@ -81,7 +81,7 @@ responsibilities:
   - id: RAS-004
     description: Selectively recover authoritative unpublished work and preserve a checked-in disposition before deleting refs.
     lifecycle_skill: lane-delivery
-    acceptance_signal: Issue #126 acceptance, final recovery ledger, accepted-tree comparison, and clean ref audit pass.
+    acceptance_signal: "Issue #126 acceptance, final recovery ledger, accepted-tree comparison, and clean ref audit pass."
     evidence_refs:
       - issue #126
       - rescue/pilot-artifacts-wip-2026-07-07@fe1f94e
@@ -166,15 +166,15 @@ escalation_paths:
     blocking: true
   - trigger: Independent review identity or current-head approval cannot be satisfied.
     owner: Repository maintainers
-    route: issue #121 and sprint-orchestrator gate-management
+    route: "issue #121 and sprint-orchestrator gate-management"
     blocking: true
   - trigger: Package, provenance, partial publication, or private history state is unsafe or inconsistent.
     owner: Release maintainer and security owner
-    route: issue #120 and release-verification
+    route: "issue #120 and release-verification"
     blocking: true
   - trigger: Recovery content or ref deletion is ambiguous.
     owner: Jason Vallery
-    route: issue #126 or a repo-hygiene gate
+    route: "issue #126 or a repo-hygiene gate"
     blocking: true
   - trigger: Agent Platform, Orbit, or Gravity runtime evidence is required.
     owner: Owning project controller
@@ -189,7 +189,7 @@ review:
 handoff:
   next_skill: state-of-union
   next_mode: strategy-refresh
-  reason: Refresh the strategy baseline after Wave 0 integrates, then route the approved #130/#126 candidate set to sprint planning.
+  reason: "Refresh the strategy baseline after Wave 0 integrates, then route the approved #130/#126 candidate set to sprint planning."
 approval:
   status: approved
   approver: Jason Vallery
