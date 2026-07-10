@@ -6,8 +6,8 @@ sprint_id: 2026-07-10-delivery-controls
 status: verified
 integrated_sha: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
 release:
-  tag: 
-  url: 
+  tag:
+  url:
 artifact_identity:
 - type: git-commit
   identifier: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
