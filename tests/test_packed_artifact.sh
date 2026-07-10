@@ -56,7 +56,7 @@ fi
 [[ "$(cat "$ROOT/VERSION")" == "1.3.0" ]]
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["version"] == "1.3.0"' "$ROOT/package.json"
 grep -q '^## 1.3.0 - 2026-07-10$' "$ROOT/CHANGELOG.md"
-[[ "$(rg -l '^  version: "1\.3\.0"$' "$ROOT"/skills/*/SKILL.md | wc -l | tr -d ' ')" == "28" ]]
+[[ "$(grep -l '^  version: "1\.3\.0"$' "$ROOT"/skills/*/SKILL.md | wc -l | tr -d ' ')" == "28" ]]
 
 for skill in "$ROOT"/skills/*/SKILL.md; do
   relative="${skill#$ROOT/}"
@@ -69,9 +69,9 @@ done
 [[ "$(grep -Ec '^[[:space:]]*npm pack --json --pack-destination' "$ROOT/scripts/build-release-candidate.sh")" == "1" ]]
 grep -Fq 'npm publish "${TARBALL}" --access public --provenance' "$ROOT/.github/workflows/publish-npm.yml"
 [[ "$(grep -Fc 'npm publish "${TARBALL}" --access public --provenance' "$ROOT/.github/workflows/publish-npm.yml")" == "1" ]]
-! rg -n 'uses: (actions/checkout|actions/setup-node|ruby/setup-ruby)@v' \
+! grep -En 'uses: (actions/checkout|actions/setup-node|ruby/setup-ruby)@v' \
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
-! rg -n 'npm@(latest|next)|npm install --global npm@[^0-9]' \
+! grep -En 'npm@(latest|next)|npm install --global npm@[^0-9]' \
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
 
 echo "Packed artifact tests passed: $TARBALL ($ORIGINAL_SHA256)"
