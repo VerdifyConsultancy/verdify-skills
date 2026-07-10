@@ -4,56 +4,58 @@ schema_version: "2.0"
 sprint_id: 2026-07-10-package-file-set
 lane_id: issue-130-package-file-set
 pull_request: 166
-worker_agent: codex-subagent-fix1
-worker_session_id: local-issue-130-fix1
-critic_agent: codex-independent-critic-4
-implementation_head_sha: "456a40e670132e5d7ee5ce750a8993ec8f082f50"
-evidence_head_sha: "54f799f881b1481cbb9fc91ad57ecb23327d4ebe"
-reviewed_head_sha: "54f799f881b1481cbb9fc91ad57ecb23327d4ebe"
+worker_agent: codex-subagent-fix2
+worker_session_id: local-issue-130-fix2
+critic_agent: codex-independent-critic-final
+implementation_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
+evidence_head_sha: "8600a9cef47e43d0287e640c76b99e3a77858870"
+reviewed_head_sha: "8600a9cef47e43d0287e640c76b99e3a77858870"
 closeout_path: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
-closeout_sha256: "5fa4f18ac244aee7268207da6d4b8ff27d4e6226860bd8e110dc2effdc43aa8b"
-critic_session_id: critic-issue-130-fix1c
-review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-package-file-set/critic-issue-130-fix1c
-outcome: request_fixes
-findings:
-  - id: FIND-001
-    severity: high
-    statement: Staged output can diverge from the Git index during one successful command because bytes and symlink targets are read from the mutable worktree after validation.
-    evidence:
-      - scripts/package-file-list.rb:69-86 snapshots index paths and modes, then lines 91-96 validate the current worktree topology, but lines 103-114 later copy file bytes and read symlink targets from that worktree without binding those reads to the indexed object IDs or an equivalent atomic snapshot.
-      - scripts/package.sh:19 stages through that two-phase selector and line 21 hashes the resulting stage, so later worktree reads rather than the validated Git index can determine packaged content.
-      - "Issue #130's latest durable review comment records the observed within-command divergence; this critic did not rerun a concurrent filesystem-change probe and confirmed the underlying gap by static review."
-    requested_action: Source staged regular-file bytes and symlink targets from Git objects, or use an equivalent atomic input tied to the selected index snapshot, add a deterministic regression, and rebuild the I/E evidence chain.
+closeout_sha256: "477539b329ef0475c4842e2dd386ac16b8e2bb53573cdd3e227e536bd275213a"
+critic_session_id: critic-issue-130-fix2
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-package-file-set/critic-issue-130-fix2
+outcome: approve
+findings: []
 acceptance_assessment:
   - criterion_id: LANE-AC-01
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
-      - The manifest and archive use one path selector, but archive staging is not sourced from the same immutable index snapshot because scripts/package-file-list.rb later reads mutable worktree bytes and link targets.
+      - scripts/package-file-list.rb captures each selected stage-0 Git-index entry's mode and blob object ID, then materializes regular bytes and symlink-target bytes through one git cat-file --batch stream without reading mutable worktree paths.
+      - scripts/gen-manifest.sh stages the captured repository snapshot and hashes that exact stage; scripts/package.sh stages the same selector output, invokes exported-tree manifest generation on that stage, and archives it.
+      - The focused regression independently passed and compared the selected regular paths, manifest paths, and exact archive path set.
   - criterion_id: LANE-AC-02
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
-      - The committed ignored and untracked fixtures pass, but the two-phase staging design still permits archive content to change during one run without a corresponding Git-index change.
+      - The focused regression independently passed with dirty tracked bytes and modes, a regular leaf replaced by a local symlink, an external symlink ancestor, ignored .claude/scheduled_tasks.lock and cache fixtures, and an untracked operator file.
+      - Direct staging, manifest generation, and the archive restored the indexed bytes and excluded all ignored and untracked fixtures.
+      - A separate critic probe confirmed NUL-delimited selection and staging, immutable indexed bytes, mode and link-target restoration, and ignored-file isolation with an unusual tracked filename.
   - criterion_id: LANE-AC-03
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
-      - Tracked discovery links and index-derived modes pass the committed tests, but File.readlink is performed after validation and can stage a link target that differs from the indexed link object.
+      - The indexed .agents/skills/project-router link target is read from its captured blob and remains a symlink in both direct staging and the extracted archive despite mutable worktree target drift.
+      - Git index modes 100644 and 100755 become exactly 0644 and 0755 in direct staging and the extracted archive despite opposite local chmod drift.
+      - The focused regression passed exact archive entry comparison and scripts/verify-package.sh verification without dereferencing tracked discovery links.
   - criterion_id: LANE-AC-04
     assessment: satisfied
     evidence:
-      - ruby scripts/validate-repo.rb and bash tests/test_package_file_set.sh passed independently at E2.
-      - make test passed independently at E2 with 90 runs, 531 assertions, and passing CLI, PR-policy, release-preflight, and npm-install tests.
-      - The ordinary deterministic checks do not exercise mutation between validation and staging, so their success does not satisfy LANE-AC-01 through LANE-AC-03.
+      - ruby scripts/validate-repo.rb independently passed at E3 with 26 skills and 46 schemas.
+      - bash tests/test_package_file_set.sh independently passed at E3.
+      - make test independently passed at E3 with 90 runs, 531 assertions, zero failures, errors, or skips, followed by passing CLI, PR-policy, release-preflight, and npm-install tests.
+      - I3 validate, compliance, and the superseding pull-request-policy run passed; E3 validate and compliance passed, while its expected policy failures identify the stale prior report and missing final report head that this S3 transaction repairs.
 evidence_assessment:
-  - The detached critic worktree, active critic lease, local lane ref, remote lane ref, and live PR head matched E2 before report creation; the critic agent and session differ from the fix-forward worker identity and session.
-  - Dispatch D b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the first post-baseline commit and adds only the approved sprint plan, wave release plan, and lane contract; all three remain byte-identical through E2.
-  - Fix-forward implementation I2 456a40e670132e5d7ee5ce750a8993ec8f082f50 changes only four contract-owned paths, and E2 changes only the canonical closeout after I2.
-  - The independently computed closeout SHA-256 is 5fa4f18ac244aee7268207da6d4b8ff27d4e6226860bd8e110dc2effdc43aa8b, and the closeout contract hash matches the immutable lane contract.
-  - The closeout and ordinary test evidence are revision-bound and credible for the behaviors they cover, but they do not establish atomic staging relative to the Git index.
+  - The detached critic worktree, active lease critic-issue-130-package-file-set-critic-issue-130-fix2, local lane ref, remote lane ref, and live PR head all matched E3 before report creation; critic agent and session both differ from the fix-forward worker identity and session.
+  - Dispatch D b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the first post-baseline commit and adds only the approved sprint plan, wave release plan, and lane contract; all three remain byte-identical through E3.
+  - I3 5902e947cad5bd220c072d0593e490dd6baf9bbc changes only six contract-owned paths after the prior request-fixes report, and E3 changes only the canonical closeout after I3 in a linear history.
+  - The independently computed closeout SHA-256 is 477539b329ef0475c4842e2dd386ac16b8e2bb53573cdd3e227e536bd275213a, and the closeout contract hash matches the immutable lane contract.
+  - Static review and independent probes confirm repository staging obtains file bytes, executable modes, and tracked link targets from captured index objects; manifest hashing and packaging consume the resulting staged snapshot.
+  - Git index parsing and internal path transport use NUL delimiters, and no current tracked path contains a line break. The legacy MANIFEST.sha256 serialization remains line-oriented and fails closed for a hypothetical future line-break path rather than accepting an ambiguous digest record.
+  - Worker evidence is revision-bound and consistent with independent validation. The earlier I3 policy failure was superseded after exact-head metadata correction; E3 policy failures are limited to the intentionally stale S2 report/current-head relationship before this report-only S3 commit.
 integration_risks:
-  - A package can contain regular-file bytes or symlink targets not represented by the Git index snapshot selected at command start, violating the reproducible tracked-input invariant.
-  - This request-fixes head must remain draft and must not receive an advancing approval; a fix requires a new substantive implementation head, closeout-only evidence head, and fresh critic report.
+  - The approving critic outcome is not an advancing GitHub approval; S3 still requires successful exact-head validate, pull-request-policy, and compliance checks plus a commit-bound APPROVED review from a repository admin or maintainer other than PR author jvallery.
+  - No npm publication, GitHub release, dev integration, runtime deployment, or deployment verification is authorized by this lane or critic report.
 residual_risks:
-  - The prior ancestor-topology and file-mode findings are fixed at I2; this report does not reopen them.
-  - No npm publication, GitHub release, dev integration, runtime deployment, or deployment verification was performed in this critic session.
-  - Any future approving report head still requires an APPROVED review from a repository admin or maintainer other than PR author jvallery.
-reviewed_at: "2026-07-10T04:15:27Z"
+  - Repository-mode archive generation requires an intact Git index and reachable captured blob objects and fails closed if an object cannot be materialized.
+  - Explicit exported-tree manifest generation intentionally has no immutable Git objects and reads the supplied filesystem boundary; release archive staging remains repository/index mode.
+  - MANIFEST.sha256 is a line-oriented repository format. Current tracked paths are compatible; a future tracked path containing a line break would fail verification and require an explicit manifest-format decision outside issue 130.
+  - Any commit after S3 invalidates its exact-head checks and any later external approval.
+reviewed_at: "2026-07-10T04:40:18Z"
