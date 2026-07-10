@@ -1,0 +1,25 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-10-npm-oidc-recovery
+decision: accepted
+reviewed_at: '2026-07-10T20:54:03Z'
+reviewer: codex-root under Jason Vallery delegated authority
+intended_outcome: Pin an OIDC-capable npm 11 CLI in both publish jobs, then independently
+  review the exact recovery before another 1.3.0 release retry.
+delivered_outcomes:
+- The exact reviewed lane merged to protected dev as 2f98073eddc53d75ceec0bebe1f20fdfa5a58ea4
+  with trusted checks green.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/208
+- git:05f53aac723abe3ed97bae5044666434aa8cb2c1
+- git:2f98073eddc53d75ceec0bebe1f20fdfa5a58ea4
+incomplete_items: []
+residual_risks: []
+follow_up_issues: []
+lessons_learned:
+- Terminal authority belongs on protected dev and must remain bound to exact review
+  and integration evidence.
+rationale: The issue-backed lane met its acceptance contract and was independently
+  reviewed, checked, and merged.
