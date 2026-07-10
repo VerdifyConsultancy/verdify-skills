@@ -610,12 +610,50 @@ class RepoValidator
 
     policy_workflow = ROOT.join(".github/workflows/policy.yml")
     policy_body = policy_workflow.file? ? policy_workflow.read : ""
+    policy_document = load_yaml(policy_workflow)
     error(policy_workflow, "must check out the protected base policy engine") unless policy_body.include?("github.event.pull_request.base.sha") && policy_body.include?("path: trusted-policy")
     error(policy_workflow, "must check out candidate history separately") unless policy_body.include?("path: candidate") && policy_body.include?("fetch-depth: 0")
     error(policy_workflow, "must pass the candidate only as --repo input") unless policy_body.include?("trusted-policy/scripts/pr-policy.rb") && policy_body.include?("--repo \"$GITHUB_WORKSPACE/candidate\"")
+    expected_read_permissions = { "actions" => "read", "checks" => "read", "contents" => "read", "pull-requests" => "read" }
+    normalize_guard = ->(value) { value.to_s.gsub(/\s+/, " ").strip }
+    policy_job_guard = normalize_guard.call(<<~GUARD)
+      github.event.pull_request.base.repo.full_name == github.repository &&
+      (github.event.pull_request.base.ref == 'dev' ||
+       github.event.pull_request.base.ref == 'main')
+    GUARD
+    delivery_job_guard = normalize_guard.call(<<~GUARD)
+      (github.event.pull_request != null &&
+       github.event.pull_request.base.repo.full_name == github.repository &&
+       (github.event.pull_request.base.ref == 'dev' ||
+        github.event.pull_request.base.ref == 'main')) ||
+      (github.event.pull_request == null &&
+       github.ref == 'refs/heads/dev')
+    GUARD
+    error(policy_workflow, "must declare only the required read permissions") unless policy_document.is_a?(Hash) && policy_document["permissions"] == expected_read_permissions
+    policy_trigger = policy_document.is_a?(Hash) ? policy_document.dig(true, "pull_request") : nil
+    error(policy_workflow, "pull requests must be filtered to protected dev and main bases") unless Array(policy_trigger&.fetch("branches", nil)).sort == %w[dev main]
+    policy_job = policy_document.is_a?(Hash) ? policy_document.dig("jobs", "pull-request-policy") : nil
+    error(policy_workflow, "policy job must require exact same-repository protected-base identity") unless normalize_guard.call(policy_job&.fetch("if", nil)) == policy_job_guard
+    policy_validation_step = Array(policy_document.dig("jobs", "pull-request-policy", "steps")).find { |step| step["name"] == "Check Verdify pull request contract" } if policy_document.is_a?(Hash)
+    error(policy_workflow, "receipt validation step must receive github.token as GH_TOKEN") unless policy_validation_step&.dig("env", "GH_TOKEN") == "${{ github.token }}"
+    {
+      "BASE_REF" => "${{ github.event.pull_request.base.ref }}",
+      "BASE_REPOSITORY" => "${{ github.event.pull_request.base.repo.full_name }}",
+      "REPOSITORY" => "${{ github.repository }}"
+    }.each do |name, value|
+      error(policy_workflow, "receipt validation must bind #{name} to trusted event identity") unless policy_validation_step&.dig("env", name) == value
+    end
+    policy_validation_run = policy_validation_step&.fetch("run", "").to_s
+    error(policy_workflow, "token-scoped validation must execute only the trusted policy engine") unless policy_validation_run.include?("trusted-policy/scripts/pr-policy.rb") && !policy_validation_run.include?("candidate/scripts/pr-policy.rb")
+    policy_ordering = [
+      '[[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]]', 'case "${BASE_REF}" in', "dev|main)",
+      "trusted-policy/scripts/pr-policy.rb"
+    ].map { |token| policy_validation_run.index(token) }
+    error(policy_workflow, "token-scoped validation must guard repository and protected base before execution") unless policy_ordering.all? && policy_ordering == policy_ordering.sort
 
     delivery_workflow = ROOT.join(".github/workflows/delivery-gate.yml")
     delivery_body = delivery_workflow.file? ? delivery_workflow.read : ""
+    delivery_document = load_yaml(delivery_workflow)
     %w[delivery-policy critic-gate pull_request pull_request_review workflow_dispatch].each do |token|
       error(delivery_workflow, "must declare #{token}") unless delivery_body.include?(token)
     end
@@ -623,6 +661,53 @@ class RepoValidator
     error(delivery_workflow, "must not request pull-request review write permission") if delivery_body.match?(/pull-requests:\s*write/) || delivery_body.match?(/pull_request_review:\s*write/)
     error(delivery_workflow, "non-PR contexts must discover and validate the exact release PR") unless delivery_body.scan("--prepare-release-event").length == 2 && delivery_body.scan("open-release-pulls.json").length >= 4
     error(delivery_workflow, "bootstrap mode must not bypass delivery policy or critic approval") if delivery_body.include?("--bootstrap")
+    error(delivery_workflow, "must declare only the required read permissions") unless delivery_document.is_a?(Hash) && delivery_document["permissions"] == expected_read_permissions
+    delivery_trigger = delivery_document.is_a?(Hash) ? delivery_document.dig(true, "pull_request") : nil
+    error(delivery_workflow, "pull requests must be filtered to protected dev and main bases") unless Array(delivery_trigger&.fetch("branches", nil)).sort == %w[dev main]
+    error(delivery_workflow, "short ref_name cannot authorize candidate policy execution") if delivery_body.include?("github.ref_name") || delivery_body.include?("REF_NAME")
+    {
+      "delivery-policy" => "Check candidate-side delivery route",
+      "critic-gate" => "Validate current-head critic or release approval"
+    }.each do |job, name|
+      job_document = delivery_document.is_a?(Hash) ? delivery_document.dig("jobs", job) : nil
+      error(delivery_workflow, "#{job} must require protected PR identity or exact refs/heads/dev") unless normalize_guard.call(job_document&.fetch("if", nil)) == delivery_job_guard
+      step = Array(delivery_document.dig("jobs", job, "steps")).find { |item| item["name"] == name } if delivery_document.is_a?(Hash)
+      error(delivery_workflow, "#{name} must receive github.token as GH_TOKEN") unless step&.dig("env", "GH_TOKEN") == "${{ github.token }}"
+      {
+        "BASE_REF" => "${{ github.event.pull_request.base.ref }}",
+        "BASE_REPOSITORY" => "${{ github.event.pull_request.base.repo.full_name }}",
+        "FULL_REF" => "${{ github.ref }}",
+        "REPOSITORY" => "${{ github.repository }}"
+      }.each do |env_name, value|
+        error(delivery_workflow, "#{name} must bind #{env_name} to trusted event identity") unless step&.dig("env", env_name) == value
+      end
+      run = step&.fetch("run", "").to_s
+      candidate_engine = job == "delivery-policy" ? "candidate/scripts/pr-policy.rb" : "candidate/scripts/delivery-gate.rb"
+      trusted_engine = job == "delivery-policy" ? "trusted-policy/scripts/pr-policy.rb" : "trusted-policy/scripts/delivery-gate.rb"
+      ordering = [
+        'if [[ "${EVENT_NAME}" == pull_request* ]]', '[[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]]',
+        'case "${BASE_REF}" in', "dev|main)", trusted_engine,
+        '[[ "${FULL_REF}" == "refs/heads/dev" ]]', candidate_engine, 'ruby "${ENGINE}"'
+      ].map { |token| run.index(token) }
+      error(delivery_workflow, "#{name} must guard trusted PR and exact dev identities before engine execution") unless ordering.all? && ordering == ordering.sort
+
+      discovery = Array(job_document&.fetch("steps", nil)).find { |item| item["name"] == "Discover the current release PR for non-PR events" }
+      discovery_run = discovery&.fetch("run", "").to_s
+      discovery_ordering = ['[[ "${FULL_REF}" == "refs/heads/dev" ]]', "gh api", "ruby candidate/scripts/delivery-gate.rb"].map { |token| discovery_run.index(token) }
+      error(delivery_workflow, "#{job} non-PR discovery must guard exact refs/heads/dev before candidate code") unless discovery&.dig("env", "FULL_REF") == "${{ github.ref }}" && discovery_ordering.all? && discovery_ordering == discovery_ordering.sort
+    end
+    trusted_delivery_checkout = Array(delivery_document.dig("jobs", "delivery-policy", "steps")).find { |step| step["name"] == "Check out protected-base delivery policy" } if delivery_document.is_a?(Hash)
+    unless trusted_delivery_checkout&.fetch("if", nil) == "github.event.pull_request != null" &&
+           trusted_delivery_checkout&.dig("with", "ref") == "${{ github.event.pull_request.base.sha }}" &&
+           trusted_delivery_checkout&.dig("with", "path") == "trusted-policy"
+      error(delivery_workflow, "PR delivery policy must check out the protected-base engine separately")
+    end
+    { policy_workflow => policy_document, delivery_workflow => delivery_document }.each do |path, document|
+      checkout_steps = document.is_a?(Hash) ? document.fetch("jobs", {}).values.flat_map { |job| Array(job["steps"]) }.select { |step| step["uses"].to_s.start_with?("actions/checkout@") } : []
+      checkout_steps.each do |step|
+        error(path, "every checkout must disable persisted credentials") unless step.dig("with", "persist-credentials") == false
+      end
+    end
     delivery_body.scan(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/).flatten.each do |action|
       error(delivery_workflow, "action must use an immutable commit pin: #{action}") unless action.match?(/@[0-9a-f]{40}\z/i)
     end

@@ -2,6 +2,15 @@
 
 module Verdify
   class GitRepository
+    MAX_CHECK_WORKFLOW_RUN_REQUESTS = 5
+
+    def self.parse_positive_check_id(value)
+      return value if value.is_a?(Integer) && value.positive?
+      return nil unless value.is_a?(String) && value.match?(/\A[1-9][0-9]*\z/)
+
+      Integer(value, 10)
+    end
+
     attr_reader :root
 
     def initialize(path)
@@ -161,20 +170,40 @@ module Verdify
       raise CommandError, "Could not read GitHub terminal pull request evidence: #{e.message}"
     end
 
-    def github_check_run_evidence(ref)
+    def github_check_run_evidence(ref, required_names:)
       slug = github_slug
       raise CommandError, "GitHub remote is not configured" if slug.to_s.empty?
 
       payload = github_api_json("repos/#{slug}/commits/#{ref}/check-runs?filter=latest&per_page=100")
-      workflow_runs = {}
-      Array(payload["check_runs"]).map do |check|
+      names = Array(required_names).map(&:to_s).uniq
+      checks = Array(payload["check_runs"]).select { |check| names.include?(check["name"].to_s) }
+      selected = checks.group_by { |check| check["name"].to_s }.filter_map do |_name, matches|
+        ordered = matches.filter_map do |check|
+          check_id = self.class.parse_positive_check_id(check["id"])
+          [check_id, check] if check_id
+        end
+        next unless ordered.length == matches.length && ordered.map(&:first).uniq.length == ordered.length
+
+        ordered.max_by(&:first).last
+      end
+      selected_run_ids = selected.filter_map do |check|
+        check["details_url"].to_s[%r{/actions/runs/(\d+)}, 1]
+      end.uniq
+      if selected_run_ids.length > MAX_CHECK_WORKFLOW_RUN_REQUESTS
+        raise CommandError, "GitHub check evidence exceeds the workflow-run request bound"
+      end
+
+      workflow_runs = selected_run_ids.to_h do |run_id|
+        [run_id, github_api_json("repos/#{slug}/actions/runs/#{run_id}")]
+      end
+      selected_ids = selected.to_h do |check|
+        [[check["name"].to_s, self.class.parse_positive_check_id(check["id"])], true]
+      end
+      checks.map do |check|
         run_id = check["details_url"].to_s[%r{/actions/runs/(\d+)}, 1]
-        run = if run_id
-                workflow_runs[run_id] ||= github_api_json("repos/#{slug}/actions/runs/#{run_id}")
-              else
-                {}
-              end
-        workflow_path = run["path"].to_s.split("@", 2).first
+        check_id = self.class.parse_positive_check_id(check["id"])
+        run = selected_ids[[check["name"].to_s, check_id]] && run_id ? workflow_runs.fetch(run_id, {}) : {}
+        workflow_path = run["path"]&.to_s&.split("@", 2)&.first
         {
           "id" => check["id"],
           "name" => check["name"],
@@ -258,10 +287,32 @@ module Verdify
     end
 
     def github_api_json(path)
-      gh = capture("gh", "api", path.to_s, allow_failure: true)
-      return JSON.parse(gh.first) if gh.last.success?
-      github_api_json_with_curl(path)
-    rescue CommandError, JSON::ParserError
+      authenticated = !ENV["GH_TOKEN"].to_s.empty?
+      begin
+        stdout, stderr, status = capture("gh", "api", "--include", path.to_s, allow_failure: true)
+      rescue CommandError
+        if authenticated
+          raise CommandError, "GitHub API request failed: resource=#{sanitize_github_diagnostic(path)}; message=GitHub CLI unavailable"
+        end
+
+        return github_api_json_with_curl(path)
+      end
+
+      response = parse_github_api_response(stdout)
+      if status.success?
+        begin
+          return JSON.parse(response.fetch(:body))
+        rescue JSON::ParserError
+          if authenticated
+            resource = sanitize_github_diagnostic(path)
+            status_code = sanitize_github_diagnostic(response[:status] || "unknown")
+            raise CommandError, "GitHub API request failed: resource=#{resource}; status=#{status_code}; message=invalid JSON response"
+          end
+        end
+      elsif authenticated
+        raise CommandError, github_api_failure_message(path, response, stderr)
+      end
+
       github_api_json_with_curl(path)
     end
 
@@ -334,6 +385,54 @@ module Verdify
       end
       records << current unless current.empty?
       records
+    end
+
+    private
+
+    def parse_github_api_response(raw)
+      header, body = raw.to_s.split(/\r?\n\r?\n/, 2)
+      return { status: nil, headers: {}, body: raw.to_s } unless header.to_s.start_with?("HTTP/")
+
+      lines = header.lines.map(&:strip)
+      headers = lines.drop(1).filter_map do |line|
+        name, value = line.split(":", 2)
+        [name.to_s.downcase, value.to_s.strip] unless value.nil?
+      end.to_h
+      {
+        status: lines.first.to_s[/\AHTTP\/\S+\s+(\d{3})\b/, 1],
+        headers: headers,
+        body: body.to_s
+      }
+    end
+
+    def github_api_failure_message(path, response, stderr)
+      headers = response.fetch(:headers)
+      status = response[:status] || stderr.to_s[/\bHTTP\s+(\d{3})\b/i, 1] || "unknown"
+      payload = JSON.parse(response.fetch(:body))
+      message = payload.is_a?(Hash) ? payload["message"] : nil
+      message = "request failed" if message.to_s.empty?
+      fields = {
+        "status" => status,
+        "message" => message,
+        "rate_remaining" => headers["x-ratelimit-remaining"],
+        "rate_resource" => headers["x-ratelimit-resource"],
+        "rate_reset" => headers["x-ratelimit-reset"],
+        "request_id" => headers["x-github-request-id"]
+      }
+      diagnostic = fields.filter_map do |name, value|
+        "#{name}=#{sanitize_github_diagnostic(value)}" unless value.to_s.empty?
+      end.join("; ")
+      "GitHub API request failed: resource=#{sanitize_github_diagnostic(path)}; #{diagnostic}"
+    rescue JSON::ParserError
+      resource = sanitize_github_diagnostic(path)
+      "GitHub API request failed: resource=#{resource}; status=#{sanitize_github_diagnostic(status)}; message=request failed"
+    end
+
+    def sanitize_github_diagnostic(value)
+      sanitized = value.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?").gsub(/[[:cntrl:]]+/, " ").strip
+      token = ENV["GH_TOKEN"].to_s
+      sanitized = sanitized.gsub(token, "[REDACTED]") unless token.empty?
+      sanitized[0, 256]
     end
   end
 end

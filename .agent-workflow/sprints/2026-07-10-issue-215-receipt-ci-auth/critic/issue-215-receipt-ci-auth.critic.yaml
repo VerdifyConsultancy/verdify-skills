@@ -1,0 +1,180 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+lane_id: issue-215-receipt-ci-auth
+pull_request: 217
+worker_agent: codex-issue215-worker
+worker_session_id: codex-issue215-worker-20260710t2134z
+critic_agent: codex-issue215-critic
+implementation_head_sha: "8c04bb373c2217f9ef58a4c0139e54fdd72568c5"
+evidence_head_sha: "c3405f47e6a311f282ece7d7e62a73c5489c52d6"
+reviewed_head_sha: "c3405f47e6a311f282ece7d7e62a73c5489c52d6"
+closeout_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/closeout/issue-215-receipt-ci-auth.closeout.yaml
+closeout_sha256: "7fe22eea66137682d85d20075cef21f445e09aa32ce089cafb8c706ad686c16d"
+critic_session_id: codex-issue215-critic-20260710t2152z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-issue-215-receipt-ci-auth/critic
+outcome: approve_with_risks
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        policy.yml and delivery-gate.yml declare exactly read-only actions,
+        checks, contents, and pull-request permissions. The three receipt
+        validation steps receive github.token only through step-scoped GH_TOKEN,
+        no write scope exists, and all six checkout invocations explicitly set
+        persist-credentials: false.
+      - >-
+        PR jobs are filtered and job-gated before their first step to exact
+        same-repository dev or main bases. Each token-bearing script repeats the
+        repository/ref guard before assigning a trusted-policy engine; no PR
+        branch can assign a candidate engine. Non-PR jobs and discovery steps
+        require exact github.ref refs/heads/dev before gh or candidate code.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        github_check_run_evidence retains every matching required check,
+        performs no hydration when any per-name ID set is malformed or
+        duplicate, selects only the unique highest valid check per name, and
+        deduplicates shared workflow-run IDs. The five-run per-lane bound and
+        48-read six-receipt ceiling remain fail closed.
+      - >-
+        Focused highest-ID, full-set retention, shared-run, and request-ledger
+        tests passed. A live authenticated PR 213 probe retained 11 matching
+        checks and hydrated five selected checks through four shared runs using
+        five total API reads.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        Loader and validator share parse_positive_check_id and reject
+        fractional Float/String, leading-zero, explicit-plus, zero, negative,
+        nil, boolean, array, object, malformed, and duplicate IDs without
+        hydration. Positive Integer and canonical decimal String IDs remain
+        valid.
+      - >-
+        Required workflow path, pull-request event, exact head SHA, GitHub
+        Actions app, completed status, successful conclusion, and unique
+        highest-ID checks are unchanged and passed against live PR 213 data.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - >-
+        With GH_TOKEN present, status failure, CLI absence, and invalid JSON
+        never invoke curl. Resource/path, message, rate, reset, resource, and
+        request-ID fields are control-character stripped, exact-token redacted,
+        and bounded to 256 characters; arbitrary headers and stderr text are not
+        copied into diagnostics.
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - >-
+        Without GH_TOKEN, the compatibility tests still attempt gh then the
+        existing bounded anonymous curl read, and failure of both paths raises
+        CommandError rather than accepting absent evidence.
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - >-
+        The six-receipt equivalent remains at 42 reads: 12 pull-request, six
+        check-list, and 24 deduplicated workflow-run requests, below the 48-read
+        ceiling. Both protected policy entrypoint suites, the full suite, and
+        the authenticated live evidence probe passed.
+  - criterion_id: LANE-AC-07
+    assessment: satisfied
+    evidence:
+      - >-
+        Independent focused receipt, PR-policy, delivery-gate, repository,
+        manifest, changed-workflow actionlint, gitleaks, diff, and full-suite
+        validation passed at E3. The live exact-E3 validate and compliance
+        checks pass; policy and critic checks fail only because the preserved S2
+        report still binds I2/E2 and requests fixes, as required before this
+        report-only S3.
+evidence_assessment:
+  - >-
+    The same locked critic agent/session performed all three review rounds and
+    is distinct from worker codex-issue215-worker/session
+    codex-issue215-worker-20260710t2134z. This final review began in the detached
+    worktree at live PR E3 c3405f47e6a311f282ece7d7e62a73c5489c52d6;
+    no second critic identity or implementation edit was introduced.
+  - >-
+    The complete history is linear and preserves every review boundary: D
+    749b23d94c1704525432427cf540b74bbda00525, I1
+    7dbcd20b0970a8edf5ab193c97c7038d39ea26eb, E1
+    72e7c72d835016151da70d997f9eea25051e9c5e, S1
+    34197999e5c908ac470236d9c832f9cc392fd173, I2
+    5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5, E2
+    fe2e5298f966b80e6eb4fb976ea1108e9c74f31f, S2
+    6c59ed16e13c5d6857b43951b83a2e9c78cdc242, I3
+    8c04bb373c2217f9ef58a4c0139e54fdd72568c5, and E3
+    c3405f47e6a311f282ece7d7e62a73c5489c52d6.
+  - >-
+    I3 is S2's direct child and changes only six contract-owned paths: both
+    workflows, repository validator, both policy shell suites, and manifest.
+    E3 is I3's direct child and changes only the canonical closeout. Dispatch
+    artifacts remain byte-identical to D; contract SHA-256 is
+    71b18893cf89eff0cd5b0db84253df0278996247707b8675a63e280e518da47b,
+    E3 closeout SHA-256 is
+    7fe22eea66137682d85d20075cef21f445e09aa32ce089cafb8c706ad686c16d,
+    and preserved S2 report SHA-256 is
+    85535bce24bd5eb43727456a1b842b30f405c40dcae2db4d33bbb6f03044ee90.
+  - >-
+    S1 FIND-001 is resolved by trusted PR engines, disabled checkout credential
+    persistence, and I3's pre-step protected-base/full-ref authorization. S1
+    FIND-002 is resolved by sanitized bounded resources on every authenticated
+    failure branch. S1 FIND-003 is resolved by the shared strict check-ID
+    parser. S2 FIND-004 is resolved by exact base repository/dev-main guards,
+    exact refs/heads/dev non-PR guards, and validator plus shell regressions.
+  - >-
+    An independent execution-level probe ran the actual YAML step scripts for
+    policy, delivery, and critic surfaces across eight cases. Same-repository
+    dev/main and fork-head-to-dev PRs selected only trusted engines; cross-base,
+    staging-base, feature-ref, and refs/tags/dev cases failed before any engine;
+    only refs/heads/dev non-PR execution selected candidate dev code.
+  - >-
+    ruby tests/test_sprint_terminal_receipt.rb passed 29 runs and 147
+    assertions. PR-policy, delivery-gate, repository validation, manifest,
+    changed-workflow actionlint, and a redacted nine-commit gitleaks scan passed.
+    make test passed all suites, including 122 runs/688 assertions, 52 runs/129
+    assertions, and 29 runs/147 assertions with zero failures, errors, or skips.
+  - >-
+    Live E3 logs bind BASE_REPOSITORY to VerdifyConsultancy/verdify-skills,
+    BASE_REF to dev, and show both delivery-policy and critic-gate assigning
+    trusted-policy engines only after the guards. Live validate and compliance
+    pass; remaining E3 policy failures are stale-S2 evidence failures, not
+    implementation or workflow authorization failures.
+  - >-
+    Whole-repository actionlint exits 1 only for inherited ShellCheck SC2012 at
+    .github/workflows/compliance-gate.yml:55. An independent baseline archive
+    reproduces the exact file, line, rule, and message; policy.yml and
+    delivery-gate.yml lint cleanly.
+integration_risks:
+  - >-
+    This approving report is not a GitHub review or merge authorization. The
+    exact S3 head must pass validate, pull-request-policy, delivery-policy,
+    compliance, and critic-gate after the controller updates required PR head
+    metadata.
+  - >-
+    Because I3 modifies CODEOWNERS-protected workflows and validator policy, a
+    current non-author code-owner approval and an allowed owner update to
+    protected dev remain mandatory before integration.
+  - >-
+    Merge does not authorize main promotion, npm publication, GitHub release,
+    branch-protection mutation, deployment, or any credential expansion.
+residual_risks:
+  - >-
+    Non-PR feature and tag cases were exercised structurally and by executing
+    the actual step scripts with controlled event identities; no live tag or
+    workflow-dispatch mutation was created during review.
+  - >-
+    The approved baseline-only SC2012 actionlint exception remains limited to
+    unmodified compliance-gate.yml. Any new diagnostic in either changed
+    workflow remains blocking.
+  - >-
+    A normal post-integration terminal receipt must still demonstrate green
+    authenticated pull-request-policy, delivery-policy, and critic-gate checks
+    in the protected-dev workflow context.
+reviewed_at: "2026-07-10T22:48:23Z"

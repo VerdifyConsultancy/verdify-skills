@@ -296,8 +296,8 @@ File.write(github_mock, <<~'MOCK')
         }
       end
 
-      def github_check_run_evidence(ref)
-        SprintTerminalReceipt::REQUIRED_CHECKS.map.with_index do |(name, workflow), index|
+      def github_check_run_evidence(ref, required_names:)
+        SprintTerminalReceipt::REQUIRED_CHECKS.slice(*required_names).map.with_index do |(name, workflow), index|
           {
             "id" => index + 1, "name" => name, "status" => "completed", "conclusion" => "success",
             "app_slug" => "github-actions", "workflow_path" => workflow, "workflow_event" => "pull_request",
@@ -415,6 +415,64 @@ raise "unresolved change request was not rejected" unless run_gate(root, push_ev
 
 event(release_event, head: chain[:head], body: "release", base: "main", source: "dev", author: "jrvallery", head_repo: "attacker/fork")
 run_gate(root, release_event, valid_repo, reviews: reviews, success: false)
+
+# Parsed workflow guards distinguish protected PR bases from non-PR execution
+# and use the full ref so a tag named dev cannot authorize candidate code.
+workflow = YAML.safe_load(File.read(File.join(root, ".github/workflows/delivery-gate.yml")), aliases: false)
+normalize = ->(value) { value.to_s.gsub(/\s+/, " ").strip }
+expected_guard = normalize.call(<<~GUARD)
+  (github.event.pull_request != null &&
+   github.event.pull_request.base.repo.full_name == github.repository &&
+   (github.event.pull_request.base.ref == 'dev' ||
+    github.event.pull_request.base.ref == 'main')) ||
+  (github.event.pull_request == null &&
+   github.ref == 'refs/heads/dev')
+GUARD
+trigger = workflow.dig(true, "pull_request")
+raise "delivery workflow base filter is not exact" unless Array(trigger["branches"]).sort == %w[dev main]
+raise "short ref_name remains an authority input" if File.read(File.join(root, ".github/workflows/delivery-gate.yml")).include?("github.ref_name")
+
+{
+  "delivery-policy" => ["Check candidate-side delivery route", "candidate/scripts/pr-policy.rb", "trusted-policy/scripts/pr-policy.rb"],
+  "critic-gate" => ["Validate current-head critic or release approval", "candidate/scripts/delivery-gate.rb", "trusted-policy/scripts/delivery-gate.rb"]
+}.each do |job_name, (step_name, candidate_engine, trusted_engine)|
+  job = workflow.dig("jobs", job_name)
+  raise "#{job_name} protected-ref guard is not exact" unless normalize.call(job["if"]) == expected_guard
+  step = Array(job["steps"]).find { |item| item["name"] == step_name }
+  expected_env = {
+    "BASE_REF" => "${{ github.event.pull_request.base.ref }}",
+    "BASE_REPOSITORY" => "${{ github.event.pull_request.base.repo.full_name }}",
+    "FULL_REF" => "${{ github.ref }}",
+    "REPOSITORY" => "${{ github.repository }}"
+  }
+  expected_env.each { |name, value| raise "#{job_name} #{name} binding drifted" unless step.dig("env", name) == value }
+  run = step.fetch("run")
+  ordering = [
+    'if [[ "${EVENT_NAME}" == pull_request* ]]', '[[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]]',
+    'case "${BASE_REF}" in', "dev|main)", trusted_engine,
+    '[[ "${FULL_REF}" == "refs/heads/dev" ]]', candidate_engine, 'ruby "${ENGINE}"'
+  ].map { |token| run.index(token) }
+  raise "#{job_name} engine can run before identity guards" unless ordering.all? && ordering == ordering.sort
+  discovery = Array(job["steps"]).find { |item| item["name"] == "Discover the current release PR for non-PR events" }
+  discovery_run = discovery.fetch("run")
+  discovery_ordering = ['[[ "${FULL_REF}" == "refs/heads/dev" ]]', "gh api", "ruby candidate/scripts/delivery-gate.rb"].map { |token| discovery_run.index(token) }
+  raise "#{job_name} discovery can run before full-ref guard" unless discovery.dig("env", "FULL_REF") == "${{ github.ref }}" && discovery_ordering.all? && discovery_ordering == discovery_ordering.sort
+end
+
+authorized = lambda do |pull_request:, base_repository: nil, repository: "example/test", base_ref: nil, full_ref: nil|
+  if pull_request
+    base_repository == repository && %w[dev main].include?(base_ref)
+  else
+    full_ref == "refs/heads/dev"
+  end
+end
+raise "protected dev PR rejected" unless authorized.call(pull_request: true, base_repository: "example/test", base_ref: "dev")
+raise "protected main review rejected" unless authorized.call(pull_request: true, base_repository: "example/test", base_ref: "main")
+raise "unprotected PR base authorized" if authorized.call(pull_request: true, base_repository: "example/test", base_ref: "staging")
+raise "cross-repository PR base authorized" if authorized.call(pull_request: true, base_repository: "attacker/fork", base_ref: "dev")
+raise "non-dev dispatch authorized" if authorized.call(pull_request: false, full_ref: "refs/heads/feature")
+raise "tag named dev authorized" if authorized.call(pull_request: false, full_ref: "refs/tags/dev")
+raise "exact dev branch rejected" unless authorized.call(pull_request: false, full_ref: "refs/heads/dev")
 RUBY
 
 echo "Delivery gate tests passed."

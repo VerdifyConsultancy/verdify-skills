@@ -421,4 +421,37 @@ if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/release-placeholder.md" --base
   exit 1
 fi
 
+# The token-bearing workflow must authorize the protected base before checkout
+# or execution; script-level PR routing is too late to establish code trust.
+ruby -ryaml - "$ROOT" <<'RUBY'
+root = ARGV.fetch(0)
+workflow = YAML.safe_load(File.read(File.join(root, ".github/workflows/policy.yml")), aliases: false)
+normalize = ->(value) { value.to_s.gsub(/\s+/, " ").strip }
+expected_guard = normalize.call(<<~GUARD)
+  github.event.pull_request.base.repo.full_name == github.repository &&
+  (github.event.pull_request.base.ref == 'dev' ||
+   github.event.pull_request.base.ref == 'main')
+GUARD
+trigger = workflow.dig(true, "pull_request")
+abort "policy workflow base filter is not exact" unless Array(trigger["branches"]).sort == %w[dev main]
+job = workflow.dig("jobs", "pull-request-policy")
+abort "policy workflow protected-base guard is not exact" unless normalize.call(job["if"]) == expected_guard
+step = Array(job["steps"]).find { |item| item["name"] == "Check Verdify pull request contract" }
+expected_env = {
+  "BASE_REF" => "${{ github.event.pull_request.base.ref }}",
+  "BASE_REPOSITORY" => "${{ github.event.pull_request.base.repo.full_name }}",
+  "REPOSITORY" => "${{ github.repository }}"
+}
+expected_env.each { |name, value| abort "policy workflow #{name} binding drifted" unless step.dig("env", name) == value }
+run = step.fetch("run")
+ordering = [
+  '[[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]]', 'case "${BASE_REF}" in', "dev|main)",
+  "ruby trusted-policy/scripts/pr-policy.rb"
+].map { |token| run.index(token) }
+abort "policy workflow invokes trusted code before identity guards" unless ordering.all? && ordering == ordering.sort
+Array(job["steps"]).select { |item| item["uses"].to_s.start_with?("actions/checkout@") }.each do |checkout|
+  abort "policy checkout persists credentials" unless checkout.dig("with", "persist-credentials") == false
+end
+RUBY
+
 echo "PR policy tests passed."

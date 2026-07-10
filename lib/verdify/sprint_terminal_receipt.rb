@@ -19,6 +19,7 @@ module Verdify
       "delivery-policy" => ".github/workflows/delivery-gate.yml",
       "critic-gate" => ".github/workflows/delivery-gate.yml"
     }.freeze
+    MAX_GITHUB_EVIDENCE_REQUESTS_PER_LANE = 2 + 1 + GitRepository::MAX_CHECK_WORKFLOW_RUN_REQUESTS
 
     Result = Struct.new(:errors, :receipt, keyword_init: true) do
       def valid?
@@ -29,7 +30,9 @@ module Verdify
     def initialize(repo:, pull_request_loader: nil, check_run_loader: nil)
       @repo = repo.is_a?(GitRepository) ? repo : GitRepository.new(repo)
       @pull_request_loader = pull_request_loader || ->(number) { @repo.github_terminal_pull_request_evidence(number) }
-      @check_run_loader = check_run_loader || ->(sha) { @repo.github_check_run_evidence(sha) }
+      @check_run_loader = check_run_loader || lambda do |sha|
+        @repo.github_check_run_evidence(sha, required_names: REQUIRED_CHECKS.keys)
+      end
       @pull_request_cache = {}
       @check_run_cache = {}
     end
@@ -664,8 +667,8 @@ module Verdify
       REQUIRED_CHECKS.each do |name, workflow_path|
         matches = Array(checks).select { |check| check["name"] == name }
         ordered = matches.filter_map do |check|
-          check_id = Integer(check["id"], exception: false)
-          next unless check_id&.positive?
+          check_id = GitRepository.parse_positive_check_id(check["id"])
+          next unless check_id
 
           [check_id, check]
         end

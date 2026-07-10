@@ -1,12 +1,19 @@
 name: policy
 on:
   pull_request:
+    branches: [dev, main]
     types: [opened, edited, synchronize, reopened, ready_for_review, labeled, unlabeled]
 permissions:
+  actions: read
+  checks: read
   contents: read
   pull-requests: read
 jobs:
   pull-request-policy:
+    if: >-
+      github.event.pull_request.base.repo.full_name == github.repository &&
+      (github.event.pull_request.base.ref == 'dev' ||
+       github.event.pull_request.base.ref == 'main')
     runs-on: ubuntu-latest
     steps:
       - name: Check out trusted policy engine from protected base
@@ -16,6 +23,7 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           path: trusted-policy
           fetch-depth: 1
+          persist-credentials: false
       - name: Check out candidate head and full evidence history
         # actions/checkout v4.2.2
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -23,20 +31,25 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: candidate
           fetch-depth: 0
+          persist-credentials: false
       # ruby/setup-ruby reviewed v1 head on 2026-07-10
       - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
         with:
           ruby-version: "3.3"
       - name: Check Verdify pull request contract
         env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
+          REPOSITORY: ${{ github.repository }}
         run: |
-          if ruby trusted-policy/scripts/pr-policy.rb --help | grep -q -- '--repo PATH'; then
-            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
-          else
-            # One-time bootstrap for the change that introduces trusted-candidate
-            # separation. The protected-base policy remains authoritative; the
-            # candidate validator is supplemental until this lands on dev.
-            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH"
-            ruby candidate/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
-          fi
+          set -euo pipefail
+          [[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]] || { echo "pull request base repository is not trusted" >&2; exit 1; }
+          case "${BASE_REF}" in
+            dev|main) ;;
+            *) echo "pull request base ref is not protected" >&2; exit 1 ;;
+          esac
+          ruby trusted-policy/scripts/pr-policy.rb \
+            --event "$GITHUB_EVENT_PATH" \
+            --repo "$GITHUB_WORKSPACE/candidate"
