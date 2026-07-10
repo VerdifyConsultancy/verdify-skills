@@ -4,7 +4,7 @@ schema_version: "1.0"
 sync_id: gbs-verdify-skills-20260710-recovery
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: "2026-07-10T02:58:30Z"
+captured_at: "2026-07-10T03:02:57Z"
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -16,7 +16,7 @@ source_authority:
     - Deployment records cover npm publication only; this repository has no long-running application runtime.
 snapshot:
   snapshot_ref: null
-  captured_at: "2026-07-10T02:58:30Z"
+  captured_at: "2026-07-10T03:02:57Z"
   freshness: live_only
   api_sources:
     - surface: issues
@@ -259,6 +259,17 @@ issue_findings:
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
     required_action: Merge and close the strategy transaction.
 pr_findings:
+  - pr: 157
+    branch: strategy/153-post-hygiene-refresh
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [153]
+    head_sha: "2efbb3221ddd397849732b3675977ba7691a850c"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Integrated post-hygiene strategy reconciliation and lossless quoted GitHub issue references.
+    evidence_refs: ["dev@af44997ea79ae4f919fa29cf951334c4f291d5ff", "issue #153"]
   - pr: 154
     branch: hygiene/153-wave0-controller-scope
     base_branch: dev
