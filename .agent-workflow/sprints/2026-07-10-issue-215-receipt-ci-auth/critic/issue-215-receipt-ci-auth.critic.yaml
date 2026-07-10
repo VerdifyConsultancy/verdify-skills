@@ -7,223 +7,191 @@ pull_request: 217
 worker_agent: codex-issue215-worker
 worker_session_id: codex-issue215-worker-20260710t2134z
 critic_agent: codex-issue215-critic
-implementation_head_sha: "7dbcd20b0970a8edf5ab193c97c7038d39ea26eb"
-evidence_head_sha: "72e7c72d835016151da70d997f9eea25051e9c5e"
-reviewed_head_sha: "72e7c72d835016151da70d997f9eea25051e9c5e"
+implementation_head_sha: "5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5"
+evidence_head_sha: "fe2e5298f966b80e6eb4fb976ea1108e9c74f31f"
+reviewed_head_sha: "fe2e5298f966b80e6eb4fb976ea1108e9c74f31f"
 closeout_path: .agent-workflow/sprints/2026-07-10-issue-215-receipt-ci-auth/lanes/closeout/issue-215-receipt-ci-auth.closeout.yaml
-closeout_sha256: "b9390e9c7f25c2bdb4fea1e7d8e39dcf582b835200ae530725cd74a10987af27"
+closeout_sha256: "690f0996ad32a7941aa52c17203da5648f05d90348e99ca062176394e0a16ebe"
 critic_session_id: codex-issue215-critic-20260710t2152z
 review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-issue-215-receipt-ci-auth/critic
 outcome: request_fixes
 findings:
-  - id: FIND-001
+  - id: FIND-004
     severity: high
     statement: >-
-      The job token is exposed to candidate-controlled code and is also
-      persisted by every checkout, so the workflow does not maintain the
-      approved trusted-engine and no-token-persistence boundary.
+      Token-bearing validation still treats every pull-request base SHA as a
+      protected policy source and uses a short ref-name check for non-PR dev
+      execution, so unprotected refs can still supply code that receives
+      GH_TOKEN.
     evidence:
       - >-
-        .github/workflows/delivery-gate.yml:51-64 exports github.token as
-        GH_TOKEN and then executes candidate/scripts/pr-policy.rb from the pull
-        request head. A pull request can replace that script and read or
-        exfiltrate the read-scoped token instead of performing validation.
+        .github/workflows/policy.yml:3-4 has no protected-base branch filter or
+        job guard, while lines 14-21 check out github.event.pull_request.base.sha
+        as trusted-policy and lines 34-42 execute it with GH_TOKEN. A pull
+        request targeting an unprotected repository branch therefore executes
+        that branch's policy code with the token before policy validation can
+        reject the route.
       - >-
-        .github/workflows/delivery-gate.yml:22-28,69-83 and
-        .github/workflows/policy.yml:14-27 invoke the pinned actions/checkout
-        revision without persist-credentials: false. The exact pinned action's
-        action.yml declares persist-credentials default true and states that the
-        token is configured in local git config; this was verified with
-        gh api repos/actions/checkout/contents/action.yml at revision
-        11bd71901bbe5b1630ceea73d27597364c9af683.
+        .github/workflows/delivery-gate.yml:4-7 likewise accepts pull_request and
+        pull_request_review events for any base. Lines 22-30 and 87-95 check out
+        the event base SHA, while the token-scoped engine selection at lines
+        73-80 and 156-168 depends only on the event-name prefix and never proves
+        base.ref is dev or main.
       - >-
-        AGENTS.md and COMMON_OPERATING_CONTRACT.md require candidate policy
-        validation to run from the protected base or another trusted engine,
-        while issue 215 requires that the job token not be printed or persisted.
-        The repository validator checks only the permission map and three added
-        GH_TOKEN values, so the current tests do not detect either exposure.
+        The non-PR token paths at delivery-gate.yml:43-82 and 108-171 check only
+        github.ref_name == dev. GitHub's official workflow-dispatch API contract
+        permits ref to be either a branch or tag, so the short name does not
+        prove refs/heads/dev; the workflow contains no exact full-ref guard.
+      - >-
+        An independent parsed-workflow audit reported no pull_request branch
+        filter in either workflow, no pull_request_review branch filter, and no
+        refs/heads/dev guard. scripts/validate-repo.rb:621-656 verifies engine
+        ordering and persisted-credential settings but does not reject these
+        unprotected base/ref cases.
     requested_action: >-
-      Run every token-consuming PR validator from protected-base or otherwise
-      trusted code with the candidate checkout only as data, set
-      persist-credentials: false on all relevant checkouts, and add workflow
-      invariants that reject candidate-engine token execution and persisted
-      checkout credentials while retaining the exact read-only permission map.
-  - id: FIND-002
-    severity: medium
-    statement: >-
-      Authenticated GitHub API errors can still disclose GH_TOKEN through the
-      unsanitized request resource even though response fields are redacted.
-    evidence:
-      - >-
-        lib/verdify/git_repository.rb:282,294,410,412 interpolates path directly
-        into every authenticated failure form, outside
-        sanitize_github_diagnostic at lines 415-419.
-      - >-
-        An independent failure fixture invoked github_api_json with
-        GH_TOKEN=issue215-token-sentinel and a resource ending in
-        ?probe=issue215-token-sentinel. The raised CommandError contained the
-        sentinel verbatim and reported path_token_leaked=true.
-      - >-
-        The committed test at tests/test_sprint_terminal_receipt.rb:435-468
-        injects the token only into the JSON message. It proves arbitrary
-        response headers are omitted and a normal authenticated failure does
-        not call curl, but it cannot fail when the resource itself carries
-        sensitive material.
-    requested_action: >-
-      Sanitize or structurally normalize the resource before every authenticated
-      error interpolation, including CLI-unavailable and invalid-JSON branches,
-      and add a regression that places a sentinel token in the resource as well
-      as in the message, stderr, and arbitrary headers while asserting no curl
-      invocation.
-  - id: FIND-003
-    severity: medium
-    statement: >-
-      Malformed fractional check-run IDs are truncated to integers and can pass
-      highest-ID selection and trusted-check validation.
-    evidence:
-      - >-
-        lib/verdify/git_repository.rb:173-178 and
-        lib/verdify/sprint_terminal_receipt.rb:669-676 use Integer(value) as a
-        validity check. Ruby converts a Float such as 1.75 to 1 instead of
-        rejecting it.
-      - >-
-        An independent end-to-end loader fixture supplied all five required
-        checks with IDs 1.75 through 5.75, returned matching workflow metadata,
-        and produced all_fractional_ids_accepted=true with no trusted-check
-        errors.
-      - >-
-        tests/test_sprint_terminal_receipt.rb:368-395 covers duplicate integers
-        and a nonnumeric string only, so the current malformed-ID regression
-        does not exercise non-integral JSON numbers or other noncanonical IDs.
-    requested_action: >-
-      Require each check-run ID to have a canonical positive-integer type or
-      representation before selection and validation, and add loader-plus-
-      validator regressions for fractional and other noncanonical IDs while
-      retaining every matching check and performing no hydration on any invalid
-      or duplicate set.
+      Gate every token-bearing PR job before checkout or execution to the exact
+      allowed protected base refs, and require the exact full refs/heads/dev
+      identity before any non-PR candidate code runs. Add validator and
+      adversarial workflow regressions for a PR targeting an unprotected base,
+      pull_request_review on that base, workflow_dispatch on a non-dev branch,
+      and workflow_dispatch on a tag whose short name is dev.
 acceptance_assessment:
   - criterion_id: LANE-AC-01
     assessment: not_satisfied
     evidence:
       - >-
-        Both workflows declare exactly actions, checks, contents, and
-        pull-requests read permissions with no write scope, and the three added
-        validation-step GH_TOKEN entries are step-scoped. FIND-001 nevertheless
-        shows that delivery-policy hands the token to candidate code and that
-        checkout persists it, contradicting the trusted/no-persistence boundary.
+        The workflows retain exactly actions, checks, contents, and
+        pull-requests read permissions; all six checkout invocations now set
+        persist-credentials: false; policy.yml has no candidate-engine fallback;
+        and the live PR 217 delivery jobs executed protected dev policy code.
+        FIND-004 nevertheless shows that the same token steps are not restricted
+        to protected base/full-ref identities.
   - criterion_id: LANE-AC-02
     assessment: satisfied
     evidence:
       - >-
-        github_check_run_evidence filters to required names but returns every
-        matching check, selects only a uniquely ordered highest ID per name,
-        hydrates only selected checks, deduplicates shared run IDs, and fails
-        above five workflow-run reads per lane.
-      - >-
-        The focused highest-ID and shared-run tests passed. A live authenticated
-        PR 213 probe retained 11 matching checks, made five API reads including
-        four deduplicated workflow-run reads, and passed trusted-check
-        validation at head 4073b6748c608021681212e0602729ad72f8a08f.
+        The loader retains every matching required check, selects only a unique
+        highest valid ID per name, hydrates only selected checks, deduplicates
+        shared runs, and enforces the five-workflow-run per-lane bound. Focused
+        tests and the authenticated live PR 213 probe passed.
   - criterion_id: LANE-AC-03
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
       - >-
-        Workflow path, event, head SHA, app, completion, success, and uniquely
-        highest-ID checks remain present and the committed duplicate/nonnumeric
-        tests pass, but FIND-003 demonstrates that fractional malformed IDs can
-        satisfy the same trusted-check path.
+        Loader and validator now share parse_positive_check_id. Committed tests
+        reject fractional floats and strings, leading-zero and explicit-plus
+        forms, malformed and duplicate sets without hydration. An independent
+        12-value matrix also rejected zero, negative, nil, boolean, array, and
+        object IDs while preserving positive Integer and canonical decimal
+        String handling.
+      - >-
+        Workflow path, pull-request event, exact head SHA, GitHub Actions app,
+        completion, success, and uniquely highest check-ID validation remain
+        unchanged and passed against live PR 213 evidence.
   - criterion_id: LANE-AC-04
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
       - >-
-        With GH_TOKEN present, ordinary command failure, CLI absence, and
-        invalid JSON do not fall back to curl; response diagnostics include only
-        allowlisted fields and arbitrary headers are omitted. FIND-002 shows the
-        unsanitized resource can still disclose the token, so the no-token-
-        exposure invariant is not complete.
+        Every explicit authenticated failure branch now passes resource/path
+        text through the same control-character stripping, exact-token
+        redaction, and 256-character bound. Status failure, CLI-unavailable, and
+        invalid-JSON regressions prove no curl fallback, token or arbitrary
+        header disclosure; an independent adversarial fixture reproduced the
+        same result at the maximum bound.
   - criterion_id: LANE-AC-05
     assessment: satisfied
     evidence:
       - >-
-        The no-token compatibility regression passed: gh failure falls back to
-        the existing bounded anonymous curl read, and failure of both paths
-        raises CommandError rather than accepting missing evidence.
+        The no-GH_TOKEN compatibility tests still use gh then bounded anonymous
+        curl and raise CommandError when both fail, preserving fail-closed public
+        read behavior.
   - criterion_id: LANE-AC-06
     assessment: satisfied
     evidence:
       - >-
-        The six-receipt ledger regression passed with 12 pull-request, six
-        check-list, and 24 workflow-run reads for 42 total, below the declared
-        ceiling of 48. E-head GitHub Actions pull-request-policy and
-        delivery-policy checks passed with the job-token workflow environment,
-        and both local protected policy entrypoint suites passed.
+        The six-receipt regression remains at 42 reads: 12 pull-request, six
+        check-list, and 24 deduplicated workflow-run requests, below the 48-read
+        ceiling. Both local policy entrypoint suites and the exact-I2 validate
+        workflow passed; a live PR 213 check probe used five reads and validated
+        all trusted checks.
   - criterion_id: LANE-AC-07
     assessment: not_satisfied
     evidence:
       - >-
-        Independent receipt, pull-request-policy, delivery-gate, repository,
-        manifest, gitleaks, changed-workflow actionlint, and full-suite checks
-        passed at E, but FIND-001 through FIND-003 require implementation changes
-        and this request_fixes report cannot produce an approving exact-S critic
-        gate.
+        Independent focused, repository, workflow, manifest, secret-scan, and
+        full-suite validation passed at E2, but FIND-004 leaves the credential
+        trust boundary incomplete and this request_fixes S2 cannot produce an
+        approving critic gate.
 evidence_assessment:
   - >-
-    The detached locked review worktree began at live PR evidence head E
-    72e7c72d835016151da70d997f9eea25051e9c5e. Critic agent
-    codex-issue215-critic and session
-    codex-issue215-critic-20260710t2152z differ from closeout worker
-    codex-issue215-worker and session
-    codex-issue215-worker-20260710t2134z.
+    The same locked critic agent/session re-reviewed the requested remediation
+    from a detached worktree at live E2
+    fe2e5298f966b80e6eb4fb976ea1108e9c74f31f. It remains distinct from worker
+    codex-issue215-worker/session
+    codex-issue215-worker-20260710t2134z; no second critic identity was created.
   - >-
-    D 749b23d94c1704525432427cf540b74bbda00525 is the direct child of
-    baseline fbe821899caf546e9b7b8daa718ea2ec74918091 and changes only the
-    approved sprint plan, wave release plan, and lane contract. Those artifacts
-    are byte-identical through E, and the independently computed contract
-    SHA-256 is 71b18893cf89eff0cd5b0db84253df0278996247707b8675a63e280e518da47b.
+    The immutable D/I1/E1/S1 chain is preserved. S1
+    34197999e5c908ac470236d9c832f9cc392fd173 remains byte-identical at SHA-256
+    7a7e3885d73e16a4bcba75cac3c7f07ac81ad7b1bc0a4ead143094fa8095581e.
+    I2 5d2ff27aaab2d052b9d419cbb10a91c4b22fb0e5 is S1's direct child and changes
+    only six contract-owned implementation paths plus MANIFEST.sha256; E2 is
+    I2's direct child and changes only the canonical closeout.
   - >-
-    I 7dbcd20b0970a8edf5ab193c97c7038d39ea26eb changes only eight
-    contract-owned workflow, library, validator, test, and manifest paths. E
-    adds only the canonical closeout, whose independent SHA-256 is
-    b9390e9c7f25c2bdb4fea1e7d8e39dcf582b835200ae530725cd74a10987af27.
+    D 749b23d94c1704525432427cf540b74bbda00525 remains the direct child of
+    baseline fbe821899caf546e9b7b8daa718ea2ec74918091 and its sprint plan, wave
+    plan, and contract are byte-identical through E2. The contract SHA-256 is
+    71b18893cf89eff0cd5b0db84253df0278996247707b8675a63e280e518da47b,
+    and the E2 closeout SHA-256 is
+    690f0996ad32a7941aa52c17203da5648f05d90348e99ca062176394e0a16ebe.
   - >-
-    ruby tests/test_sprint_terminal_receipt.rb passed 27 runs and 108
-    assertions; bash tests/test_pr_policy.sh, bash tests/test_delivery_gate.sh,
-    ruby scripts/validate-repo.rb, make manifest-check, changed-workflow
-    actionlint, and the redacted three-commit gitleaks scan all passed.
+    S1 FIND-002 is resolved: status, CLI-unavailable, invalid-JSON, and malformed
+    resource fixtures all redact and bound the resource without authenticated
+    curl fallback. S1 FIND-003 is resolved: loader and validator reject all
+    independently tested fractional, noncanonical, nonpositive, and non-scalar
+    IDs without hydration. S1 FIND-001 is partially resolved by trusted PR
+    engines and persist-credentials: false, but FIND-004 records the remaining
+    base/ref authorization gap.
   - >-
-    make test passed at E: its Ruby suites reported 120 runs/649 assertions,
-    52 runs/129 assertions, and 27 runs/108 assertions with zero failures,
-    errors, or skips; all CLI, policy, delivery, release, package, install, and
-    packed-artifact suites completed successfully.
+    ruby tests/test_sprint_terminal_receipt.rb passed 29 runs and 147
+    assertions. PR-policy, delivery-gate, repository validation, manifest,
+    changed-workflow actionlint, redacted gitleaks, and make test all passed;
+    the full suite reported 122 runs/688 assertions, 52 runs/129 assertions,
+    and 29 runs/147 assertions with zero failures, errors, or skips.
+  - >-
+    The live authenticated PR 213 probe retained 11 matching checks, hydrated
+    five selected checks through four shared workflow runs, made five total API
+    reads, and passed trusted-check validation at
+    4073b6748c608021681212e0602729ad72f8a08f.
   - >-
     Whole-repository actionlint exits 1 only for inherited ShellCheck SC2012 at
-    .github/workflows/compliance-gate.yml:55. An independent git-archive run at
-    baseline fbe821899caf546e9b7b8daa718ea2ec74918091 reproduced the exact same
-    file, line, rule, and message, while both changed workflows lint cleanly.
+    .github/workflows/compliance-gate.yml:55. The exact file, line, rule, and
+    message reproduce from baseline fbe821899caf546e9b7b8daa718ea2ec74918091,
+    while both changed workflows lint cleanly.
   - >-
-    At E, live validate, compliance, pull-request-policy, and delivery-policy
-    checks passed. The critic-gate failures are the expected pre-report state
-    because no canonical critic report existed at E.
+    At E2, live validate and compliance checks pass. Pull-request-policy,
+    delivery-policy, and critic-gate fail only because the preserved S1 report
+    still binds I1/E1 and requests fixes; logs confirm PR 217 selected the
+    protected dev policy engines rather than candidate scripts.
 integration_risks:
   - >-
-    PR 217 must not integrate while candidate-controlled code can receive or
-    recover the job token, while authenticated resource diagnostics can echo
-    token material, or while malformed fractional IDs can satisfy trusted check
-    identity.
+    PR 217 must not integrate until token-bearing jobs prove that their policy
+    source is an allowed protected base or exact protected dev ref before any
+    candidate/base script executes.
   - >-
-    A fix worker must create a new implementation and closeout chain, followed
-    by a fresh independent critic. This report-only S is durable request-fixes
-    evidence and is not an approval or merge authorization.
+    A fix worker must append a new implementation and closeout chain, followed
+    by re-review from this same critic session or another authorized fresh
+    critic as directed by the controller. S2 is request-fixes evidence, not an
+    approval or merge authorization.
 residual_risks:
   - >-
-    The job token is read-only, which limits but does not remove the impact of
-    exposing private repository contents, checks, workflow-run metadata, or
-    actions resources to candidate-controlled code during the job.
+    The token remains read-only, limiting but not eliminating exposure of
+    private contents, checks, workflow-run metadata, or Actions resources if an
+    unprotected policy source executes.
   - >-
-    Whole-repository actionlint retains the approved baseline-only SC2012
-    exception; any new diagnostic in policy.yml or delivery-gate.yml remains
-    blocking.
+    The approved baseline-only SC2012 actionlint exception remains limited to
+    unmodified compliance-gate.yml; any new diagnostic in either changed
+    workflow is blocking.
   - >-
     A normal post-integration terminal receipt with green authenticated policy,
     delivery, and critic checks remains required after a corrected lane merges.
-reviewed_at: "2026-07-10T22:02:05Z"
+reviewed_at: "2026-07-10T22:26:50Z"
