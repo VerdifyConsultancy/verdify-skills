@@ -1,0 +1,22 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: pr-184-admin-merge-override
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+type: policy_exception
+status: approved
+question: "May PR #184 use administrator bypass after fresh critic approval when GitHub forbids the author from submitting the required non-author review?"
+owner: Jason Vallery
+evidence_required:
+  - "PR #184 exact D/I/E/S chain: 3c78dd8, 369b6df, 4f1c123, d1e8cdc."
+  - "Fresh critic outcome approve at S3 with zero findings and distinct worker and critic agents, sessions, and worktrees."
+  - "Validate, pull-request-policy, and compliance checks pass on exact S3."
+  - "The deterministic I3-to-E4 tarball difference is limited to injected gitHead source binding; final-main publication builds and tests one exact source-bound candidate."
+  - "The user explicitly authorized autonomous PR administration and override of GitHub approval restrictions."
+allowed_decisions: [admin_merge, wait_for_non_author_review, request_fixes, stop]
+decision: admin_merge
+rationale: "GitHub correctly rejects an author self-approval, so no approval is fabricated. Administrator bypass accepts the fresh zero-finding critic verdict and current exact-head checks. It grants only integration of PR #184 into dev; issue #121 delivery controls, final dev-to-main approval, npm publication, tag/release creation, and rescue-ref cleanup remain separate gates."
+opened_at: "2026-07-10T09:11:37Z"
+resolved_at: "2026-07-10T09:11:37Z"
+resume_state: READY_FOR_INTEGRATION
