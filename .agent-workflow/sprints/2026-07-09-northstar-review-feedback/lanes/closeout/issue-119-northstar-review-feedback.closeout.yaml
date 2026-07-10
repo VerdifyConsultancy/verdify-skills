@@ -1,0 +1,176 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-09-northstar-review-feedback
+lane_id: issue-119-northstar-review-feedback
+status: ready_for_critic
+issue_ids: [119]
+pull_request: 122
+baseline_sha: "c90801f97646238a3d7b3bfb064c799038d40c68"
+implementation_head_sha: "f737e0bae268a809872169069b9354e05ab824f6"
+validated_head_sha: "f737e0bae268a809872169069b9354e05ab824f6"
+contract_hash: "cf67eea275cc16212150b0e7fdea0990c9fc13dded275f352853bc5d6949b6bb"
+changed_paths:
+  - .agent-workflow/gates/northstar.yaml
+  - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+  - .agent-workflow/northstar/NORTHSTAR_INTERVIEW.md
+  - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  - .agent-workflow/northstar/OPENCLAW_SDLC_WORKFLOW_SKILLS.md
+  - .agent-workflow/northstar/REVIEW_PLAN.md
+  - .agent-workflow/northstar/SDLC_SKILL_DESIGN.md
+  - .agent-workflow/northstar/collateral/NSE-20260709-agents-current-state-audit.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-gravity-current-state-audit.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-jason-iteration-25-final-lock-approval.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-jason-review-feedback.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-orbit-current-state-audit.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260709-verdify-skills-adversarial-review.yaml
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-agents-current-state-audit-2026-07-09-agents-current-state-audit-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-gravity-current-state-audit-2026-07-09-gravity-current-state-audit-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-jason-iteration-25-final-lock-approval-jason-final-lock-approval-source-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-jason-review-feedback-2026-07-09-jason-review-feedback-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-orbit-current-state-audit-2026-07-09-orbit-current-state-audit-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260709-verdify-skills-adversarial-review-verdify-skills-adversarial-review-2026-07-09-md
+  - .agent-workflow/northstar/evidence-registry.yaml
+  - .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
+  - .agent-workflow/northstar/northstar-artifacts.yaml
+  - .agent-workflow/northstar/northstar-plan.md
+  - .agent-workflow/northstar/northstar-plan.yaml
+  - .agent-workflow/northstar/research-inbox/2026-07-09-agents-current-state-audit.md
+  - .agent-workflow/northstar/research-inbox/2026-07-09-gravity-current-state-audit.md
+  - .agent-workflow/northstar/research-inbox/2026-07-09-jason-review-feedback.md
+  - .agent-workflow/northstar/research-inbox/2026-07-09-orbit-current-state-audit.md
+  - .agent-workflow/router/route-decision.md
+  - .agent-workflow/router/route-decision.yaml
+  - .agent-workflow/sprints/2026-07-09-northstar-review-feedback/issue-reconciliation.md
+  - .agent-workflow/sprints/2026-07-09-northstar-review-feedback/semantic-cross-link-audit.md
+validation_results:
+  - id: repo-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:54:22Z"
+    artifact: null
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:54:22Z"
+    artifact: null
+  - id: northstar-artifacts
+    command: ruby bin/verdify artifact validate --file .agent-workflow/northstar/northstar-artifacts.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/northstar-artifacts.yaml
+  - id: northstar-plan
+    command: ruby bin/verdify artifact validate --file .agent-workflow/northstar/northstar-plan.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/northstar-plan.yaml
+  - id: northstar-gate
+    command: ruby bin/verdify artifact validate --file .agent-workflow/gates/northstar.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/gates/northstar.yaml
+  - id: evidence-registry
+    command: ruby bin/verdify artifact validate --file .agent-workflow/northstar/evidence-registry.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/evidence-registry.yaml
+  - id: learning-packet
+    command: ruby bin/verdify artifact validate --file .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
+  - id: final-lock-evidence-query
+    command: bin/verdify northstar evidence list --repo . --query final-lock --json
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/collateral/NSE-20260709-jason-iteration-25-final-lock-approval.yaml
+  - id: lock-state-audit
+    command: ruby -ryaml -e 'assert northstar artifacts, structured plan, and human gate all record approved lock state'
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/northstar-artifacts.yaml
+  - id: stale-lock-language
+    command: "! rg -n 'does not record final lock|final lock remains separate|Final North Star lock is still pending|final lock approval is still pending' against the six canonical North Star Markdown artifacts"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/northstar/REVIEW_PLAN.md
+  - id: exact-ten-and-question-audit
+    command: inspect ten-default cardinality, deferred question inventory, and nonblocking planning gate recommendations
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/semantic-cross-link-audit.md
+  - id: dispatch-and-scope-audit
+    command: verify D parent, frozen contract digest, D-only paths, I-only owned paths, and no pre-evidence closeout or critic artifact
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/contracts/issue-119-northstar-review-feedback.contract.yaml
+  - id: committed-route-parity
+    command: compare committed route-decision YAML/Markdown with a fresh bin/verdify route --repo . --json computation
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: .agent-workflow/router/route-decision.yaml
+  - id: yaml-issue-reference-semantics
+    command: >-
+      Parse sprint, contract, wave, and closeout YAML and prove #72, #119, #122, #198, #2889, and #406 remain inside their intended scalar values.
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:37:45Z"
+    artifact: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/contracts/issue-119-northstar-review-feedback.contract.yaml
+  - id: public-evidence-redaction
+    command: verify the public adversarial-review source is a bounded redacted summary and its SHA-256 agrees with the evidence item and registry
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:54:22Z"
+    artifact: .agent-workflow/northstar/collateral/NSE-20260709-verdify-skills-adversarial-review.yaml
+  - id: diff-hygiene
+    command: git diff --check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T00:26:28Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [final-lock-evidence-query, evidence-registry, lock-state-audit]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [northstar-artifacts, northstar-plan, exact-ten-and-question-audit, stale-lock-language]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [northstar-artifacts, northstar-plan, northstar-gate, lock-state-audit, committed-route-parity]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [exact-ten-and-question-audit]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [learning-packet, public-evidence-redaction, repo-validation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [full-suite, dispatch-and-scope-audit, yaml-issue-reference-semantics, diff-hygiene]
+    assessment: satisfied
+discovered_issues: [198, 2889, 406]
+residual_risks:
+  - "PR #122 still requires a fresh v2 critic-report head, successful live checks, and an independent current-head GitHub approval from an admin or maintainer other than the PR author."
+  - Package publication, broad Orbit connectors, fleet bootstrap, platform authority, and the first integrated four-project slice retain their own action-scoped readiness, security, release, and runtime gates.
+worktree_clean: true
+worker_agent: root
+worker_session_id: root-119-lock-20260709e
+completed_at: "2026-07-10T00:54:22Z"
+limitations:
+  - Public adversarial-review evidence is a redacted summary; installer reproduction detail and raw private validation evidence remain restricted to unpublished advisory GHSA-4452-3c6p-3q26.
+  - LANE-AC-06 at E covers the revised worker-evaluable pre-critic prerequisites; sprint integration remains prohibited until the later critic-report-only S head passes live checks and receives independent current-head approval.
+  - No runtime was deployed or mutated; this planning lane has deployment type none and merge success remains distinct from any future runtime proof.
+  - "The integer-only discovered_issues field records jvallery/orbit#198, jvallery/agents#2889, and VerdifyConsultancy/gravity#406; repository-qualified links are durable in the issue reconciliation packet and PR #122."
+  - Deferred NSQ-009 through NSQ-013 are nonblocking owner work and do not authorize their affected recurring loop, infrastructure, connector, or platform action.
