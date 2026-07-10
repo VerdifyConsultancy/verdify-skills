@@ -1,102 +1,92 @@
-# State of Union: Four-Project Autonomous Development Platform
+# State of Union: Post-#135 Autonomous Platform Program
 
-Assessed at `dev@314516e1ba110fa981a235b21f09750bcbc42500` on
-2026-07-10. Canonical strategy:
-`.agent-workflow/strategy/state-of-union.yaml`.
+Canonical authority: `.agent-workflow/strategy/state-of-union.yaml`
+Assessed at protected `dev@1c142c75b10629ec9aa1b3048e7db060c1cbd212`
+on 2026-07-10.
 
 ## Verdict
 
-The North Star is coherent and the component foundations are real, but the
-integrated platform is not ready for unattended operation.
+Issue #135 is complete. All six historical sprint transactions now have
+canonical terminal receipts, `integrated_unterminated` is zero, and the global
+router truthfully stops at strategy approval instead of selecting stale work.
 
-- Verdify Skills has the strongest control surface: approved iteration-25
-  product/architecture, 28 validating skills, 48 schemas, independent review,
-  protected delivery, and a proven exact-artifact 1.3.0 release.
-- Agent Platform supplies persistent repo cells, fixed agent sessions, GitOps,
-  APIs, MCP, telemetry, and healthy target volumes, but security P0s, storage and
-  Argo drift, invalid lifecycle records, provider-contract mismatch, and failed
-  loops block fan-out.
-- Gravity is a deployed, data-rich alpha with live retrieval and a substantial
-  corpus, but its current North Star is unsigned, readiness is absent, citations
-  are not hydrated, callable MCP is unproved, conversion is failed, and CI is
-  broken.
-- Orbit has useful mission, dispatch, ledger, and tick primitives on a Ready
-  repo cell, but it is not a trusted Chief of Staff: its lifecycle points at
-  retired infrastructure, loop recovery is unproved, CI/protection is absent,
-  connector trust is unresolved, and Gravity integration is stale.
+Jason has delegated approval for the issue-backed autonomous sequence and asked
+that the skills optimize for clear authority and high-quality evidence without
+turning every deterministic transition into another review. This strategy is
+therefore approved without an additional human gate. Fresh independent
+criticism remains mandatory for implementation output; deterministic planning,
+receipt, routing, and merge transitions consume existing authority and evidence
+instead of manufacturing more approvals.
 
-The overall maturity is therefore **architecture-approved, component-deployed,
-integration-unproved**. Hands-off execution should remain limited to low-risk,
-reversible work until the control floor and first four-project slice pass.
+The four-project vertical slice remains prohibited. Agents #2884, #2887, and
+#2906 are all still open P0 Stage 0 security stops.
 
-## What Is Working
+## Immediate Route
 
-1. GitHub and `.agent-workflow` already provide the right durable authority
-   model; the system does not need a new private task database.
-2. The root-planner, four-pilot, provider, context, and evidence responsibility
-   split is already locked in Verdify iteration 25.
-3. One-issue/lane/branch/worktree/session/PR isolation, fresh criticism, exact
-   head checks, release provenance, and runtime verification are working in
-   Verdify delivery.
-4. Agent Platform runs 38/38 persistent repo cells and 136/136 agent containers
-   Ready, with live API, MCP, GitOps, and loop primitives.
-5. Gravity has a real deployed data plane and corpus rather than a design-only
-   knowledge service.
-6. Orbit has early durable mission and reporting primitives and its retired
-   standalone OpenClaw deployment is gone.
-7. The important gaps are already mostly represented by owning GitHub Issues.
+Issue #215 is the sole ready next sprint candidate. Pull request #214 proved the
+six-sprint terminal receipt correct with authenticated production validation,
+but three Actions policy jobs exhausted anonymous GitHub API capacity because
+their validation steps did not receive the job token. Fixing that narrow defect
+first prevents repeated administrative CI exceptions during the remaining
+sequence.
 
-## Blocking Gaps
+Issue #71 follows, but as reconciliation rather than assumed implementation.
+Current code appears to validate most route authority inputs already. The lane
+must map acceptance to current validators and regressions, close the issue if it
+is already satisfied, or narrow it to only the demonstrated remainder.
 
-| Priority | Gap | Owning work |
-| --- | --- | --- |
-| P0 | Four completed Verdify transactions still block global routing | Verdify #135 |
-| P0 | Route and approval transitions can trust invalid or empty evidence | Verdify #71, #73 |
-| P0 | Agent behavior and semantic correctness are not executable, merge-blocking evals | Verdify #75, #74 |
-| P0 | Verdify requires a dispatch operation Agent Platform intentionally rejects | Verdify #12, Agents #2497/#655 |
-| P0 | Agent Platform has unresolved request-desync and tracked-secret candidates | Agents #2884, #2887 |
-| P0 | Root-loop health, replay, signals, and recovery substrate are unproved | Agents #2840, #2905 |
-| P0 | Gravity does not yet return release-verified citations over HTTP/MCP | Gravity #184, #407 |
-| P0 | Orbit context and fleet actuation share trust and stale lifecycle boundaries | Orbit #193-#198, Verdify #117 |
-| P1 | Shared bounded-loop contract and risk fast path are incomplete | Verdify #43, #70 |
-| P1 | One correlated portfolio trace and acceptance suite do not exist | Verdify #116 plus four owning projects |
+## Issue Sequence
 
-## Execution Sequence
+1. **Reliable receipt CI:** Verdify #215.
+2. **Trusted transition and evaluation floor:** Verdify #71, #73, #75, #74.
+3. **Bounded autonomy and proportional process:** Verdify #43 and #70.
+4. **Agent Platform security and authority:** Agents #2884, #2887, #2906,
+   #2890, #2905.
+5. **Provider capability negotiation:** Verdify #12/#116 and Agents
+   #2497/#655.
+6. **Gravity citation/API/MCP readiness:** Gravity #407, then #184 acceptance.
+7. **Orbit trust and lifecycle repair:** Orbit #197, #193-#196, #198, then #43.
+8. **One correlated transaction:** one correlation ID across all four projects,
+   only after every Stage 0 stop is closed with live proof.
+9. **Durability:** failure drills and seven unattended days before broader
+   fleet autonomy.
 
-1. **Restore truthful routing:** execute one narrow issue #135 sprint and make
-   terminalization automatic or merge-blocking.
-2. **Build the trusted decision floor:** #71 -> #73 -> #75 -> #74.
-3. **Codify bounded autonomy:** #43 and #70 define objective, permissions,
-   budget, observation, repair, intervention, stop, provenance, and change class.
-4. **Reconcile the provider:** close Agent Platform security/authority gates,
-   decide #2905, and resolve #12/#116 through versioned capability negotiation.
-5. **Make evidence and context trustworthy:** Gravity #184/#407 and Orbit
-   #193-#198/#43, followed by Verdify #117/#98 thin facades.
-6. **Prove one vertical slice:** cited Gravity evidence -> source-linked Orbit
-   brief -> root-planner issue choice -> Agent Platform worker -> Verdify critic
-   and CI -> deployed verification -> accepted outcome -> next-loop learning.
-7. **Scale only after proof:** seven unattended days plus crash, missed-tick,
-   auth-expiry, quota, stale-marker, duplicate-wake, push-conflict, and pod-restart
-   drills, then canary fleet/customer rollout.
+## Process Balance
 
-## Next Sprint Candidate
+The target operating model is evidence-proportionate:
 
-Issue #135 is ready as a single-issue transaction. It is evidence-complete,
-narrow, and blocks deterministic lifecycle entry. Issues #71/#73 follow after
-its route proof. The full one-SDLC slice remains correctly blocked on explicit
-Agent Platform, Gravity, and Orbit prerequisites.
+- one issue/lane/worktree/session/PR for implementation;
+- one fresh critic for implementation output, not repeated critics for the same
+  exact artifact;
+- required CI and exact-head evidence before integration;
+- deterministic receipt, routing, and merge actions advance automatically when
+  their declared evidence is valid;
+- human decisions are reserved for protected product/architecture authority,
+  irreversible or credential-sensitive operations, and unresolved high-impact
+  tradeoffs;
+- runtime-changing work still requires proof from the runtime, separately from
+  merge success.
 
-## Open Gates
+Issues #43 and #70 own codifying this common bounded-loop contract, risk classes,
+typed stops, and fast paths in the skills package. The strategy does not silently
+weaken review, evidence, or security requirements.
 
-- Agent Platform P0 security containment and four-pilot re-lock.
-- Agent Platform durable-execution architecture decision and readiness approval.
-- Gravity iteration-6 signoff, Gate B, citation parity, and canonical readiness.
-- Orbit four-pilot reframe, stale sprint supersession, and trust-domain split.
-- Integrated pilot acceptance from one correlated end-to-end trace and failure
-  drill suite.
+## Current Risks
+
+| Risk | Durable owner |
+| --- | --- |
+| Receipt CI makes unauthenticated GitHub evidence reads | Verdify #215 |
+| Route validation may be partly complete but unreconciled | Verdify #71 |
+| Critic evidence can remain non-exhaustive | Verdify #73 |
+| Eval packs lack a deterministic runner contract | Verdify #75 |
+| Consumer CI cannot enforce an undefined runner | Verdify #74 |
+| Shared bounded-loop and risk fast-path contracts are missing | Verdify #43/#70 |
+| Stage 0 request, archive-secret, and probe-destination security stops | Agents #2884/#2887/#2906 |
+| Provider ownership and capability negotiation are unresolved | Verdify #12/#116; Agents #2497/#655 |
+| Citation, trust, lifecycle, and correlated runtime proof are missing | Gravity #184/#407; Orbit #193-#198/#43 |
 
 ## Handoff
 
-After this strategy is reviewed and merged, route to `sprint-planning` in
-`lane-transaction` mode for issue #135. Detailed operating guidance is in
-[`docs/northstar/autonomous-development-platform-plan-2026-07-10.md`](../../docs/northstar/autonomous-development-platform-plan-2026-07-10.md).
+After this planning-only refresh merges to protected `dev`, run
+`project-router`. The expected handoff is `sprint-planning` in
+`lane-transaction` mode for Verdify #215. No broad fan-out is authorized.
