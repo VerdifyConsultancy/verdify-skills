@@ -1,0 +1,21 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: plan-approval-2026-07-10-recovery-publication
+sprint_id: 2026-07-10-recovery-publication
+lane_id: null
+type: plan_approval
+status: approved
+question: "Approve the single issue #126 recovery lane, its exact three rescue sources, selective-port constraints, ledger requirement, risks, and no-release boundary?"
+owner: Jason Vallery
+evidence_required:
+  - "Approved state-of-union sequence placing issue #126 after integrated issue #130."
+  - "Issue #126 acceptance intent and durable GitHub comments inventorying fe1f94e, f425515, 22f81bd, branches, worktrees, and live runner state."
+  - "Zero-finding gitleaks scan over the changed paths in 22f81bd and proof the shared runner checkout was not mutated."
+  - "Sprint plan, lane map, contract, wave release plan, and route-exception gate."
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: "The user explicitly directed autonomous overnight completion and authorized ROOT to manage integration. One lane matches issue #126's end-to-end recovery outcome and avoids conflicting manifest/registry edits across partial lanes."
+opened_at: "2026-07-10T04:50:00Z"
+resolved_at: "2026-07-10T04:50:00Z"
+resume_state: READY

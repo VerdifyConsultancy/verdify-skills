@@ -2,13 +2,13 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-07-10T02:25:36Z'
+generated_at: '2026-07-10T04:46:13Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: STATE_OF_UNION_MISSING
-next_skill: state-of-union
-next_mode: strategy-review
-reason: Approved foundations exist, but no strategy/backlog reconciliation has been
-  recorded.
+current_state: REVIEW_INBOX_REQUIRED
+next_skill: release-verification
+next_mode: review-inbox
+reason: Lanes with approving critic outcomes need a review inbox packet before integration
+  or human review.
 evidence:
 - source: ".agent-workflow/intake/transcript-replan.yaml"
   finding: transcript-replan status is "routed"
@@ -18,6 +18,8 @@ evidence:
   finding: northstar-plan status is "approved"
 - source: ".agent-workflow/northstar/northstar-artifacts.yaml"
   finding: northstar-artifacts status is "approved"
+- source: ".agent-workflow/sprints/2026-07-10-package-file-set/sprint-plan.yaml"
+  finding: active sprint 2026-07-10-package-file-set has status approved
 missing_artifacts:
-- ".agent-workflow/strategy/state-of-union.yaml"
+- ".agent-workflow/sprints/2026-07-10-package-file-set/review/review-inbox-packet.yaml"
 open_gates: []
