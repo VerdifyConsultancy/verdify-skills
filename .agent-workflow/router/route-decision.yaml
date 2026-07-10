@@ -2,13 +2,13 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-07-10T13:29:37Z'
+generated_at: '2026-07-10T21:22:27Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: SPRINT_TRANSACTION_AMBIGUOUS
-next_skill: project-router
-next_mode: route
-reason: Multiple committed sprint transactions are active; rerun route with --sprint
-  ID.
+current_state: STATE_OF_UNION_HANDOFF
+next_skill: sprint-planning
+next_mode: lane-transaction
+reason: Issue 135 is terminal, issue 215 is the only ready next candidate, and the
+  approved sequence is recorded in .agent-workflow/strategy/state-of-union.yaml.
 evidence:
 - source: ".agent-workflow/intake/transcript-replan.yaml"
   finding: transcript-replan status is "routed"
@@ -18,8 +18,9 @@ evidence:
   finding: northstar-plan status is "approved"
 - source: ".agent-workflow/northstar/northstar-artifacts.yaml"
   finding: northstar-artifacts status is "approved"
-- source: ".agent-workflow/sprints"
-  finding: 'multiple active sprint plans: 2026-07-10-release-recovery, 2026-07-10-publish-path-recovery,
-    2026-07-10-npm-oidc-recovery, 2026-07-10-delivery-controls'
+- source: ".agent-workflow/strategy/state-of-union.yaml"
+  finding: state-of-union status is "approved"
+- source: ".agent-workflow/hygiene/repo-hygiene.yaml"
+  finding: repo-hygiene status is "complete"
 missing_artifacts: []
 open_gates: []

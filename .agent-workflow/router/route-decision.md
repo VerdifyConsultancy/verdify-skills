@@ -1,10 +1,10 @@
 # Route decision
 
-- Current state: `SPRINT_TRANSACTION_AMBIGUOUS`
-- Next skill: `project-router`
-- Next mode: `route`
+- Current state: `STATE_OF_UNION_HANDOFF`
+- Next skill: `sprint-planning`
+- Next mode: `lane-transaction`
 
-Multiple committed sprint transactions are active; rerun route with --sprint ID.
+Issue 135 is terminal, issue 215 is the only ready next candidate, and the approved sequence is recorded in .agent-workflow/strategy/state-of-union.yaml.
 
 ## Missing artifacts
 
