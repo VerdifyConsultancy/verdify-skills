@@ -1,0 +1,59 @@
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: "1.0"
+sprint_id: 2026-07-10-package-file-set
+status: verified
+integrated_sha: "17b3762f024186a336556f60c27268006a8d59b6"
+release:
+  tag: null
+  url: null
+artifact_identity:
+  - type: git_commit
+    identifier: "dev@17b3762f024186a336556f60c27268006a8d59b6"
+  - type: github_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#166 at critic-report head b2911c9c3db215fbd70d65cfed4fe160f91fa7ac"
+integration_results:
+  - name: fresh independent criticism
+    result: passed
+    evidence: "Critic codex-independent-critic-final/session critic-issue-130-fix2 recorded outcome approve at b2911c9 after reviewing implementation 5902e947 and evidence 8600a9ce."
+  - name: validate at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29069756367 passed at 17b3762: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069756367"
+  - name: compliance at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29069756415 passed at 17b3762: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069756415"
+  - name: package file-set outcome
+    result: passed
+    evidence: "PR #166 integrated immutable Git-index object staging; the accepted outcome records 90 tests, 531 assertions, exact archive checks, and no package publication."
+deployment:
+  environment: github-actions-ci/dev (package-integrity integration; no runtime service)
+  deployment_id: 29069756367
+  deployed_at: "2026-07-10T04:44:59Z"
+  observed_revision: "17b3762f024186a336556f60c27268006a8d59b6"
+  deployer: jvallery
+  approval:
+    required: true
+    approved_by: "Jason Vallery (user-authorized administrator merge; no fabricated self-review)"
+    approved_at: "2026-07-10T04:44:59Z"
+    evidence: "PR #166 and controller exception commit 0022972: https://github.com/VerdifyConsultancy/verdify-skills/pull/166"
+runtime_checks:
+  - name: repository validation workflow
+    result: passed
+    observed_at: "2026-07-10T04:45:45Z"
+    evidence: "Validate push run 29069756367 completed successfully at the integrated SHA."
+  - name: compliance workflow
+    result: passed
+    observed_at: "2026-07-10T04:45:14Z"
+    evidence: "Compliance self-test push run 29069756415 completed successfully at the integrated SHA."
+migrations:
+  - name: none
+    result: not_applicable
+    evidence: "Package selection and staging only; no data, schema, npm, main, tag, release, or runtime migration occurred."
+rollback:
+  ready: true
+  known_good_revision: "32038e3a0637192699af09ad60da48031b7575bc"
+  procedure: "Revert merge commit 17b3762 on dev and rerun repository, package-file-set, npm-install, and GitHub validation checks."
+incidents:
+  - "PR #166 could not receive an APPROVED review from author jvallery; the user-authorized administrator exception was recorded without fabricating a GitHub review, and issue #121 owns the durable replacement control."
+verified_at: "2026-07-10T09:17:23Z"
+verifier: "Codex ROOT lifecycle controller repair for issue #190"

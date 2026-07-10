@@ -1,0 +1,340 @@
+schema_ref: github-backlog-sync.schema.yaml
+kind: GitHubBacklogSync
+schema_version: "1.0"
+sync_id: gbs-2026-07-10-delivery-controls
+status: reconciled
+repository: VerdifyConsultancy/verdify-skills
+captured_at: "2026-07-10T09:28:20Z"
+source_authority:
+  github_is_authoritative: true
+  snapshot_is_cache: false
+  live_access: live
+  snapshot_ref: null
+  limitations:
+    - No GitHub Project or milestone is configured; Issues remain backlog authority.
+    - Package runtime logs, metrics, traces, and alerts are not applicable.
+snapshot:
+  snapshot_ref: null
+  captured_at: "2026-07-10T09:28:20Z"
+  freshness: live_only
+  api_sources:
+    - surface: issues
+      source_ref: live issue API
+      captured: true
+      limitation: None for relevant open and recently completed issues.
+    - surface: pulls
+      source_ref: "live pull request API through PR #192"
+      captured: true
+      limitation: Closed invalid release candidates remain historical evidence.
+    - surface: checks
+      source_ref: live PR check rollups
+      captured: true
+      limitation: "PR #189 includes repeated checks from each dev advance."
+    - surface: workflow_runs
+      source_ref: live Actions runs through dev e702911
+      captured: true
+      limitation: Failed earlier runs are retained alongside later success.
+    - surface: deployments
+      source_ref: npm deployment and GitHub release API
+      captured: true
+      limitation: Latest deployed package is still 1.2.1.
+    - surface: environments
+      source_ref: npm GitHub environment
+      captured: true
+      limitation: The environment has no protection rules.
+    - surface: projects
+      source_ref: repository planning surfaces
+      captured: false
+      limitation: No Project or milestone is configured.
+    - surface: git
+      source_ref: origin/dev e702911 and origin/main 898d7c7
+      captured: true
+      limitation: Rescue refs remain intentionally local or retained remote handles.
+issue_findings:
+  - issue: 121
+    title: Enforce protected dev integration and release-only main promotion
+    state: OPEN
+    classification: candidate
+    labels: [type:problem, risk:high]
+    assignees: []
+    milestone: null
+    dependencies: ["terminal #120 dev outcome", "open PR #189"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["live branch protection", ".github/CODEOWNERS", "PR #189 policy run 29083094613"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/121"]
+    required_action: Plan and execute as the sole next lane, then apply and verify live controls.
+  - issue: 188
+    title: Release @verdify-cli/cli@1.3.0
+    state: OPEN
+    classification: in_progress
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: ["#121", "current-head Jason approval"]
+    sub_issues: []
+    linked_prs: ["#189"]
+    project_refs: []
+    evidence_refs: ["dev version 1.3.0", "James-authored dev-to-main PR"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/188"]
+    required_action: "Keep open and unmerged until issue #121 and live verification complete."
+  - issue: 120
+    title: Test and publish the exact packed artifact as an atomic recoverable transaction
+    state: OPEN
+    classification: in_progress
+    labels: [type:problem, risk:high]
+    assignees: []
+    milestone: null
+    dependencies: ["#121", "#188"]
+    sub_issues: []
+    linked_prs: ["#184", "#189"]
+    project_refs: []
+    evidence_refs: ["terminal sprint 2026-07-10-release-safety", "dev@5d3393e"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/120"]
+    required_action: Close after final main/npm/tag/release/ledger verification.
+  - issue: 130
+    title: Ignore host-local and untracked files in manifests and archives
+    state: OPEN
+    classification: in_progress
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: ["#188"]
+    sub_issues: []
+    linked_prs: ["#166"]
+    project_refs: []
+    evidence_refs: ["dev@17b3762", "terminal package-file-set outcome"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/130"]
+    required_action: Close after final released artifact proves the accepted file set.
+  - issue: 126
+    title: Publish timeline-historian and reconcile local delivery residue
+    state: OPEN
+    classification: in_progress
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: ["#188", "post-release cleanup"]
+    sub_issues: []
+    linked_prs: ["#173"]
+    project_refs: []
+    evidence_refs: ["dev@da2f433", "docs/recovery-ledger-2026-07-10.md"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/126"]
+    required_action: Close after main inclusion and safe rescue cleanup.
+  - issue: 190
+    title: Backfill missing release verification for completed package sprints
+    state: CLOSED
+    classification: done
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: ["#191"]
+    project_refs: []
+    evidence_refs: ["dev@a9c2669", "restored project-router validation"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/190"]
+    required_action: No action.
+  - issue: 174
+    title: Reject malformed historian content digests and mismatched asset IDs
+    state: OPEN
+    classification: deferred
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["issue #126 critic low finding"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/174"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 71
+    title: Validate route status strings and transitions
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/71"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 73
+    title: Reject vacuous approval evidence
+    state: OPEN
+    classification: deferred
+    labels: []
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["quality backlog"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/73"]
+    required_action: Keep for the post-release quality wave.
+  - issue: 12
+    title: Negotiate Agent Platform capabilities and supported worker adapters
+    state: OPEN
+    classification: blocked
+    labels: [bug, type:problem, risk:critical]
+    assignees: []
+    milestone: null
+    dependencies: ["Agent Platform readiness"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["external provider boundary"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/12"]
+    required_action: Keep blocked on owning platform evidence.
+  - issue: 116
+    title: Codify the platform loop-native operating convention
+    state: OPEN
+    classification: blocked
+    labels: [enhancement]
+    assignees: []
+    milestone: null
+    dependencies: ["#12", "#121", "verified 1.3.0 release"]
+    sub_issues: []
+    linked_prs: []
+    project_refs: []
+    evidence_refs: ["iteration-25 North Star"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/116"]
+    required_action: Resume after package trust and Agent Platform gates.
+  - issue: 142
+    title: Sequence repository recovery and trusted main promotion
+    state: OPEN
+    classification: in_progress
+    labels: [type:problem]
+    assignees: []
+    milestone: null
+    dependencies: ["#121", "#188"]
+    sub_issues: []
+    linked_prs: ["#144"]
+    project_refs: []
+    evidence_refs: ["this state-of-union refresh"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
+    required_action: "Close after #121, final release, and cleanup reconciliation."
+pr_findings:
+  - pr: 189
+    branch: dev
+    base_branch: main
+    state: OPEN
+    draft: false
+    linked_issues: [188]
+    head_sha: "e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
+    checks_status: fail
+    deployment_status: missing
+    finding: "Valid 1.3.0 route and James authorship; held because main's old policy fails and no real approval or #121 live controls exist."
+    evidence_refs: ["policy run 29083094613", "issue #121"]
+  - pr: 184
+    branch: lane/120-release-safety
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [120]
+    head_sha: "d1e8cdc2e616443db90d11dc2ef39310e5b74339"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Zero-finding critic-approved release safety integrated to dev at 5d3393e under the committed admin exception.
+    evidence_refs: ["terminal release-safety sprint", "PR #184"]
+  - pr: 191
+    branch: controller/2026-07-10-terminal-verification-repair
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [190]
+    head_sha: "4404991e6bb438ae1e453cd08de632eb986a196a"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Backfilled historical terminal verification and restored valid global routing.
+    evidence_refs: ["dev@a9c2669"]
+  - pr: 192
+    branch: controller/2026-07-10-release-safety-terminal
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [120]
+    head_sha: "6ee649aed51481b06f71c72c584a9c5b4752365f"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: "Terminalized the bounded #120 dev outcome and routed to this strategy refresh."
+    evidence_refs: ["dev@e702911"]
+lane_findings:
+  - lane_id: issue-120-release-safety
+    contract_ref: .agent-workflow/sprints/2026-07-10-release-safety/lanes/contracts/issue-120-release-safety.contract.yaml
+    issue_ids: [120]
+    branch: lane/120-release-safety
+    pr_refs: ["#184"]
+    status: aligned
+    findings: ["D/I3/E4/S3 is terminal and verified on dev; final package release remains a separate release-verification action."]
+  - lane_id: issue-121-delivery-controls
+    contract_ref: null
+    issue_ids: [121]
+    branch: null
+    pr_refs: []
+    status: not_started
+    findings: ["Issue is ready for one sprint lane; no branch, contract, lease, or PR exists yet."]
+delivery_findings:
+  - ref: main branch protection
+    type: branch_rule
+    status: fail
+    evidence_refs: ["live branches/main/protection", "issue #121"]
+    finding: Main requires validate, pull-request-policy, compliance, admin enforcement, and conversation resolution, but no PR review.
+  - ref: dev branch protection
+    type: branch_rule
+    status: missing
+    evidence_refs: ["live branches/dev/protection", "issue #121"]
+    finding: Dev is unprotected.
+  - ref: PR #189 candidate policy
+    type: check
+    status: fail
+    evidence_refs: ["policy run 29083094613", "main@898d7c7"]
+    finding: "Main's 1.2.1 trusted policy expects version 1.2.1 and rejects the 1.3.0 marker; issue #121 needs a bootstrap candidate-side delivery policy."
+  - ref: npm release 1.2.1
+    type: release
+    status: pass
+    evidence_refs: ["npm:@verdify-cli/cli@1.2.1", "GitHub release v1.2.1", "main@898d7c7"]
+    finding: Current accepted release authorities agree on 1.2.1.
+  - ref: workflow review permissions
+    type: other
+    status: fail
+    evidence_refs: ["actions/permissions/workflow"]
+    finding: Default workflow permissions are read and can_approve_pull_request_reviews is false; no workflow may substitute a fake release approval.
+actions:
+  - id: GBSA-001
+    type: route
+    target: "issue #121"
+    owner: sprint-planning
+    status: proposed
+    apply_through: state_of_union
+    evidence_refs: ["live branch rules", "PR #189", "terminal #120 sprint"]
+  - id: GBSA-002
+    type: route
+    target: "PR #189 after #121"
+    owner: release-verification
+    status: proposed
+    apply_through: release_verification
+    evidence_refs: ["issue #188", "James authorship", "no current review"]
+  - id: GBSA-003
+    type: update_issue
+    target: "issue #190"
+    owner: state-of-union
+    status: applied
+    apply_through: github_issue
+    evidence_refs: ["PR #191", "issue closed 2026-07-10T09:28:21Z"]
+  - id: GBSA-004
+    type: no_op
+    target: "deferred quality issues #71, #73, and #174"
+    owner: state-of-union
+    status: not_applicable
+    apply_through: none
+    evidence_refs: ["live open issue inventory"]
+handoff:
+  next_skill: sprint-planning
+  next_mode: lane-transaction
+  reason: "Issue #121 is the sole ready candidate; terminal #120 evidence, live branch rules, and held PR #189 define its complete scope."

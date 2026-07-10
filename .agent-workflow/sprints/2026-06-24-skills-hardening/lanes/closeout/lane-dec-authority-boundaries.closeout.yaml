@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-authority-boundaries
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 8
 pull_request: 37
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "a1a961303904beca9f518fe35497cb233daba58f"
+implementation_head_sha: "a1a961303904beca9f518fe35497cb233daba58f"
+validated_head_sha: "a1a961303904beca9f518fe35497cb233daba58f"
 contract_hash: "184eebce149d50e8120b12b2173c8f4bacae69c4ee055edfc2bfa88223d00d28"
 changed_paths:
   - "docs/decisions/ADR-0011-northstar-projectdef-architecture-authority.md"
@@ -65,6 +66,7 @@ residual_risks:
   - "Fresh critic or reviewer approval is still required before integration."
   - "ADR-0011 is not merged yet; PR #37 is open as a draft for independent criticism."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-authority"
 completed_at: "2026-06-24T16:45:52Z"
 limitations:

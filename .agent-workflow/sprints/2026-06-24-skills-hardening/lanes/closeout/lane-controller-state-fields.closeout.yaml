@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-controller-state-fields
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 22
 pull_request: 47
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "6a76e096309576caaaaa6558a447d1479ad10273"
+implementation_head_sha: "6a76e096309576caaaaa6558a447d1479ad10273"
+validated_head_sha: "6a76e096309576caaaaa6558a447d1479ad10273"
 contract_hash: "dd8202e8be31c634ebaa1a64d6d14735782722ffa33cd4a041c8cc8527de0715"
 changed_paths:
   - "schemas/controller-state.schema.yaml"
@@ -89,6 +90,7 @@ residual_risks:
   - "config/lifecycle.yaml remains unchanged because it is coordination-required read-only context for this lane."
   - "Controller-state schema now requires top-level waves; downstream controller-state artifacts must include waves, even when empty."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-ctrlstate"
 completed_at: "2026-06-24T17:30:38Z"
 limitations:

@@ -1,0 +1,392 @@
+schema_ref: state-of-union.schema.yaml
+kind: StateOfUnion
+schema_version: "1.0"
+strategy_id: iteration-25-delivery-controls-and-release
+status: approved
+repository: VerdifyConsultancy/verdify-skills
+baseline_sha: "e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
+assessed_at: "2026-07-10T09:29:52Z"
+inputs:
+  - id: IN-001
+    type: north-star
+    location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+    summary: Approved iteration-25 product authority requires trusted package safety, human-governed delivery, and exact release evidence.
+    evidence_status: verified
+  - id: IN-002
+    type: north-star-architecture
+    location: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+    summary: Approved architecture defines dev integration, release-only main, exact artifacts, and Jason-or-James release authority.
+    evidence_status: verified
+  - id: IN-003
+    type: project-definition
+    location: .agent-workflow/project/project-definition.yaml
+    summary: Approved project definition covers package recovery, release safety, branch controls, review, rollback, and outcome proof.
+    evidence_status: verified
+  - id: IN-004
+    type: architecture
+    location: .agent-workflow/architecture/architecture.yaml
+    summary: Current module contracts separate release-package, governance, quality, and external runtime ownership.
+    evidence_status: verified
+  - id: IN-005
+    type: live-github
+    location: .agent-workflow/strategy/github-backlog-sync.yaml
+    summary: Live issues, PRs, checks, branch protections, workflow permissions, and environment state captured at this assessment.
+    evidence_status: verified
+  - id: IN-006
+    type: git
+    location: "dev@e7029118bc8108f2fc1e2deaa27a1d423ce9a0b4"
+    summary: "Clean dev contains terminal #130, #126, and #120 sprint evidence plus version 1.3.0 release-safety implementation."
+    evidence_status: verified
+  - id: IN-007
+    type: git
+    location: "main@898d7c78845f11a4cec29556e698ebd27aa58ef1"
+    summary: Main remains the published version 1.2.1 authority.
+    evidence_status: verified
+  - id: IN-008
+    type: package-registry
+    location: npm:@verdify-cli/cli@1.2.1
+    summary: npm latest and GitHub release v1.2.1 agree with main gitHead 898d7c7.
+    evidence_status: verified
+  - id: IN-009
+    type: release-candidate
+    location: "GitHub issue #188 and PR #189"
+    summary: "James-authored 1.3.0 dev-to-main candidate is open, unapproved, unpublished, and held for issue #121."
+    evidence_status: verified
+source_freshness:
+  - surface: git
+    source_ref: local clean dev plus origin/dev and origin/main
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Rescue refs remain intentionally retained until final release cleanup.
+  - surface: github_issues
+    source_ref: live GitHub issue API
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: GitHub Issues are authoritative; no milestone or Project is configured for this slice.
+  - surface: github_pull_requests
+    source_ref: "live GitHub pull request API through PR #192"
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Closed invalid 1.2.1 candidates remain historical evidence.
+  - surface: github_checks
+    source_ref: live PR check rollups and workflow runs through dev e702911
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "PR #189 has successful validate/compliance evidence but main's old policy check rejects the new candidate identity."
+  - surface: github_deployments
+    source_ref: npm environment and GitHub release API
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "The npm environment has no protection rules; issue #121 owns repository delivery controls, not npm credential policy redesign."
+  - surface: github_projects
+    source_ref: live repository planning surfaces
+    status: missing
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: No Project or milestone is required for the one-issue next sprint.
+  - surface: north_star
+    source_ref: .agent-workflow/northstar/northstar-artifacts.yaml
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: No new product or architecture decision is introduced by this refresh.
+  - surface: project_definition
+    source_ref: .agent-workflow/project/project-definition.yaml
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: None.
+  - surface: architecture
+    source_ref: .agent-workflow/architecture/architecture.yaml and module contracts
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Agent Platform, Orbit, and Gravity runtime state remains external to this package-control slice.
+  - surface: sprint_artifacts
+    source_ref: .agent-workflow/sprints
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: All committed sprints are complete; no active lane exists.
+  - surface: lane_artifacts
+    source_ref: "issue #120 D/I3/E4/S3 chain and terminal release/outcome records"
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Final main and npm evidence intentionally does not exist yet.
+  - surface: review_artifacts
+    source_ref: "PR #184 critic and admin-exception evidence plus PR #189 review state"
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: "PR #189 has no approval; Jason can supply a real non-author review after #121 updates dev."
+  - surface: deployment_runtime
+    source_ref: npm 1.2.1 and GitHub release v1.2.1
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Package publication has no long-running application runtime.
+  - surface: logs
+    source_ref: package runtime logs
+    status: not_applicable
+    captured_at: null
+    limitation: GitHub Actions and release transaction evidence are the applicable operational surfaces.
+  - surface: metrics
+    source_ref: package runtime metrics
+    status: not_applicable
+    captured_at: null
+    limitation: No runtime service is deployed from this repository.
+  - surface: traces
+    source_ref: package runtime traces
+    status: not_applicable
+    captured_at: null
+    limitation: No traced runtime service exists.
+  - surface: alerts
+    source_ref: package runtime alerts
+    status: not_applicable
+    captured_at: null
+    limitation: Workflow failures and GitHub Issues are the relevant signals.
+  - surface: local_artifacts
+    source_ref: retained recovery commits fe1f94e, f425515, and 22f81bdc35e4f1e5a70797624c93bc86bc66056c
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: Do not delete until main 1.3.0 and recovery cleanup are verified.
+  - surface: external_dependency
+    source_ref: npm registry and GitHub Actions authority
+    status: fresh
+    captured_at: "2026-07-10T09:28:20Z"
+    limitation: npm and GitHub availability can still stop the resumable final transaction.
+planning_inventory:
+  - artifact_type: north_star
+    location: .agent-workflow/northstar
+    status: current
+    finding: Iteration-25 authority still requires the trusted package and delivery-control wave.
+    action: Preserve it unchanged.
+  - artifact_type: project_definition
+    location: .agent-workflow/project/project-definition.yaml
+    status: current
+    finding: Delivery control and exact release requirements remain applicable.
+    action: "Use them as #121 contract inputs."
+  - artifact_type: architecture
+    location: .agent-workflow/architecture/architecture.yaml
+    status: current
+    finding: "Existing release and governance boundaries support a one-issue #121 lane."
+    action: No architecture refresh is required.
+  - artifact_type: module_contracts
+    location: .agent-workflow/modules/contracts
+    status: current
+    finding: Governance and release-package contracts cover branch rules, policy workflows, and final promotion.
+    action: "Bind #121 ownership to those interfaces."
+  - artifact_type: sprint_plan
+    location: .agent-workflow/sprints
+    status: current
+    finding: "#130, #126, and #120 are terminal with validated release and outcome evidence."
+    action: "Create a new bounded sprint for #121 only."
+  - artifact_type: release_verification
+    location: .agent-workflow/sprints/2026-07-10-release-safety/release/release-verification.yaml
+    status: current
+    finding: Version 1.3.0 release safety is verified on dev; privileged main/npm proof remains intentionally absent.
+    action: "Keep PR #189 held until #121 code and live rules are complete."
+  - artifact_type: github_backlog_sync
+    location: .agent-workflow/strategy/github-backlog-sync.yaml
+    status: current
+    finding: "Live delivery state identifies #121 as the sole ready next slice."
+    action: "Hand #121 to sprint planning."
+north_star:
+  goal: >-
+    Deliver a durable method and planning layer that converts human intent and
+    evidence into bounded, independently reviewed, exactly released, and
+    runtime-verifiable work across Verdify projects.
+  alignment_status: aligned
+  source_refs: [IN-001, IN-002, IN-003, IN-004]
+current_state:
+  summary: >-
+    Recovery, package integrity, and version 1.3.0 release safety are integrated
+    and terminal on dev. Main, npm, and GitHub release remain at 1.2.1. The only
+    blocking delivery gap is issue #121: dev is unprotected, main lacks review,
+    CODEOWNERS is ineffective, and the open James-authored PR #189 needs a
+    candidate-side bootstrap policy plus real Jason approval before promotion.
+  lifecycle_state: READY
+  active_sprint: null
+  open_gates: []
+  delivery_risks:
+    - Dev is unprotected, so ordinary integrations are not machine-bound to PRs, current checks, or critic evidence.
+    - Main requires old checks but no review; its 1.2.1 trusted policy cannot validate the 1.3.0 candidate body on PR #189.
+    - Workflow tokens cannot approve PR reviews, so dev must use transport-neutral critic status and releases must use a real non-author owner review.
+    - Rescue refs and the shared recovery checkout must remain until 1.3.0 reaches main and cleanup is verified.
+delivery_health:
+  status: degraded
+  diagnostic_refs:
+    - .agent-workflow/strategy/github-backlog-sync.yaml
+    - .agent-workflow/sprints/2026-07-10-release-safety/release/release-verification.yaml
+  deployment_refs:
+    - "main@898d7c78845f11a4cec29556e698ebd27aa58ef1"
+    - "npm:@verdify-cli/cli@1.2.1"
+    - "GitHub release v1.2.1"
+    - "open release PR #189"
+  log_refs:
+    - "PR #189 failed policy run 29083094613"
+  telemetry_refs:
+    - "dev validate/compliance runs recorded in terminal sprint evidence"
+  discovered_health_issues:
+    - id: HEALTH-001
+      statement: Live branch protection and ownership rules do not enforce the documented dev-first and reviewed-release model.
+      severity: high
+      evidence_refs: ["issue #121", "live main protection", "live unprotected dev", ".github/CODEOWNERS"]
+      action: "Plan, implement, and apply issue #121 before PR #189 can merge."
+    - id: HEALTH-002
+      statement: "Main's current 1.2.1 trusted policy rejects PR #189 before the candidate-side 1.3.0 policy can become base authority."
+      severity: high
+      evidence_refs: ["PR #189", "policy run 29083094613", "main@898d7c7"]
+      action: Add a distinct candidate-side delivery-policy check for the bootstrap release, then restore the normal base policy requirement after 1.3.0 reaches main.
+    - id: HEALTH-003
+      statement: Recovery refs and the shared recovery checkout remain intentionally retained after dev integration.
+      severity: low
+      evidence_refs: ["docs/recovery-ledger-2026-07-10.md", "issue #126 outcome"]
+      action: Audit and clean only after final release verification.
+issue_inventory:
+  - issue: 121
+    title: Enforce protected dev integration and release-only main promotion
+    state: OPEN
+    classification: candidate
+    rationale: The issue is complete enough, high risk, architecture-aligned, and the sole blocker for the approved 1.3.0 promotion.
+    dependencies: ["terminal #120 dev outcome", "open PR #189"]
+    action: Plan one lane with code, deterministic tests, bootstrap/steady-state branch protection, and live reconciliation.
+  - issue: 188
+    title: Release @verdify-cli/cli@1.3.0
+    state: OPEN
+    classification: in_progress
+    rationale: "The valid James-authored release issue exists, but promotion is intentionally held for #121 and a real Jason review."
+    dependencies: ["#121", "PR #189 approval and checks"]
+    action: Keep open; do not merge until live delivery controls pass.
+  - issue: 120
+    title: Test and publish the exact packed artifact as an atomic recoverable transaction
+    state: OPEN
+    classification: in_progress
+    rationale: "Its bounded dev sprint is accepted, while final npm/tag/release verification remains pending on PR #189."
+    dependencies: ["#121", "#188"]
+    action: Close only after verified 1.3.0 publication and final transaction assets.
+  - issue: 130
+    title: Ignore host-local and untracked files in manifests and archives
+    state: OPEN
+    classification: in_progress
+    rationale: The implementation is verified on dev and awaits inclusion in the final main release.
+    dependencies: ["#188"]
+    action: Close after main and released artifact prove the package file set.
+  - issue: 126
+    title: Publish timeline-historian and reconcile local delivery residue
+    state: OPEN
+    classification: in_progress
+    rationale: Recovery is verified on dev, with final main inclusion and rescue cleanup intentionally pending.
+    dependencies: ["#188", "post-release cleanup"]
+    action: Close after main release and safe rescue-ref/worktree cleanup.
+  - issue: 190
+    title: Backfill missing release verification for completed package sprints
+    state: CLOSED
+    classification: done
+    rationale: "PR #191 added both missing verification records and restored valid global routing."
+    dependencies: []
+    action: No further action.
+  - issue: 174
+    title: Reject malformed historian content digests and mismatched asset IDs
+    state: OPEN
+    classification: deferred
+    rationale: Low-risk critic follow-up is issue-backed and outside the trusted release boundary.
+    dependencies: []
+    action: Keep for the post-release quality wave.
+  - issue: 71
+    title: Validate route status strings and transitions
+    state: OPEN
+    classification: deferred
+    rationale: "Valid quality work, but not required for #121 or the 1.3.0 release."
+    dependencies: []
+    action: Keep for the post-release quality wave.
+  - issue: 73
+    title: Reject vacuous approval evidence
+    state: OPEN
+    classification: deferred
+    rationale: Valid quality work remains durable and outside the one-issue control sprint.
+    dependencies: []
+    action: Keep for the post-release quality wave.
+  - issue: 12
+    title: Negotiate Agent Platform capabilities and supported worker adapters
+    state: OPEN
+    classification: blocked
+    rationale: External platform authority and readiness evidence are not part of this repository release.
+    dependencies: ["Agent Platform readiness"]
+    action: Keep blocked on owning platform evidence.
+  - issue: 116
+    title: Codify the platform loop-native operating convention
+    state: OPEN
+    classification: blocked
+    rationale: It depends on trusted package release plus Agent Platform capability work.
+    dependencies: ["#12", "#121", "verified 1.3.0 release"]
+    action: Resume after package trust and external platform gates.
+  - issue: 142
+    title: Sequence repository recovery and trusted main promotion
+    state: OPEN
+    classification: in_progress
+    rationale: "The umbrella sequence is complete through #120 and remains active through #121, release, and cleanup."
+    dependencies: ["#121", "#188"]
+    action: Close after final release and cleanup reconciliation.
+gaps:
+  - id: GAP-001
+    type: delivery
+    statement: Dev and main live protections do not enforce the documented integration and release model.
+    owner: "issue #121"
+    blocking: false
+    apply_through: sprint_planning
+  - id: GAP-002
+    type: delivery
+    statement: The bootstrap 1.3.0 candidate needs a candidate-side policy and review check because main still runs 1.2.1 policy code.
+    owner: "issue #121"
+    blocking: false
+    apply_through: sprint_planning
+  - id: GAP-003
+    type: deployment
+    statement: "npm, tag, GitHub release, exact retained artifact, and completed ledger evidence do not exist until PR #189 is approved and merged."
+    owner: release-verification
+    blocking: false
+    apply_through: release_verification
+recommended_sequence:
+  - id: SEQ-001
+    outcome: Enforce delivery controls in code and live GitHub state.
+    issue_ids: [121]
+    prerequisites: ["approved current strategy", "clean dev baseline", "open PR #189 held"]
+    risks: ["branch-protection lockout", "bootstrap policy deadlock", "stale review or check acceptance"]
+    depends_on: []
+  - id: SEQ-002
+    outcome: Approve and promote the exact 1.3.0 dev candidate.
+    issue_ids: [188, 120]
+    prerequisites: ["#121 merged", "live pre-release protections verified", "Jason approval on current James-authored head"]
+    risks: ["immutable npm publish", "partial authority mutation", "artifact retention or registry outage"]
+    depends_on: [SEQ-001]
+  - id: SEQ-003
+    outcome: Reconcile final issues and safely clean retained recovery handles.
+    issue_ids: [126, 130, 142]
+    prerequisites: ["main/npm/tag/release/ledger verification complete"]
+    risks: ["deleting the last unique rescue source", "closing issues before main proof"]
+    depends_on: [SEQ-002]
+next_sprint_candidates:
+  - outcome: Protected dev integration and reviewed release-only main promotion
+    issue_ids: [121]
+    readiness: ready
+    rationale: "Issue #121 has clear acceptance intent, current live evidence, no unresolved product or architecture decision, and is the only blocker for PR #189."
+    required_actions: ["create one lane contract", "include bootstrap and steady-state protection phases", "require fresh critic before dev integration", "apply and verify live rules after merge"]
+actions:
+  - id: ACT-001
+    type: plan_sprint
+    target: "issue #121"
+    owner: sprint-planning
+    status: proposed
+  - id: ACT-002
+    type: route
+    target: "PR #189 and issue #188 after #121"
+    owner: release-verification
+    status: proposed
+  - id: ACT-003
+    type: no_op
+    target: "issues #71, #73, and #174"
+    owner: state-of-union
+    status: not_applicable
+handoff:
+  next_skill: sprint-planning
+  next_mode: lane-transaction
+  reason: "Issue #121 is the sole ready candidate after terminal #120 evidence; live branch rules and PR #189 prove the exact bounded delivery-control scope."
+  required_before_handoff: []
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T09:29:52Z"

@@ -1,13 +1,14 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-27-ship-verify-skills
 lane_id: issue-93-adversarial-audit
 status: ready_for_critic
 issue_ids: [93]
 pull_request: 97
 baseline_sha: fffa61c09cbe09f8d0dd32681029a967c59066ee
-head_sha: 129b14d122a1a521095ba025b2c67db6d634bbeb
+implementation_head_sha: 129b14d122a1a521095ba025b2c67db6d634bbeb
+validated_head_sha: 129b14d122a1a521095ba025b2c67db6d634bbeb
 contract_hash: e9e24e8672dbaf9458b6b5f30271476a6f49794c1065c826cb4c111bd75d6423
 changed_paths:
   - .agents/skills/adversarial-audit
@@ -57,7 +58,8 @@ discovered_issues: []
 residual_risks:
   - Shared lifecycle registration surfaces will conflict with the other P0 skill PRs until controller-merge reconciles them.
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: worker-93-20260627a
 completed_at: "2026-06-27T22:58:05Z"
 limitations:
-  - Closeout head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.
+  - Closeout implementation_head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.

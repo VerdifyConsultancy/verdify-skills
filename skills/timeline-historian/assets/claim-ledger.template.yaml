@@ -1,0 +1,17 @@
+schema: timeline-historian.claim-ledger.v1
+generated_at: "<iso8601>"
+claims:
+  - claim_id: "claim-001"
+    window_id: "<window-id>"
+    assertion: "<atomic historical assertion>"
+    time_interval:
+      start_year:
+      end_year:
+    claim_type: "event"
+    source_anchors:
+      - asset_id: "sha256:<content_sha256>"
+        anchor_type: "asset"
+        citation: "<path, source card, OCR page, or span>"
+    confidence: "low"
+    status: "draft"
+    created_from: "extraction"

@@ -1,0 +1,111 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/release-transaction.schema.yaml
+title: Verdify Release Transaction
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, state, resumable, next_action, package, source, artifact, authorities, errors]
+properties:
+  schema_ref: {const: release-transaction.schema.yaml}
+  kind: {const: ReleaseTransaction}
+  schema_version: {const: "1.0"}
+  state:
+    type: string
+    enum: [prepared, artifact_verified, npm_published, tag_pushed, github_released, completed, failed]
+  resumable: {type: boolean}
+  next_action:
+    type: string
+    enum: [verify_artifact, publish_npm, push_tag, create_github_release, upload_release_assets, upload_completed_ledger, none, manual_reconcile]
+  package:
+    type: object
+    additionalProperties: false
+    required: [name, version]
+    properties:
+      name: {type: string, minLength: 1}
+      version: {type: string, pattern: '^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$'}
+  source:
+    type: object
+    additionalProperties: false
+    required: [commit, clean, candidate_sidecar_sha256]
+    properties:
+      commit: {type: string, pattern: '^[0-9a-f]{40}$'}
+      clean: {type: boolean}
+      candidate_sidecar_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+  artifact:
+    type: object
+    additionalProperties: false
+    required: [candidate_identity, tarball_filename, tarball_size, tarball_sha256, tarball_sha512, npm_integrity, npm_shasum, npm_pack_invocations, package_file_list_blob, member_files_sha256, archive_filename, archive_size, archive_sha256, checksum_filename, checksum_sha256, actions]
+    properties:
+      candidate_identity: {type: string, pattern: '^v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?-[0-9a-f]{40}$'}
+      tarball_filename: {type: string, minLength: 1}
+      tarball_size: {type: integer, minimum: 1}
+      tarball_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      tarball_sha512: {type: string, pattern: '^[0-9a-f]{128}$'}
+      npm_integrity: {type: string, pattern: '^sha512-[A-Za-z0-9+/]+={0,2}$'}
+      npm_shasum: {type: string, pattern: '^[0-9a-f]{40}$'}
+      npm_pack_invocations: {const: 1}
+      package_file_list_blob: {type: string, pattern: '^[0-9a-f]{40}$'}
+      member_files_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      archive_filename: {type: string, minLength: 1}
+      archive_size: {type: integer, minimum: 1}
+      archive_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      checksum_filename: {type: string, minLength: 1}
+      checksum_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+      actions:
+        type: object
+        additionalProperties: false
+        required: [repository, workflow_path, source_branch, source_sha, workflow_run_id, workflow_run_attempt, artifact_id, artifact_name, artifact_digest, provenance_filename, provenance_sha256, binding_filename, binding_sha256, binding_artifact_run_id, binding_artifact_run_attempt, binding_artifact_id, binding_artifact_name, binding_artifact_digest]
+        properties:
+          repository: {type: string, pattern: '^[^/]+/[^/]+$'}
+          workflow_path: {type: string, minLength: 1}
+          source_branch: {type: string, minLength: 1}
+          source_sha: {type: string, pattern: '^[0-9a-f]{40}$'}
+          workflow_run_id: {type: integer, minimum: 1}
+          workflow_run_attempt: {type: integer, minimum: 1}
+          artifact_id: {type: integer, minimum: 1}
+          artifact_name: {type: string, minLength: 1}
+          artifact_digest: {type: string, pattern: '^sha256:[0-9a-f]{64}$'}
+          provenance_filename: {const: candidate-provenance.json}
+          provenance_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+          binding_filename: {const: candidate-artifact-binding.json}
+          binding_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+          binding_artifact_run_id: {type: integer, minimum: 1}
+          binding_artifact_run_attempt: {type: integer, minimum: 1}
+          binding_artifact_id: {type: integer, minimum: 1}
+          binding_artifact_name: {type: string, minLength: 1}
+          binding_artifact_digest: {type: string, pattern: '^sha256:[0-9a-f]{64}$'}
+  authorities:
+    type: object
+    additionalProperties: false
+    required: [npm, tag, github_release]
+    properties:
+      npm:
+        type: object
+        additionalProperties: false
+        required: [status, version, integrity, git_head]
+        properties:
+          status: {type: string, enum: [absent, published, unknown]}
+          version: {type: [string, 'null']}
+          integrity: {type: [string, 'null']}
+          git_head: {type: [string, 'null']}
+      tag:
+        type: object
+        additionalProperties: false
+        required: [status, name, commit]
+        properties:
+          status: {type: string, enum: [absent, present, unknown]}
+          name: {type: string, minLength: 1}
+          commit: {type: [string, 'null']}
+      github_release:
+        type: object
+        additionalProperties: false
+        required: [status, tag, url, required_assets_complete, completed_ledger_asset]
+        properties:
+          status: {type: string, enum: [absent, partial, present, unknown]}
+          tag: {type: [string, 'null']}
+          url: {type: [string, 'null']}
+          required_assets_complete: {type: boolean}
+          completed_ledger_asset: {type: boolean}
+  errors:
+    type: array
+    uniqueItems: true
+    items: {type: string, minLength: 1}

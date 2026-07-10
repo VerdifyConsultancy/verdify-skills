@@ -42,6 +42,7 @@ sequenceDiagram
     participant SP as sprint-planning
     participant H as Human
     participant SO as sprint-orchestrator
+    participant GH as GitHub
     participant CL as controller-loop
     participant AP as Agent Platform
     participant LD as lane-delivery
@@ -56,12 +57,16 @@ sequenceDiagram
     loop each ready lane
         SO->>AP: dispatch one worker (add_worktree_agent)
         AP-->>LD: worker session
-        LD->>LD: implement owned paths, validate, open PR
-        LD->>IC: closeout (ready_for_critic)
-        IC-->>SO: approve / request fixes
+        LD->>LD: verify dispatch-only D (plan + wave + contract)
+        LD->>LD: validate + commit implementation I
+        LD->>IC: commit closeout-only E and stop writing
+        IC-->>SO: distinct agent/session commits report-only S
+        SO->>GH: verify external admin/maintainer APPROVED on S
     end
-    SO->>RV: all lanes approved
-    RV->>RV: review packet + deploy verification
+    SO->>RV: all lane S heads externally approved
+    RV->>RV: packet-only P on evidence-only controller branch
+    RV->>GH: merge each lane PR individually
+    RV->>RV: verify integrated runtime separately
     RV-->>H: review-ready evidence + outcome
     H-->>RV: accept outcome
     RV->>SU: cycle continues

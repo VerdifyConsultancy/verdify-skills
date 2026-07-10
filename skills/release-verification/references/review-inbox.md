@@ -10,8 +10,11 @@ rollback, and outcome review.
 
 ## Inputs
 
-- North Star IDs, sprint ID, lane IDs, issue IDs, PR or merge request URL, base
-  ref, head ref, and exact reviewed head SHA.
+- North Star IDs, sprint ID, lane IDs, issue IDs, PR or merge request URL, target
+  base ref, deterministic `controller/<sprint-id>` head ref, implementation
+  head, closeout-only evidence head, critic-report head, and one exact
+  commit-bound review submission per lane with reviewer login and immutable
+  GitHub user ID.
 - Wave release plan path when present, especially required checks, preview or
   review environment, GitOps desired state, release-health signals, rollback,
   and telemetry expectations.
@@ -33,10 +36,13 @@ rollback, and outcome review.
 
 ## Procedure
 
-1. Verify the PR or merge request identity and exact head SHA before using any
-   check, preview, or critic evidence.
-2. Collect required checks and workflow results by name. Do not summarize them
-   as "CI passed" without URLs or observed timestamps.
+1. Verify each PR or merge request identity and exact head SHA before using any
+   check, preview, or critic evidence. Each live head, critic-report commit, and
+   external review-submission commit must match; the latest effective review
+   from the recorded reviewer must be `APPROVED`.
+2. Collect required checks and workflow results by name. Every configured
+   required check must have a live `SUCCESS` result on that exact head; do not
+   summarize them as "CI passed" without URLs or observed timestamps.
 3. Record review or preview deployment evidence separately from merge state.
    Include desired-state refs and observed runtime or reconciliation evidence
    for GitOps-managed environments.
@@ -45,23 +51,40 @@ rollback, and outcome review.
 5. Review privileged access, secrets, production mutation, and preview generator
    controls. Treat unresolved critical security findings as blockers.
 6. Record rollback readiness before marking a packet review-ready.
-7. Write `.agent-workflow/sprints/<sprint-id>/review/review-inbox-packet.yaml`
-   and validate it against `../../schemas/review-inbox-packet.schema.yaml`.
-8. Set the recommendation to `approve`, `request_changes`, `reject`, or
+7. Build the deterministic pushed `controller/<sprint-id>` branch as an
+   evidence-only history from the SprintPlan baseline. Copy only the approved
+   sprint transaction, canonical lane closeouts, critic reports, and release
+   evidence; never merge or copy lane implementation changes into this branch.
+8. Write `.agent-workflow/sprints/<sprint-id>/review/review-inbox-packet.yaml`,
+   validate it against `../../schemas/review-inbox-packet.schema.yaml`, and
+   commit it as the only changed path in packet commit P. The packet is never
+   committed onto a lane PR branch, and the controller branch is never an
+   integration candidate.
+9. Set the recommendation to `approve`, `request_changes`, `reject`, or
    `escalate`.
-9. Route feedback to exactly one next action: fix lane, replan, architecture
+10. Route feedback to exactly one next action: fix lane, replan, architecture
    review, release verification, human signoff, issue creation, or hold.
 
-Critic approval is necessary but not sufficient for integration. Integration
-waits for a complete review packet with an approve recommendation, or an
-explicit policy exception recorded through the appropriate gate.
+After P, keep the packet bytes unchanged. Only linear commits limited to
+`release/release-verification.yaml`, `outcome/outcome-review.yaml`,
+`status.yaml`, or an atomic terminalization of only `sprint-plan.yaml` plus
+`status.yaml` may follow. Merge or queue each approved lane PR individually
+against its approved base, then verify the integrated runtime separately.
+
+A valid critic outcome is necessary but not sufficient for integration. Each S
+also needs external approval, and integration waits for a complete review packet
+with an approve recommendation or an explicit policy exception recorded through
+the appropriate gate.
 
 ## Completeness Rules
 
 Mark `evidence_completeness.verdict` as `complete` only when:
 
-- PR/MR identity, exact reviewed head SHA, and linked issue/lane/sprint IDs are
-  present.
+- PR/MR identity, per-lane review-submission head, authorized admin/maintainer
+  login and immutable user ID, and linked issue/lane/sprint IDs are present.
+- The packet bytes are the sole change in P, P is on the pushed declared
+  `controller/<sprint-id>` evidence branch, and any post-P suffix contains only
+  the allowed canonical delivery artifacts.
 - Required checks have observed statuses, conclusions, and evidence URLs.
 - Required preview, review, staging, or production deployment evidence is
   present, or the packet explicitly records a non-environment reason.
@@ -77,8 +100,9 @@ would be misleading or unsafe.
 
 Stop and route to `fix_lane`, `replan`, `architecture_review`, or `hold` when:
 
-- the reviewed head SHA is missing or does not match the PR, checks, critic
-  report, or preview deployment;
+- any per-lane review-submission head or authorized reviewer identity is missing
+  or does not match the live open PR, latest `APPROVED` GitHub review, required
+  checks, critic report, or preview deployment;
 - required checks or workflow runs are missing or failing;
 - a required preview/review deployment is absent or cannot identify the
   observed revision;

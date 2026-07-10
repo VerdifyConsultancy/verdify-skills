@@ -1,108 +1,114 @@
-# North Star Review Plan
+# North Star Review And Signoff Plan
 
-Status: `requested`
-Requested at: `2026-06-23T04:30:38Z`
-Reviewers: Jason, James
+Status: `approved`
+Iteration: `25`
+Prepared: `2026-07-09`
+Lock recorded: `2026-07-09T23:20:09Z`
+Final lock authority: Jason
+PR and release approver: James (`jrvallery`) or another authorized independent repository admin/maintainer under the applicable policy
 
-## Review Target
+## Decision
 
-Approve or request changes for the Verdify Skills repository North Star:
+Jason approved every July 9 recommendation and ten-answer resolution as the
+planning default, then separately directed the controller to fix #72 and lock
+iteration 25. The final-lock decision is registered as
+`northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval`.
+It does not overwrite the earlier feedback item, which correctly records that
+the ten answers alone were not yet the final lock.
 
-- `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
-- `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
-- `.agent-workflow/northstar/northstar-artifacts.yaml`
-- `.agent-workflow/northstar/northstar-plan.yaml`
-- `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`
+Iteration 25 is the approved product and architecture North Star for one
+self-building system composed of four co-equal active pilot projects:
 
-Approval locks the North Star for the next milestone. Feedback returns the
-loop to `northstar-planning` / `artifact-loop`.
+1. Verdify Skills — internal-first shared agent method, lifecycle contracts,
+   validators, planning outer loop, and capability adapters.
+2. Agent Platform — shared runtime/control, worker/session, Kubernetes/GitOps,
+   CI, observability, and identity capabilities.
+3. Orbit — Jason's personal assistant and engineering chief of staff across
+   governed personal, enterprise, meeting, conversation, and project context.
+4. Gravity — active evidence ingestion, retrieval, citation, processing, and
+   versioned read-only HTTP/API plus consumer MCP capability.
+
+Each project retains product, backlog, runtime, deployment, and outcome
+authority. The root planner reconciles portfolio vision, dependencies, gates,
+and next actions without replacing those project authorities.
 
 ## Evidence In Scope
 
-- `northstar://evidence/NSE-20260623-walk-transcript-agent-platform-gravity-skills`
-- `northstar://evidence/NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery`
-- `northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality`
-- `northstar://evidence/NSE-20260623-end-to-end-agent-based-sdlc`
-- `COMMON_OPERATING_CONTRACT.md`
-- `README.md`
-- `verdify.workflow.yaml`
-- `docs/decisions/ADR-0001-github-control-plane.md`
-- `docs/decisions/ADR-0002-cohesive-skills.md`
-- `docs/decisions/ADR-0003-worktree-leases.md`
-- `docs/decisions/ADR-0004-readiness-loop-skills.md`
-- `docs/decisions/ADR-0005-northstar-planning-loop.md`
-- `docs/decisions/ADR-0006-northstar-evidence-registry.md`
-- `docs/decisions/ADR-0007-product-architecture-northstar-artifacts.md`
-- `docs/decisions/ADR-0008-northstar-interview-skill.md`
+- `northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval`
+- `northstar://evidence/NSE-20260709-jason-review-feedback`
+- `northstar://evidence/NSE-20260709-verdify-skills-adversarial-review`
+- `northstar://evidence/NSE-20260709-agents-current-state-audit`
+- `northstar://evidence/NSE-20260709-orbit-current-state-audit`
+- `northstar://evidence/NSE-20260709-gravity-current-state-audit`
+- Prior registered North Star evidence and accepted ADRs where they do not
+  conflict with the July 9 decisions.
 
-## Review Checks
+## Content Signoff Checks
 
-1. Confirm the product North Star covers the intended scope of this repository:
-   lifecycle skills, CLI, schemas, host discovery, durable artifacts, GitHub
-   authority, lane/worktree execution, review, release verification, readiness,
-   and CI/CD wave deployment.
-2. Confirm the architecture North Star gives each product requirement a
-   corresponding architecture requirement, interface, control, or traceability
-   entry.
-3. Confirm the only North Star planning gate is final approval to lock the
-   North Star for the next milestone.
-4. Confirm deferred questions are correctly routed:
-   - `NSQ-002` branch/session/worktree/wave naming goes to release architecture.
-   - `NSQ-003` Gravity/Onyx dependency goes to `gravity-readiness`.
-5. Confirm Gravity feature implementation remains blocked until platform and
-   Gravity readiness approvals pass.
-6. Confirm CI/CD based wave deployment remains a core plan requirement.
-7. Confirm repo/application/environment/namespace cardinality is sufficient for
-   planning: repository/application is the product boundary; dev, staging,
-   production, and preview use environment-scoped namespaces or namespace sets
-   with quota, RBAC, NetworkPolicy, secret references, endpoints, deployment
-   path, and observability.
-8. Confirm the next route should remain `northstar-planning` / `human-review`
-   until approval or changes-requested feedback is recorded.
-9. Confirm the `NORTHSTAR_INTERVIEW.md` P0 questions are accepted, modified, or
-   rejected before final lock approval.
+- [x] Every July 9 recommendation is represented as a planning default.
+- [x] The exact ten human answers are represented, including the separate
+  adoption decision and the later final-lock decision.
+- [x] The old single non-Gravity pilot and Orbit-as-global-outer-loop model is
+  replaced by the four-project `PilotProject` model and root planner.
+- [x] Internal-first distribution and no-backwards-compatibility policy are
+  explicit; deprecated capability ends in atomic convergence and removal.
+- [x] Trusted installation, exact packed-artifact publication, validated
+  transitions, executable evals, consumer conformance, protected `dev`, and
+  release-only `main` remain critical-path safety prerequisites.
+- [x] Agent Platform dispatch negotiates supported versioned capabilities.
+- [x] Current Gravity is active source truth; the trusted consumer contract is
+  versioned tenant-scoped read-only HTTP plus a consumer MCP adapter with cited
+  results or typed denials.
+- [x] Orbit broad information scope is core intent and remains separated from
+  fleet actuation through source, tenant, ACL, provenance, freshness,
+  classification, retention, audit, revocation, and human-write controls.
+- [x] Jason-only North Star lock is distinct from package/PR approval under the
+  repository's independent-review policy.
+- [x] The next outcome is one integrated four-project vertical slice that
+  improves the platform itself and can later onboard customer consulting work
+  without creating a second lifecycle.
+- [x] Learning proposals remain staged; no proposal is silently implemented.
+- [x] There are no P0 or other blocking human questions for this lock.
 
-## Agent Readiness Audit
+## Issue And Security Reconciliation
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Paired North Star artifacts exist | pass | `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`, `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md` |
-| Product artifact covers required sections | pass | Purpose, personas, PRD, stories, requirements, milestones, waves, surfaces, review script, questions, traceability |
-| Architecture artifact covers required sections | pass | Intent, stories, requirements, high-level design, environments, interfaces, RBAC/secrets, observability, release/rollback, ADRs, questions, traceability |
-| Every product requirement has architecture or artifact traceability | pass | `PRQ-001` through `PRQ-015` all appear in architecture links, `northstar-artifacts.yaml`, or the traceability indexes |
-| Every architecture requirement links back to product value | pass | `ARQ-001` through `ARQ-014` cite product requirements, stories, waves, or surfaces |
-| Evidence registry is referenceable | pass | Four `northstar://evidence/...` records are present in `.agent-workflow/northstar/evidence-registry.yaml` |
-| North Star interview packet exists | pass | `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md` contains prioritized P0/P1/P2 questions, proposed defaults, tradeoffs, affected IDs, evidence, and answer-capture rules |
-| Ordinary planning questions are not gates | pass | `NSQ-002` and `NSQ-003` are deferred, nonblocking, and routed to release architecture or `gravity-readiness` |
-| Final-lock gate is durable and open | pass | `.agent-workflow/gates/northstar.yaml` has `status: open` and `resume_state: northstar-planning/human-review` |
-| Router points to human review | pass | `.agent-workflow/router/route-decision.yaml` reports `OPEN_GATE`, `northstar-planning`, `human-review` |
-| Deterministic validation has passed | pass | `bin/verdify artifact validate`, `ruby scripts/validate-repo.rb`, `make test`, and `git diff --check` passed on this review packet |
-| Approval is intentionally not recorded | pass | `northstar-artifacts.yaml` keeps `review.status: requested` and `approvals: []` |
+- Verdify Skills: #12, #71-#76, #98, #116, #117, #119-#121; #72 is closed by
+  merged PR #123 and supplies the v2 exact-head evidence substrate.
+- Private installer vulnerability: draft advisory `GHSA-4452-3c6p-3q26`;
+  public planning retains safe acceptance criteria only.
+- Agent Platform: #2889 owns legacy sprint-transaction reconciliation; #2890
+  retains the co-equal pilot/root-planner authority change; other capability,
+  runtime, health, CI, security, and version issues remain project-owned.
+- Orbit: #198 owns W27B transaction reconciliation; #193-#197 retain distinct
+  connector, trust, private-material, data-contract, and North Star work.
+- Gravity: #406 owns current authority/readiness reconciliation; #407 retains
+  cited API/MCP parity; #184 and other CI/GitOps/conversion issues remain
+  project-owned.
 
-Remaining final decision: Jason and James either approve the lock, request
-changes, or reject this review packet. Requested changes return the loop to
-`artifact-loop`; approval allows downstream skills to treat the paired North
-Star artifacts as authority for the next milestone.
+## Deferred, Nonblocking Owner Work
 
-## Approval Decision
+NSQ-009 through NSQ-013 retain proposed defaults and named Skills, platform,
+security, storage, and networking owners. They must be resolved before their
+affected recurring loop, fleet bootstrap, broad infrastructure authority, or
+platform mutation path is activated. They do not block this North Star lock or
+project-definition discovery.
 
-Allowed decisions:
+## Delivery Proof Still Required For PR #122
 
-- `approved`: lock the North Star and route downstream to the next milestone.
-- `changes_requested`: preserve feedback and restart `artifact-loop`.
-- `rejected`: keep the North Star unapproved and require a new planning pass.
+The human North Star decision is recorded, while repository integration still
+requires the independent delivery chain:
 
-Recommended approval record if approved:
+1. immutable dispatch `D` from the post-#123 `dev` baseline;
+2. one substantive implementation head `I` containing the complete lock;
+3. closeout-only `E` under LaneCloseout v2;
+4. fresh critic-report-only `S` under CriticReport v2;
+5. current checks and an independent admin/maintainer GitHub approval on `S`;
+6. integration into `dev` and a fresh downstream route probe.
 
-```yaml
-review:
-  status: approved
-  approvals:
-    - reviewer: Jason
-      decision: approved
-      decided_at: "<UTC timestamp>"
-      notes: "Approved as the Verdify Skills North Star for the next milestone."
-```
+No runtime deployment or package publication belongs to this planning lane.
 
-Do not mark `northstar-artifacts.yaml` approved until the actual human decision
-is provided.
+## Handoff
+
+After the PR delivery proof integrates, route exactly to
+`project-definition / discovery`. Material future feedback starts a new North
+Star evidence iteration; it does not reopen or silently mutate iteration 25.

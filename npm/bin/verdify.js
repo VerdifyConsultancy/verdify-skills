@@ -24,13 +24,16 @@ const COPY_ENTRIES = [
   "bin",
   "config",
   "docs",
+  "evaluations",
   "examples",
   "lib",
   "npm",
+  "packs",
   "package.json",
   "schemas",
   "scripts",
   "skills",
+  "templates",
   "verdify.workflow.yaml"
 ];
 
@@ -39,19 +42,61 @@ function usage() {
 
 Usage:
   npx @verdify-cli/cli@${version} init [--repo PATH] [--host codex|claude|all] [--force]
+  npx @verdify-cli/cli@${version} dl PACK [--repo PATH] [--host codex|claude|all] [--include-optional] [--force]
   npx @verdify-cli/cli@${version} <verdify-command> [options]
 
 The init command installs the skills package under .agent-skills, links agent
 skills into .agents/skills, writes AGENTS.md instructions, and initializes
-.agent-workflow lifecycle artifacts. Other commands are forwarded to the
-packaged Ruby lifecycle CLI.
+.agent-workflow lifecycle artifacts. The dl command installs a specific skill
+pack from the package registry without initializing lifecycle artifacts. Other
+commands are forwarded to the packaged Ruby CLI.
 `;
+}
+
+function parseInstallArgs(argv, options = {}) {
+  const parsed = {
+    repo: options.repo || process.cwd(),
+    host: options.host || "codex",
+    pack: options.pack || "all",
+    force: false,
+    includeOptional: false
+  };
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === "--repo") {
+      i += 1;
+      if (!argv[i]) fail("--repo requires a path", 2);
+      parsed.repo = argv[i];
+    } else if (arg === "--host") {
+      i += 1;
+      if (!["codex", "claude", "all"].includes(argv[i])) fail("--host must be codex, claude, or all", 2);
+      parsed.host = argv[i];
+    } else if (arg === "--pack") {
+      i += 1;
+      if (!argv[i]) fail("--pack requires a name", 2);
+      parsed.pack = argv[i];
+    } else if (arg === "--include-optional") {
+      parsed.includeOptional = true;
+    } else if (arg === "--force") {
+      parsed.force = true;
+    } else if (arg === "-h" || arg === "--help") {
+      process.stdout.write(usage());
+      process.exit(0);
+    } else {
+      fail(`unknown option: ${arg}`, 2);
+    }
+  }
+
+  return parsed;
 }
 
 function parseInitArgs(argv) {
   const options = {
     repo: process.cwd(),
     host: "codex",
+    pack: "all",
+    includeOptional: false,
     force: false
   };
 
@@ -65,6 +110,12 @@ function parseInitArgs(argv) {
       i += 1;
       if (!["codex", "claude", "all"].includes(argv[i])) fail("--host must be codex, claude, or all", 2);
       options.host = argv[i];
+    } else if (arg === "--pack") {
+      i += 1;
+      if (!argv[i]) fail("--pack requires a name", 2);
+      options.pack = argv[i];
+    } else if (arg === "--include-optional") {
+      options.includeOptional = true;
     } else if (arg === "--force") {
       options.force = true;
     } else if (arg === "-h" || arg === "--help") {
@@ -89,8 +140,11 @@ function run(command, args, options = {}) {
     stdio: options.stdio || "inherit",
     encoding: "utf8"
   });
-  if (result.error) fail(`${command} failed: ${result.error.message}`);
-  if (result.status !== 0) process.exit(result.status || 1);
+  if (result.error || result.status !== 0) {
+    if (options.cleanup) options.cleanup();
+    if (result.error) fail(`${command} failed: ${result.error.message}`);
+    process.exit(result.status || 1);
+  }
   return result;
 }
 
@@ -115,34 +169,81 @@ function findRepoRoot(repoPath) {
 
 function copyPackage(dest, force) {
   if (fs.existsSync(dest)) {
-    if (!force) return false;
-    fs.rmSync(dest, { recursive: true, force: true });
+    if (!force) return { changed: false, commit: () => {}, rollback: () => {} };
   }
 
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of COPY_ENTRIES) {
-    const source = path.join(packageRoot, entry);
-    if (!fs.existsSync(source)) continue;
-    const target = path.join(dest, entry);
-    fs.cpSync(source, target, {
-      recursive: true,
-      verbatimSymlinks: true,
-      filter: (candidate) => {
-        const relative = path.relative(packageRoot, candidate);
-        return !relative.startsWith(".git")
-          && !relative.startsWith(".agent-skills")
-          && !relative.startsWith(".agent-workflow")
-          && !relative.startsWith("dist")
-          && !relative.startsWith("node_modules");
-      }
-    });
+  const parent = path.dirname(dest);
+  const temp = `${dest}.tmp-${process.pid}`;
+  const backup = `${dest}.rollback-${process.pid}`;
+  fs.mkdirSync(parent, { recursive: true });
+  fs.rmSync(temp, { recursive: true, force: true });
+  fs.rmSync(backup, { recursive: true, force: true });
+  try {
+    fs.mkdirSync(temp, { recursive: true });
+    for (const entry of COPY_ENTRIES) {
+      const source = path.join(packageRoot, entry);
+      if (!fs.existsSync(source)) continue;
+      const target = path.join(temp, entry);
+      fs.cpSync(source, target, {
+        recursive: true,
+        verbatimSymlinks: true,
+        filter: (candidate) => {
+          const relative = path.relative(packageRoot, candidate);
+          return !relative.startsWith(".git")
+            && !relative.startsWith(".agent-skills")
+            && !relative.startsWith(".agent-workflow")
+            && !relative.startsWith("dist")
+            && !relative.startsWith("node_modules");
+        }
+      });
+    }
+
+    for (const executable of ["bin/verdify", "scripts/setup-agent-hosts.rb"]) {
+      const file = path.join(temp, executable);
+      if (fs.existsSync(file)) fs.chmodSync(file, 0o755);
+    }
+    if (fs.existsSync(dest)) fs.renameSync(dest, backup);
+    fs.renameSync(temp, dest);
+  } catch (error) {
+    fs.rmSync(temp, { recursive: true, force: true });
+    if (!fs.existsSync(dest) && fs.existsSync(backup)) fs.renameSync(backup, dest);
+    throw error;
   }
 
-  for (const executable of ["bin/verdify", "scripts/setup-agent-hosts.rb"]) {
-    const file = path.join(dest, executable);
-    if (fs.existsSync(file)) fs.chmodSync(file, 0o755);
+  let active = true;
+  return {
+    changed: true,
+    commit: () => {
+      if (!active) return;
+      fs.rmSync(backup, { recursive: true, force: true });
+      active = false;
+    },
+    rollback: () => {
+      if (!active) return;
+      fs.rmSync(dest, { recursive: true, force: true });
+      if (fs.existsSync(backup)) fs.renameSync(backup, dest);
+      removeEmptyInstallParents(dest);
+      active = false;
+    }
+  };
+}
+
+function removeEmptyInstallParents(installDir) {
+  const stop = path.dirname(path.dirname(path.dirname(installDir)));
+  let cursor = path.dirname(installDir);
+  while (cursor !== stop && fs.existsSync(cursor) && fs.readdirSync(cursor).length === 0) {
+    fs.rmdirSync(cursor);
+    cursor = path.dirname(cursor);
   }
-  return true;
+}
+
+function pruneOtherVersions(installDir) {
+  const parent = path.dirname(installDir);
+  if (!fs.existsSync(parent)) return;
+  for (const entry of fs.readdirSync(parent, { withFileTypes: true })) {
+    if (entry.name === version || !entry.isDirectory()) continue;
+    fs.rmSync(path.join(parent, entry.name), { recursive: true, force: true });
+  }
 }
 
 function upsertAgentsBlock(repoRoot, installDir) {
@@ -173,20 +274,87 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function upsertPackBlock(repoRoot, installDir, packName) {
+  const file = path.join(repoRoot, "AGENTS.md");
+  const relativeInstall = path.relative(repoRoot, installDir);
+  const start = "<!-- BEGIN VERDIFY SKILL PACKS -->";
+  const end = "<!-- END VERDIFY SKILL PACKS -->";
+  const block = `${start}
+# Verdify Skill Packs
+
+Installed Verdify skill package: \`${relativeInstall}\`.
+Installed pack: \`${packName}\`.
+Use the linked skills under \`.agents/skills\` or \`.claude/skills\` according to host setup. Packs are installable subsets of the package registry under \`${relativeInstall}/packs\`.
+${end}
+`;
+
+  const existing = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+  const pattern = new RegExp(`${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}\\n?`);
+  const next = pattern.test(existing)
+    ? existing.replace(pattern, block)
+    : `${existing.replace(/\s*$/, "")}${existing.trim() ? "\n\n" : ""}${block}`;
+  fs.writeFileSync(file, next, "utf8");
+}
+
 function init(argv) {
   const options = parseInitArgs(argv);
   const repoRoot = findRepoRoot(options.repo);
   const installDir = path.join(repoRoot, ".agent-skills", "verdify-skills", version);
-  const copied = copyPackage(installDir, options.force);
+  const installTransaction = copyPackage(installDir, options.force);
+  const copied = installTransaction.changed;
+  const runOptions = { cleanup: installTransaction.rollback };
 
-  run("ruby", [path.join(installDir, "bin", "verdify"), "init", "--repo", repoRoot].concat(options.force ? ["--force"] : []));
-  run("ruby", [path.join(installDir, "scripts", "setup-agent-hosts.rb"), "--root", repoRoot, "--source", installDir, "--host", options.host]);
+  run("ruby", [path.join(installDir, "bin", "verdify"), "init", "--repo", repoRoot].concat(options.force ? ["--force"] : []), runOptions);
+  run("ruby", [
+    path.join(installDir, "scripts", "setup-agent-hosts.rb"),
+    "--root", repoRoot,
+    "--source", installDir,
+    "--host", options.host,
+    "--pack", options.pack
+  ].concat(options.includeOptional ? ["--include-optional"] : []), runOptions);
+  if (options.pack !== "all") {
+    run("ruby", [path.join(installDir, "bin", "verdify"), "pack", "install", "--repo", repoRoot, "--pack", options.pack, "--host", options.host, "--force"].concat(options.includeOptional ? ["--include-optional"] : []), runOptions);
+  }
+  run("ruby", [path.join(installDir, "bin", "verdify"), "route", "--repo", repoRoot, "--write"], runOptions);
   upsertAgentsBlock(repoRoot, installDir);
-  run("ruby", [path.join(installDir, "bin", "verdify"), "route", "--repo", repoRoot, "--write"]);
+  upsertPackBlock(repoRoot, installDir, options.pack);
+  installTransaction.commit();
+  pruneOtherVersions(installDir);
 
   process.stdout.write(`Verdify skills ${version} ${copied ? "installed" : "already installed"} in ${path.relative(repoRoot, installDir)}\n`);
+  process.stdout.write(`Skill pack: ${options.pack}\n`);
   process.stdout.write("Workflow artifacts: .agent-workflow\n");
   process.stdout.write("Agent skills: .agents/skills\n");
+}
+
+function dl(argv) {
+  if (argv.length === 0 || argv[0] === "-h" || argv[0] === "--help") {
+    process.stdout.write(usage());
+    process.exit(0);
+  }
+  const packName = argv[0];
+  const options = parseInstallArgs(argv.slice(1), { pack: packName });
+  const repoRoot = findRepoRoot(options.repo);
+  const installDir = path.join(repoRoot, ".agent-skills", "verdify-skills", version);
+  const installTransaction = copyPackage(installDir, options.force);
+  const copied = installTransaction.changed;
+  const args = [
+    path.join(installDir, "bin", "verdify"),
+    "pack",
+    "install",
+    "--repo", repoRoot,
+    "--pack", options.pack,
+    "--host", options.host
+  ];
+  if (options.includeOptional) args.push("--include-optional");
+  if (options.force) args.push("--force");
+  run("ruby", args, {
+    cleanup: installTransaction.rollback
+  });
+  installTransaction.commit();
+  pruneOtherVersions(installDir);
+  upsertPackBlock(repoRoot, installDir, options.pack);
+  process.stdout.write(`Verdify skill pack ${options.pack} ${copied ? "downloaded" : "already downloaded"} from @verdify-cli/cli ${version}\n`);
 }
 
 function forwardToRuby(argv) {
@@ -206,6 +374,8 @@ if (argv[0] === "version" || argv[0] === "--version" || argv[0] === "-v") {
 
 if (argv[0] === "init") {
   init(argv.slice(1));
+} else if (argv[0] === "dl") {
+  dl(argv.slice(1));
 } else {
   forwardToRuby(argv);
 }

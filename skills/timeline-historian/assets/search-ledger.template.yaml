@@ -1,0 +1,19 @@
+schema: timeline-historian.search-ledger.v1
+generated_at: "<iso8601>"
+searches:
+  - search_id: "search-001"
+    purpose: "discovery"
+    backend: "<manifest|sql|fulltext|semantic|hybrid|qdrant|iiif|external>"
+    query: "<query text or manifest filter>"
+    filters: {}
+    index_version: "<manifest hash, model version, or collection version>"
+    searched_at: "<iso8601>"
+    results:
+      - rank: 1
+        score:
+        asset_id: "sha256:<content_sha256>"
+        anchor:
+          page:
+          region:
+          text_span:
+        snippet: ""

@@ -1,0 +1,23 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: pr-196-admin-merge-override
+sprint_id: 2026-07-10-delivery-controls
+lane_id: issue-121-delivery-controls
+type: policy_exception
+status: approved
+question: "May PR #196 use administrator bypass for its one-time bootstrap integration after fresh critic approval, before the CODEOWNERS compensating control it introduces is live on dev?"
+owner: Jason Vallery
+evidence_required:
+  - "PR #196 final fix-forward chain: D bd9e567, I4 6a2617b, E2 4d9ffbc, and S2 9d95f62."
+  - "Fresh critic S2 outcome approve_with_risks with zero findings and distinct worker and critic agents, sessions, and worktrees."
+  - "Validate, pull-request-policy, delivery-policy, critic-gate, and compliance checks pass on exact S2."
+  - "S1 FIND-001 is remediated by stale-dismissing code-owner review for every workflow and trusted control-plane path, plus owner-only protected-branch update restrictions."
+  - "The desired CODEOWNERS and dev protection cannot govern the pull request that bootstraps them because neither is present on the current dev base."
+  - "The user explicitly authorized autonomous PR administration and override of GitHub approval restrictions."
+allowed_decisions: [admin_merge, wait_for_non_author_review, request_fixes, stop]
+decision: admin_merge
+rationale: "GitHub correctly forbids author self-approval and the compensating CODEOWNERS rule is not live until this pull request reaches dev, so no review is fabricated. Administrator bypass accepts the fresh approving critic verdict and exact-head checks for this bootstrap only. ROOT must then dry-run, apply, and verify the pre-release branch controls before approving or merging PR #189."
+opened_at: "2026-07-10T11:15:00Z"
+resolved_at: "2026-07-10T11:15:00Z"
+resume_state: READY_FOR_INTEGRATION

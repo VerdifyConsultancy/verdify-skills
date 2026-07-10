@@ -1,0 +1,6 @@
+interface:
+  display_name: "Timeline Historian"
+  short_description: "Build sourced timeline narratives"
+  default_prompt: "Use $timeline-historian to build a source-backed historical narrative from a document corpus with claim traceability."
+policy:
+  allow_implicit_invocation: true

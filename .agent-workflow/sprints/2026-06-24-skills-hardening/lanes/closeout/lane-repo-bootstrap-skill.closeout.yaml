@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-repo-bootstrap-skill
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 1
 pull_request: 63
 baseline_sha: "8e2c3bbb69c9cce906f8b50c4128fef5e580e3c6"
-head_sha: "a8906920e53c8a3178f556afaa5cceac783ebfbd"
+implementation_head_sha: "a8906920e53c8a3178f556afaa5cceac783ebfbd"
+validated_head_sha: "a8906920e53c8a3178f556afaa5cceac783ebfbd"
 contract_hash: "a9ae6fe902c358b260674ebe2dc7ddf118d7b84bf7faab0e3c33ae15e943d9c7"
 changed_paths:
   - ".agent-workflow/sprints/2026-06-24-skills-hardening/lanes/closeout/lane-repo-bootstrap-skill.closeout.yaml"
@@ -85,6 +86,7 @@ residual_risks:
   - "Project-router routing behavior was not changed to automatically select repo-bootstrap; this lane registers the skill and packet contract for discoverability."
   - "Narrative README/docs counts that mention eighteen lifecycle skills remain outside this lane's scope."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-repoboot"
 completed_at: "2026-06-24T19:15:00Z"
 limitations:

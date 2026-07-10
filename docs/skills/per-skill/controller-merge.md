@@ -8,9 +8,11 @@
 ## Purpose
 
 `controller-merge` is the controller-owned merge decision surface. It compares
-the GitHub issue, lane contract, PR, branch head, closeout, critic report, check
-rollup, and review packet. It records whether the lane is merge-ready,
-return-for-fix, or blocked, without acting as the critic or deployment verifier.
+the GitHub issue, lane contract, PR, implementation I, closeout-only E,
+critic-report-only S, worker and critic agent/session identities, external
+admin/maintainer approval, check rollup, and packet commit P. It records whether
+the lane is merge-ready, return-for-fix, or blocked, without acting as the
+critic, external approver, or deployment verifier.
 
 ## When to use / when not
 
@@ -30,8 +32,8 @@ critic requests changes.
 
 | Mode | What it does |
 |---|---|
-| `reconcile` | Compare issue, contract, PR, branch, closeout, critic, checks, and review packet. |
-| `merge-ready` | Record the exact merge-ready handoff and target branch when evidence is current. |
+| `reconcile` | Compare issue, contract, PR, D/I/E/S, identities, external approval, checks, and packet P. |
+| `merge-ready` | Record the exact individual lane-PR merge handoff and target branch when evidence is current. |
 | `return-for-fix` | Generate a bounded fix-forward instruction for one sequential worker. |
 | `integration-handoff` | Hand merge-ready evidence to release-verification and human review. |
 
@@ -51,7 +53,7 @@ critic requests changes.
 |---|---|---|
 | Merge/fix decision summary | Markdown / PR comment | controller, human review |
 | Fix-forward instruction | lane contract scoped | `subagent-worktree`, `lane-delivery` |
-| Integration handoff | review packet update | `release-verification` |
+| Integration handoff | exact packet P + lane PR refs | `release-verification` |
 
 ## Sequence
 
@@ -62,12 +64,13 @@ sequenceDiagram
     participant CO as closeout
     participant CR as critic report
     participant RV as release-verification
-    C->>PR: read head, checks, mergeability, policy fields
-    C->>CO: validate worker evidence
-    C->>CR: validate fresh critic verdict
+    C->>PR: verify D/I/E/S, external approval, checks, mergeability
+    C->>CO: validate worker identity + implementation evidence
+    C->>CR: validate distinct critic identity + report-only S
+    C->>C: verify complete packet-only P on controller evidence branch
     C->>C: classify merge_ready / return_for_fix / blocked
     alt merge_ready
-      C->>RV: integration and review-inbox handoff
+      C->>RV: merge individual lane PR; never merge controller branch
     else return_for_fix
       C->>PR: record fix-forward instruction
     else blocked
@@ -77,9 +80,11 @@ sequenceDiagram
 
 ## Gates & stop conditions
 
-Stop for missing critic evidence, stale PR head, implementation-check failures,
-merge conflicts, protected decisions, release/deployment approval, or shared
-registration conflicts that cannot be reconciled mechanically.
+Stop for missing/invalid D/I/E/S evidence, shared worker/critic agent or session,
+missing/stale external approval, incomplete packet P, stale PR head,
+implementation-check failures, merge conflicts, protected decisions,
+release/deployment approval, or shared registration conflicts that cannot be
+reconciled mechanically.
 
 ## Tools used
 

@@ -1,0 +1,55 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: lane-assurance
+contract_version: "1.0"
+status: approved
+purpose: Bound lane implementation and independently validate exact implementation, evidence, critic, check, and review chains before integration.
+requirement_ids: [FR-004, FR-006, NFR-001, NFR-002, NFR-007]
+owned_paths:
+  - skills/lane-delivery/**
+  - skills/independent-critic/**
+  - skills/adversarial-audit/**
+  - skills/consensus-audit-workflow/**
+  - schemas/lane-lease.schema.yaml
+  - schemas/lane-closeout.schema.yaml
+  - schemas/critic-report.schema.yaml
+  - schemas/evidence-manifest.schema.yaml
+  - lib/verdify/lane_review_validator.rb
+  - .agent-workflow/sprints/*/lanes/closeout/**
+  - .agent-workflow/sprints/*/critic/**
+  - .agent-workflow/sprints/*/evidence/**
+prohibited_paths: [.agent-workflow/sprints/*/lanes/contracts/**, .github/workflows/publish-npm.yml, package.json, VERSION]
+inputs:
+  - name: lane_transaction
+    schema: Approved contract, lease, implementation head, evidence head, closeout, checks, and PR metadata
+    producer: planning-hygiene, execution-control, worker, GitHub
+outputs:
+  - name: critic_decision
+    schema: critic-report.schema.yaml bound to exact implementation, evidence, and report heads
+    consumers: [integration controller, release-package, GitHub reviewer]
+public_interfaces:
+  - name: lane closeout and critic chain
+    location: .agent-workflow/sprints/<sprint-id>/lanes/closeout and critic
+    compatibility: Evidence identities and exact-head ordering are fail-closed and versioned.
+dependencies:
+  hard: [governance-routing, execution-control]
+  soft: [quality-enablement]
+invariants:
+  - The worker does not approve its own output and the critic reviews a detached exact head.
+  - Empty, stale, unresolved, identity-invalid, or self-authored review evidence cannot satisfy integration.
+  - Critic reports do not silently change implementation files.
+runtime_resources: [One detached critic worktree/lease and read-only access to issue, PR, checks, commits, and validation evidence.]
+validation_commands:
+  - id: review-validator
+    command: ruby tests/test_lane_review_validator.rb
+    purpose: Verify exact-head chain and review rules.
+  - id: pr-policy
+    command: bash tests/test_pr_policy.sh
+    purpose: Verify PR metadata and evidence policy.
+required_evidence: [Implementation/evidence/report SHAs, closeout, critic findings, resolved threads, GitHub checks and review]
+definition_of_done: [Every criterion is assessed, findings are severity-ranked, current-head evidence reconciles, residual risks are explicit]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

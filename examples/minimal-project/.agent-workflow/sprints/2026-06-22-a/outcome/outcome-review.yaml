@@ -8,7 +8,7 @@ reviewer: product-owner
 intended_outcome: Operators can verify service health and running revision.
 delivered_outcomes:
   - GET /health returns healthy status and the integrated revision in staging.
-evidence_links: ["EV-001", "EV-002", "EV-003", "pull request #456", "deployment deploy-789"]
+evidence_links: ["EV-001", "EV-002", "EV-003", "pull request #123", "deployment deploy-789"]
 incomplete_items: []
 residual_risks:
   - Production deployment requires its own environment approval and verification.

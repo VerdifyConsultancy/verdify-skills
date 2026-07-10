@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-eval-uplift
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 24
 pull_request: 46
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "9052fe49a304be900db8652de75a07efdaa3b30e"
+implementation_head_sha: "9052fe49a304be900db8652de75a07efdaa3b30e"
+validated_head_sha: "9052fe49a304be900db8652de75a07efdaa3b30e"
 contract_hash: "b96ddeb37f48407f8f795fe53645179dd806749421c66eb472b14f600adcd077"
 changed_paths:
   - "evaluations/architecture-contracts/evals.json"
@@ -78,6 +79,7 @@ residual_risks:
   - "Fresh independent critic review is required before integration."
   - "Evaluation packs remain behavioral spec examples, not executable model-run evals, under ADR-0015."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-evaluplift"
 completed_at: "2026-06-24T17:28:00Z"
 limitations:

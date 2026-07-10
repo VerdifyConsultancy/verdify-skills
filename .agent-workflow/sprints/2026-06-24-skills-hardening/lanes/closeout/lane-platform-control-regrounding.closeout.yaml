@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-platform-control-regrounding
 status: ready_for_critic
@@ -11,7 +11,8 @@ issue_ids:
   - 34
 pull_request: 52
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "6895b3226f4027691d60abc3ef3708a39eadf57a"
+implementation_head_sha: "6895b3226f4027691d60abc3ef3708a39eadf57a"
+validated_head_sha: "6895b3226f4027691d60abc3ef3708a39eadf57a"
 contract_hash: "45d202e3ef09688a9b0cefff1ebc371558ccb0a818128a0aa72abd1ef1023b3e"
 changed_paths:
   - "examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml"
@@ -121,6 +122,7 @@ residual_risks:
   - "Fresh independent critic approval is still required before integration."
   - "No runtime deployment was performed by this worker lane."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-platctl"
 completed_at: "2026-06-24T17:57:17Z"
 limitations:

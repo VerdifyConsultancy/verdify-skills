@@ -1,0 +1,30 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260709-jason-iteration-25-final-lock-approval
+reference: northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval
+title: Jason iteration 25 final lock approval
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-07-09T23:28:41Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-worktrees/2026-07-09-northstar-review-feedback/jason-final-lock-approval-source.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260709-jason-iteration-25-final-lock-approval-jason-final-lock-approval-source-md"
+  sha256: c457864b1f5ee21df8211551537d9290eecf545814d58fcab3b8c643d6601e8c
+summary: Distinct human authority to lock the reconciled iteration-25 North Star after
+  issue 72 is integrated.
+tags:
+- final-lock
+- governance
+- review-feedback
+claims:
+- Jason explicitly directed the controller to fix issue 72 and then lock iteration
+  25.
+- The final-lock instruction is separate from the earlier ten-answer review-feedback
+  evidence.
+- The lock includes updating the interview packet and asking only genuinely remaining
+  questions.
+planning_relevance: []
+limitations: []

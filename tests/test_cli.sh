@@ -21,6 +21,174 @@ git -C "$REPO" check-ignore -q .agent-workflow/northstar/collateral/sources/exam
 "$ROOT/bin/verdify" route --repo "$REPO" --write --json > "$TMP/route.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["next_skill"] == "project-definition" && d["next_mode"] == "discovery"' "$TMP/route.json"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/router/route-decision.yaml" >/dev/null
+"$ROOT/bin/verdify" pack list --json > "$TMP/packs.json"
+ruby -rjson -e '
+  d = JSON.parse(File.read(ARGV[0]))
+  names = d["packs"].map { |pack| pack["name"] }
+  expected = %w[crm-email fleet-operations governance-review northstar-strategy research-analysis sdlc-core]
+  abort unless d["count"] == expected.length && names.sort == expected
+  crm = d["packs"].find { |pack| pack["name"] == "crm-email" }
+  abort unless crm["required_skills"] == ["crm-email"] && crm["category"] == "integration"
+' "$TMP/packs.json"
+PACK_REPO="$TMP/pack-project"
+mkdir -p "$PACK_REPO"
+git -C "$PACK_REPO" init -q -b main
+git -C "$PACK_REPO" config user.name "Verdify Test"
+git -C "$PACK_REPO" config user.email "verdify-test@example.invalid"
+printf '# Pack project\n' > "$PACK_REPO/README.md"
+git -C "$PACK_REPO" add README.md
+git -C "$PACK_REPO" commit -qm "initial"
+"$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack research-analysis --host all >/dev/null
+[[ -L "$PACK_REPO/.agents/skills/northstar-research-ingest" ]]
+[[ -L "$PACK_REPO/.claude/skills/northstar-question-resolution" ]]
+[[ ! -e "$PACK_REPO/.agents/skills/project-router" ]]
+[[ -f "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+"$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml" >/dev/null
+
+make_pack_repo() {
+  local path="$1"
+  mkdir -p "$path"
+  git -C "$path" init -q -b main
+  git -C "$path" config user.name "Verdify Test"
+  git -C "$path" config user.email "verdify-test@example.invalid"
+  printf '# Pack transaction fixture\n' > "$path/README.md"
+  git -C "$path" add README.md
+  git -C "$path" commit -qm "initial"
+}
+
+PACK_SKILLS=(northstar-research-ingest northstar-question-resolution northstar-interview)
+for position in 0 1 2; do
+  COLLISION_REPO="$TMP/pack-collision-$position"
+  make_pack_repo "$COLLISION_REPO"
+  conflict="${PACK_SKILLS[$position]}"
+  mkdir -p "$COLLISION_REPO/.agents/skills/$conflict"
+  printf 'operator owned\n' > "$COLLISION_REPO/.agents/skills/$conflict/owner.txt"
+  if "$ROOT/bin/verdify" pack install --repo "$COLLISION_REPO" --pack research-analysis --host codex >"$TMP/collision-$position.out" 2>"$TMP/collision-$position.err"; then
+    echo "expected pack conflict at position $position to fail" >&2
+    exit 1
+  fi
+  [[ "$(cat "$COLLISION_REPO/.agents/skills/$conflict/owner.txt")" == "operator owned" ]]
+  for skill in "${PACK_SKILLS[@]}"; do
+    if [[ "$skill" != "$conflict" ]]; then
+      [[ ! -e "$COLLISION_REPO/.agents/skills/$skill" ]]
+    fi
+  done
+  [[ ! -e "$COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml" ]]
+done
+
+MANIFEST_COLLISION_REPO="$TMP/pack-manifest-collision"
+make_pack_repo "$MANIFEST_COLLISION_REPO"
+mkdir -p "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if "$ROOT/bin/verdify" pack install --repo "$MANIFEST_COLLISION_REPO" --pack research-analysis --host codex >"$TMP/manifest-collision.out" 2>"$TMP/manifest-collision.err"; then
+  echo "expected operator-owned manifest conflict to fail" >&2
+  exit 1
+fi
+[[ "$(cat "$MANIFEST_COLLISION_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+for skill in "${PACK_SKILLS[@]}"; do
+  [[ ! -e "$MANIFEST_COLLISION_REPO/.agents/skills/$skill" ]]
+done
+
+ROLLBACK_REPO="$TMP/pack-rollback"
+make_pack_repo "$ROLLBACK_REPO"
+mkdir -p "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest"
+printf 'operator link target\n' > "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt"
+mkdir -p "$ROLLBACK_REPO/.agent-skills/verdify-packs"
+printf 'operator manifest\n' > "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml"
+if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE=before-manifest \
+  "$ROOT/bin/verdify" pack install --repo "$ROLLBACK_REPO" --pack research-analysis --host codex --force >"$TMP/rollback.out" 2>"$TMP/rollback.err"; then
+  echo "expected injected late pack failure" >&2
+  exit 1
+fi
+[[ "$(cat "$ROLLBACK_REPO/.agents/skills/northstar-research-ingest/owner.txt")" == "operator link target" ]]
+[[ "$(cat "$ROLLBACK_REPO/.agent-skills/verdify-packs/research-analysis.yaml")" == "operator manifest" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-question-resolution" ]]
+[[ ! -e "$ROLLBACK_REPO/.agents/skills/northstar-interview" ]]
+
+snapshot_pack_operator_state() {
+  local repo="$1"
+  local output="$2"
+  ruby -rdigest -rjson -e '
+    root, output = ARGV
+    paths = %w[
+      .agents/skills/northstar-research-ingest
+      .agents/skills/northstar-question-resolution
+      .agents/skills/northstar-interview
+      .agent-skills/verdify-packs/research-analysis.yaml
+    ]
+    snapshot = lambda do |path|
+      stat = File.lstat(path)
+      value = {"mode" => stat.mode & 0o7777}
+      if stat.symlink?
+        value.merge("type" => "symlink", "target" => File.readlink(path))
+      elsif stat.file?
+        value.merge("type" => "file", "sha256" => Digest::SHA256.file(path).hexdigest)
+      elsif stat.directory?
+        children = Dir.children(path).sort.to_h { |name| [name, snapshot.call(File.join(path, name))] }
+        value.merge("type" => "directory", "children" => children)
+      else
+        abort "unsupported fixture type: #{path}"
+      end
+    end
+    document = paths.to_h { |relative| [relative, snapshot.call(File.join(root, relative))] }
+    File.write(output, JSON.generate(document) + "\n")
+  ' "$repo" "$output"
+}
+
+seed_pack_operator_state() {
+  local repo="$1"
+  mkdir -p "$repo/.agents/skills/northstar-research-ingest/nested"
+  printf 'first operator directory\n' > "$repo/.agents/skills/northstar-research-ingest/nested/owner.txt"
+  printf 'symlink destination\n' > "$repo/operator-source.txt"
+  ln -s ../../operator-source.txt "$repo/.agents/skills/northstar-question-resolution"
+  printf 'last operator regular file\n' > "$repo/.agents/skills/northstar-interview"
+  chmod 0600 "$repo/.agents/skills/northstar-interview"
+  mkdir -p "$repo/.agent-skills/verdify-packs/research-analysis.yaml"
+  printf 'operator manifest directory\n' > "$repo/.agent-skills/verdify-packs/research-analysis.yaml/owner.txt"
+}
+
+# No backup failure may mutate any operator target. Write, manifest, and
+# rollback failures must restore every original byte, type, link target, and
+# mode; an injected restore error is reported only after the target is safe.
+PACK_FAILURES=(backup-0 backup-1 backup-3 write-2 before-manifest after-manifest before-manifest,restore-0)
+for failure in "${PACK_FAILURES[@]}"; do
+  SAFE_REPO="$TMP/pack-safe-${failure//,/-}"
+  make_pack_repo "$SAFE_REPO"
+  seed_pack_operator_state "$SAFE_REPO"
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.before.json"
+  if VERDIFY_TESTING=1 VERDIFY_TEST_PACK_FAILURE="$failure" \
+    "$ROOT/bin/verdify" pack install --repo "$SAFE_REPO" --pack research-analysis --host codex --force \
+      >"$TMP/$failure.out" 2>"$TMP/$failure.err"; then
+    echo "expected injected pack failure at $failure" >&2
+    exit 1
+  fi
+  snapshot_pack_operator_state "$SAFE_REPO" "$TMP/$failure.after.json"
+  cmp "$TMP/$failure.before.json" "$TMP/$failure.after.json"
+done
+grep -q 'verified backups retained at' "$TMP/before-manifest,restore-0.err"
+
+"$ROOT/bin/verdify" pack install --repo "$PACK_REPO" --pack crm-email --host all >/dev/null
+[[ -L "$PACK_REPO/.agents/skills/crm-email" ]]
+[[ -L "$PACK_REPO/.claude/skills/crm-email" ]]
+[[ -f "$PACK_REPO/.agent-skills/verdify-packs/crm-email.yaml" ]]
+"$ROOT/bin/verdify" artifact validate --file "$PACK_REPO/.agent-skills/verdify-packs/crm-email.yaml" >/dev/null
+
+"$ROOT/skills/crm-email/scripts/crm_request.rb" --help > "$TMP/crm-help.txt"
+grep -q -- "--dry-run" "$TMP/crm-help.txt"
+printf '%s\n' '{"subject":"Fixture","body":"No external write"}' > "$TMP/crm-request.json"
+"$ROOT/skills/crm-email/scripts/crm_request.rb" \
+  --base-url http://127.0.0.1:1 \
+  --method POST \
+  --path /api/email/drafts \
+  --body "$TMP/crm-request.json" \
+  --dry-run > "$TMP/crm-dry-run.json"
+ruby -rjson -rdigest -e '
+  result = JSON.parse(File.read(ARGV[0]))
+  body = File.read(ARGV[1])
+  abort unless result["dry_run"] == true && result["method"] == "POST"
+  abort unless result["body_sha256"] == Digest::SHA256.hexdigest(body)
+  abort if File.read(ARGV[0]).include?(body)
+' "$TMP/crm-dry-run.json" "$TMP/crm-request.json"
 
 REPO_WITH_EVIDENCE="$TMP/project-with-evidence"
 mkdir -p "$REPO_WITH_EVIDENCE/docs/northstar/evidence"
@@ -288,10 +456,61 @@ ruby -rtime -ryaml -e '
   "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" "$BASE"
 "$ROOT/bin/verdify" artifact validate --file "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml" >/dev/null
 
+# Publish the approved sprint/wave/contract transaction before dispatch. Lane
+# creation copies this exact committed authority snapshot into each worker
+# branch as a dispatch-only commit before implementation begins.
+mkdir -p "$REPO/.agent-workflow/sprints/sprint-a/release"
+ruby -rtime -ryaml -e '
+  plan_src, wave_src, plan_dst, wave_dst, baseline = ARGV
+  plan = YAML.safe_load(File.read(plan_src), permitted_classes: [], aliases: false)
+  plan["sprint_id"] = "sprint-a"
+  plan["status"] = "active"
+  plan["baseline_sha"] = baseline
+  plan["github"]["repository"] = "example/test"
+  plan["issue_ids"] = [123, 124]
+  first = plan["lanes"].first
+  first["lane_id"] = "issue-123-api"
+  first["issue_ids"] = [123]
+  first["contract_path"] = ".agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml"
+  first["branch"] = "lane/123-health-api"
+  second = first.dup
+  second["lane_id"] = "issue-124-race"
+  second["issue_ids"] = [124]
+  second["contract_path"] = ".agent-workflow/sprints/sprint-a/lanes/contracts/issue-124-race.contract.yaml"
+  second["branch"] = "lane/124-race"
+  plan["lanes"] = [first, second]
+  plan["acceptance_criteria"].first["lane_ids"] = ["issue-123-api", "issue-124-race"]
+  plan["dependency_order"] = [["issue-123-api", "issue-124-race"]]
+  plan["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
+  File.write(plan_dst, YAML.dump(plan))
+
+  wave = YAML.safe_load(File.read(wave_src), permitted_classes: [], aliases: false)
+  wave["wave_id"] = "wave-sprint-a"
+  wave["scope"]["sprint_id"] = "sprint-a"
+  wave["scope"]["issue_ids"] = [123, 124]
+  wave["scope"]["lane_ids"] = ["issue-123-api", "issue-124-race"]
+  wave["github"]["repository"] = "example/test"
+  wave["branch_model"]["base_ref"] = "main"
+  wave["github"]["required_checks"] = ["validate"]
+  wave["review_handoff"]["expected_review_packet_path"] = ".agent-workflow/sprints/sprint-a/review/review-inbox-packet.yaml"
+  wave["status"] = "approved"
+  wave["approval"] = {"status"=>"approved", "approver"=>"test-owner", "approved_at"=>Time.now.utc.iso8601}
+  File.write(wave_dst, YAML.dump(wave))
+' "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/sprint-plan.yaml" \
+  "$ROOT/examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/wave-release-plan.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/sprint-plan.yaml" \
+  "$REPO/.agent-workflow/sprints/sprint-a/release/wave-release-plan.yaml" "$BASE"
+git -C "$REPO" add .agent-workflow/sprints/sprint-a
+git -C "$REPO" commit -qm "approve sprint dispatch transaction"
+
 WORKTREE="$TMP/worker"
 "$ROOT/bin/verdify" lane create --repo "$REPO" --sprint sprint-a --lane-id issue-123-api --issue 123 \
   --session-id worker-test --agent test-agent --path "$WORKTREE" >/dev/null
 [[ -d "$WORKTREE" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/sprint-plan.yaml" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/release/wave-release-plan.yaml" ]]
+[[ -f "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" ]]
+git -C "$WORKTREE" diff-tree --no-commit-id --name-only -r HEAD | grep -Fx '.agent-workflow/sprints/sprint-a/sprint-plan.yaml' >/dev/null
 "$ROOT/bin/verdify" lane inspect --repo "$REPO" --lease-id issue-123-api > "$TMP/lease.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])); abort unless d["role"] == "worker" && d["worktree_exists"]' "$TMP/lease.json"
 
@@ -387,13 +606,60 @@ ruby -rjson -e '
 [[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.md" ]]
 [[ -f "$REPO/.agent-workflow/sprints/sprint-a/prompts/worker.manifest.json" ]]
 
+mkdir -p "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts"
+cp "$REPO/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" \
+  "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml"
+printf 'implemented\n' > "$WORKTREE/implementation.txt"
+git -C "$WORKTREE" add implementation.txt .agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml
+git -C "$WORKTREE" commit -qm "implement lane"
+IMPLEMENTATION_HEAD="$(git -C "$WORKTREE" rev-parse HEAD)"
+mkdir -p "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/closeout"
+ruby -rdigest -rtime -ryaml -e '
+  path, contract, baseline, implementation = ARGV
+  document = {
+    "schema_ref"=>"lane-closeout.schema.yaml",
+    "kind"=>"LaneCloseout",
+    "schema_version"=>"2.0",
+    "sprint_id"=>"sprint-a",
+    "lane_id"=>"issue-123-api",
+    "status"=>"ready_for_critic",
+    "issue_ids"=>[123],
+    "pull_request"=>456,
+    "baseline_sha"=>baseline,
+    "implementation_head_sha"=>implementation,
+    "validated_head_sha"=>implementation,
+    "contract_hash"=>Digest::SHA256.file(contract).hexdigest,
+    "changed_paths"=>["implementation.txt"],
+    "validation_results"=>[{"id"=>"test", "command"=>"true", "exit_status"=>0, "result"=>"passed", "executed_at"=>Time.now.utc.iso8601, "artifact"=>nil}],
+    "acceptance_evidence"=>[{"criterion_id"=>"LANE-AC-01", "evidence_ids"=>["test"], "assessment"=>"satisfied"}],
+    "discovered_issues"=>[],
+    "residual_risks"=>[],
+    "worktree_clean"=>true,
+    "worker_agent"=>"test-agent",
+    "worker_session_id"=>"worker-test",
+    "completed_at"=>Time.now.utc.iso8601,
+    "limitations"=>[]
+  }
+  File.write(path, YAML.dump(document))
+' "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/closeout/issue-123-api.closeout.yaml" \
+  "$WORKTREE/.agent-workflow/sprints/sprint-a/lanes/contracts/issue-123-api.contract.yaml" "$BASE" "$IMPLEMENTATION_HEAD"
+git -C "$WORKTREE" add .agent-workflow/sprints/sprint-a/lanes/closeout/issue-123-api.closeout.yaml
+git -C "$WORKTREE" commit -qm "record worker closeout"
+
+# Independence comes from the committed closeout, even after the worker lease is released.
+"$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id issue-123-api --session-id worker-test >/dev/null
+if "$ROOT/bin/verdify" lane review --repo "$REPO" --lane-id issue-123-api \
+  --session-id worker-test --agent test-agent --path "$TMP/self-review" >/dev/null 2>&1; then
+  echo "expected self-review to be rejected without relying on an active worker lease" >&2
+  exit 1
+fi
+
 REVIEW="$TMP/review"
 "$ROOT/bin/verdify" lane review --repo "$REPO" --lane-id issue-123-api \
   --session-id critic-test --agent critic-agent --path "$REVIEW" >/dev/null
 [[ -d "$REVIEW" ]]
 CRITIC_LEASE="critic-issue-123-api-critic-test"
 "$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id "$CRITIC_LEASE" --session-id critic-test >/dev/null
-"$ROOT/bin/verdify" lane release --repo "$REPO" --lease-id issue-123-api --session-id worker-test >/dev/null
 [[ ! -e "$WORKTREE" ]]
 [[ ! -e "$REVIEW" ]]
 

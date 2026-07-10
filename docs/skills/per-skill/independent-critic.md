@@ -9,22 +9,27 @@
 The **adversarial reviewer**. From a fresh session with no hidden worker context, it
 reconstructs the intended behavior independently and judges a finished lane against
 its issue, requirements/design criteria, module and lane contracts, diff, evidence,
-and CI. It must **never reuse the worker's session or worktree**: a separate detached
-review worktree checked out at the current PR head SHA verifies the exact revision.
-The critic reviews the lane; it does not become its implementer.
+and CI. It must **never reuse the worker's agent, session, or worktree**: a
+separate detached review worktree checked out at closeout-only evidence head E
+verifies the exact revision. The critic reviews the lane, then commits only the
+canonical report as final lane head S; it does not become its implementer or
+approve its own report commit.
 
 ## When to use / when not
 
 - **Use** after a `lane-delivery` worker closeout (`status: ready_for_critic`) and
   before review-inbox packet assembly or integration.
-- **Not** to write lane code, edit or commit to the worker branch, re-run the
-  worker's session, or make protected design decisions.
+- **Not** to write lane code, alter implementation I or closeout E, reuse the
+  worker agent/session/worktree, submit the advancing approval as the PR author,
+  or make protected design decisions. Its only lane-branch write is the
+  canonical critic report commit S.
 
 ## Position in the loop
 
-The gate of **VERIFY**. A fresh critic session runs after worker closeout and before
-integration, reviewing the lane at its current PR head SHA, then routes the outcome
-back to fixes or forward to release verification.
+The gate of **VERIFY**. A fresh critic starts at E, independently reconstructs
+the worker's validated I and closeout-only suffix, then commits only its report as
+S. A distinct repository admin or maintainer other than the PR author must submit
+the latest effective `APPROVED` GitHub review on S before the lane can advance.
 
 ## Modes
 
@@ -40,16 +45,16 @@ back to fixes or forward to release verification.
 |---|---|---|
 | GitHub issue + dependencies | issue/links | GitHub control plane |
 | Approved requirements / design criteria | `project-definition` | upstream lifecycle |
-| Module + lane contracts | `module-contract`, `lane-contract` | `architecture-contracts`, `sprint-planning` |
-| PR diff + commits, required checks + current head SHA | GitHub | `lane-delivery`, CI |
-| Worker closeout + evidence; deployment/migration implications | `lane-closeout.schema.yaml` | `lane-delivery` |
+| Module + lane contracts and dispatch-only D | `module-contract`, `lane-contract`, Git | `architecture-contracts`, `sprint-planning`, `sprint-orchestrator` |
+| PR diff + commits, implementation I, closeout-only E, and required checks | GitHub | `lane-delivery`, CI |
+| Worker closeout + worker agent/session + evidence; deployment/migration implications | `lane-closeout.schema.yaml` | `lane-delivery` |
 
 ## Outputs (produced)
 
 | Output | Schema | Consumed by |
 |---|---|---|
-| `.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` | `critic-report.schema.yaml` | `sprint-orchestrator`, `release-verification`, session ledger |
-| Optional GitHub review submission (approve / request-changes / comment) | GitHub | PR, integration |
+| Critic-report-only final lane commit S containing `.agent-workflow/sprints/<sprint-id>/critic/<lane-id>.critic.yaml` | `critic-report.schema.yaml` | `sprint-orchestrator`, `release-verification`, session ledger |
+| Separate commit-bound GitHub review by an authorized admin/maintainer who is not the PR author | GitHub | review packet, integration gate |
 
 ## Sequence
 
@@ -60,21 +65,25 @@ sequenceDiagram
     participant WT as detached review worktree
     participant GH as GitHub PR + checks
     participant Art as .agent-workflow critic/
-    LD-->>IC: contract, PR, head SHA, closeout, evidence
-    IC->>WT: lane review (fresh session, checkout = PR head SHA)
-    IC->>IC: confirm critic session != worker; no edits to worker branch
-    IC->>GH: review diff, commits, required checks at head SHA
+    LD-->>IC: dispatch D, contract, PR, I, E, closeout, worker identity
+    IC->>WT: fresh critic agent/session, detached checkout = E
+    IC->>IC: verify D is dispatch-only; I..E changes only canonical closeout
+    IC->>GH: review implementation I + checks and closeout E
     IC->>IC: validate scope, behavior, evidence freshness, integration risk
     IC->>IC: classify each finding by severity with concrete citations
-    IC->>Art: write <lane-id>.critic.yaml + set outcome
-    IC->>GH: submit PR review (only when authorized)
+    IC->>Art: write report with I/E + identity backlinks
+    IC->>GH: commit only report as S and push
+    GH-->>GH: distinct admin/maintainer submits APPROVED on S
 ```
 
 ## Gates & stop conditions
 
-Work in a **separate detached review worktree**; the **critic session must differ
-from the worker session**; review at the **current PR head SHA**; **do not edit or
-commit to the worker branch**. Any new commit invalidates a prior approval. Outcomes:
+Work in a **separate detached review worktree**; both the **critic agent and
+session must differ** from the worker identity recorded in the closeout. Review
+starts at E; I..E may change only the closeout, and E..S may change only the
+critic report. The external reviewer must have repository `admin` or `maintain`
+permission and must not be the PR author. Any later commit or later effective
+change-request invalidates approval. Outcomes:
 `approve`, `approve_with_risks`, `request_fixes`, `block_integration`,
 `needs_human_review`. Do not submit a GitHub review while any material scope,
 security, migration, deployment, or human-only approval gate stays open.
@@ -83,14 +92,16 @@ security, migration, deployment, or human-only approval gate stays open.
 
 - **CLI:** `bin/verdify lane review` (create/verify the detached review worktree and
   bind the critic session) — see [tools-and-mcp](../tools-and-mcp.md).
-- **GitHub:** read issue/PR/check state; `gh pr review --approve | --request-changes
-  | --comment --body-file <body>` when authorized.
+- **GitHub:** read issue/PR/check state; after S, an authorized external reviewer
+  uses `gh pr review --approve | --request-changes --body-file <body>`.
 
 ## Handoffs
 
-- **Upstream:** `lane-delivery` closeout (contract, PR, head SHA, closeout, evidence).
+- **Upstream:** `lane-delivery` closeout (contract, PR, I, E, closeout, evidence,
+  worker agent/session).
 - **Downstream:** `sprint-orchestrator`, then `release-verification` review-inbox
-  packet mode when dependencies are ready; or back to `lane-delivery` (via the
+  packet mode after S has a distinct admin/maintainer approval; or back to
+  `lane-delivery` (via the
   orchestrator) for `request_fixes` / `block_integration`. A material contract problem
   routes to `sprint-planning` or `architecture-contracts`.
 

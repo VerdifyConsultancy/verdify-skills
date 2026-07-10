@@ -1,0 +1,18 @@
+schema: timeline-historian.window-summary.v1
+window:
+  window_id: "<window-id>"
+  label: "<period label>"
+  start_year:
+  end_year:
+  parent_window_id:
+source_coverage:
+  asset_count: 0
+  categories: {}
+  weak_date_count: 0
+  no_text_count: 0
+accepted_claims: []
+qualified_claims: []
+contradicted_claims: []
+narrative: ""
+open_questions: []
+rollup_ready: false

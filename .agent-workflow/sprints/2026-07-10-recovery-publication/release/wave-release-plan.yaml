@@ -1,0 +1,131 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-recovery-publication
+status: approved
+scope:
+  sprint_id: 2026-07-10-recovery-publication
+  issue_ids: [126]
+  lane_ids: [issue-126-recovery-publication]
+  northstar_ids: [FR-007, FR-012, AC-007, AC-012]
+  summary: Selectively recover unpublished skill, pack, evidence, and ledger work into dev without publishing a package or mutating runtime services.
+  non_goals:
+    - Publish npm, tag Git, create a GitHub release, or promote dev to main.
+    - Delete rescue refs or clean the shared live runner checkout.
+    - Send CRM email, mutate CRM, deploy runtime state, or change GitOps.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: null
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-126
+  decision_notes: One issue, one recovery lane, one lease/worktree/session/branch/PR; coupling stays inside the existing issue because all source surfaces converge on one manifest, package, registry, and disposition ledger.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [full package test result, recovered skill/pack validation, release-preflight result]
+    - name: policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected: [issue/lane/contract/current-head policy result]
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 15
+      evidence_expected: [compliance workflow result]
+  artifacts:
+    - Timeline-historian and CRM/pack validation output.
+    - Evidence registry/source hash audit.
+    - Recovery ledger and Git ref/worktree snapshot.
+    - Manifest/package/npm exact-set evidence.
+  required_events: [pull_request, push]
+environments:
+  - name: not-applicable
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: none
+    protection_rules: []
+    expected_revision_source: null
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: []
+  remediation_policy: No runtime or GitOps state is changed by this recovery sprint.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps: []
+observability:
+  dashboards: []
+  logs: [GitHub Actions validate, policy, and compliance logs]
+  metrics: []
+  traces: []
+  runtime_checks:
+    - Validate recovered skills, packs, registry evidence, and installed package behavior in isolated local targets.
+    - Confirm the shared live runner remains unchanged and all rescue refs remain reachable.
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: "Revert the issue #126 merge commit on dev; retain all three source refs for reconstruction."
+  known_good_ref: "17b3762f024186a336556f60c27268006a8d59b6"
+  procedure: "Revert the recovery integration commit, rerun make test, and reconstruct any disputed artifact from its exact retained rescue ref."
+  validation_steps:
+    - Run make test on the reverted dev head in a clean worktree.
+    - Confirm fe1f94e, f425515, and 22f81bd remain reachable and the recovery ledger names the rollback disposition.
+release_health:
+  stabilization_window: until required dev push workflows finish
+  signals:
+    - name: exact-head required checks
+      source: GitHub check rollup on the integrated dev revision
+      threshold: validate, pull-request-policy, and compliance all SUCCESS
+      blocking: true
+    - name: retained recovery handles
+      source: Git ls-remote plus checked-in recovery ledger
+      threshold: all three source commit IDs remain reachable until final main release cleanup
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-recovery-publication/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Compare the recovery ledger and PR diff against fe1f94e, f425515, and 22f81bd; confirm stale trees were not replayed.
+    - Run pack list/install and inspect timeline-historian/CRM skill discovery links in an isolated target.
+    - "Confirm VERSION and package.json version remain 1.2.1 and issue #130 immutable index staging remains intact."
+  approval_gate: Fresh critic approval on exact report head S, followed by non-author review when available or the recorded user-authorized admin integration policy.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: Old rescue content could overwrite newer lifecycle and package behavior.
+    mitigation: Review source-to-target mapping and reject any non-enumerated or prohibited path.
+  - id: RISK-02
+    severity: high
+    statement: Recovered package changes could weaken immutable index staging or exact archive verification.
+    mitigation: Prohibit scripts/package-file-list.rb changes and require full package/npm tests.
+  - id: RISK-03
+    severity: medium
+    statement: Untrusted research or CRM content could be treated as executable instruction or trigger live writes.
+    mitigation: Treat source text as data, use local fixtures only, and prohibit live service mutation.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T04:50:00Z"
+prepared_at: "2026-07-10T04:50:00Z"
+planner: root-verdify-skills-controller

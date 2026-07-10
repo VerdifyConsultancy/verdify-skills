@@ -3,15 +3,15 @@ schema_ref: northstar-artifacts.schema.yaml
 kind: NorthStarArtifacts
 schema_version: '1.0'
 project_id: verdify-skills
-status: iterating
-iteration: 24
+status: approved
+iteration: 25
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-07-07T19:02:27Z'
+updated_at: '2026-07-09T23:28:41Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
-  status: review_requested
-  summary: Iterating product North Star for the Verdify Skills SDLC and self-hosted operating-plane system, including PRD summary, personas, requirements, user stories, milestones, waves, lifecycle/CLI/artifact surfaces, external OpenClaw SDLC workflow skills, repo-controller bootstrap, repo-agent scope/responsibility charters, fleet self-discovery, Agent Platform MCP/API-first control, live Agent Platform readiness gaps, Sunshine-to-Gravity reuse, typed proposal-only learning capture, loop-readiness checks, explicit Orbit daily brief deferral, review script, planning questions, and traceability.
-  section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013]
+  status: approved
+  summary: Approved iteration 25 product North Star for an internal-first minimal Skills method layer binding four co-equal active pilots under a root-planner outer loop, with capability-negotiated Agent Platform control, governed Orbit personal and engineering context, current Gravity authority and cited API/MCP consumption, trusted atomic publication, ASAP integrated delivery, customer-consulting reuse, and separate North Star-lock versus release authority.
+  section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013, PRODUCT-014]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
@@ -41,12 +41,18 @@ product:
   - NSE-20260623-gravity-core-extraction-implementation-b
   - NSE-20260623-north-star-research-queue-completion
   - NSE-20260623-repo-controller-bootstrap-self-discovery
-  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+  - NSE-20260709-verdify-skills-adversarial-review
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-jason-iteration-25-final-lock-approval
+  - NSE-20260709-agents-current-state-audit
+  - NSE-20260709-orbit-current-state-audit
+  - NSE-20260709-gravity-current-state-audit
+  open_question_ids: [NSQ-009, NSQ-012]
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-  status: draft
-  summary: Iterating architecture North Star for governed autonomous delivery and the self-hosted operating plane, including lifecycle skill topology, CLI and schema interfaces, Agent Platform MCP/API control and live-state gaps, repo-controller bootstrap, repo-agent scope/responsibility contracts, fleet runtime, namespace/storage/credential topology, controller observability and recovery, Hermes/OpenClaw planning layer, deferred Orbit daily brief boundary, OpenClaw-facing SDLC workflow skill facade, Sunshine-to-Gravity extraction, proposal-only learning capture, loop-readiness checks, worktree leases, GitHub authority, package/install boundaries, infrastructure, RBAC/secrets, observability, release/rollback, ADRs, planning questions, and traceability.
-  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020]
+  status: approved
+  summary: Approved iteration 25 architecture North Star defining a common PilotProject contract, root-planner outer loop, four pilot ownership domains, capability-negotiated Agent Platform provider interface, policy-governed Orbit connector plane, versioned tenant-scoped Gravity HTTP API plus MCP adapter with citations, minimal no-compatibility Skills graph, exact-artifact atomic package transaction, and customer-scoped consulting expansion through the same contracts.
+  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020, ARCH-021]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
@@ -76,7 +82,13 @@ architecture:
   - NSE-20260623-gravity-core-extraction-implementation-b
   - NSE-20260623-north-star-research-queue-completion
   - NSE-20260623-repo-controller-bootstrap-self-discovery
-  open_question_ids: [NSQ-002, NSQ-006, NSQ-007, NSQ-008, NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-014]
+  - NSE-20260709-verdify-skills-adversarial-review
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-jason-iteration-25-final-lock-approval
+  - NSE-20260709-agents-current-state-audit
+  - NSE-20260709-orbit-current-state-audit
+  - NSE-20260709-gravity-current-state-audit
+  open_question_ids: [NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013]
 evidence_references:
 - id: NSE-20260623-long-horizon-agent-compounding-learning
   reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
@@ -218,6 +230,36 @@ evidence_references:
   title: Repo controller bootstrap and fleet self-discovery walk intake
   evidence_status: reported
   used_in: [both]
+- id: NSE-20260709-verdify-skills-adversarial-review
+  reference: northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+  title: Verdify Skills adversarial review
+  evidence_status: verified
+  used_in: [both]
+- id: NSE-20260709-jason-review-feedback
+  reference: northstar://evidence/NSE-20260709-jason-review-feedback
+  title: Jason July 9 review feedback and planning decisions
+  evidence_status: reported
+  used_in: [both]
+- id: NSE-20260709-jason-iteration-25-final-lock-approval
+  reference: northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval
+  title: Jason iteration 25 final lock approval
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260709-agents-current-state-audit
+  reference: northstar://evidence/NSE-20260709-agents-current-state-audit
+  title: Agent Platform current-state audit
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260709-orbit-current-state-audit
+  reference: northstar://evidence/NSE-20260709-orbit-current-state-audit
+  title: Orbit current-state audit
+  evidence_status: observed
+  used_in: [both]
+- id: NSE-20260709-gravity-current-state-audit
+  reference: northstar://evidence/NSE-20260709-gravity-current-state-audit
+  title: Gravity current-state audit
+  evidence_status: observed
+  used_in: [both]
 cross_links:
 - from_id: PRQ-001
   to_id: ARQ-001
@@ -251,7 +293,7 @@ cross_links:
   relationship: The review inbox interface now has a validated packet schema.
 - from_id: WAVE-002
   to_id: ARCH-009
-  relationship: Non-Gravity pilot wave requires preview, promotion, and rollback architecture.
+  relationship: Integrated four-project vertical slice requires preview, promotion, rollback, and outcome-proof architecture.
 - from_id: PRQ-006
   to_id: ARQ-006
   relationship: CI/CD based wave deployment requires explicit release architecture.
@@ -263,7 +305,7 @@ cross_links:
   relationship: The wave release architecture now has a validated environment GitOps reconciliation schema.
 - from_id: PRQ-007
   to_id: ARQ-007
-  relationship: Seventeen canonical skills require a package and validation architecture.
+  relationship: The supported minimal skill inventory requires a coherent package and validation architecture.
 - from_id: PRQ-008
   to_id: ARQ-008
   relationship: CLI product surface requires dependency-light schema-driven CLI architecture.
@@ -329,13 +371,13 @@ cross_links:
   relationship: The Agent Platform MCP/control interface now has a durable request, authorization, policy, target, result, review, and handoff artifact.
 - from_id: SURF-013
   to_id: IFACE-013
-  relationship: Gravity core and pack surface defines the reusable evidence-engine boundary.
+  relationship: Current Gravity product and pack boundary supplies the source, processing, search, tenant, and pack semantics beneath the evidence service.
 - from_id: IFACE-013
   to_id: schemas/gravity-core-extraction-plan.schema.yaml
   relationship: Gravity core/pack interface now has a validated source-object, reuse, risk, pilot, readiness, and approval artifact.
 - from_id: WAVE-005
   to_id: ARCH-014
-  relationship: Sunshine reuse planning requires Gravity core and pack extraction architecture.
+  relationship: Current Gravity API, MCP adapter, citation, tenant, and Gate B convergence requires the active Gravity evidence-service architecture.
 - from_id: PRQ-020
   to_id: ARQ-019
   relationship: Learning-capture product requirement requires proposal-only evidence-backed improvement architecture.
@@ -350,13 +392,13 @@ cross_links:
   relationship: Learning-capture planning wave requires loop-readiness and proposal-routing architecture.
 - from_id: PRQ-022
   to_id: ARQ-021
-  relationship: External OpenClaw SDLC workflow skills require lifecycle contract delegation and GitHub authority preservation.
+  relationship: Optional conversational workflow adapters require lifecycle contract delegation and GitHub authority preservation.
 - from_id: SURF-015
   to_id: IFACE-015
-  relationship: OpenClaw workflow skill surface defines the SDLC workflow facade interface.
+  relationship: Optional conversational workflow surface defines the thin adapter interface.
 - from_id: WAVE-007
   to_id: ARCH-016
-  relationship: OpenClaw SDLC workflow pilot requires the workflow skill architecture.
+  relationship: Orbit workflow-adapter pilot requires the optional conversational facade architecture.
 - from_id: PRQ-023
   to_id: ARQ-022
   relationship: Repo-bootstrap product requirement requires schema-backed bootstrap architecture.
@@ -374,10 +416,10 @@ cross_links:
   relationship: Controller observability product requirement requires telemetry, dashboards, alerts, and recovery architecture.
 - from_id: PRQ-028
   to_id: ARQ-026
-  relationship: Orbit daily brief product surface requires read-only source-linked governance architecture.
+  relationship: Orbit personal-assistant and engineering-chief-of-staff product scope requires source-aware connector governance and a separate actuation boundary.
 - from_id: PRQ-028
   to_id: WAVE-009
-  relationship: Orbit daily brief is explicitly deferred until source scope, connector permissions, privacy, retention, source-freshness rules, and owner approval are recorded.
+  relationship: Orbit connector governance wave establishes source scope, permissions, privacy, retention, freshness, and owner approval before broad activation.
 - from_id: SURF-016
   to_id: IFACE-016
   relationship: Repo-bootstrap surface defines the self-discovery packet interface.
@@ -386,10 +428,10 @@ cross_links:
   relationship: Fleet controller dashboard surface defines controller observability and alert routing.
 - from_id: SURF-018
   to_id: IFACE-018
-  relationship: Orbit daily brief surface defines source-fresh read-only operating context.
+  relationship: Orbit personal and engineering context plane uses the governed source, connector, provenance, freshness, and action-authority contract.
 - from_id: IFACE-018
   to_id: WAVE-009
-  relationship: Concrete Orbit interface implementation is deferred until the Orbit/platform owner approves connector and privacy rules.
+  relationship: Concrete Orbit connector implementation advances source by source after connector and privacy rules pass.
 - from_id: WAVE-008
   to_id: ARCH-017
   relationship: Repo-controller bootstrap pilot requires bootstrap and fleet runtime architecture.
@@ -408,26 +450,76 @@ cross_links:
 - from_id: WAVE-008
   to_id: ARCH-020
   relationship: Repo-controller bootstrap pilot requires a scope charter before controller ownership.
+- from_id: PRQ-030
+  to_id: ARQ-029
+  relationship: Four co-equal pilots require one common PilotProject contract without a global pilot hierarchy.
+- from_id: PRQ-031
+  to_id: ARQ-030
+  relationship: No compatibility window permits breaking atomic convergence and deletion of deprecated capability.
+- from_id: PRQ-032
+  to_id: IFACE-020
+  relationship: Root-planner coordination requires the common PilotProject status and capability interface.
+- from_id: PRQ-033
+  to_id: ARQ-017
+  relationship: Agent Platform dispatch must negotiate supported MCP/API capabilities instead of requiring one concrete worker operation.
+- from_id: PRQ-034
+  to_id: IFACE-021
+  relationship: Exact-artifact trusted publication requires an atomic recoverable package transaction.
+- from_id: PRQ-035
+  to_id: ARQ-026
+  relationship: Broad Orbit context requires source-aware connector governance and a separate actuation trust boundary.
+- from_id: PRQ-036
+  to_id: ARQ-032
+  relationship: Gravity results require first-class resolvable evidence references with tenant-aware API/MCP parity.
+- from_id: PRQ-036
+  to_id: IFACE-022
+  relationship: Gravity consumers require the versioned tenant-scoped HTTP API and equivalent MCP adapter.
+- from_id: PRQ-037
+  to_id: ARQ-031
+  relationship: North Star lock and release approval require separate policy subjects and evidence.
+- from_id: PST-025
+  to_id: ARQ-031
+  relationship: Release approver story binds Jason-or-James package approval to a policy distinct from Jason-only North Star lock.
+- from_id: PRQ-038
+  to_id: ARQ-034
+  relationship: Customer consulting projects reuse the same lifecycle and PilotProject contracts with customer-scoped ownership, tenancy, evidence, and review.
+- from_id: PST-026
+  to_id: ARCH-021
+  relationship: Customer consulting reuse is the expansion outcome after the internal four-pilot slice proves the shared platform.
+- from_id: SURF-020
+  to_id: IFACE-020
+  relationship: Four-pilot portfolio status uses the common PilotProject contract.
+- from_id: SURF-021
+  to_id: IFACE-021
+  relationship: Trusted package transaction surface uses the exact-artifact atomic publication and install contract.
+- from_id: SURF-013
+  to_id: IFACE-022
+  relationship: Gravity evidence consumption uses equivalent HTTP and MCP contracts with resolvable citations.
+- from_id: WAVE-002
+  to_id: ARCH-021
+  relationship: The first integrated self-building slice proves the four-project architecture and durable root-planner loop.
 open_questions:
 - id: NSQ-001
   artifact: both
-  question: 'What exact approval rule applies to protected North Star product and architecture artifacts: Jason, James, either approver, both approvers, or change-class-specific approval?'
-  owner: Jason and James
+  question: What approval rule applies to North Star lock versus Verdify Skills release approval?
+  owner: Jason
   blocking: false
   status: resolved
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
-  proposed_resolution: The only North Star planning gate is final approval to lock the North Star and proceed to the next milestone; intermediate evidence, research, questions, design proposals, and review feedback continue through the planning loop.
+  - NSE-20260709-jason-review-feedback
+  proposed_resolution: Jason alone records final North Star lock. Jason or James may approve a Verdify Skills release, and James is the npm publisher. Review feedback remains separate from final lock.
 - id: NSQ-002
   artifact: both
   question: Should execution identity remain one issue/lane/branch/worktree/session/PR or introduce wave-level branches?
   owner: Jason, James, and release owner
   blocking: false
-  status: deferred
+  status: resolved
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
-  proposed_resolution: Treat wave as the CI/CD deployment and review unit; defer exact branch/session/worktree naming to release architecture before automation is encoded.
+  - NSE-20260709-jason-review-feedback
+  proposed_resolution: Keep one issue, lane, branch, worktree, worker session, and PR as the default implementation unit. Treat a wave as the coordination, review, and release unit, not a shared coding branch.
 - id: NSQ-005
   artifact: architecture
   question: What is the exact repo/application/environment/namespace cardinality for the Agent Platform pilot?
@@ -453,40 +545,48 @@ open_questions:
 - id: NSQ-006
   artifact: both
   question: Which P0 North Star interview decisions should be accepted, modified, or rejected before final lock?
-  owner: Jason and James
+  owner: Jason
   blocking: false
-  status: open
+  status: resolved
   source_ids:
   - NSE-20260623-end-to-end-agent-based-sdlc
-  proposed_resolution: Use `.agent-workflow/northstar/NORTHSTAR_INTERVIEW.md`; answers return to `northstar-planning` / `review-feedback` and do not themselves record final approval.
+  - NSE-20260709-verdify-skills-adversarial-review
+  - NSE-20260709-jason-review-feedback
+  proposed_resolution: Jason accepted every July 9 recommendation as the new planning default. The answers returned through `northstar-planning` / `review-feedback` and do not themselves record final approval.
 - id: NSQ-007
   artifact: both
   question: What exact responsibility split should hold among Verdify Skills, Agent Platform, Hermes/OpenClaw (now Orbit), and Gravity?
   owner: Jason and architecture owner
   blocking: false
-  status: answered
+  status: resolved
   source_ids:
   - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
   - NSE-20260623-agent-platform-live-state-audit
   - NSE-20260623-openclaw-hermes-reuse-interface-security-audit
-  proposed_resolution: Resolved in practice (2026-07-07) as the working ruling — jvallery/agents owns the platform/substrate (runtime, control plane, durable-loop substrate); verdify-skills owns the method (portable lifecycle contracts plus platform-adapter skills per ADR-0016); jvallery/orbit owns the chief-of-staff/outer-loop conductor; Gravity owns reusable file-to-knowledge/evidence ingestion with customer packs. Final cross-repo ratification rides the jvallery/agents North Star lock.
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-agents-current-state-audit
+  - NSE-20260709-orbit-current-state-audit
+  - NSE-20260709-gravity-current-state-audit
+  proposed_resolution: The root planner owns the portfolio outer loop; Verdify Skills owns shared method and contracts; Agent Platform owns runtime/control capabilities; Orbit owns governed personal and engineering information context; Gravity owns evidence/search semantics; all four projects retain pilot ownership; runtime adapters remain optional.
 - id: NSQ-008
   artifact: both
-  question: What is the safest extraction path from Sunshine Club into reusable Gravity core?
+  question: What is the authoritative current Gravity implementation and shared consumer path?
   owner: Gravity readiness owner
   blocking: false
-  status: open
+  status: resolved
   source_ids:
   - NSE-20260623-agent-platform-sunshine-gravity-ip-priorities
   - NSE-20260623-sunshine-gravity-extraction-architecture-audit
   - NSE-20260623-gravity-core-extraction-implementation-b
-  proposed_resolution: Use `verdify_gravity` as the generic core target, keep Sunshine-specific source setup under `clients/sunshine`, validate `gravity-core-extraction-plan.yaml`, and port scanner, SHA-256/object staging, Postgres pipeline, readiness, read-only MCP, and validation contracts before client-pack behavior.
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-gravity-current-state-audit
+  proposed_resolution: The current restarted Gravity repository and live deployment are authoritative. The first shared consumer surface is a versioned tenant-scoped read-only HTTP API with an MCP adapter and resolvable citations. Sunshine remains optional historical evidence.
 - id: NSQ-009
   artifact: both
   question: Which session sources, retention windows, and redaction rules should the learning-capture loop use?
   owner: Skills maintainer and security owner
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-long-horizon-agent-compounding-learning
   - NSE-20260623-long-horizon-learning-loop-source-verification
@@ -496,7 +596,7 @@ open_questions:
   question: What exact namespace naming convention should bind GitHub owner, organization, repository, dev, preview, staging, and production namespace identity for fleet bootstrap?
   owner: Platform and security owner
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260623-environment-gitops-implementation-best-p
@@ -506,7 +606,7 @@ open_questions:
   question: Should repo-controller orchestration use Codex, Claude, or a controller abstraction that selects the model/tooling per task and failure mode?
   owner: Platform architecture owner
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260623-openclaw-hermes-local-evidence
@@ -516,7 +616,7 @@ open_questions:
   question: Which infrastructure domain agents are allowed broader scoped access, and what owner, audit, approval, and rollback rules apply?
   owner: Jason, platform owner, and security owner
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260623-secrets-credential-injection-patterns
@@ -526,32 +626,40 @@ open_questions:
   question: What is the approved request path for repo agents to add NFS/PVC mounts, route/DNS changes, or base-image packages?
   owner: Platform, storage, and networking owners
   blocking: false
-  status: open
+  status: deferred
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
   - NSE-20260623-environment-gitops-implementation-best-p
   proposed_resolution: Repo agents submit platform control requests or PR-reviewed desired-state changes; storage/network/image owners approve before mutation.
 - id: NSQ-014
   artifact: product
-  question: What sources, privacy boundaries, connector permissions, and source-freshness rules should the Orbit daily operating brief use?
+  question: What sources, privacy boundaries, connector permissions, trust separation, and source-freshness rules should Orbit use across its personal-assistant and engineering-chief-of-staff scope?
   owner: Jason and Orbit/platform owner
   blocking: false
-  status: deferred
+  status: resolved
   source_ids:
   - NSE-20260623-repo-controller-bootstrap-self-discovery
-  proposed_resolution: Deferred by `WAVE-009` until the Orbit/platform owner records source scope, connector permissions, privacy, retention, source-freshness rules, and implementation ownership. Proposed starting scope remains GitHub, repo-controller state, and `.agent-workflow` records; email/calendar require explicit connector policy first.
+  - NSE-20260709-jason-review-feedback
+  - NSE-20260709-orbit-current-state-audit
+  proposed_resolution: Orbit covers authorized email, calendars, enterprise documents, transcripts, notes, conversations, meetings, and engineering context. Implementation proceeds through a governed connector plane with tenant, provenance, freshness, classification, ACL, retention, read/write authority, and personal-context/fleet-actuation separation.
 learning_capture:
   status: staged
   proposal_paths:
   - .agent-workflow/northstar/learning-capture/2026-06-23-alignment-loop.yaml
-  open_proposal_ids: [NLP-001, NLP-002]
+  - .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
+  open_proposal_ids: [NLP-001, NLP-002, NLP-003, NLP-004, NLP-005, NLP-006, NLP-007]
 review:
-  requested_at: '2026-07-07T19:02:27Z'
+  requested_at: '2026-07-09T18:48:04Z'
   reviewers: [Jason, James]
-  status: requested
-  approvals: []
-  signoff_required_for_downstream: true
+  status: approved
+  approvals:
+  - reviewer: Jason
+    decision: approved
+    decided_at: '2026-07-09T23:20:09Z'
+    notes: >-
+      Jason explicitly directed the controller to fix #72 and then lock iteration 25; see northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval. Approval covers exactly these ten defaults: adopt every July 9 review recommendation; keep pre-lock safety narrow but require trusted exact-artifact atomic publication and installation; remain proprietary and internal-first without a current community-growth goal; carry no backwards-compatibility obligation and delete deprecated capability after atomic convergence; operate Verdify Skills, Agent Platform, Orbit, and Gravity as four co-equal active pilots under the root planning outer loop; separate Jason-only North Star lock, Jason-or-James release approval, James's npm-publisher role, and independent PR review; use the restarted current Gravity repository and runtime as source truth; expose Gravity through versioned tenant-scoped read-only HTTP plus a consumer MCP adapter with equivalent authorization and resolvable citations; make Orbit both personal assistant and engineering chief of staff across governed authorized personal, enterprise, meeting, conversation, and engineering sources separated from fleet actuation; and move as soon as safely possible without an artificial deadline toward one complete four-project self-building slice and customer-consulting reuse while filing gaps in owning repositories.
+  signoff_required_for_downstream: false
 handoff:
-  next_skill: northstar-planning
-  next_mode: human-review
-  reason: Iteration 24 (2026-07-07) reconciled the product North Star to the shipped 1.2.0 package and the 2026-06-29 AI-OS/Orbit program (skill counts, primary-customer framing, Orbit naming annotations, NSQ-007 working ruling, WAVE-010 Orbit chief-of-staff skill suite). Review is requested from Jason and James before further artifact-loop iteration or final lock approval.
+  next_skill: project-definition
+  next_mode: discovery
+  reason: "Jason approved and locked iteration 25 after #72 integrated; project definition can now turn the four-project product and architecture authority into end-to-end users, requirements, lifecycle coverage, interfaces, operations, relationships, and approval points."

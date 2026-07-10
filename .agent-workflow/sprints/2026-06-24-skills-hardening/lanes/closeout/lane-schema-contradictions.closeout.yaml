@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-schema-contradictions
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 28
 pull_request: 51
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "86bf11340edcc8e8aee3bf6a5fb4a0227ec70b4a"
+implementation_head_sha: "86bf11340edcc8e8aee3bf6a5fb4a0227ec70b4a"
+validated_head_sha: "86bf11340edcc8e8aee3bf6a5fb4a0227ec70b4a"
 contract_hash: "8ef4fba9ee7d5209b037fb8cc7b8d0ad0c4c083a4a352d3f931b09b58e0cbcce"
 changed_paths:
   - "schemas/critic-report.schema.yaml"
@@ -80,8 +81,9 @@ residual_risks:
   - "Fresh critic approval is still required before integration."
   - "The scripts/validate-repo.rb drift-check implementation belongs to lane-validator-engine and was not edited in this lane."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-schemacontra"
 completed_at: "2026-06-24T17:33:56Z"
 limitations:
   - "Controller authorization required scripts/validate-repo.rb acceptance to be recorded as satisfied-by-coordination for lane-validator-engine, not implemented by this lane."
-  - "The closeout head_sha records the implementation commit before the closeout-only metadata commit; PR #51 records the current branch head after closeout is pushed."
+  - "The closeout implementation_head_sha records the implementation commit before the closeout-only metadata commit; PR #51 records the current branch head after closeout is pushed."

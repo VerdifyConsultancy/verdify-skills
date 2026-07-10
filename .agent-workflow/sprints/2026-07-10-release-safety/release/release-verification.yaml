@@ -1,0 +1,69 @@
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-safety
+status: verified
+integrated_sha: "5d3393e61db46b01a813b7bc9a687a6a262ed23c"
+release:
+  tag: null
+  url: null
+artifact_identity:
+  - type: git_commit
+    identifier: "dev@5d3393e61db46b01a813b7bc9a687a6a262ed23c"
+  - type: github_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#184 at critic-report head d1e8cdc2e616443db90d11dc2ef39310e5b74339"
+  - type: release_candidate_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#189 for @verdify-cli/cli@1.3.0, authored by jrvallery and intentionally left open"
+integration_results:
+  - name: fresh independent criticism
+    result: passed
+    evidence: "Critic codex-critic-3/session critic-120-release-safety-fix3-20260710t1000z recorded outcome approve with zero findings at d1e8cdc after reviewing implementation 369b6df and evidence 4f1c123."
+  - name: exact-head lane checks
+    result: passed
+    evidence: "PR #184 validate, pull-request-policy, and compliance checks passed on critic-report head d1e8cdc before the user-authorized administrator merge."
+  - name: validate at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29082391716 passed at 5d3393e: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29082391716"
+  - name: compliance at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29082391855 passed at 5d3393e: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29082391855"
+  - name: corrected 1.3.0 release candidate generation
+    result: passed
+    evidence: "Corrected workflow dispatch 29082434227 at 5d3393e created issue #188 and same-repository dev-to-main PR #189 as jrvallery after stale pre-integration 1.2.1 candidate #187/#186 was closed."
+deployment:
+  environment: github-actions-ci/dev (release-safety integration; no package or runtime deployment)
+  deployment_id: 29082391716
+  deployed_at: "2026-07-10T09:14:36Z"
+  observed_revision: "5d3393e61db46b01a813b7bc9a687a6a262ed23c"
+  deployer: jvallery
+  approval:
+    required: true
+    approved_by: "Jason Vallery (user-authorized administrator merge; no fabricated self-review)"
+    approved_at: "2026-07-10T09:14:36Z"
+    evidence: ".agent-workflow/sprints/2026-07-10-release-safety/gates/pr-184-admin-merge-override.yaml and https://github.com/VerdifyConsultancy/verdify-skills/pull/184"
+runtime_checks:
+  - name: repository and exact-artifact validation workflow
+    result: passed
+    observed_at: "2026-07-10T09:16:53Z"
+    evidence: "Validate push run 29082391716 completed successfully at the integrated SHA with version 1.3.0."
+  - name: compliance workflow
+    result: passed
+    observed_at: "2026-07-10T09:14:50Z"
+    evidence: "Compliance self-test push run 29082391855 completed successfully at the integrated SHA."
+  - name: release candidate control-plane path
+    result: passed
+    observed_at: "2026-07-10T09:15:44Z"
+    evidence: "Release PR workflow dispatch 29082434227 completed successfully and created PR #189 without publishing, tagging, creating a GitHub release, or promoting main."
+migrations:
+  - name: none
+    result: not_applicable
+    evidence: "Versioned package and release-control integration only; npm, main, tags, GitHub releases, runtime services, and rescue refs were not mutated."
+rollback:
+  ready: true
+  known_good_revision: "52225d0dc6cba9a7157ba3b43803dd6f674c2102"
+  procedure: "Close PR #189 and issue #188, revert PR #184 merge commit 5d3393e on dev together with later controller-only descendants as needed, then rerun repository/package/release validation. No immutable npm or tag rollback is required because publication has not occurred."
+incidents:
+  - "The dev push that recorded the PR #184 admin exception ran the pre-#120 generator and created stale 1.2.1 issue #186/PR #187. Both were closed before any promotion; the integrated workflow then failed closed on the conflict and the corrected rerun created only the 1.3.0 candidate."
+  - "PR #184 could not receive an APPROVED review from author jvallery; the committed user-authorized administrator exception allowed dev integration without fabricating a GitHub review, and issue #121 owns the durable replacement control."
+verified_at: "2026-07-10T09:22:21Z"
+verifier: "Codex ROOT release-safety controller"

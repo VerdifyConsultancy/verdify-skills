@@ -1,0 +1,32 @@
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: "1.0"
+sprint_id: 2026-07-10-package-file-set
+decision: accepted_with_risks
+reviewed_at: "2026-07-10T05:54:00Z"
+reviewer: "Jason Vallery (user-authorized administrator merge recorded by ROOT)"
+intended_outcome: >-
+  Make manifest and package generation select one reproducible tracked shipped-file
+  set independent of ignored, untracked, or mutable host state.
+delivered_outcomes:
+  - "PR #166 integrated immutable Git-index object staging into dev at 17b3762f024186a336556f60c27268006a8d59b6."
+  - "Manifest hashing and archive generation consume the same captured object bytes, modes, and symlink targets rather than mutable worktree paths."
+  - "Fresh criticism, 90 tests with 531 assertions, contaminated-worktree regressions, exact archive checks, and all required GitHub checks passed on the final report head."
+evidence_links:
+  - "https://github.com/VerdifyConsultancy/verdify-skills/pull/166"
+  - "https://github.com/VerdifyConsultancy/verdify-skills/issues/130"
+  - ".agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml"
+  - ".agent-workflow/sprints/2026-07-10-package-file-set/critic/issue-130-package-file-set.critic.yaml"
+  - ".agent-workflow/sprints/2026-07-10-package-file-set/gates/pr-166-admin-merge-override.yaml"
+incomplete_items: []
+residual_risks:
+  - "PR #166 could not receive an APPROVED review from its author; the user-authorized administrator exception is durable, but issue #121 still owns a transport-neutral merge gate."
+  - "The accepted implementation remains on dev until the new exact-artifact release owned by issue #120 reaches main."
+follow_up_issues: [120, 121]
+lessons_learned:
+  - "Packaging must stage immutable Git objects once and reuse that snapshot for hashing and archiving."
+  - "Sprint terminal state must be committed immediately after integration so the global router does not rediscover accepted work as active."
+rationale: >-
+  The approved issue scope is integrated on dev, exact implementation and critic heads
+  passed deterministic and GitHub checks, and the only missing delivery control is
+  durably owned by issue #121.

@@ -1,0 +1,135 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-safety
+status: complete
+goal: Build, exercise, and recover one exact new-version package artifact before any npm publication or main promotion can occur.
+baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [120]
+scope:
+  - Bump the recovered package and all 28 required skill metadata versions from published version 1.2.1 to new minor version 1.3.0 and record the release scope.
+  - Build one npm tarball once, derive its integrity and identity, and use that same file for install, reinstall, upgrade, collision, corruption, rollback, minimum-runtime, and publish inputs.
+  - Make installed-package validation truthful and runnable from the packed artifact.
+  - Make ZIP verification reject missing, altered, and unlisted regular files while preserving issue #130 immutable Git-index staging.
+  - Add a schema-valid resumable release transaction that reconciles source, tarball, integrity, npm, provenance, tag, GitHub release, archive, and checksums.
+  - Prevent generated release issues and PRs for an already-published or unbumped dev version.
+  - Make pack installation preflight or roll back all selected links and manifest state on conflict.
+non_goals:
+  - Merge the final dev-to-main release before issue #121 delivery controls are integrated and applied live.
+  - Change dev/main branch protection, CODEOWNERS, or critic-gate policy owned by issue #121.
+  - Change any skill behavior, body content, agent metadata, references, scripts, assets, or evaluations beyond the mechanical SKILL.md metadata.version value.
+  - Publish from a worker session, use npm credentials, create tags/releases, or mutate production/runtime services.
+  - Change scripts/package-file-list.rb or weaken issue #130 immutable object staging.
+  - Resolve the private GitHub Support purge request in public repository artifacts.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: One exact npm tarball is created once and every artifact test plus publish command consumes that same path, digest, version, and source revision.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [single-pack test, tarball SHA-512/SHA-256 identity, workflow publish-path audit, 28-skill version parity]
+  - id: SPR-AC-02
+    statement: Fresh install, same-version reinstall, 1.2.1-to-1.3.0 upgrade, minimum Node runtime, collision, corruption, and rollback tests leave deterministic package and pack state.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [packed-artifact matrix, transactional pack conflict regression]
+  - id: SPR-AC-03
+    statement: Installed package commands are runnable and ZIP verification proves exact regular-file equality, rejecting missing, changed, and unlisted files.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [installed npm test, exact-set mutation tests, package-file-set regression]
+  - id: SPR-AC-04
+    statement: A schema-valid release ledger resumes safely from every partial publication state and reconciles npm gitHead/provenance, tag, release, archive, version, integrity, and commit identity.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [release transaction state-machine tests, partial npm-published resume fixture, duplicate prevention]
+  - id: SPR-AC-05
+    statement: Privileged workflow actions and npm are immutable-version pinned, generated release PRs require a genuine new version, and the exact tarball is the only npm publish input.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [workflow pin audit, release-preflight tests, release PR dry-run fixtures]
+  - id: SPR-AC-06
+    statement: Exact implementation and report heads pass secret scan, repository validation, focused artifact tests, full make test, package verification, and required GitHub checks.
+    lane_ids: [issue-120-release-safety]
+    evidence_expected: [gitleaks, make test, exact archive/npm evidence, check URLs]
+risks:
+  - id: RISK-01
+    severity: critical
+    statement: npm publication is irreversible and can succeed before tag, release, or ledger completion.
+    mitigation: Publish only the exact tested tarball and make every later step idempotently resumable from the durable ledger.
+  - id: RISK-02
+    severity: high
+    statement: Repacking between tests and publication can change consumer bytes without changing source checks.
+    mitigation: Pack once, record the path and digests, and prohibit source-directory npm publish.
+  - id: RISK-03
+    severity: high
+    statement: Artifact tests may leave partial installs, links, tags, or records after a failure.
+    mitigation: Use isolated fixtures, preflight all mutations, and assert rollback/zero-partial-state behavior.
+  - id: RISK-04
+    severity: high
+    statement: Workflow dependency drift could change privileged publication behavior.
+    mitigation: Pin actions and npm to reviewed immutable versions and test the workflow contract.
+lanes:
+  - lane_id: issue-120-release-safety
+    issue_ids: [120]
+    contract_path: .agent-workflow/sprints/2026-07-10-release-safety/lanes/contracts/issue-120-release-safety.contract.yaml
+    branch: lane/120-release-safety
+    owner: release-safety-worker
+    reviewer: fresh-independent-critic
+    summary: Implement version 1.3.0 exact-artifact testing, resumable release state, duplicate prevention, and transactional install behavior.
+dependency_order:
+  - [issue-120-release-safety]
+deployment_expectations:
+  - The worker and critic perform no live npm, tag, GitHub release, main, or runtime mutation.
+  - Lane integration targets dev only after fresh criticism, exact-head checks, and the recorded user-authorized admin policy when non-author review transport is unavailable.
+  - The generated version 1.3.0 release PR remains unmerged until issue #121 is integrated, live protections are reconciled, and Jason approves the James-authored exact candidate.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Exact tarball consumer matrix
+      due: before worker closeout
+      evidence_expected:
+        - One tarball digest is used across install, reinstall, upgrade, collision, corruption, rollback, minimum-runtime, and declared-command tests.
+        - Pack installation failure leaves no new links or manifest residue.
+    - id: QA-02
+      name: Resumable publication and exact archive proof
+      due: before critic review
+      evidence_expected:
+        - Every ledger transition and partial-release resume fixture is deterministic and idempotent.
+        - ZIP mutation tests reject missing, altered, and extra regular files.
+    - id: QA-03
+      name: Exact-head release gate
+      due: before dev integration
+      evidence_expected:
+        - Fresh critic verifies workflow pins, release identity, source-to-artifact binding, and issue #130 staging preservation.
+        - Required GitHub checks pass on the critic-report-only head.
+  human_review_milestones:
+    - id: HR-01
+      name: Independent release-safety implementation review
+      owner: Fresh critic plus repository admin integration authority
+      trigger: Critic report S and exact-head checks pass.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-release-safety/review/review-inbox-packet.yaml
+    - id: HR-02
+      name: Final version 1.3.0 release approval
+      owner: Jason Vallery or James Vallery, excluding the release PR author
+      trigger: Issue #121 is integrated and live branch rules plus exact-artifact checks cover the final dev head.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-release-safety/review/release-approval-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As a maintainer, I can prove that the bytes installed and published are the same bytes that passed the complete consumer and recovery matrix.
+      issue_ids: [120]
+      lane_ids: [issue-120-release-safety]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05, SPR-AC-06]
+  reporting_summary:
+    included:
+      - "Issue #120 version 1.3.0 exact tarball, install matrix, exact archive verifier, resumable ledger, duplicate prevention, workflow pins, and pack rollback."
+    deferred:
+      - "Issue #121 branch protection, CODEOWNERS, critic gate, main-only release enforcement, and live rule application."
+      - "Final dev-to-main approval, npm publication, tag, GitHub release, and rescue-ref cleanup until #121 completes."
+    ownership:
+      - lane_id: issue-120-release-safety
+        owner: release-safety-worker
+        responsibility: Implement and prove the exact new-version artifact and recoverable release transaction without publishing it.
+    next_review: Fresh critic on the exact D/I/E/S chain, then dev integration and issue #121 delivery-control execution before final release approval.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T05:55:37Z"

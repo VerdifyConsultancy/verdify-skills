@@ -12,7 +12,7 @@ scope:
   non_goals: []
 branch_model:
   model: per_lane_branches
-  base_ref: main
+  base_ref: replace-me
   release_ref: null
   merge_queue_required: false
   concurrency_group: null

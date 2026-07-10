@@ -1,0 +1,174 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-delivery-controls
+status: approved
+scope:
+  sprint_id: 2026-07-10-delivery-controls
+  issue_ids: [121]
+  lane_ids: [issue-121-delivery-controls]
+  northstar_ids: [FR-007, FR-012, AC-007, AC-012]
+  summary: Integrate reviewed delivery-control code to dev, apply and verify pre-release GitHub rules, and hold final release promotion for separate approval.
+  non_goals:
+    - "Publish npm, push v1.3.0, create a GitHub release, or merge PR #189 within the worker lane."
+    - Deploy a runtime service or mutate GitOps.
+    - Apply live rules before the reviewed implementation is on dev.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: main
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-121
+  decision_notes: One issue and lane target dev. ROOT performs post-merge live reconciliation; only the generated same-repository dev-to-main PR may later promote main.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [full test suite, repository validator, delivery-control focused tests]
+    - name: policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected: [dev/main route and current-head body policy]
+    - name: delivery-gate
+      required: true
+      event_triggers: [pull_request, push, workflow_dispatch, other]
+      timeout_minutes: 15
+      evidence_expected: [transport-neutral critic status, real release review, bootstrap delivery policy]
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 15
+      evidence_expected: [reusable compliance result]
+  artifacts:
+    - Route, critic identity, and review-history test matrices.
+    - Pre-release and steady-state desired branch-protection payloads.
+    - Dry-run/apply/verify/rollback evidence and live protection GET snapshots.
+    - Fresh critic report and controller reconciliation comment.
+  required_events: [pull_request, push, workflow_dispatch, other]
+environments:
+  - name: github-repository-controls
+    environment_type: production
+    required: true
+    namespace: null
+    url: https://github.com/VerdifyConsultancy/verdify-skills/settings/branches
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: Existing gh administrator authentication used only by ROOT after merge.
+    protection_rules: [plan approval, fresh critic, exact-head checks, dry-run before apply, GET verification]
+    expected_revision_source: "dev merge commit containing reviewed issue #121 code"
+gitops:
+  controller: none
+  desired_state_refs:
+    - config/github-delivery-controls.yaml
+  sync_order:
+    - phase: pre-release
+      wave: 1
+      resource: dev branch protection
+      purpose: Require PRs, strict checks, critic-gate, conversation resolution, admin enforcement, and no force/delete.
+    - phase: pre-release
+      wave: 2
+      resource: main branch protection
+      purpose: Require PRs, one code-owner review, delivery-policy, critic-gate, validate/compliance, conversation resolution, admin enforcement, and no force/delete.
+    - phase: steady-state
+      wave: 3
+      resource: main branch protection
+      purpose: Add trusted-base pull-request-policy after version 1.3.0 reaches main.
+  reconciliation_checks:
+    - Compare live branch GET documents to normalized phase-specific desired state.
+    - "Confirm PR #189 head and required check contexts before human approval."
+    - Confirm no workflow review-approval permission was enabled.
+  remediation_policy: Stop and restore the captured branch-protection snapshot if any apply response or verification differs from desired state.
+deployment_strategy:
+  type: manual
+  progressive_delivery: true
+  traffic_policy: null
+  steps:
+    - id: STEP-01
+      action: Dry-run pre-release branch protection against live GitHub state.
+      success_criteria: "The diff changes only approved dev/main protection fields and preserves PR #189 route."
+      rollback_trigger: Unexpected repository, branch, check, review, bypass, or permission change.
+    - id: STEP-02
+      action: Apply dev protection and verify exact live state.
+      success_criteria: Dev matches the approved strict PR/check/critic/admin/conversation/no-force/no-delete configuration.
+      rollback_trigger: Any mismatch or inability to open and update normal dev PRs.
+    - id: STEP-03
+      action: "Apply pre-release main protection and verify PR #189 required contexts."
+      success_criteria: Main requires one code-owner review plus validate, compliance, delivery-policy, and critic-gate without requiring the incompatible old policy context.
+      rollback_trigger: "PR #189 route is locked out for a reason outside its missing real approval or current checks."
+    - id: STEP-04
+      action: After verified 1.3.0 release, apply steady-state main protection.
+      success_criteria: Main additionally requires pull-request-policy from the now-current base implementation.
+      rollback_trigger: The base policy does not validate an exact future release fixture.
+observability:
+  dashboards: [GitHub branch protection API, "PR #189 check rollup", Actions workflow runs]
+  logs: [delivery-gate, policy, validate, compliance, branch-control dry-run/apply output]
+  metrics: []
+  traces: []
+  runtime_checks:
+    - Compare dev and main protection GETs with declarative desired state.
+    - "Confirm PR #189 current head, author, base/head repositories, review state, and check contexts."
+    - Confirm merge remains blocked until real Jason approval and all current checks pass.
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Restore the exact pre-apply branch protection snapshots with the same authenticated API, then verify both GET documents.
+  known_good_ref: "91828dd4f0b632a2833a3d4f62cf4f92c1e35901"
+  procedure: "Run the generated rollback payload for each changed branch, verify live state, and revert the issue #121 dev merge if code behavior must also be removed."
+  validation_steps:
+    - Re-read dev and main protection and compare to captured snapshots.
+    - "Confirm PR #189 remains open and unmerged."
+    - Rerun route/policy/delivery tests on the reverted dev code if implementation rollback is used.
+release_health:
+  stabilization_window: "until live pre-release protection verification and PR #189 check refresh complete"
+  signals:
+    - name: reviewed dev integration
+      source: "Issue #121 lane D/I/E/S chain and exact-head checks"
+      threshold: Fresh critic approves with no blocking finding and validate/policy/compliance pass.
+      blocking: true
+    - name: live branch-rule parity
+      source: GitHub branch protection GET comparison
+      threshold: Dev and main equal pre-release desired state with no unapproved fields.
+      blocking: true
+    - name: release candidate readiness
+      source: "PR #189 current-head checks and review history"
+      threshold: Delivery-policy, critic-gate, validate, and compliance pass; Jason approval is current and non-author.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-delivery-controls/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Inspect CODEOWNERS, workflow permissions, route rules, critic identity, and review-history logic.
+    - Compare dry-run pre-release branch payloads with the issue acceptance intent and live snapshots.
+    - "Verify PR #189 remains held before live rules and real approval."
+  approval_gate: "Fresh critic on exact S plus the user-authorized bootstrap integration exception; final main promotion separately requires Jason's real review on James-authored PR #189."
+risks:
+  - id: RISK-01
+    severity: critical
+    statement: A bad live apply can lock out delivery or weaken main promotion.
+    mitigation: Dry-run, snapshot, ordered apply, exact GET verification, and tested rollback are mandatory.
+  - id: RISK-02
+    severity: high
+    statement: Bootstrap and steady-state required checks can be confused, leaving main permanently weaker or temporarily impossible.
+    mitigation: Encode named phases and require post-release steady-state reconciliation as final release evidence.
+  - id: RISK-03
+    severity: high
+    statement: A stale check or review can outlive a new dev commit.
+    mitigation: Strict checks, dismiss stale reviews, exact commit validation, and rerun on review/synchronize events.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T09:38:46Z"
+prepared_at: "2026-07-10T09:38:46Z"
+planner: root-verdify-skills-controller

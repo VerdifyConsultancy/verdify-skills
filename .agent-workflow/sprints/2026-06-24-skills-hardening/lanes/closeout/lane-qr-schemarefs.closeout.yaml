@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-qr-schemarefs
 status: ready_for_critic
@@ -8,7 +8,8 @@ issue_ids:
   - 14
 pull_request: 53
 baseline_sha: "9b0fd53f276823c9b82eaeeaded114a5af0a6c77"
-head_sha: "8875153d39f063c89d4ea5aced89ea9ddfb510a6"
+implementation_head_sha: "8875153d39f063c89d4ea5aced89ea9ddfb510a6"
+validated_head_sha: "8875153d39f063c89d4ea5aced89ea9ddfb510a6"
 contract_hash: "ea7e4442ce8c5eafd072f47f73e79513ee2a59ab6a20ca9c3ac19ff468da285a"
 changed_paths:
   - "skills/northstar-question-resolution/assets/resolution-register.template.yaml"
@@ -85,6 +86,7 @@ residual_risks:
   - "SemanticValidator cases for the three NorthStarQuestion* kinds remain a coordination item for lane-platform-control-regrounding."
   - "MANIFEST.sha256 entries for the new schemas remain a release-regeneration item and were intentionally not manually edited."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-qr"
 completed_at: "2026-06-24T17:36:58Z"
 limitations:

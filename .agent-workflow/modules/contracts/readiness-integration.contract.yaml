@@ -1,0 +1,52 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: readiness-integration
+contract_version: "1.0"
+status: approved
+purpose: Define and assess Agent Platform and Gravity readiness, cross-project provider/evidence contracts, environments, security boundaries, and pilot criteria without implementing external systems.
+requirement_ids: [FR-008, FR-009, FR-010, NFR-003, NFR-004, NFR-005]
+owned_paths:
+  - skills/platform-readiness/**
+  - skills/gravity-readiness/**
+  - schemas/platform-readiness.schema.yaml
+  - schemas/gravity-readiness.schema.yaml
+  - schemas/gravity-core-extraction-plan.schema.yaml
+  - schemas/agent-platform-control-request.schema.yaml
+  - schemas/environment-gitops-reconciliation.schema.yaml
+  - .agent-workflow/platform/**
+  - .agent-workflow/gravity/**
+prohibited_paths: [skills/controller-loop/**, .agent-workflow/northstar/**, .github/workflows/**]
+inputs:
+  - name: approved_external_contracts
+    schema: Versioned Agent Platform provider, Gravity API/MCP, Orbit connector, environment, identity, and pilot expectations
+    producer: Approved architecture and owning project repositories
+  - name: live_readiness_evidence
+    schema: Repositories, tests, deployments, credentials references, observability, permissions, and operator-path probes
+    producer: Owning repositories and runtime operators
+outputs:
+  - name: readiness_decision
+    schema: platform-readiness.schema.yaml or gravity-readiness.schema.yaml with owner-routed gaps
+    consumers: [project-router, state-of-union, sprint-planning, pilot approvers]
+public_interfaces:
+  - name: readiness artifacts
+    location: .agent-workflow/platform/ and .agent-workflow/gravity/
+    compatibility: Live evidence is refreshed; external authority remains with owning repos and approved interface versions.
+dependencies:
+  hard: [governance-routing, definition-architecture-strategy, execution-control]
+  soft: [quality-enablement]
+invariants:
+  - Platform state remains authoritative under platform readiness and is referenced, not duplicated, by Gravity readiness.
+  - Missing identity, capability, permission, observability, rollback, or pilot evidence blocks the affected readiness decision.
+  - No external implementation or production mutation occurs from readiness assessment alone.
+runtime_resources: [Read-only access to owning repositories, clusters, APIs, credentials references, observability, and operator surfaces.]
+validation_commands:
+  - id: readiness-schemas
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate readiness schemas, skills, and references.
+required_evidence: [Current owning-repo revision, live capability and permission probes, environment/GitOps state, observability and rollback evidence]
+definition_of_done: [Domains are pass/fail/blocked with evidence, gaps have owners, pilot criteria and approvers are explicit]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

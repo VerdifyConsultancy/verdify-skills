@@ -1,10 +1,10 @@
 ---
 name: controller-merge
 description: Reconciles completed Verdify lane branches after worker closeout and fresh critic review, then either prepares a merge/integration action or returns the lane for contract-scoped fixes. Use when a controller owns branch, PR, closeout, check, and critic evidence and must decide merge-ready versus fix-forward without self-certifying worker output.
-compatibility: Requires Git, GitHub PR/check access, validated lane closeout, critic report, and an approved sprint or review packet. It never substitutes for independent criticism or runtime deployment verification.
+compatibility: Requires Git, GitHub PR/check access, a validated D/I/E/S chain, phase-appropriate current-head critic or human approval evidence, and complete packet commit P for the approved sprint. It never substitutes for independent criticism or runtime deployment verification.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Controller Merge
@@ -17,49 +17,71 @@ not approve its own output.
 ## Start
 
 1. Read `../../COMMON_OPERATING_CONTRACT.md` when available.
-2. Identify the sprint, lane ID, issue, PR, branch, baseline SHA, closeout,
+2. Invoke the validator from the protected base checkout or the atomically
+   installed controller package; never execute the candidate's validator as
+   its own authority.
+3. Identify the sprint, lane ID, issue, PR, branch, baseline SHA, closeout,
    critic report, checks, review packet, and target integration branch.
-3. Confirm the critic reviewed the current intended head and did not use the
-   worker session or worker worktree.
-4. Confirm required checks and PR-policy fields are current.
+4. Run the lane review-chain validator. Confirm the critic's agent and session
+   both differ from the worker agent/session recorded in the closeout, the
+   critic reviewed closeout-only evidence head E from a separate worktree, and
+   the critic report is the only later branch change at S.
+5. For a lane targeting `dev`, confirm the required `critic-gate` succeeds on
+   exact S with an approving critic outcome. If the diff touches a protected
+   delivery/control-plane CODEOWNERS path, also confirm current approval from
+   `jvallery` or `jrvallery` other than the author. For a promotion targeting `main`,
+   confirm `jvallery` or `jrvallery`, other than the PR author, supplied the
+   latest effective current-head `APPROVED` review. Required checks and
+   PR-policy fields must be current in either phase.
 
 Read `references/reconcile-and-merge.md` before deciding the lane outcome.
 
 ## Procedure
 
-1. **Collect evidence.** Read the PR body, branch head, closeout, critic report,
-   check rollup, mergeability, changed paths, issue linkage, and review packet
-   state.
+1. **Collect evidence.** Read the PR body, implementation I, closeout-only E,
+   report-only S, worker/critic identities, phase-appropriate approval evidence, check rollup,
+   mergeability, changed paths, issue linkage, and review packet state.
 2. **Compare authority.** Check that GitHub issue, lane contract, closeout,
-   critic report, PR head, and check results refer to the same lane and intended
-   revision.
+   critic report, PR head, critic status or release review, and check results refer to the
+   same lane and their correct implementation/evidence/report revisions.
 3. **Classify outcome.**
-   - `merge_ready`: closeout is ready, critic approves, checks pass or known
-     release-only caveats are recorded, and no protected gate is open.
+   - `merge_ready`: the exact D/I/E/S chain validates, the phase-appropriate gate on S is
+     current, protected control-plane changes have current code-owner approval,
+     required checks pass, the final evidence packet is complete, and
+     no protected gate is open.
    - `return_for_fix`: critic requests changes, checks fail on implementation
      or policy evidence, or PR metadata is stale.
    - `blocked`: merge conflicts, missing evidence, protected decisions, or
      release/deployment gates prevent integration.
 4. **Prepare merge or fix-forward.** For merge-ready lanes, record the exact
-   merge action and target. For fixes, release the old worker lease as needed
+   individual lane-PR merge action and target. Never use the controller evidence
+   branch as the integration candidate. For fixes, release the old worker lease
+   as needed
    and ask `subagent-worktree` or `lane-delivery` for one sequential fix worker.
-5. **Record evidence.** Write a concise merge/reconciliation note in the review
-   packet or PR comment, including the action, evidence, caveats, and next
-   lifecycle route.
+5. **Record evidence.** Write a concise merge/reconciliation note as a PR
+   comment or allowed canonical release/outcome/status evidence, including the action,
+   evidence, caveats, and next lifecycle route. Never amend packet P after its
+   atomic commit.
 
 ## Required Outputs
 
-- Merge/reconciliation decision summary with lane, issue, PR, branch, head SHA,
-  checks, closeout, critic report, target branch, and outcome.
+- Merge/reconciliation decision summary with lane, issue, PR, branch, D/I/E/S,
+  worker and critic agent/session identities, critic status or release reviewer, checks,
+  closeout, critic report, packet commit P, target branch, and outcome.
 - Either a merge-ready handoff, a fix-forward instruction, or a blocking gate.
-- Updated review packet or PR comment when the decision affects human review.
+- PR comment or allowed canonical release/outcome/status evidence when the decision
+  affects human review; packet P remains byte-for-byte unchanged.
 
 ## Stop Conditions
 
 Stop when:
 
-- no fresh critic report exists;
-- critic and closeout reviewed different heads without an explicit explanation;
+- no fresh critic report or complete final evidence packet exists;
+- critic/worker agent or session identities are not distinct;
+- the report, closeout, PR, or phase-appropriate gate refer to different heads;
+- `critic-gate` is not successful for `dev`, a protected control-plane change
+  lacks current code-owner approval, or the latest effective allowed owner
+  review is not `APPROVED` on a `main` release head;
 - required checks are failing for implementation reasons;
 - merge conflicts or shared registration conflicts need manual reconciliation;
 - the action would merge to a protected release branch, deploy runtime changes,
@@ -67,7 +89,7 @@ Stop when:
 
 ## Handoff
 
-Hand off merge-ready lanes to `release-verification` for review inbox and
-integration evidence. Hand off fix-needed lanes to `subagent-worktree` or
+Hand off merge-ready lanes and packet P to `release-verification` for individual
+lane-PR integration and later runtime evidence. Hand off fix-needed lanes to `subagent-worktree` or
 `lane-delivery` fix-forward. Hand off protected blockers to gates or
 `sprint-planning` replanning.

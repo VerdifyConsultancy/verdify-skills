@@ -1,6 +1,6 @@
 # Lifecycle and handoffs
 
-Verdify exposes twenty-five lifecycle skills but preserves the detailed lifecycle as explicit modes. The numbered sections below walk the core stage handoffs; [`skills/README.md`](skills/README.md) documents every skill individually. `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, order, and standalone skill treatment. `verdify.workflow.yaml`, router emissions, this document, and SKILL.md frontmatter are derived views and must validate against that config. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Standalone skills such as `issue-triage` sit outside this graph.
+Verdify exposes twenty-five lifecycle skills but preserves the detailed lifecycle as explicit modes. The numbered sections below walk the core stage handoffs; [`skills/README.md`](skills/README.md) documents every skill individually. `config/lifecycle.yaml` is the canonical source for lifecycle skills, standard states, modes, order, and built-in standalone skill treatment. `verdify.workflow.yaml`, router emissions, this document, and SKILL.md frontmatter are derived views that must validate against that config. A lifecycle skill may advance through its own modes without reactivation, provided each mode's artifacts and gates are satisfied. Package registry capabilities such as standalone `timeline-historian` and registry `crm-email` sit outside this graph and are never emitted by the lifecycle router.
 
 ## 1. Project router
 
@@ -105,7 +105,9 @@ complete transaction; worktrees are not created before approval.
 The orchestrator checks prerequisites, snapshots/reconciles GitHub, builds or
 refreshes `.agent-workflow/sprints/<sprint-id>/execution/sprint-execution-runbook.yaml`,
 dispatches dependency-ready lanes through the configured Agent Platform MCP/API
-operation, monitors platform session and terminal events, coordinates CI/CD and
+operation, and uses `lane create` to seed a separate approved dispatch commit D
+containing the SprintPlan, wave release plan, and lane contract before any
+worker code. It monitors platform session and terminal events, coordinates CI/CD and
 review deployment readiness, resolves gates, and routes results. Local
 tmux/terminal views are operator interfaces for platform sessions, not the
 authoritative execution record. It does not implement lane code or review its
@@ -139,25 +141,43 @@ criteria. It does not implement Gravity features.
 
 ## 16. Lane delivery
 
-A worker acquires one worktree lease, implements only the contract, runs validation, pushes a branch, opens or updates the linked PR, and performs closeout in the same bounded session. Discoveries become issues. Material contract problems stop the lane.
+A worker receives the immutable dispatch commit D, acquires one worktree lease,
+implements only the contract, validates and commits implementation head I,
+opens or updates the linked PR, then commits only the closeout as evidence head
+E in the same bounded session. The worker stops
+writing after E. Discoveries become issues. Material contract problems stop the
+lane.
 
 ## 17. Independent criticism
 
-A fresh critic uses a separate detached worktree or clean clone. It compares requirements, issue, module contract, lane contract, diff, tests, CI, and evidence. It approves, approves with risks, requests fixes, blocks, or escalates. It does not silently repair the worker branch.
+A fresh critic with a different agent and session uses a separate detached
+worktree or clean clone at E. It compares requirements, issue, module contract,
+lane contract, implementation I, tests, CI, and closeout evidence, then commits
+only its report as S. It approves, approves with risks, requests fixes, blocks,
+or escalates, but does not silently repair implementation. For a PR targeting
+`dev`, the required transport-neutral `critic-gate` validates the exact current
+S and independent identities without requiring author GitHub approval for an
+ordinary lane. A change to protected delivery/control-plane paths additionally
+requires a current non-author code-owner approval because its candidate can
+define the workflow job that emits the status. A release promotion targeting
+`main` separately requires a real current-head approval from an allowed
+non-author owner.
 
 ## 18. Release verification
 
 A fresh release-verification role first assembles a review inbox packet when
 work claims review-ready status, and a diagnostic packet when strategy, review,
 release, readiness, incident, or feedback decisions depend on runtime evidence.
-The review packet binds PR/MR identity, exact head SHA, checks, preview or
-review deployment, telemetry, security disposition, rollback, risks, questions,
-recommendation, and feedback route. The diagnostic packet binds correlation
+The review packet binds every lane PR's I/E/S chain, exact current-head critic
+status, checks, preview or review deployment, telemetry, security disposition,
+rollback, risks, questions, recommendation, and feedback route. It is the sole
+path in packet commit P on an evidence-only controller branch. The diagnostic
+packet binds correlation
 IDs, hypotheses, telemetry links, signal assessments, runtime checks,
 deployment markers, findings, missing instrumentation, and routing. After the
-review packet is complete and approving, integration combines approved lanes in
-dependency order, runs whole-system validation, and uses required checks or a
-merge queue. A separately authorized deployment role proves the expected
+review packet is complete and approving, integration merges or queues each lane
+PR individually in dependency order, runs whole-system validation, and never
+uses the controller evidence branch as its candidate. A separately authorized deployment role proves the expected
 commit/image/configuration in the target environment. Outcome review records
 human acceptance, remaining risk, follow-up issues, and lessons learned.
 

@@ -1,0 +1,61 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-package-file-set
+lane_id: issue-130-package-file-set
+pull_request: 166
+worker_agent: codex-subagent-fix2
+worker_session_id: local-issue-130-fix2
+critic_agent: codex-independent-critic-final
+implementation_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
+evidence_head_sha: "8600a9cef47e43d0287e640c76b99e3a77858870"
+reviewed_head_sha: "8600a9cef47e43d0287e640c76b99e3a77858870"
+closeout_path: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
+closeout_sha256: "477539b329ef0475c4842e2dd386ac16b8e2bb53573cdd3e227e536bd275213a"
+critic_session_id: critic-issue-130-fix2
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-package-file-set/critic-issue-130-fix2
+outcome: approve
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - scripts/package-file-list.rb captures each selected stage-0 Git-index entry's mode and blob object ID, then materializes regular bytes and symlink-target bytes through one git cat-file --batch stream without reading mutable worktree paths.
+      - scripts/gen-manifest.sh stages the captured repository snapshot and hashes that exact stage; scripts/package.sh stages the same selector output, invokes exported-tree manifest generation on that stage, and archives it.
+      - The focused regression independently passed and compared the selected regular paths, manifest paths, and exact archive path set.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - The focused regression independently passed with dirty tracked bytes and modes, a regular leaf replaced by a local symlink, an external symlink ancestor, ignored .claude/scheduled_tasks.lock and cache fixtures, and an untracked operator file.
+      - Direct staging, manifest generation, and the archive restored the indexed bytes and excluded all ignored and untracked fixtures.
+      - A separate critic probe confirmed NUL-delimited selection and staging, immutable indexed bytes, mode and link-target restoration, and ignored-file isolation with an unusual tracked filename.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - The indexed .agents/skills/project-router link target is read from its captured blob and remains a symlink in both direct staging and the extracted archive despite mutable worktree target drift.
+      - Git index modes 100644 and 100755 become exactly 0644 and 0755 in direct staging and the extracted archive despite opposite local chmod drift.
+      - The focused regression passed exact archive entry comparison and scripts/verify-package.sh verification without dereferencing tracked discovery links.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - ruby scripts/validate-repo.rb independently passed at E3 with 26 skills and 46 schemas.
+      - bash tests/test_package_file_set.sh independently passed at E3.
+      - make test independently passed at E3 with 90 runs, 531 assertions, zero failures, errors, or skips, followed by passing CLI, PR-policy, release-preflight, and npm-install tests.
+      - I3 validate, compliance, and the superseding pull-request-policy run passed; E3 validate and compliance passed, while its expected policy failures identify the stale prior report and missing final report head that this S3 transaction repairs.
+evidence_assessment:
+  - The detached critic worktree, active lease critic-issue-130-package-file-set-critic-issue-130-fix2, local lane ref, remote lane ref, and live PR head all matched E3 before report creation; critic agent and session both differ from the fix-forward worker identity and session.
+  - Dispatch D b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the first post-baseline commit and adds only the approved sprint plan, wave release plan, and lane contract; all three remain byte-identical through E3.
+  - I3 5902e947cad5bd220c072d0593e490dd6baf9bbc changes only six contract-owned paths after the prior request-fixes report, and E3 changes only the canonical closeout after I3 in a linear history.
+  - The independently computed closeout SHA-256 is 477539b329ef0475c4842e2dd386ac16b8e2bb53573cdd3e227e536bd275213a, and the closeout contract hash matches the immutable lane contract.
+  - Static review and independent probes confirm repository staging obtains file bytes, executable modes, and tracked link targets from captured index objects; manifest hashing and packaging consume the resulting staged snapshot.
+  - Git index parsing and internal path transport use NUL delimiters, and no current tracked path contains a line break. The legacy MANIFEST.sha256 serialization remains line-oriented and fails closed for a hypothetical future line-break path rather than accepting an ambiguous digest record.
+  - Worker evidence is revision-bound and consistent with independent validation. The earlier I3 policy failure was superseded after exact-head metadata correction; E3 policy failures are limited to the intentionally stale S2 report/current-head relationship before this report-only S3 commit.
+integration_risks:
+  - The approving critic outcome is not an advancing GitHub approval; S3 still requires successful exact-head validate, pull-request-policy, and compliance checks plus a commit-bound APPROVED review from a repository admin or maintainer other than PR author jvallery.
+  - No npm publication, GitHub release, dev integration, runtime deployment, or deployment verification is authorized by this lane or critic report.
+residual_risks:
+  - Repository-mode archive generation requires an intact Git index and reachable captured blob objects and fails closed if an object cannot be materialized.
+  - Explicit exported-tree manifest generation intentionally has no immutable Git objects and reads the supplied filesystem boundary; release archive staging remains repository/index mode.
+  - MANIFEST.sha256 is a line-oriented repository format. Current tracked paths are compatible; a future tracked path containing a line break would fail verification and require an explicit manifest-format decision outside issue 130.
+  - Any commit after S3 invalidates its exact-head checks and any later external approval.
+reviewed_at: "2026-07-10T04:40:18Z"

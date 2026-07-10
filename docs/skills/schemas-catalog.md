@@ -1,6 +1,6 @@
 # Schema Catalog
 
-The 46 canonical artifact schemas under [`../../schemas/`](../../schemas/). Every
+The 47 canonical artifact schemas under [`../../schemas/`](../../schemas/). Every
 durable `.agent-workflow` artifact declares a `schema_ref` equal to its schema
 filename and validates against JSON Schema draft 2020-12. Validate any artifact with:
 
@@ -80,14 +80,14 @@ owner **CLI/validator** are produced by `bin/verdify` or consumed cross-skill.
 | `wave-release-plan` | sprint-planning | planning → orchestrator/release | Branch/merge model, CI, environments, rollback. |
 | `lane-lease` | CLI/validator | `lane create`/`review` → worker/critic | Durable lane identity + worktree lease. |
 | `sprint-execution-runbook` | sprint-orchestrator | orchestrator → dispatch/recovery | Dispatch plan, cadence, session identities. |
-| `lane-closeout` | lane-delivery | worker → critic | Worker closeout evidence (`ready_for_critic`). |
-| `critic-report` | independent-critic | critic → orchestrator/release | Evidence-backed critic decision. |
+| `lane-closeout` | lane-delivery | worker → critic | Version-2 worker identity and validation evidence for implementation I, committed alone at E (`ready_for_critic`). |
+| `critic-report` | independent-critic | critic → orchestrator/release | Version-2 worker/critic backlinks, closeout digest, and evidence-backed decision committed alone at S. |
 
 ## Review, release & operations
 
 | Schema | Owner | Produced → consumed | Purpose |
 |---|---|---|---|
-| `review-inbox-packet` | release-verification | release → human reviewer | Aggregated review-ready evidence bundle. |
+| `review-inbox-packet` | release-verification | release → human reviewer | Per-lane approved S submissions, committed alone as P on the controller evidence branch. |
 | `observability-diagnostic-packet` | release-verification / platform-readiness | release → reviewer | Correlated telemetry + signal assessment. |
 | `release-verification` | release-verification | release → outcome | Integration + deployment verification record. |
 | `outcome-review` | release-verification | release → router | Human outcome acceptance, separate from merge. |
@@ -98,6 +98,7 @@ owner **CLI/validator** are produced by `bin/verdify` or consumed cross-skill.
 |---|---|---|---|
 | `compliance-assessment` | CLI/validator (compliance gate) | assessor → CI | Executable operating-contract compliance result. |
 | `evidence-manifest` | CLI/validator | packaging → audit | Hash manifest for an evidence bundle. |
+| `skill-pack` | CLI/validator | pack registry → host installer | Installable subsets of the flat skill registry. |
 
 See [`../authority-model.md`](../authority-model.md) for which artifact type owns
 which truth when sources disagree.

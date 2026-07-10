@@ -1,0 +1,197 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-delivery-controls
+lane_id: issue-121-delivery-controls
+pull_request: 196
+worker_agent: codex-delivery-controls-fix1
+worker_session_id: worker-121-delivery-controls-fix1-20260710t1050z
+critic_agent: codex-independent-critic-fix1
+implementation_head_sha: "6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a"
+evidence_head_sha: "4d9ffbc0658b81ab28bae38e0b1f43ca6c953b8b"
+reviewed_head_sha: "4d9ffbc0658b81ab28bae38e0b1f43ca6c953b8b"
+closeout_path: .agent-workflow/sprints/2026-07-10-delivery-controls/lanes/closeout/issue-121-delivery-controls.closeout.yaml
+closeout_sha256: "126be7d5eb4c1ef2b24364103125aad11033cba3ad28fbab82227567bc390e66"
+critic_session_id: critic-121-delivery-controls-fix1-20260710t1110z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-delivery-controls/critic-issue-121-delivery-controls-fix1
+outcome: approve_with_risks
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        bash tests/test_pr_policy.sh passed ordinary dev and exact same-repository
+        dev-to-main positives plus wrong base, non-dev head, fork, wrong
+        repository, malformed marker, unresolved placeholder, and candidate
+        identity negatives.
+      - >-
+        The live PR #189 bootstrap fixture at
+        1b571f4497ee7f8eb13c5c96edd5513206b084f1 passed route policy against
+        its real body, durable 1.3.0 marker, and checked-out candidate files.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        bash tests/test_delivery_gate.sh and ruby
+        tests/test_lane_review_validator.rb passed exact D/I/E/S, stale and
+        post-report head, shared worker/critic identity, non-approving outcome,
+        and invalid suffix fixtures.
+      - >-
+        Ordinary unowned paths retain dev required_approving_review_count 0 and
+        required critic-gate, whose protected-base validator binds the approving
+        report to the exact current head and independent identities.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        The review-history matrix rejected missing, stale, author, workflow/bot,
+        fork, and unresolved change-request cases and accepted only a current
+        allowed non-author owner approval.
+      - >-
+        Fresh live PR #189 evidence confirmed zero reviews fail the main gate and
+        a synthetic current-head jvallery User approval passes for jrvallery as
+        author; no GitHub review was submitted or changed.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - >-
+        actionlint passed delivery-gate.yml, policy.yml, and release-pr.yml; the
+        delivery workflow declares contents, pull-requests, and checks read only
+        and has no permission to create or mutate reviews.
+      - >-
+        Pull request, review, dev-push, and manual bootstrap fixtures preserve
+        distinct delivery-policy and critic-gate jobs and unique current release
+        PR discovery.
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - >-
+        bash tests/test_github_delivery_controls.sh passed pre-release and
+        steady-state dry-run, confirmation failure, apply, exact verify, second
+        apply no-op, immutable snapshot, and rollback fixtures.
+      - >-
+        Expanded GitHub restriction user, team, and app objects normalize to
+        stable login/slug payloads and rollback restored the original identities
+        while preserving admin, conversation, no-force, and no-delete settings.
+      - >-
+        A fresh read-only live pre-release dry-run reported dev unprotected and
+        both branches different from desired state; no apply or rollback request
+        was issued.
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - >-
+        GitHub reported no CODEOWNERS syntax errors at the candidate ref. The
+        exact patterns self-own CODEOWNERS and cover every workflow depth,
+        config, schemas, lib/verdify.rb plus lib/verdify/**, and the delivery,
+        GitHub-control, PR-policy, and repository-validator scripts with both
+        jvallery and jrvallery; ordinary lane paths remain unowned.
+      - >-
+        GitHub reports both owners have admin/write access. Official CODEOWNERS
+        semantics plus require_code_owner_reviews make a nested no-op
+        .github/workflows rewrite require one owner approval; stale dismissal
+        makes it current and pull request authors cannot self-approve.
+      - >-
+        Both phases declare dev count 0 and main count 1 with stale-dismissing
+        code-owner review, and restrict protected updates to jvallery and
+        jrvallery users with empty team and app lists.
+  - criterion_id: LANE-AC-07
+    assessment: satisfied
+    evidence:
+      - >-
+        CLI, lane-review, controller, release-verification, operating-contract,
+        ADR, and lifecycle checks preserve transport-neutral exact-head critic
+        status for ordinary dev lanes and real non-author owner approval for
+        protected control-plane changes and main release promotion.
+      - >-
+        North Star authority was not changed, and no protected planning artifact
+        was modified after dispatch.
+  - criterion_id: LANE-AC-08
+    assessment: satisfied
+    evidence:
+      - >-
+        Fresh make test passed at E2 with 28 skills, 48 schemas, 93 schema runs
+        and 541 assertions, 52 lane-review runs and 129 assertions, plus CLI,
+        route, delivery, branch-control, release, package, npm, and packed
+        artifact suites.
+      - >-
+        actionlint passed all three changed workflows and gitleaks scanned all
+        eight commits from baseline through E2, approximately 140.68 KB, with no
+        leaks.
+evidence_assessment:
+  - >-
+    The detached review worktree, local HEAD, remote lane ref, and live PR #196
+    head all matched E2 4d9ffbc0658b81ab28bae38e0b1f43ca6c953b8b before
+    report creation. Critic codex-independent-critic-fix1 /
+    critic-121-delivery-controls-fix1-20260710t1110z differs from worker
+    codex-delivery-controls-fix1 /
+    worker-121-delivery-controls-fix1-20260710t1050z.
+  - >-
+    D bd9e567d5b24688edc9de36da34063c7bc4408ee is the first child of baseline
+    91828dd4f0b632a2833a3d4f62cf4f92c1e35901 and adds only the approved sprint
+    plan, wave release plan, and lane contract. All three remain unchanged
+    through E2.
+  - >-
+    The linear history is D, initial implementation through I3
+    2699321ed31d2c378df6fadcaad953fee89131df, E1
+    4d566a0cfdb768f04face50301037f030a03b0bf, request-fixes S1
+    7f6b5f31ca471f0902a20488c1fee248f272a387, fix-forward I4
+    6a2617bd35a580b1fc3dd98f7c0e1fca0c9af69a, and closeout-only E2
+    4d9ffbc0658b81ab28bae38e0b1f43ca6c953b8b.
+  - >-
+    S1 FIND-001 established that candidate-defined required contexts were
+    forgeable on GitHub Free. I4 remediates it with selective stale-dismissing
+    code-owner review and owner-only update restrictions for every context-
+    producing or validating control-plane path while preserving the ordinary
+    exact-head critic path. The superseded request-fixes report remains durable
+    in Git history at S1.
+  - >-
+    Implementation paths are contract-owned except tests/test_packed_artifact.sh,
+    authorized by merged coordination PR #195. I4 changes only owned paths, E2
+    changes only the canonical closeout, and no prohibited path changed. The
+    independently computed contract and closeout SHA-256 values are
+    20b00ca7604106249eebddd7b9ecefbcd87c34b5d02d0451090d35af903fc06e and
+    126be7d5eb4c1ef2b24364103125aad11033cba3ad28fbab82227567bc390e66.
+  - >-
+    Live GitHub remained read only during criticism: dev is still unprotected,
+    main retains its prior three-check protection, PR #196 is draft with no
+    reviews, and PR #189 remains open, unreviewed, unmerged, and authored by
+    jrvallery at the current dev head.
+  - >-
+    No branch protection, repository setting, review, merge, main, npm, tag,
+    release, runtime, credential, PR #189, implementation, or closeout mutation
+    was performed.
+integration_risks:
+  - >-
+    PR #196 itself bootstraps the effective CODEOWNERS file while current dev is
+    unprotected and its base CODEOWNERS contains placeholders. Before integration
+    it still requires a real current-head approval from jrvallery, the allowed
+    non-author owner, plus the controller's recorded bootstrap exception; this
+    critic report is not that GitHub approval.
+  - >-
+    The report-only S2 commit must become the exact PR head and rerun validate,
+    pull-request-policy, compliance, delivery-policy, and critic-gate. Any later
+    commit invalidates the evidence chain and owner approval.
+  - >-
+    Declarative pre-release controls are not live. A separately authorized
+    controller must snapshot, apply, and verify both branches after reviewed dev
+    integration, then apply steady-state controls only after the 1.3.0 release.
+  - >-
+    PR #189 must remain unmerged until Jason supplies its separate real
+    current-head approval and release verification owns final promotion.
+residual_risks:
+  - >-
+    GitHub Free provides no immutable organization-required workflow here, so
+    future protected control-plane changes depend on the selective human
+    code-owner gate in addition to exact-head critic status.
+  - >-
+    A pre-release dev-push delivery-gate failure may need rerunning after the
+    real PR #189 approval because candidate-only pull_request_review discovery is
+    unavailable on the non-PR event path.
+  - >-
+    Snapshot rollback intentionally normalizes the modeled branch-protection
+    fields. Expanded restriction objects preserve their user/team/app identities,
+    but a controller should inspect future unmodeled GitHub protection fields
+    before apply or rollback.
+reviewed_at: "2026-07-10T11:10:00Z"

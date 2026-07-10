@@ -1,0 +1,21 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: predecessor-route-exception-2026-07-10-recovery-publication
+sprint_id: 2026-07-10-recovery-publication
+lane_id: null
+type: policy_exception
+status: approved
+question: "May issue #126 planning proceed after PR #166 was fresh-critic approved and admin-merged to dev, while the current router still requires an impossible post-merge non-author review submission?"
+owner: Jason Vallery
+evidence_required:
+  - "PR #166 merged to dev at 17b3762 after final critic approve head b2911c9 and exact-head checks."
+  - "GitHub App review returned 403 and the user explicitly authorized admin override of the author-approval restriction."
+  - "PR #166 admin-merge exception is committed at controller branch commit 0022972."
+  - "Issue #121 remains the backlog owner for approval transport and router policy-exception support."
+allowed_decisions: [proceed_to_126, wait_for_121, stop]
+decision: proceed_to_126
+rationale: "The predecessor implementation and independent review evidence are complete on dev. This exception bypasses only the stale review-inbox route for planning issue #126 and does not waive its own worker/critic/check evidence."
+opened_at: "2026-07-10T04:50:00Z"
+resolved_at: "2026-07-10T04:50:00Z"
+resume_state: READY

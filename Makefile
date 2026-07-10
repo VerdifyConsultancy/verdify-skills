@@ -1,15 +1,20 @@
-.PHONY: validate test links package verify-package manifest manifest-check
+.PHONY: validate test links package release-candidate verify-package manifest manifest-check
 
 validate:
 	ruby scripts/setup-agent-hosts.rb --check
 	ruby scripts/validate-repo.rb
 
 test: validate manifest-check
+	bash tests/test_package_file_set.sh
 	ruby tests/test_schema_validator.rb
 	bash tests/test_cli.sh
+	ruby tests/test_lane_review_validator.rb
 	bash tests/test_pr_policy.sh
+	bash tests/test_delivery_gate.sh
+	bash tests/test_github_delivery_controls.sh
 	bash tests/test_release_preflight.sh
-	bash tests/test_npm_install.sh
+	bash tests/test_release_transaction.sh
+	bash tests/test_packed_artifact.sh
 
 # Regenerate the committed integrity manifest (run after changing any tracked file). #109
 manifest:
@@ -30,6 +35,9 @@ links:
 
 package: test
 	bash scripts/package.sh
+
+release-candidate: test
+	bash scripts/build-release-candidate.sh
 
 verify-package:
 	bash scripts/verify-package.sh "$${ARCHIVE:?set ARCHIVE=/path/to/package.zip}"

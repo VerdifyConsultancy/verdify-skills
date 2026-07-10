@@ -1,0 +1,12 @@
+schema_ref: lane-map.schema.yaml
+kind: LaneMap
+schema_version: "1.0"
+sprint_id: 2026-07-10-release-safety
+lanes:
+  - lane_id: issue-120-release-safety
+    issue_ids: [120]
+    module_contracts: [release-package, quality-enablement]
+    contract_path: .agent-workflow/sprints/2026-07-10-release-safety/lanes/contracts/issue-120-release-safety.contract.yaml
+    parallel_group: 1
+dependency_order:
+  - [issue-120-release-safety]

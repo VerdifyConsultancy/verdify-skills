@@ -1,0 +1,16 @@
+# Jason iteration-25 final-lock instruction
+
+Date: 2026-07-09
+Source: direct human review and controller instruction from Jason Vallery
+
+Jason confirmed that approval means adopting every recommendation from the
+July 9 review as the planning default used to move forward. After the review
+feedback was synthesized, Jason directed the controller to codify the defaults,
+fix critical issue #72, then formally lock the North Star, update the interview
+packet, and ask any genuinely remaining questions.
+
+This instruction is the explicit final-lock decision for iteration 25. It is
+separate from the earlier July 9 review-feedback evidence, which correctly
+recorded that the ten answers alone did not yet constitute the final lock. The
+lock remains sequenced after #72 so the protected artifacts can be reviewed and
+integrated using the repaired exact-head evidence chain.

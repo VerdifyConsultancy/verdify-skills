@@ -1,0 +1,67 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: definition-architecture-strategy
+contract_version: "1.0"
+status: approved
+purpose: Convert locked North Star intent into an approved end-to-end definition, implementable architecture, black-box module contracts, and current execution strategy.
+requirement_ids: [FR-003, NFR-001, NFR-005, NFR-008]
+owned_paths:
+  - skills/project-definition/**
+  - skills/architecture-contracts/**
+  - skills/state-of-union/**
+  - schemas/project-definition.schema.yaml
+  - schemas/architecture.schema.yaml
+  - schemas/module-contract.schema.yaml
+  - schemas/state-of-union.schema.yaml
+  - schemas/github-backlog-sync.schema.yaml
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/modules/**
+  - .agent-workflow/strategy/**
+prohibited_paths: [.agent-workflow/northstar/**, .agent-workflow/sprints/**, lib/verdify/cli.rb]
+inputs:
+  - name: locked_northstar
+    schema: Approved North Star product, architecture, evidence, and signoff packet
+    producer: evidence-northstar
+  - name: repository_delivery_reality
+    schema: Source, tests, modules, issues, PRs, releases, deployments, and health evidence
+    producer: GitHub, Git, runtime owners, quality-enablement
+outputs:
+  - name: project_definition
+    schema: project-definition.schema.yaml
+    consumers: [architecture-contracts, state-of-union, project-router]
+  - name: architecture_contract_set
+    schema: architecture.schema.yaml and module-contract.schema.yaml
+    consumers: [state-of-union, planning-hygiene, lane workers]
+  - name: execution_strategy
+    schema: state-of-union.schema.yaml and github-backlog-sync.schema.yaml
+    consumers: [planning-hygiene, project-router]
+public_interfaces:
+  - name: approved definition and architecture
+    location: .agent-workflow/project/ and .agent-workflow/architecture/
+    compatibility: Protected authority changes require approved upstream intent and explicit supersession.
+  - name: module contracts
+    location: .agent-workflow/modules/contracts/
+    compatibility: Contract versions change when public interfaces, ownership, or invariants change.
+dependencies:
+  hard: [governance-routing, evidence-northstar]
+  soft: [quality-enablement]
+invariants:
+  - Definition and architecture may refine but never silently change locked product intent.
+  - Local module owned paths do not overlap and hard dependencies remain acyclic or explicitly controlled.
+  - Strategy reconciles live GitHub and runtime state rather than treating snapshots as authority.
+runtime_resources: [Read-only repository, GitHub, deployment, and diagnostic evidence; no implementation runtime ownership.]
+validation_commands:
+  - id: project-definition
+    command: bin/verdify artifact validate --file .agent-workflow/project/project-definition.yaml
+    purpose: Validate the approved definition.
+  - id: architecture
+    command: bin/verdify artifact validate --file .agent-workflow/architecture/architecture.yaml
+    purpose: Validate the approved architecture.
+required_evidence: [Approved upstream signoff, schema validation, cross-reference audit, interface-risk report, route transition]
+definition_of_done: [No blocking unknown, contracts are independently buildable, risks and gaps have owners, next strategy route is deterministic]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

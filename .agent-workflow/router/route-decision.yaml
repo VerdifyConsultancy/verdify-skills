@@ -2,21 +2,16 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-06-26T18:48:56Z'
+generated_at: '2026-07-10T05:59:56Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: NORTHSTAR_ARTIFACTS_INCOMPLETE
-next_skill: northstar-planning
-next_mode: artifact-loop
-reason: Product and architecture North Star artifacts must be cross-linked and signed
-  off before downstream lifecycle skills treat them as core planning authority.
+current_state: GATE_STATE_UNCOMMITTED
+next_skill: project-router
+next_mode: route
+reason: Durable gate state must be committed, present, and schema-valid before routing.
 evidence:
-- source: ".agent-workflow/intake/transcript-replan.yaml"
-  finding: transcript-replan status is "routed"
-- source: ".agent-workflow/northstar/evidence-registry.yaml"
-  finding: registered North Star evidence count is 38
-- source: ".agent-workflow/northstar/northstar-plan.yaml"
-  finding: northstar-plan status is "proposed"
-- source: ".agent-workflow/northstar/northstar-artifacts.yaml"
-  finding: northstar-artifacts status is "iterating"
+- source: ".agent-workflow"
+  finding: ".agent-workflow/sprints/2026-07-10-release-safety/gates/local-worktree-fallback.yaml:
+    gate is uncommitted; .agent-workflow/sprints/2026-07-10-release-safety/gates/plan-approval.yaml:
+    gate is uncommitted"
 missing_artifacts: []
 open_gates: []

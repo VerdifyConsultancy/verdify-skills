@@ -1,0 +1,103 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-package-file-set
+lane_id: issue-130-package-file-set
+status: ready_for_critic
+issue_ids: [130]
+pull_request: 166
+baseline_sha: "32038e3a0637192699af09ad60da48031b7575bc"
+implementation_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
+validated_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
+contract_hash: "73c399061ac423ab740458a08a7b7634e2e885096174aee2a210b96f66c66674"
+changed_paths:
+  - MANIFEST.sha256
+  - Makefile
+  - docs/vendoring-standard.md
+  - scripts/gen-manifest.sh
+  - scripts/package-file-list.rb
+  - scripts/package.sh
+  - tests/test_package_file_set.sh
+  - .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
+validation_results:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
+  - id: package-file-set-regression
+    command: bash tests/test_package_file_set.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
+  - id: github-checks
+    command: gh pr checks 166 --repo VerdifyConsultancy/verdify-skills --watch --interval 10 --fail-fast
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/166/checks"
+  - id: closeout-validation
+    command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - scripts/package-file-list.rb
+      - scripts/gen-manifest.sh
+      - scripts/package.sh
+      - package-file-set-regression
+      - "Git-index blob OIDs are the only repository-mode byte and symlink-target source"
+      - "manifest hashing and archive generation consume selector-staged snapshots"
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - tests/test_package_file_set.sh
+      - package-file-set-regression
+      - "isolated ignored .claude/scheduled_tasks.lock fixture"
+      - "byte-identical before/after selector and manifest outputs"
+      - "dirty tracked regular bytes excluded from direct stage, manifest, and archive"
+      - "indexed regular leaf restored from Git despite local symlink replacement"
+      - "indexed directory and descendant restored from Git despite external symlink ancestor"
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - "tracked .agents/skills/project-router symlink identity assertion"
+      - "tracked discovery-link target restored from its indexed blob despite local target drift"
+      - "exact archive entry-list comparison"
+      - "Git index 100644 and 100755 mode normalization in direct stage and extracted archive"
+      - package-file-set-regression
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids:
+      - repository-validation
+      - full-suite
+      - github-checks
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069115428/job/86286805765"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069115478/job/86286806530"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069163091/job/86286946563"
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "A fresh critic agent and session must re-review this fix-forward closeout-only evidence head from another worktree before integration."
+  - "A repository admin or maintainer other than the PR author must submit an APPROVED review bound to the final critic-report head."
+  - "Release archive generation requires an intact Git index and reachable indexed blobs; exported-tree manifest generation remains available without Git metadata."
+worktree_clean: true
+worker_agent: codex-subagent-fix2
+worker_session_id: local-issue-130-fix2
+completed_at: "2026-07-10T04:29:43Z"
+limitations:
+  - "The first post-baseline commit b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the immutable dispatch-only commit containing the approved sprint plan, wave release plan, and lane contract."
+  - "The prior critic report at c9fbc8d2a337d931b0fe04ffbdf6034221e6f9e6 requested fixes; it remains unchanged as durable review history."
+  - "Fix-forward implementation head 5902e947cad5bd220c072d0593e490dd6baf9bbc is the last substantive commit; this closeout must be the only path added afterward."
+  - "No pull request review, merge, release publication, runtime deployment, or deployment verification was performed by this worker."

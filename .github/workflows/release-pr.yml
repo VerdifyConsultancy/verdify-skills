@@ -18,9 +18,23 @@ jobs:
   release-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+
+      # actions/setup-node v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+
+      - name: Use reviewed npm
+        run: npm install --global npm@11.4.2
 
       - name: Open or update release PR
         env:
@@ -29,33 +43,88 @@ jobs:
         run: |
           set -euo pipefail
 
+          PREFLIGHT="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --repository "${GITHUB_REPOSITORY}" --json)"
+          DECISION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).fetch("decision")' "${PREFLIGHT}")"
+          if [ "${DECISION}" = "skip" ]; then
+            echo "${PREFLIGHT}"
+            exit 0
+          fi
+          if [ "${DECISION}" != "create" ]; then
+            echo "release PR preflight did not authorize mutation: ${PREFLIGHT}" >&2
+            exit 1
+          fi
+
           if [ -z "${GH_TOKEN}" ]; then
             echo "::warning::VERDIFY_RELEASE_PR_TOKEN is not configured; skipping automatic release PR creation."
             exit 0
           fi
 
+          AUTHOR="$(gh api user --jq .login)"
+          if [ "${AUTHOR}" != "jrvallery" ]; then
+            echo "release PR token must authenticate as jrvallery, got ${AUTHOR}" >&2
+            exit 1
+          fi
+
           VERSION="$(cat VERSION)"
           TITLE="Release @verdify-cli/cli@${VERSION}"
-          ISSUE="$(
-            gh issue list \
-              --state open \
-              --limit 100 \
-              --json number,title \
-              --jq ".[] | select(.title == \"${TITLE}\") | .number" \
-              | head -n 1 || true
-          )"
+          IDENTITY="@verdify-cli/cli@${VERSION}"
+          MARKER="<!-- verdify-release-candidate:${IDENTITY} -->"
+          CANDIDATE_STATE="$(mktemp)"
+          ISSUES_PAGES="$(mktemp)"
+          PULLS_PAGES="$(mktemp)"
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/issues?state=all&per_page=100" > "${ISSUES_PAGES}"
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/pulls?state=all&per_page=100" > "${PULLS_PAGES}"
+          ruby -rjson -e '
+            issues_pages, pulls_pages, output = ARGV
+            issues = JSON.parse(File.read(issues_pages)).flatten.reject { |issue| issue.key?("pull_request") }.map do |issue|
+              {"number"=>issue.fetch("number"), "state"=>issue.fetch("state"), "body"=>issue["body"]}
+            end
+            pulls = JSON.parse(File.read(pulls_pages)).flatten.map do |pull|
+              {
+                "number"=>pull.fetch("number"), "state"=>pull.fetch("state"), "merged_at"=>pull["merged_at"],
+                "body"=>pull["body"],
+                "base"=>pull.dig("base", "ref"), "base_repo"=>pull.dig("base", "repo", "full_name"),
+                "head"=>pull.dig("head", "ref"), "head_repo"=>pull.dig("head", "repo", "full_name")
+              }
+            end
+            File.write(output, JSON.generate({"issues"=>issues, "pull_requests"=>pulls}) + "\n")
+          ' "${ISSUES_PAGES}" "${PULLS_PAGES}" "${CANDIDATE_STATE}"
 
-          if [ -z "${ISSUE}" ]; then
-            ISSUE="$(
-              gh issue create \
-                --title "${TITLE}" \
-                --body "Tracks the release candidate promoted from dev to main for @verdify-cli/cli@${VERSION}."
-            )"
-            ISSUE="${ISSUE##*/}"
+          RECONCILIATION="$(ruby scripts/release-preflight.rb --release-pr-base origin/main --candidate-state "${CANDIDATE_STATE}" --repository "${GITHUB_REPOSITORY}" --json)"
+          RECONCILE_DECISION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).fetch("decision")' "${RECONCILIATION}")"
+          if [ "${RECONCILE_DECISION}" = "skip" ]; then
+            echo "${RECONCILIATION}"
+            exit 0
           fi
+          if [ "${RECONCILE_DECISION}" != "create" ]; then
+            echo "release candidate reconciliation did not authorize mutation: ${RECONCILIATION}" >&2
+            exit 1
+          fi
+
+          ISSUE_ACTION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).dig("candidate", "issue_action")' "${RECONCILIATION}")"
+          ISSUE="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).dig("candidate", "issue_number")' "${RECONCILIATION}")"
+          case "${ISSUE_ACTION}" in
+            create)
+              ISSUE="$(gh issue create --title "${TITLE}" --body "${MARKER}
+
+          Tracks the release candidate promoted from dev to main for ${IDENTITY}.")"
+              ISSUE="${ISSUE##*/}"
+              ;;
+            reopen)
+              gh issue reopen "${ISSUE}"
+              ;;
+            reuse)
+              ;;
+            *)
+              echo "unsupported release issue action: ${ISSUE_ACTION}" >&2
+              exit 1
+              ;;
+          esac
 
           BODY="$(mktemp)"
           cat > "${BODY}" <<EOF
+          ${MARKER}
+
           ## Backlog issue
 
           Closes #${ISSUE}
@@ -78,6 +147,8 @@ jobs:
           - \`validate\`
           - \`pull-request-policy\`
           - \`compliance / compliance\`
+          - \`delivery-policy\`
+          - \`critic-gate\`
 
           Current head SHA: \`${HEAD_SHA}\`
 
@@ -88,17 +159,21 @@ jobs:
           - Runtime deployment is not performed by this package release.
           EOF
 
-          PR="$(
-            gh pr list \
-              --base main \
-              --head dev \
-              --state open \
-              --json number \
-              --jq '.[0].number // empty'
-          )"
-
-          if [ -n "${PR}" ]; then
-            gh pr edit "${PR}" --title "${TITLE}" --body-file "${BODY}"
-          else
-            gh pr create --base main --head dev --title "${TITLE}" --body-file "${BODY}"
-          fi
+          PR_ACTION="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).dig("candidate", "pull_request_action")' "${RECONCILIATION}")"
+          PR="$(ruby -rjson -e 'puts JSON.parse(ARGV.fetch(0)).dig("candidate", "pull_request_number")' "${RECONCILIATION}")"
+          case "${PR_ACTION}" in
+            create)
+              gh pr create --base main --head dev --title "${TITLE}" --body-file "${BODY}"
+              ;;
+            reopen)
+              gh pr reopen "${PR}"
+              gh pr edit "${PR}" --title "${TITLE}" --body-file "${BODY}"
+              ;;
+            reuse)
+              gh pr edit "${PR}" --title "${TITLE}" --body-file "${BODY}"
+              ;;
+            *)
+              echo "unsupported release pull request action: ${PR_ACTION}" >&2
+              exit 1
+              ;;
+          esac

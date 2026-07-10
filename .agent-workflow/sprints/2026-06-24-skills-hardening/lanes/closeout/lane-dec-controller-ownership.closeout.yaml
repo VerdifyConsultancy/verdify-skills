@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-dec-controller-ownership
 status: ready_for_critic
@@ -9,7 +9,8 @@ issue_ids:
   - 23
 pull_request: 42
 baseline_sha: "fa8fb8a5a32ffabef8f2e62bcbaa653740041f2e"
-head_sha: "81590aa60e412faa2143af6f2348f28b8c644ebd"
+implementation_head_sha: "81590aa60e412faa2143af6f2348f28b8c644ebd"
+validated_head_sha: "81590aa60e412faa2143af6f2348f28b8c644ebd"
 contract_hash: "a21049f95b960bb302cc7340f8e6519c533e073e5e2ad7cf972ec850fb0e1838"
 changed_paths:
   - "docs/decisions/ADR-0012-controller-loop-vs-orchestrator-ownership.md"
@@ -79,6 +80,7 @@ residual_risks:
   - "Fresh independent critic approval is still required before integration."
   - "Downstream skill, router, workflow, template, and example edits must conform to ADR-0012 in later implementation lanes."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-controller"
 completed_at: "2026-06-24T16:56:48Z"
 limitations:

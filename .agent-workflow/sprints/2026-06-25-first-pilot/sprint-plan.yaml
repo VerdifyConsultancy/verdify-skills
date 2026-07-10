@@ -2,7 +2,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: "1.0"
 sprint_id: 2026-06-25-first-pilot
-status: active
+status: complete
 goal: Prove the core loop end-to-end on one real change by delivering the PR-policy lightweight path.
 baseline_sha: "74833e7986dda464e32b8eab46db40d21c40a425"
 github:

@@ -6,7 +6,7 @@ status: active
 goal: Deliver and verify an auditable service health endpoint.
 baseline_sha: "1111111111111111111111111111111111111111"
 github:
-  repository: example/example-service
+  repository: example/minimal-project
   milestone: Sprint 2026-06-22-a
   project: Verdify delivery
 issue_ids: [123]
@@ -31,7 +31,7 @@ lanes:
     contract_path: .agent-workflow/sprints/2026-06-22-a/lanes/contracts/issue-123-api.contract.yaml
     branch: lane/123-health-api
     owner: api-worker
-    reviewer: critic
+    reviewer: example-critic
     summary: Implement the health endpoint and prove runtime revision identity.
 dependency_order:
   - [issue-123-api]
@@ -44,13 +44,15 @@ review_plan:
       name: Lane validation and critic review
       due: "before review inbox assembly"
       evidence_expected:
-        - API contract tests pass on the lane head.
-        - Independent critic approves the reviewed head SHA.
+        - API contract tests pass on implementation head I.
+        - Evidence head E adds only the canonical worker closeout.
+        - A different critic agent and session commits only the critic report at S.
+        - A repository admin or maintainer other than the PR author submits the latest effective APPROVED review on S.
   human_review_milestones:
     - id: HR-01
       name: Review health endpoint packet
       owner: human-reviewer
-      trigger: Review inbox packet is complete with preview URL, checks, telemetry, and rollback evidence.
+      trigger: The evidence-only controller branch contains an atomic packet commit P with each lane's approved S head, checks, telemetry, and rollback evidence.
       review_packet_path: .agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml
   user_stories_for_review:
     - id: US-01
@@ -67,7 +69,7 @@ review_plan:
       - lane_id: issue-123-api
         owner: api-worker
         responsibility: API implementation, tests, and lane evidence.
-    next_review: Human review begins after the review inbox packet is complete.
+    next_review: Merge PR #123 individually after packet P is complete; verify the integrated runtime separately.
 approval:
   status: approved
   approver: delivery-owner

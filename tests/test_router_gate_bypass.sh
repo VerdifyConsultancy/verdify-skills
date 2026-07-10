@@ -68,6 +68,8 @@ ruby -ryaml -rtime -e '
   }
   File.write(path, YAML.dump(gate))
 ' "$REPO/.agent-workflow/gates/project-definition.yaml"
+git -C "$REPO" add .agent-workflow/gates/project-definition.yaml
+git -C "$REPO" commit -qm "approve project definition gate"
 
 "$ROOT/bin/verdify" route --repo "$REPO" --json > "$TMP/gate-approved-route.json"
 ruby -rjson -e '

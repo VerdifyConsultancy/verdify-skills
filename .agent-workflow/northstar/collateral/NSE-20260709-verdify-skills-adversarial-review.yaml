@@ -1,0 +1,35 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: "1.0"
+id: NSE-20260709-verdify-skills-adversarial-review
+reference: northstar://evidence/NSE-20260709-verdify-skills-adversarial-review
+title: Verdify Skills adversarial review 2026-07-09
+evidence_type: adversarial_review
+evidence_status: verified
+ingested_at: "2026-07-09T18:35:29Z"
+source:
+  uri: null
+  original_path: /Users/jason/repos/VERDIFY_SKILLS_ADVERSARIAL_REVIEW_2026-07-09.md
+  copied_path: .agent-workflow/northstar/collateral/sources/NSE-20260709-verdify-skills-adversarial-review-verdify-skills-adversarial-review-2026-07-09-md
+  sha256: 1b46e0c68feb7288b7230abb13e826418fbcbb42eb2b330c253d265708ba6701
+summary: Redacted public planning summary of the July 9 adversarial review; installer reproduction detail remains restricted to private advisory GHSA-4452-3c6p-3q26.
+tags:
+  - adversarial-review
+  - governance
+  - gravity
+  - orbit
+  - package
+  - platform
+  - redacted-public-summary
+  - skills
+claims:
+  - Package publication and installation require one trusted exact-artifact transaction with atomic promotion, rollback, provenance, and consumer verification.
+  - Lifecycle transition, critic, route, evidence, and executable-evaluation invariants require stronger merge-blocking validation.
+  - Cross-project integration requires explicit ownership, versioned capabilities, current-state evidence, and owning-repository issues.
+  - Deprecated or duplicate capability should be removed after coordinated consumer convergence rather than retained through indefinite compatibility shims.
+planning_relevance:
+  - Supports the trusted publication, minimal skill graph, four-pilot contract, governed connector, current Gravity, and lifecycle-coherence requirements in iteration 25.
+limitations:
+  - This public evidence item intentionally omits reproduction commands, proof-of-concept material, vulnerable code-path detail, and raw private evidence.
+  - Security remediation and disclosure authority remain in unpublished private advisory GHSA-4452-3c6p-3q26.

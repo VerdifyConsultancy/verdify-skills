@@ -1,0 +1,53 @@
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: "1.0"
+sprint_id: 2026-07-09-issue-72-exact-head
+status: verified
+integrated_sha: "c90801f97646238a3d7b3bfb064c799038d40c68"
+release:
+  tag: null
+  url: null
+artifact_identity:
+  - type: git_commit
+    identifier: "dev@c90801f97646238a3d7b3bfb064c799038d40c68"
+  - type: github_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#123 at lane head 71e3f6eee0c5fb58f118536ce9b43ebcc1cfe1a5"
+integration_results:
+  - name: validate at integrated revision
+    result: passed
+    evidence: "GitHub push run 29057089023 passed at c90801f97646238a3d7b3bfb064c799038d40c68: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29057089023"
+  - name: compliance self-test at integrated revision
+    result: passed
+    evidence: "GitHub push run 29057089106 passed at c90801f97646238a3d7b3bfb064c799038d40c68: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29057089106"
+deployment:
+  environment: github-actions-ci/dev (package policy and CLI integration; no runtime service)
+  deployment_id: 29057089023
+  deployed_at: "2026-07-09T23:20:12Z"
+  observed_revision: "c90801f97646238a3d7b3bfb064c799038d40c68"
+  deployer: jvallery
+  approval:
+    required: true
+    approved_by: "Jason Vallery (manual merge of PR #123)"
+    approved_at: "2026-07-09T23:20:09Z"
+    evidence: "https://github.com/VerdifyConsultancy/verdify-skills/pull/123"
+runtime_checks:
+  - name: repository validation workflow
+    result: passed
+    observed_at: "2026-07-09T23:20:51Z"
+    evidence: "Validate push run 29057089023 completed successfully at the integrated SHA."
+  - name: compliance policy workflow
+    result: passed
+    observed_at: "2026-07-09T23:20:24Z"
+    evidence: "Compliance self-test push run 29057089106 completed successfully at the integrated SHA."
+migrations:
+  - name: none
+    result: not_applicable
+    evidence: "The lane changed package policy, schemas, validators, tests, and documentation; no runtime data migration exists."
+rollback:
+  ready: true
+  known_good_revision: "719f87c6f3c6554c13ab46757e78587a14ffacdb"
+  procedure: "Revert merge commit c90801f97646238a3d7b3bfb064c799038d40c68 on dev and rerun the repository validation workflows."
+incidents:
+  - "PR #123 merged without a commit-bound independent GitHub approval review; the exception is preserved as residual risk in issue #135."
+verified_at: "2026-07-10T02:22:18Z"
+verifier: "Codex root lifecycle recovery session for issue #135"

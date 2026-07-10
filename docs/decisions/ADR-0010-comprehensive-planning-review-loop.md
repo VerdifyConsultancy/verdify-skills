@@ -40,8 +40,8 @@ explicitly comprehensive:
 - `sprint-planning` records included and deferred work, lane owners/reviewers,
   QA milestones, human review milestones, user stories for review, lane
   contracts, and wave release plan in one approval transaction.
-- The router requires a complete approving review inbox packet before routing
-  critic-approved lanes to integration.
+- The router requires valid D/I/E/S chains, external admin/maintainer approval on
+  every S, and a complete packet-only P before routing lane PRs to integration.
 
 ## Consequences
 
@@ -52,5 +52,5 @@ explicitly comprehensive:
   footnotes.
 - Sprint plans now answer "what's in, what's deferred, who owns what, when is
   QA/human review, and what user stories are reviewable" from canonical YAML.
-- Integration waits for review packet evidence, reinforcing that critic approval
-  and review readiness are related but separate gates.
+- Integration waits for external S approvals and packet P, reinforcing that a
+  critic outcome, review submission, and packet readiness are separate gates.

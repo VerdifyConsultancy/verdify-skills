@@ -1,0 +1,120 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-09-northstar-review-feedback
+status: approved
+scope:
+  sprint_id: 2026-07-09-northstar-review-feedback
+  issue_ids: [119]
+  lane_ids: [issue-119-northstar-review-feedback]
+  northstar_ids: [NSG-001, NSG-002]
+  summary: Validate and integrate the approved iteration-25 North Star lock into the Verdify Skills development branch.
+  non_goals:
+    - Publish npm, promote dev to main, deploy a runtime, or implement downstream recommendations.
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: main
+  merge_queue_required: false
+  concurrency_group: verdify-skills-northstar-lock-119
+  decision_notes: "PR #122 is reconstructed as one issue/lane branch from post-#72 dev; main receives only a separate generated release PR."
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks:
+    - validate
+    - pull-request-policy
+    - compliance / compliance
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 30
+      evidence_expected:
+        - Repository validation, schema tests, North Star artifact validation, and package tests pass.
+    - name: pull-request-policy
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected:
+        - Protected-base policy validates D, I, E, S, PR metadata, and current-head evidence.
+    - name: compliance-selftest
+      required: true
+      event_triggers: [pull_request]
+      timeout_minutes: 15
+      evidence_expected:
+        - Compliance self-test passes on the exact candidate head.
+  artifacts:
+    - Locked iteration-25 North Star artifacts and v2 lane evidence.
+  required_events: [pull_request]
+environments:
+  - name: not-applicable
+    environment_type: none
+    required: false
+    namespace: null
+    url: null
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: none
+    protection_rules: []
+    expected_revision_source: GitHub lane PR head SHA
+gitops:
+  controller: none
+  desired_state_refs: []
+  sync_order: []
+  reconciliation_checks: []
+  remediation_policy: Protected planning changes do not mutate a runtime environment.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps: []
+observability:
+  dashboards: []
+  logs: []
+  metrics: []
+  traces: []
+  runtime_checks:
+    - North Star artifact, route, package, and exact-head policy validation run in isolated temporary repositories.
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the dev merge before any downstream project treats the locked artifacts as authority.
+  known_good_ref: "c90801f97646238a3d7b3bfb064c799038d40c68"
+  procedure: "Revert the issue #119 merge on dev, restore review_requested iteration 25, and rerun all required gates."
+  validation_steps:
+    - Confirm reverted dev passes validate, pull-request-policy, and compliance checks.
+    - Confirm the router no longer treats iteration 25 as approved downstream authority.
+release_health:
+  stabilization_window: null
+  signals:
+    - name: protected planning gate
+      source: GitHub required checks and exact-head review evidence
+      threshold: All configured checks succeed and an independent admin or maintainer approves the critic-report head.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-09-northstar-review-feedback/review/review-inbox-packet.yaml
+  human_test_steps:
+    - Confirm every approved default is present in product, architecture, and structured traceability.
+    - Confirm Jason's lock is recorded separately from the earlier review-feedback evidence.
+    - Confirm the interview has no P0 question and retains owner-routed nonblocking research.
+    - Confirm the PR head equals the critic-report commit and has an independent commit-bound approval.
+  approval_gate: James or another independent admin or maintainer approves the exact final lane head before integration into dev.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: Inconsistent protected planning state could advance downstream work under a partially locked North Star.
+    mitigation: Require atomic artifact changes, full validation, fresh criticism, and exact-head approval before merge.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T23:20:09Z"
+prepared_at: "2026-07-09T23:23:12Z"
+planner: root

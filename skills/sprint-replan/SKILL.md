@@ -4,7 +4,7 @@ description: Replans an existing or proposed Verdify sprint into a standard Mark
 compatibility: Requires GitHub issue context, current lifecycle artifacts when present, and repository read access. Writes only a sprint-replan Markdown handoff unless separately assigned sprint-planning authority.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Sprint Replan

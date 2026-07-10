@@ -1,0 +1,226 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-10-recovery-publication
+lane_id: issue-126-recovery-publication
+status: ready_for_critic
+issue_ids: [126]
+pull_request: 173
+baseline_sha: "17b3762f024186a336556f60c27268006a8d59b6"
+implementation_head_sha: "b13f17baa4787ef377377babb4b2e959007c383f"
+validated_head_sha: "b13f17baa4787ef377377babb4b2e959007c383f"
+contract_hash: "0d285707210535d1dc93815aa16e1c7842a193c388f60b4e4ad08a6f1c512bba"
+changed_paths:
+  - .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md
+  - .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-audit-closeout.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260624-agentic-loop-sdlc-best-practices.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260625-recommended-event-driven-sdlc-control-plane.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260625-walk-transcript-delivery-loop-topology.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260627-timeline-historian-claims-provenance-and.yaml
+  - .agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-audit-closeout-pasted-text-1-txt
+  - .agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-sdlc-best-practices-pasted-text-1-txt
+  - .agent-workflow/northstar/collateral/sources/NSE-20260625-recommended-event-driven-sdlc-control-plane-recommended-model-critique-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260625-walk-transcript-delivery-loop-topology-walk-transcript-loop-topology-md
+  - .agent-workflow/northstar/collateral/sources/NSE-20260627-timeline-historian-claims-provenance-and-2026-06-27-timeline-historian-claims-provenance
+  - .agent-workflow/northstar/evidence-registry.yaml
+  - .agent-workflow/northstar/research-inbox/2026-06-27-timeline-historian-claims-provenance-brave-research.md
+  - .agent-workflow/sprints/2026-07-10-recovery-publication/lanes/closeout/issue-126-recovery-publication.closeout.yaml
+  - .agents/skills/crm-email
+  - .agents/skills/timeline-historian
+  - .claude/skills/crm-email
+  - .claude/skills/timeline-historian
+  - MANIFEST.sha256
+  - README.md
+  - docs/architecture.md
+  - docs/lifecycle.md
+  - docs/recovery-ledger-2026-07-10.md
+  - docs/skill-packs.md
+  - docs/skills/README.md
+  - docs/skills/per-skill/crm-email.md
+  - docs/skills/per-skill/timeline-historian.md
+  - docs/skills/schemas-catalog.md
+  - evaluations/crm-email/evals.json
+  - evaluations/timeline-historian/evals.json
+  - lib/verdify/cli.rb
+  - npm/bin/verdify.js
+  - package.json
+  - packs/crm-email/pack.yaml
+  - packs/fleet-operations/pack.yaml
+  - packs/governance-review/pack.yaml
+  - packs/northstar-strategy/pack.yaml
+  - packs/research-analysis/pack.yaml
+  - packs/sdlc-core/pack.yaml
+  - schemas/skill-pack.schema.yaml
+  - scripts/setup-agent-hosts.rb
+  - scripts/validate-repo.rb
+  - skills/crm-email/SKILL.md
+  - skills/crm-email/agents/openai.yaml
+  - skills/crm-email/references/crm-api.md
+  - skills/crm-email/references/email-workflow.md
+  - skills/crm-email/scripts/crm_request.rb
+  - skills/timeline-historian/SKILL.md
+  - skills/timeline-historian/agents/openai.yaml
+  - skills/timeline-historian/assets/asset-ledger.template.yaml
+  - skills/timeline-historian/assets/claim-ledger.template.yaml
+  - skills/timeline-historian/assets/claim-treatment-ledger.template.yaml
+  - skills/timeline-historian/assets/narrative-review.template.yaml
+  - skills/timeline-historian/assets/search-ledger.template.yaml
+  - skills/timeline-historian/assets/window-summary.template.yaml
+  - skills/timeline-historian/references/asset-traceability.md
+  - skills/timeline-historian/references/search-and-ocr.md
+  - skills/timeline-historian/references/shepard-claims.md
+  - skills/timeline-historian/references/sunshine-vault.md
+  - skills/timeline-historian/references/windowing-strategy.md
+  - skills/timeline-historian/scripts/plan_windows.py
+  - skills/timeline-historian/scripts/sunshine_manifest_seed.py
+  - skills/timeline-historian/scripts/validate_timeline_bundle.py
+  - tests/test_cli.sh
+  - tests/test_npm_install.sh
+validation_results:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:24:05Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/b13f17baa4787ef377377babb4b2e959007c383f"
+  - id: pack-cli-list
+    command: bin/verdify pack list --json
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:24:05Z"
+    artifact: "Six schema-valid packs: crm-email, fleet-operations, governance-review, northstar-strategy, research-analysis, sdlc-core"
+  - id: cli-lifecycle-suite
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:24:05Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/b13f17baa4787ef377377babb4b2e959007c383f"
+  - id: installed-package-suite
+    command: bash tests/test_npm_install.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:24:05Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/b13f17baa4787ef377377babb4b2e959007c383f"
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:24:24Z"
+    artifact: "90 runs, 533 assertions, 439 manifest entries, package exact-set passed"
+  - id: changed-path-secret-scan
+    command: 'gitleaks git --no-banner --redact --log-opts="17b3762f024186a336556f60c27268006a8d59b6..HEAD"'
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:12Z"
+    artifact: "Two commits and approximately 265 KB scanned; no leaks found"
+  - id: historian-skill-validation
+    command: python3 /Users/jason/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/timeline-historian
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:33Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/tree/b13f17baa4787ef377377babb4b2e959007c383f/skills/timeline-historian"
+  - id: crm-skill-validation
+    command: python3 /Users/jason/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/crm-email
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:33Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/tree/b13f17baa4787ef377377babb4b2e959007c383f/skills/crm-email"
+  - id: evidence-registry-and-source-hashes
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/evidence-registry.yaml && verify five copied-source SHA-256 values
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:33Z"
+    artifact: docs/recovery-ledger-2026-07-10.md
+  - id: synthetic-timeline-bundle
+    command: python3 skills/timeline-historian/scripts/sunshine_manifest_seed.py --manifest /tmp/issue-126-sunshine-manifest.jsonl --decade 1960s --category meeting-minutes --limit 25 --output /tmp/issue-126-timeline-bundle && python3 skills/timeline-historian/scripts/validate_timeline_bundle.py /tmp/issue-126-timeline-bundle
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:20:45Z"
+    artifact: "Two assets, one search, two claims, two treatments, valid=true"
+  - id: package-archive-verification
+    command: VERDIFY_PACKAGE_SKIP_TESTS=1 bash scripts/package.sh /tmp/issue-126-I-package && bash scripts/verify-package.sh /tmp/issue-126-I-package/verdify-lifecycle-skills-v1.2.1.zip
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:33Z"
+    artifact: "Archive SHA-256 7ad420eba99b1e34b44f117984f6407b1806017a5769ee7c8aff440b031ee211"
+  - id: package-invariant-audit
+    command: git diff --exit-code 17b3762f024186a336556f60c27268006a8d59b6..HEAD -- VERSION scripts/package-file-list.rb scripts/package.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:48Z"
+    artifact: "VERSION/package identity 1.2.1; archive root and immutable Git-index stager unchanged"
+  - id: dispatch-and-scope-audit
+    command: verify D-only first post-baseline commit, immutable dispatch artifacts, owned paths, and empty prohibited/coordination-required diff
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:25:48Z"
+    artifact: docs/recovery-ledger-2026-07-10.md
+  - id: github-checks
+    command: gh pr checks 173 --repo VerdifyConsultancy/verdify-skills --watch --interval 10 --fail-fast
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:27:20Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/173/checks"
+  - id: closeout-validation
+    command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-recovery-publication/lanes/closeout/issue-126-recovery-publication.closeout.yaml
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-10T05:27:53Z"
+    artifact: .agent-workflow/sprints/2026-07-10-recovery-publication/lanes/closeout/issue-126-recovery-publication.closeout.yaml
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids:
+      - historian-skill-validation
+      - synthetic-timeline-bundle
+      - "Sunshine source unavailable: /Volumes/sunshine/decades/_manifest/decade-export-manifest.jsonl was not mounted"
+      - evidence-registry-and-source-hashes
+      - skills/timeline-historian/**
+      - evaluations/timeline-historian/evals.json
+      - .agents/skills/timeline-historian
+      - .claude/skills/timeline-historian
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids:
+      - evidence-registry-and-source-hashes
+      - dispatch-and-scope-audit
+      - .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md
+      - docs/recovery-ledger-2026-07-10.md
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids:
+      - pack-cli-list
+      - cli-lifecycle-suite
+      - installed-package-suite
+      - crm-skill-validation
+      - package-archive-verification
+      - package-invariant-audit
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids:
+      - docs/recovery-ledger-2026-07-10.md
+      - dispatch-and-scope-audit
+      - "https://github.com/VerdifyConsultancy/verdify-skills/issues/126"
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids:
+      - repository-validation
+      - full-suite
+      - changed-path-secret-scan
+      - package-archive-verification
+      - github-checks
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - "The real Sunshine manifest was unavailable because /Volumes/sunshine is not mounted; deterministic helper and synthetic read-only bundle checks passed instead."
+  - "One hash-bound historical copied source retains its original trailing spaces so its registered SHA-256 remains exact."
+  - "The three rescue refs and shared Agent Platform checkout remain retained until a later new-version main release and final cleanup audit."
+  - "The dev branch advanced after dispatch with controller/planning commits; the controller must reconcile that integration state without rewriting the immutable D-I-E chain."
+  - "A fresh critic agent/session and a distinct admin or maintainer GitHub approval are still required before integration."
+worktree_clean: true
+worker_agent: codex
+worker_session_id: worker-126-recovery-20260710t0505z
+completed_at: "2026-07-10T05:27:53Z"
+limitations:
+  - "The first post-baseline commit b4ea69b1aa9d3142057239123f13d9178ca4c2ec is the immutable dispatch-only commit containing the approved sprint plan, wave release plan, and lane contract."
+  - "Implementation head b13f17baa4787ef377377babb4b2e959007c383f is the last substantive and validated commit; this closeout is the only path permitted afterward at evidence head E."
+  - "No live CRM/email write, shared-runner mutation, destructive cleanup, release publication, main promotion, pull-request review, merge, or deployment was performed by this worker."

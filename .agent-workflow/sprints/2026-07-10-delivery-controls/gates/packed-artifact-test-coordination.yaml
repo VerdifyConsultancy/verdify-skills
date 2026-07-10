@@ -1,0 +1,22 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: packed-artifact-test-coordination-2026-07-10-delivery-controls
+sprint_id: 2026-07-10-delivery-controls
+lane_id: issue-121-delivery-controls
+type: scope_change
+status: approved
+question: "May the issue #121 worker update tests/test_packed_artifact.sh so its version-only skill-body invariant permits only the three lifecycle skills already owned by the approved contract?"
+owner: Jason Vallery
+evidence_required:
+  - The approved lane contract owns delivery-control behavior changes in skills/controller-merge/SKILL.md, skills/independent-critic/SKILL.md, and skills/release-verification/SKILL.md.
+  - Exact implementation I a129266 reaches tests/test_packed_artifact.sh only after all preceding full-suite stages pass.
+  - The failing invariant predates issue #121 and assumes every skill differs from the published baseline only by metadata.version.
+  - The coordination change is limited to tests/test_packed_artifact.sh and must preserve the strict normalized equality check for every other skill.
+  - The change may not weaken package member, digest, archive, install, release, provenance, or rollback validation.
+allowed_decisions: [allow_test_coordination, replan_contract, stop]
+decision: allow_test_coordination
+rationale: The implementation objective, public interfaces, baseline, and owned lifecycle skill paths are unchanged. This gate corrects one omitted coordination test path so the existing package invariant can distinguish the three explicitly approved behavior changes from every other version-only skill. A fresh critic must inspect the exact exception and rerun the full packed-artifact suite.
+opened_at: "2026-07-10T10:13:15Z"
+resolved_at: "2026-07-10T10:13:15Z"
+resume_state: IMPLEMENTING

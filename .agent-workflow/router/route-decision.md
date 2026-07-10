@@ -1,10 +1,10 @@
 # Route decision
 
-- Current state: `NORTHSTAR_ARTIFACTS_INCOMPLETE`
-- Next skill: `northstar-planning`
-- Next mode: `artifact-loop`
+- Current state: `GATE_STATE_UNCOMMITTED`
+- Next skill: `project-router`
+- Next mode: `route`
 
-Product and architecture North Star artifacts must be cross-linked and signed off before downstream lifecycle skills treat them as core planning authority.
+Durable gate state must be committed, present, and schema-valid before routing.
 
 ## Missing artifacts
 

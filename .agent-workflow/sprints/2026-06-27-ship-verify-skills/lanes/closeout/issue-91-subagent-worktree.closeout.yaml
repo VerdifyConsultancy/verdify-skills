@@ -1,13 +1,14 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-27-ship-verify-skills
 lane_id: issue-91-subagent-worktree
 status: ready_for_critic
 issue_ids: [91]
 pull_request: 95
 baseline_sha: fffa61c09cbe09f8d0dd32681029a967c59066ee
-head_sha: 81e5827075a4755eb3b146338dd4e4cff0e9be9f
+implementation_head_sha: 81e5827075a4755eb3b146338dd4e4cff0e9be9f
+validated_head_sha: 81e5827075a4755eb3b146338dd4e4cff0e9be9f
 contract_hash: a7d2a2cce091ae069767fe283432acc4d970693dc4c9a4f93e18ae1d10e4d234
 changed_paths:
   - .agents/skills/subagent-worktree
@@ -57,7 +58,8 @@ discovered_issues: []
 residual_risks:
   - Shared lifecycle registration surfaces will conflict with the other P0 skill PRs until controller-merge reconciles them.
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: worker-91-20260627a
 completed_at: "2026-06-27T22:50:26Z"
 limitations:
-  - Closeout head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.
+  - Closeout implementation_head_sha records the implementation commit before adding this closeout artifact; the PR body is updated separately after the closeout commit.

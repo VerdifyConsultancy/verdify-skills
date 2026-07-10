@@ -1,0 +1,65 @@
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: "1.0"
+sprint_id: 2026-07-10-recovery-publication
+status: verified
+integrated_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+release:
+  tag: null
+  url: null
+artifact_identity:
+  - type: git_commit
+    identifier: "dev@da2f43392e768c7554fd35d750507eea64ca0fb3"
+  - type: github_pull_request
+    identifier: "VerdifyConsultancy/verdify-skills#173 at critic-report head dcefe45dcc92a6a2a311d37e6a73545e9eaa5fa6"
+  - type: recovery_source_set
+    identifier: "fe1f94e, f425515, and 22f81bdc35e4f1e5a70797624c93bc86bc66056c as mapped by docs/recovery-ledger-2026-07-10.md"
+integration_results:
+  - name: fresh independent criticism
+    result: passed
+    evidence: "Critic codex-critic/session critic-126-recovery-20260710t0530z recorded approve_with_risks at dcefe45 after reviewing implementation b13f17ba and evidence abdc6bec; low findings were routed to #174 and #120."
+  - name: validate at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29072398850 passed at da2f433: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29072398850"
+  - name: compliance at integrated dev revision
+    result: passed
+    evidence: "GitHub push run 29072398959 passed at da2f433: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29072398959"
+  - name: selective recovery outcome
+    result: passed
+    evidence: "PR #173 integrated 28 skills, 47 schemas, six packs, five evidence bundles, and the source-to-target recovery ledger without mutating the shared live runner or deleting rescue refs."
+deployment:
+  environment: github-actions-ci/dev (recovery integration; no runtime service)
+  deployment_id: 29072398850
+  deployed_at: "2026-07-10T05:52:40Z"
+  observed_revision: "da2f43392e768c7554fd35d750507eea64ca0fb3"
+  deployer: jvallery
+  approval:
+    required: true
+    approved_by: "Jason Vallery (user-authorized administrator merge; no fabricated self-review)"
+    approved_at: "2026-07-10T05:52:40Z"
+    evidence: ".agent-workflow/sprints/2026-07-10-recovery-publication/gates/pr-173-admin-merge-override.yaml and https://github.com/VerdifyConsultancy/verdify-skills/pull/173"
+runtime_checks:
+  - name: repository validation workflow
+    result: passed
+    observed_at: "2026-07-10T05:53:49Z"
+    evidence: "Validate push run 29072398850 completed successfully at the integrated SHA."
+  - name: compliance workflow
+    result: passed
+    observed_at: "2026-07-10T05:52:54Z"
+    evidence: "Compliance self-test push run 29072398959 completed successfully at the integrated SHA."
+  - name: recovery preservation boundary
+    result: passed
+    observed_at: "2026-07-10T05:54:00Z"
+    evidence: "The accepted outcome records all three rescue sources retained and the shared Agent Platform checkout unchanged pending final release cleanup."
+migrations:
+  - name: none
+    result: not_applicable
+    evidence: "Selective repository recovery only; no npm, main, tag, GitHub release, CRM/email, runtime, or destructive cleanup mutation occurred."
+rollback:
+  ready: true
+  known_good_revision: "17b3762f024186a336556f60c27268006a8d59b6"
+  procedure: "Revert merge commit da2f433 on dev, rerun repository/package/npm validation, and reconstruct disputed files from the three retained rescue source commits."
+incidents:
+  - "PR #173 could not receive an APPROVED review from author jvallery; the committed user-authorized administrator exception preserved the two low-risk dispositions without fabricating a GitHub review."
+verified_at: "2026-07-10T09:17:23Z"
+verifier: "Codex ROOT lifecycle controller repair for issue #190"

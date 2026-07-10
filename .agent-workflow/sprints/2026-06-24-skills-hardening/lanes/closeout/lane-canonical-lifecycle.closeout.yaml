@@ -1,6 +1,6 @@
 schema_ref: lane-closeout.schema.yaml
 kind: LaneCloseout
-schema_version: "1.0"
+schema_version: "2.0"
 sprint_id: 2026-06-24-skills-hardening
 lane_id: lane-canonical-lifecycle
 status: ready_for_critic
@@ -10,7 +10,8 @@ issue_ids:
   - 30
 pull_request: 60
 baseline_sha: "1c79c1d03d2aae1fb77f71a737fbaa46635d4338"
-head_sha: "5c83accb162bc1a66a6cbc58828f9f471356d3bd"
+implementation_head_sha: "5c83accb162bc1a66a6cbc58828f9f471356d3bd"
+validated_head_sha: "5c83accb162bc1a66a6cbc58828f9f471356d3bd"
 contract_hash: "e9fe07c6dff6133119922df53d5223535cf1d267ff8869591562062af486e286"
 changed_paths:
   - "README.md"
@@ -112,10 +113,11 @@ residual_risks:
   - "GitHub checks must be evaluated on the final pushed branch head after the closeout metadata commit."
   - "External consumers of SKILL.md metadata.lifecycle-order must migrate to config/lifecycle.yaml; no in-repository consumers were found."
 worktree_clean: true
+worker_agent: historical-worker
 worker_session_id: "codex-20260624-canonical"
 completed_at: "2026-06-24T18:35:00Z"
 limitations:
-  - "The closeout head_sha records the implementation commit before the closeout-only metadata commit; PR #60 is updated after the closeout commit is pushed."
+  - "The closeout implementation_head_sha records the implementation commit before the closeout-only metadata commit; PR #60 is updated after the closeout commit is pushed."
   - "MANIFEST.sha256 was intentionally not edited per user instruction; release regeneration remains outside this lane."
   - "The required route --write validation updated only route-decision generated_at; the timestamp churn was restored and the command output is recorded as validation evidence."
   - "scripts/validate-repo.rb and lib/verdify/cli.rb are coordination-required paths; dependency lane outputs were merged to main before this lease baseline, and this lane extended those files without unresolved conflicts."

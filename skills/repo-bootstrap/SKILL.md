@@ -4,7 +4,7 @@ description: Runs a repository bootstrap and self-discovery facade over existing
 compatibility: Requires repository read access, Git, Verdify CLI, GitHub CLI or current GitHub snapshots, and only authorized runtime or credential-reference snapshots. Live cluster or secret access is optional and must be separately authorized.
 metadata:
   author: Verdify
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Repo Bootstrap

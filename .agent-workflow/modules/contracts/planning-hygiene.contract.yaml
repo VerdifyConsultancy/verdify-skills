@@ -1,0 +1,61 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: planning-hygiene
+contract_version: "1.0"
+status: approved
+purpose: Bootstrap and assess repositories, reconcile backlog truth, and compile approved issue-backed sprint and lane transactions without executing them.
+requirement_ids: [FR-003, FR-004, FR-011, NFR-001, NFR-005]
+owned_paths:
+  - skills/repo-bootstrap/**
+  - skills/repo-hygiene/**
+  - skills/issue-triage/**
+  - skills/sprint-planning/**
+  - skills/sprint-replan/**
+  - skills/sprint-handoff/**
+  - schemas/repo-*.schema.yaml
+  - schemas/compliance-assessment.schema.yaml
+  - schemas/github-snapshot.schema.yaml
+  - schemas/github-reconciliation.schema.yaml
+  - schemas/sprint-plan.schema.yaml
+  - schemas/lane-map.schema.yaml
+  - schemas/lane-contract.schema.yaml
+  - schemas/wave-release-plan.schema.yaml
+  - lib/verdify/compliance_assessor.rb
+  - .agent-workflow/hygiene/**
+  - .agent-workflow/sprints/*/sprint-plan.yaml
+  - .agent-workflow/sprints/*/lanes/lane-map.yaml
+  - .agent-workflow/sprints/*/lanes/contracts/**
+  - .agent-workflow/sprints/*/gates/plan-approval.yaml
+  - .agent-workflow/sprints/*/release/wave-release-plan.yaml
+prohibited_paths: [.agent-workflow/sprints/*/lanes/closeout/**, .agent-workflow/sprints/*/critic/**, .github/workflows/**]
+inputs:
+  - name: approved_strategy
+    schema: state-of-union.schema.yaml and live GitHub issues/dependencies
+    producer: definition-architecture-strategy and GitHub
+outputs:
+  - name: executable_sprint
+    schema: sprint-plan, lane-map, lane-contract, plan-gate, and wave-release-plan schemas
+    consumers: [execution-control, lane-assurance, release-package]
+public_interfaces:
+  - name: sprint transaction
+    location: .agent-workflow/sprints/<sprint-id>/
+    compatibility: Approved contracts are immutable after dispatch; material changes require replanning and renewed approval.
+dependencies:
+  hard: [governance-routing, definition-architecture-strategy]
+  soft: [quality-enablement]
+invariants:
+  - Every selected implementation outcome is backed by a ready GitHub issue.
+  - One issue maps to one lane by default and every criterion has runnable evidence.
+  - Planning never creates a coding worktree before the complete transaction is approved.
+runtime_resources: [GitHub snapshots as non-authoritative caches; no worker or production resources.]
+validation_commands:
+  - id: sprint-artifacts
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate schemas, references, skills, and repository integrity.
+required_evidence: [Issue readiness, approved strategy, contract validation, overlap and dependency review, plan approval]
+definition_of_done: [Scope and non-goals are bounded, ownership is exclusive, dependency order is executable, review/release plan is explicit]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

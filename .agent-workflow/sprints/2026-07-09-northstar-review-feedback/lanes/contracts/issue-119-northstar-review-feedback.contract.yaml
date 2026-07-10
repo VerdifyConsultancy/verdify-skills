@@ -1,0 +1,177 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-09-northstar-review-feedback
+lane_id: issue-119-northstar-review-feedback
+title: Reconstruct and lock iteration 25 as the four-project North Star
+status: approved
+issue_ids: [119]
+coupling_justification: null
+objective: Register Jason's final-lock instruction and atomically reconcile the complete iteration-25 product, architecture, design, interview, gate, evidence, question, issue, committed route, and handoff state.
+desired_outcome: Verdify Skills contains one approved, evidence-backed iteration-25 North Star for the integrated Skills, Agent Platform, Orbit, and Gravity self-building platform, with no remaining P0 human question and one downstream project-definition discovery handoff.
+non_goals:
+  - Implement the accepted product, platform, connector, package, or runtime recommendations.
+  - Publish npm, promote dev to main, or mutate any runtime environment.
+  - Edit Agents, Orbit, or Gravity source code from this lane.
+  - Apply staged learning proposals or preserve deprecated capability through compatibility shims.
+baseline_sha: "c90801f97646238a3d7b3bfb064c799038d40c68"
+branch: lane/119-northstar-review-feedback
+module_contracts:
+  - COMMON_OPERATING_CONTRACT.md
+  - config/authority-matrix.yaml
+  - skills/northstar-planning/SKILL.md
+  - skills/northstar-interview/SKILL.md
+  - skills/northstar-research-ingest/SKILL.md
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [North Star final lock, evidence registration, interview state, committed lifecycle route, planning handoff]
+  owned_paths:
+    - .agent-workflow/northstar/**
+    - .agent-workflow/gates/northstar.yaml
+    - .agent-workflow/router/**
+    - .agent-workflow/sprints/2026-07-09-northstar-review-feedback/**
+  prohibited_paths:
+    - .github/**
+    - docs/**
+    - examples/**
+    - evaluations/**
+    - skills/**
+    - lib/**
+    - npm/**
+    - schemas/**
+    - scripts/**
+    - package.json
+    - VERSION
+    - MANIFEST.sha256
+  coordination_required_paths:
+    - config/authority-matrix.yaml
+    - docs/decisions/**
+  owned_interfaces: [iteration-25 North Star authority, final-lock evidence, interview question state, project-definition handoff]
+dependencies:
+  hard: []
+  soft:
+    - lane_id: agents-platform-current-state-audit
+      coordination: "Link Agents #2889 and preserve Agent Platform ownership without editing that repository."
+    - lane_id: orbit-current-state-audit
+      coordination: "Link Orbit #198 and preserve Orbit product authority without editing that repository."
+    - lane_id: gravity-current-state-audit
+      coordination: "Link Gravity #406 and preserve current Gravity source truth without editing that repository."
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: Jason's explicit final-lock instruction is ingested, registered, queryable, and distinct from the earlier review-feedback evidence.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [evidence item and registry validation, query output, source digest]
+  - id: LANE-AC-02
+    statement: Every protected iteration-25 artifact consistently encodes all ten approved planning defaults and the integrated four-project self-building platform boundary.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [artifact validation, semantic cross-link audit, stale-language scan]
+  - id: LANE-AC-03
+    statement: Product, architecture, design, structured plan, loop record, North Star gate, and committed router pair record Jason's approval and agree with a fresh project-definition discovery route.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [approval and gate inspection, committed route record, fresh route parity, handoff evidence]
+  - id: LANE-AC-04
+    statement: The interview packet records the final-lock decision, has no P0 or other blocking human question, and classifies all remaining research as nonblocking with a proposed default and owner.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [interview rubric audit, question inventory]
+  - id: LANE-AC-05
+    statement: Cross-repository gaps remain linked to owning issues, learning-capture packets remain staged proposals, and public evidence contains only safe acceptance intent while installer reproduction detail stays in the private advisory.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [issue reconciliation, learning packet validation, public evidence redaction and digest audit]
+  - id: LANE-AC-06
+    statement: The implementation head and closeout satisfy repository, full-suite, dispatch, scope, and v2 evidence prerequisites and are ready for a fresh critic; integration remains prohibited until the later critic-report-only head passes live checks and receives independent current-head approval.
+    sprint_acceptance_ids: [SPR-AC-06]
+    evidence_required: [repository and full-suite tests, v2 closeout, dispatch and scope audit]
+validation_commands:
+  - id: repo-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate the Verdify Skills repository contract and all protected artifacts.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run the complete package and lifecycle gate.
+    required: true
+  - id: northstar-artifacts
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/northstar-artifacts.yaml
+    purpose: Validate the canonical North Star loop record.
+    required: true
+  - id: northstar-plan
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/northstar-plan.yaml
+    purpose: Validate the structured North Star synthesis and approval state.
+    required: true
+  - id: northstar-gate
+    command: bin/verdify artifact validate --file .agent-workflow/gates/northstar.yaml
+    purpose: Validate the final-lock decision artifact.
+    required: true
+  - id: evidence-query
+    command: bin/verdify northstar evidence list --repo . --query final-lock --json
+    purpose: Prove the final-lock instruction is registered and discoverable.
+    required: true
+  - id: evidence-registry
+    command: bin/verdify artifact validate --file .agent-workflow/northstar/evidence-registry.yaml
+    purpose: Validate the registered evidence index after final-lock ingestion.
+    required: true
+  - id: diff-hygiene
+    command: git diff --check
+    purpose: Reject malformed whitespace in the protected artifact transaction.
+    required: true
+  - id: lock-state-audit
+    command: >-
+      ruby -ryaml -e 'a=YAML.safe_load_file(".agent-workflow/northstar/northstar-artifacts.yaml"); p=YAML.safe_load_file(".agent-workflow/northstar/northstar-plan.yaml"); g=YAML.safe_load_file(".agent-workflow/gates/northstar.yaml"); abort("lock state mismatch") unless a["status"] == "approved" && a.dig("review", "status") == "approved" && a.dig("review", "signoff_required_for_downstream") == false && p["status"] == "approved" && p.dig("approval", "status") == "approved" && g["status"] == "approved" && g["decision"] == "approved"'
+    purpose: Prove the structured loop, synthesis, and human gate agree on the approved lock.
+    required: true
+  - id: stale-lock-language
+    command: >-
+      ! rg -n 'does not record final lock|final lock remains separate|Final North Star lock is still pending|final lock approval is still pending' .agent-workflow/northstar/NORTHSTAR_PRODUCT.md .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md .agent-workflow/northstar/SDLC_SKILL_DESIGN.md .agent-workflow/northstar/NORTHSTAR_INTERVIEW.md .agent-workflow/northstar/REVIEW_PLAN.md .agent-workflow/northstar/northstar-plan.md
+    purpose: Reject stale review-requested prose in the locked canonical packet.
+    required: true
+  - id: committed-route-parity
+    command: >-
+      ruby -rjson -ryaml -ropen3 -e 'stored=YAML.safe_load_file(".agent-workflow/router/route-decision.yaml"); out,err,status=Open3.capture3("bin/verdify","route","--repo",".","--json"); abort(err) unless status.success?; fresh=JSON.parse(out); keys=%w[current_state next_skill next_mode reason]; abort("committed route mismatch") unless keys.all?{|key| stored[key] == fresh[key]}; md=File.read(".agent-workflow/router/route-decision.md"); abort("route markdown mismatch") unless md.include?("`#{fresh["current_state"]}`") && md.include?("`#{fresh["next_skill"]}`") && md.include?("`#{fresh["next_mode"]}`")'
+    purpose: Prove the committed YAML and Markdown route snapshot agrees with a fresh non-writing router computation.
+    required: true
+  - id: yaml-issue-reference-semantics
+    command: >-
+      ruby -ryaml -e 's=YAML.safe_load_file(".agent-workflow/sprints/2026-07-09-northstar-review-feedback/sprint-plan.yaml"); c=YAML.safe_load_file(".agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/contracts/issue-119-northstar-review-feedback.contract.yaml"); w=YAML.safe_load_file(".agent-workflow/sprints/2026-07-09-northstar-review-feedback/release/wave-release-plan.yaml"); q=YAML.safe_load_file(".agent-workflow/sprints/2026-07-09-northstar-review-feedback/lanes/closeout/issue-119-northstar-review-feedback.closeout.yaml"); values=Array(s.dig("review_plan","reporting_summary","included"))+Array(c["required_evidence"])+Array(c["definition_of_done"])+[w.dig("branch_model","decision_notes"),w.dig("rollback","procedure")]+Array(q["residual_risks"])+Array(q["limitations"]); %w[#72 #119 #122 #198 #2889 #406].each{|token|abort("missing parsed #{token}") unless values.any?{|value|value.to_s.include?(token)}}'
+    purpose: Prove issue references survive YAML parsing instead of being truncated as plain-scalar comments.
+    required: true
+  - id: public-evidence-redaction
+    command: >-
+      ruby -rdigest -ryaml -e 'path=".agent-workflow/northstar/collateral/sources/NSE-20260709-verdify-skills-adversarial-review-verdify-skills-adversarial-review-2026-07-09-md"; item=YAML.safe_load_file(".agent-workflow/northstar/collateral/NSE-20260709-verdify-skills-adversarial-review.yaml"); registry=YAML.safe_load_file(".agent-workflow/northstar/evidence-registry.yaml"); text=File.read(path); digest=Digest::SHA256.file(path).hexdigest; entry=Array(registry["evidence"]).find{|candidate|candidate["id"]==item["id"]}; abort("public evidence is not the redacted summary") unless text.start_with?("# Public evidence summary") && text.include?("GHSA-4452-3c6p-3q26") && text.bytesize < 4000 && !text.include?("```"); abort("public evidence digest mismatch") unless item.dig("source","sha256")==digest && entry && entry["source_sha256"]==digest'
+    purpose: Prove the public adversarial-review source is a bounded redacted summary whose digest agrees with the evidence item and registry.
+    required: true
+required_evidence:
+  - Registered final-lock evidence and preserved July 9 review-feedback evidence.
+  - Locked product, architecture, design, plan, loop, interview, gate, and cross-link artifacts.
+  - "Owning-repository issue reconciliation for Orbit #198, Agents #2889, and Gravity #406."
+  - Zero-P0 interview audit and nonblocking owner-routed research list.
+  - Committed route YAML/Markdown and fresh route parity for project-definition discovery.
+  - Redacted public adversarial-review source with matching item/registry digest and private-advisory boundary.
+  - Full v2 lane evidence and live current-head GitHub approval.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - A requested change would implement downstream product/runtime work or apply staged learning proposals.
+  - Final approval cannot be traced to Jason's explicit instruction or the protected artifacts disagree about lock state.
+  - Exact-head GitHub review identity cannot be reconciled without an exception.
+  - Work requires raw secrets, destructive mutation, package publication, or another repository's source change.
+definition_of_done:
+  - Dispatch D is the first child of c90801f97646238a3d7b3bfb064c799038d40c68 and changes only the canonical SprintPlan, WaveReleasePlan, and LaneContract.
+  - Every worker-evaluable acceptance criterion has durable evidence at the implementation or closeout head; post-closeout criticism, live checks, and external approval remain explicit integration gates.
+  - "The branch is pushed to existing PR #122 targeting dev with exact I, E, and S metadata."
+  - A fresh critic reviews the reconstructed final evidence chain from a separate session and worktree.
+  - An independent admin or maintainer approves the exact critic-report head before integration.
+  - After integration, lifecycle evidence proves the locked North Star hands off to project-definition discovery.
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-09T23:20:09Z"

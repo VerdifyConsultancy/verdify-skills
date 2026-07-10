@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "tmpdir"
+
 module Verdify
   class CLI
     SKILLS = %w[
@@ -82,6 +84,14 @@ module Verdify
       when "prompt" then command_prompt
       when "github" then command_github
       when "gate" then command_gate
+      when "pack" then command_pack
+      when "dl"
+        pack_name = @argv.shift
+        if pack_name&.start_with?("-")
+          @argv.unshift(pack_name)
+          pack_name = nil
+        end
+        command_pack_install(pack_name)
       else
         raise UsageError, "unknown command #{command.inspect}\n\n#{help}"
       end
@@ -113,6 +123,9 @@ module Verdify
           github snapshot            Cache current issues and pull requests locally
           github reconcile           Compare sprint lane contracts with a snapshot
           gate compliance            Assess fleet-standard-shape conformance of a repo
+          pack list                  List skill packs in this registry package
+          pack install               Link one skill pack into a target repository
+          dl                         Shortcut for `pack install --pack NAME`
 
         Run `bin/verdify <command> --help` for command options.
       HELP
@@ -224,17 +237,18 @@ module Verdify
     end
 
     def command_route
-      options = { repo: Dir.pwd, write: false, json: false }
+      options = { repo: Dir.pwd, sprint: nil, write: false, json: false }
       parser = OptionParser.new do |o|
-        o.banner = "Usage: bin/verdify route [--repo PATH] [--write] [--json]"
+        o.banner = "Usage: bin/verdify route [--repo PATH] [--sprint ID] [--write] [--json]"
         o.on("--repo PATH", "Target Git repository") { |v| options[:repo] = v }
+        o.on("--sprint ID", "Select one active sprint when concurrent sprint transactions exist") { |v| options[:sprint] = v }
         o.on("--write", "Write route-decision YAML and Markdown") { options[:write] = true }
         o.on("--json", "Emit JSON instead of YAML") { options[:json] = true }
         o.on("-h", "--help") { puts o; return 0 }
       end
       parse_options(parser)
       repo = GitRepository.new(options[:repo])
-      decision = build_route_decision(repo)
+      decision = build_route_decision(repo, requested_sprint_id: options[:sprint])
       validate_hash!(decision, "route-decision.schema.yaml", "generated route decision")
 
       if options[:write]
@@ -299,6 +313,80 @@ module Verdify
         warn errors.map { |e| "#{file}: #{e}" }.join("\n")
         1
       end
+    end
+
+    def command_pack
+      subcommand = @argv.shift
+      case subcommand
+      when "list" then command_pack_list
+      when "install" then command_pack_install
+      else
+        raise UsageError, "Usage: bin/verdify pack <list|install>"
+      end
+    end
+
+    def command_pack_list
+      options = { json: false }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify pack list [--json]"
+        o.on("--json", "Emit JSON") { options[:json] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      packs = skill_packs.map do |pack|
+        {
+          "name" => pack["name"],
+          "display_name" => pack["display_name"],
+          "category" => pack["category"],
+          "maturity" => pack["maturity"],
+          "required_skills" => Array(pack.dig("includes", "required")),
+          "optional_skills" => Array(pack.dig("includes", "optional")),
+          "capabilities" => Array(pack.dig("provides", "capabilities"))
+        }
+      end
+      if options[:json]
+        puts JSON.pretty_generate({ "count" => packs.length, "packs" => packs })
+      else
+        puts format("%-22s %-12s %-12s %s", "PACK", "CATEGORY", "MATURITY", "REQUIRED SKILLS")
+        packs.each do |pack|
+          puts format("%-22s %-12s %-12s %s",
+                      pack["name"], pack["category"], pack["maturity"], pack["required_skills"].join(","))
+        end
+      end
+      0
+    end
+
+    def command_pack_install(initial_pack = nil)
+      options = {
+        repo: Dir.pwd,
+        pack: initial_pack,
+        host: "codex",
+        include_optional: false,
+        force: false,
+        init_workflow: false
+      }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify pack install --pack NAME [--repo PATH] [--host codex|claude|all] [--include-optional] [--force] [--init-workflow]"
+        o.on("--repo PATH", "Target Git repository") { |v| options[:repo] = v }
+        o.on("--pack NAME", "Skill pack to install") { |v| options[:pack] = v }
+        o.on("--host HOST", %w[codex claude all], "Host links to write") { |v| options[:host] = v }
+        o.on("--include-optional", "Install optional skills declared by the pack") { options[:include_optional] = true }
+        o.on("--force", "Replace conflicting links or directories") { options[:force] = true }
+        o.on("--init-workflow", "Also initialize .agent-workflow if missing") { options[:init_workflow] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      raise UsageError, "--pack is required" if options[:pack].to_s.empty?
+
+      pack = load_skill_pack(options[:pack])
+      selected = pack_skill_names(pack, options[:include_optional])
+      repo = GitRepository.new(options[:repo])
+      install_pack_transaction(repo.root, pack, selected, options)
+      command_init_for_pack(repo, options[:force]) if options[:init_workflow]
+      puts "Installed skill pack #{pack['name']} (#{selected.length} skills) into #{repo.root}"
+      puts "Hosts: #{options[:host]}"
+      puts "Manifest: .agent-skills/verdify-packs/#{pack['name']}.yaml"
+      0
     end
 
     def command_northstar
@@ -634,6 +722,7 @@ module Verdify
       contract_path = resolve_contract_path(repo, options[:sprint], options[:lane_id], options[:contract])
       contract = load_and_validate_contract(contract_path)
       enforce_lane_contract!(contract, options)
+      dispatch_artifacts = load_lane_dispatch_artifacts(contract_path, contract)
 
       base_ref = options[:base] || contract["baseline_sha"]
       resolved_base = repo.head_sha(base_ref)
@@ -670,6 +759,7 @@ module Verdify
 
         puts "DRY RUN"
         puts "git worktree add #{repo.branch_exists?(branch) ? '' : "-b #{branch} "}#{path} #{repo.branch_exists?(branch) ? branch : resolved_base}".strip
+        puts "seed approved sprint plan, wave release plan, and lane contract as one dispatch commit"
         puts "git worktree lock --reason #{Shellwords.escape("Verdify worker #{options[:lane_id]} session #{options[:session_id]}")} #{path}"
         puts JSON.pretty_generate(lease)
         return 0
@@ -683,6 +773,7 @@ module Verdify
 
         repo.add_worktree(path: path, branch: branch, base: resolved_base)
         begin
+          seed_lane_dispatch_artifacts(path, dispatch_artifacts, contract["lane_id"])
           repo.lock_worktree(path, "Verdify worker #{options[:lane_id]} session #{options[:session_id]}")
           write_lease(repo, lease)
         rescue StandardError
@@ -715,44 +806,95 @@ module Verdify
       repo = GitRepository.new(options[:repo])
       worker_lease = all_leases(repo).select { |l| l["lane_id"] == options[:lane_id] && l["role"] == "worker" }
                                      .max_by { |l| l["created_at"].to_s }
-      contract_path = if worker_lease
-                        Pathname.new(worker_lease["contract_path"])
-                      else
-                        find_contract_by_lane(repo, options[:lane_id])
-                      end
-      contract = load_and_validate_contract(contract_path)
-      if worker_lease && worker_lease["session_id"] == options[:session_id]
+      contract_source_path = if worker_lease && Pathname.new(worker_lease["contract_path"]).file?
+                               Pathname.new(worker_lease["contract_path"])
+                             else
+                               find_contract_by_lane(repo, options[:lane_id])
+                             end
+      if worker_lease && Pathname.new(worker_lease["contract_path"]).file? &&
+         Digest::SHA256.file(contract_source_path).hexdigest != worker_lease["contract_hash"]
+        raise UsageError, "worker lease contract hash no longer matches its contract"
+      end
+      contract_source_repo = GitRepository.new(contract_source_path.dirname)
+      contract_relative_path = contract_source_path.relative_path_from(contract_source_repo.root)
+      contract = load_and_validate_contract(contract_source_path)
+      branch = contract["branch"]
+      branch_head = repo.github_slug ? nil : repo.head_sha(branch)
+      sprint_root = contract_relative_path.dirname.parent.parent
+      closeout_relative_path = sprint_root.join("lanes/closeout/#{contract['lane_id']}.closeout.yaml")
+      review_head = branch_head
+      expected_pull_request = nil
+      if repo.github_slug
+        pull_request = repo.github_pull_request_for_branch(branch)
+        expected_pull_request = pull_request["number"]
+        fetched_head = repo.fetch_pull_request_head(expected_pull_request)
+        unless fetched_head == pull_request["head_sha"]
+          raise UsageError, "fetched pull request head does not match GitHub head"
+        end
+        review_head = fetched_head
+      end
+      begin
+        closeout = YAML.safe_load(repo.file_at(review_head, closeout_relative_path), permitted_classes: [], aliases: false) || {}
+      rescue Psych::Exception, CommandError => e
+        raise UsageError, "lane closeout is not committed on the live review head: #{e.message}"
+      end
+      if closeout["worker_session_id"].to_s.empty?
+        raise UsageError, "lane closeout does not record worker_session_id"
+      end
+      if worker_lease && closeout["worker_session_id"] != worker_lease["session_id"]
+        raise UsageError, "lane closeout worker_session_id does not match worker lease history"
+      end
+      if worker_lease && closeout["worker_agent"] != worker_lease["agent"]
+        raise UsageError, "lane closeout worker_agent does not match worker lease history"
+      end
+      if closeout["worker_session_id"] == options[:session_id]
         raise UsageError, "critic session must differ from worker session"
+      end
+      if closeout["worker_agent"] == options[:agent]
+        raise UsageError, "critic agent must differ from worker agent"
+      end
+      if expected_pull_request && closeout["pull_request"] != expected_pull_request
+        raise UsageError, "lane closeout pull_request does not match the live branch pull request"
       end
 
       lease_id = "critic-#{options[:lane_id]}-#{Verdify.slug(options[:session_id], max: 24)}"
       path = options[:path] ? Pathname.new(options[:path]).expand_path : default_review_path(repo, options[:lane_id], options[:session_id])
-      branch = contract["branch"]
-      repo.head_sha(branch)
 
-      lease = build_lease(
-        repo: repo,
-        lease_id: lease_id,
-        sprint_id: contract["sprint_id"],
-        lane_id: contract["lane_id"],
-        issue_ids: contract["issue_ids"],
-        role: "critic",
-        agent: options[:agent],
-        session_id: options[:session_id],
-        branch: branch,
-        baseline_sha: repo.head_sha(branch),
-        contract_path: contract_path,
-        worktree_path: path,
-        ttl_hours: contract.dig("lease_policy", "critic_ttl_hours") || 8
-      )
+      lease = nil
 
       with_lease_lock(repo) do
         existing = lease_path(repo, lease_id)
         raise UsageError, "critic lease already exists: #{lease_id}" if existing.exist? && load_json(existing)["status"] == "active"
         raise UsageError, "review worktree path already exists: #{path}" if path.exist?
 
-        repo.add_worktree(path: path, branch: branch, base: branch, detach: true)
+        repo.add_worktree(path: path, branch: branch, base: review_head, detach: true)
         begin
+          review_repo = GitRepository.new(path)
+          review_contract_path = path.join(contract_relative_path)
+          review_closeout_path = path.join(closeout_relative_path)
+          validation = LaneReviewValidator.new(
+            repo: review_repo,
+            contract_path: review_contract_path,
+            closeout_path: review_closeout_path
+          ).validate_closeout(evidence_head_sha: review_head)
+          unless validation.valid?
+            raise UsageError, "lane evidence is not reviewable:\n#{validation.errors.join("\n")}"
+          end
+          lease = build_lease(
+            repo: repo,
+            lease_id: lease_id,
+            sprint_id: contract["sprint_id"],
+            lane_id: contract["lane_id"],
+            issue_ids: contract["issue_ids"],
+            role: "critic",
+            agent: options[:agent],
+            session_id: options[:session_id],
+            branch: branch,
+            baseline_sha: review_head,
+            contract_path: review_contract_path,
+            worktree_path: path,
+            ttl_hours: contract.dig("lease_policy", "critic_ttl_hours") || 8
+          )
           repo.lock_worktree(path, "Verdify critic #{options[:lane_id]} session #{options[:session_id]}")
           write_lease(repo, lease)
         rescue StandardError
@@ -1144,23 +1286,45 @@ module Verdify
       assessment["ok"] || options[:report_only] ? 0 : 1
     end
 
-    def build_route_decision(repo)
+    def build_route_decision(repo, requested_sprint_id: nil)
       root = repo.root.join(".agent-workflow")
       evidence = []
       missing = []
-      open_gate_files = Dir[root.join("**/gates/*.yaml")].select do |path|
-        begin
-          Verdify.safe_load_yaml(path)["status"] == "open"
-        rescue Error
-          false
+      workflow_relative = root.relative_path_from(repo.root).to_s
+      committed_gate_paths = repo.tracked_paths(ref: repo.head_sha, pathspec: workflow_relative).grep(%r{/gates/[^/]+\.yaml\z})
+      working_gate_paths = Dir[root.join("**/gates/*.yaml")].map { |path| Pathname.new(path).relative_path_from(repo.root).to_s }.uniq.sort
+      gate_snapshot_errors = (committed_gate_paths | working_gate_paths).filter_map do |relative|
+        path = repo.root.join(relative)
+        if !committed_gate_paths.include?(relative)
+          "#{relative}: gate is uncommitted"
+        elsif !path.file?
+          "#{relative}: committed gate is deleted from the working tree"
+        elsif repo.file_at(repo.head_sha, relative) != path.binread
+          "#{relative}: working gate differs from HEAD"
         end
       end
-      open_gates = open_gate_files.map { |path| Pathname.new(path).relative_path_from(repo.root).to_s }
+      gate_documents = {}
+      committed_gate_paths.each do |relative|
+        path = repo.root.join(relative)
+        next unless path.file?
+
+        gate = Verdify.safe_load_yaml(path)
+        errors = SchemaValidator.new.validate(gate, SchemaValidator.load_document(Verdify::ROOT.join("schemas/human-gate.schema.yaml")))
+        errors.concat(SemanticValidator.validate(gate))
+        gate_snapshot_errors.concat(errors.map { |error| "#{relative}: #{error}" })
+        gate_documents[relative] = gate
+      end
+      unless gate_snapshot_errors.empty?
+        evidence << { "source" => workflow_relative, "finding" => gate_snapshot_errors.join("; ") }
+        return route_hash(repo, "GATE_STATE_UNCOMMITTED", "project-router", "route", "Durable gate state must be committed, present, and schema-valid before routing.", evidence, missing, [])
+      end
+      open_gates = gate_documents.filter_map { |relative, gate| relative if gate["status"] == "open" }
+      open_gate_files = open_gates.map { |relative| repo.root.join(relative) }
 
       unless open_gate_files.empty?
-        gate = Verdify.safe_load_yaml(open_gate_files.first)
+        gate = gate_documents.fetch(open_gates.first)
         skill, mode = route_for_gate(gate["type"])
-        evidence << { "source" => Pathname.new(open_gate_files.first).relative_path_from(repo.root).to_s, "finding" => "open #{gate['type']} gate" }
+        evidence << { "source" => open_gates.first, "finding" => "open #{gate['type']} gate" }
         return route_hash(repo, "OPEN_GATE", skill, mode, "An open durable gate blocks normal progression.", evidence, missing, open_gates)
       end
 
@@ -1205,7 +1369,37 @@ module Verdify
         return route_hash(repo, "MODULE_CONTRACTS_INCOMPLETE", "architecture-contracts", "module-contracts", "Approved black-box module contracts are missing or incomplete.", evidence, missing, open_gates)
       end
 
-      plans = Dir[root.join("sprints/*/sprint-plan.yaml")].map { |path| Pathname.new(path) }.sort_by(&:mtime).reverse
+      sprint_root_relative = root.join("sprints").relative_path_from(repo.root).to_s
+      transaction_path_pattern = %r{\A#{Regexp.escape(sprint_root_relative)}/[^/]+/(?:sprint-plan\.yaml|status\.yaml|lanes/contracts/[^/]+\.yaml|release/(?:wave-release-plan|release-verification)\.yaml|outcome/outcome-review\.yaml|gates/cancellation\.yaml)\z}
+      committed_transaction_paths = repo.tracked_paths(ref: repo.head_sha, pathspec: sprint_root_relative).grep(transaction_path_pattern)
+      working_transaction_paths = [
+        root.join("sprints/*/sprint-plan.yaml"),
+        root.join("sprints/*/status.yaml"),
+        root.join("sprints/*/lanes/contracts/*.yaml"),
+        root.join("sprints/*/release/wave-release-plan.yaml"),
+        root.join("sprints/*/release/release-verification.yaml"),
+        root.join("sprints/*/outcome/outcome-review.yaml"),
+        root.join("sprints/*/gates/cancellation.yaml")
+      ].flat_map { |pattern| Dir[pattern] }
+       .map { |path| Pathname.new(path).relative_path_from(repo.root).to_s }
+       .uniq
+       .sort
+      transaction_snapshot_errors = (committed_transaction_paths | working_transaction_paths).filter_map do |relative|
+        path = repo.root.join(relative)
+        if !committed_transaction_paths.include?(relative)
+          "#{relative}: transaction artifact is uncommitted"
+        elsif !path.file?
+          "#{relative}: committed transaction artifact is deleted from the working tree"
+        elsif repo.file_at(repo.head_sha, relative) != path.binread
+          "#{relative}: working transaction artifact differs from HEAD"
+        end
+      end
+      unless transaction_snapshot_errors.empty?
+        evidence << { "source" => sprint_root_relative, "finding" => transaction_snapshot_errors.join("; ") }
+        return route_hash(repo, "SPRINT_TRANSACTION_UNCOMMITTED", "sprint-planning", "lane-transaction", "Sprint selection and lane authority require an exact committed plan, status, and contract snapshot.", evidence, missing, open_gates)
+      end
+
+      plans = committed_transaction_paths.grep(%r{/sprint-plan\.yaml\z}).map { |path| repo.root.join(path) }.sort_by(&:to_s).reverse
       if plans.empty?
         strategy_route = route_for_strategy(repo, root, evidence, missing, open_gates)
         return strategy_route if strategy_route
@@ -1213,12 +1407,92 @@ module Verdify
         return strategy_handoff_route(repo, root, evidence, missing, open_gates)
       end
 
-      plan_path = plans.find do |path|
+      plan_documents = {}
+      status_documents = {}
+      verified_terminal_plans = {}
+      selection_errors = []
+      plans.each do |path|
         plan = Verdify.safe_load_yaml(path)
+        plan_documents[path] = plan
+        expected_sprint_id = path.dirname.basename.to_s
+        plan_validation = SchemaValidator.new.validate(plan, SchemaValidator.load_document(Verdify::ROOT.join("schemas/sprint-plan.schema.yaml")))
+        plan_validation.concat(SemanticValidator.validate(plan))
+        selection_errors.concat(plan_validation.map { |error| "#{path.relative_path_from(repo.root)}: #{error}" })
+        unless plan["sprint_id"] == expected_sprint_id
+          selection_errors << "#{path.relative_path_from(repo.root)}: sprint_id must match its sprint directory"
+        end
         status_path = path.dirname.join("status.yaml")
-        state = status_path.file? ? Verdify.safe_load_yaml(status_path)["state"] : nil
-        !%w[complete cancelled].include?(plan["status"].to_s.downcase) && !%w[COMPLETE CANCELLED].include?(state)
+        if status_path.file?
+          status = Verdify.safe_load_yaml(status_path)
+          status_documents[path] = status
+          status_validation = SchemaValidator.new.validate(status, SchemaValidator.load_document(Verdify::ROOT.join("schemas/status.schema.yaml")))
+          status_validation.concat(SemanticValidator.validate(status))
+          selection_errors.concat(status_validation.map { |error| "#{status_path.relative_path_from(repo.root)}: #{error}" })
+          unless status["sprint_id"] == expected_sprint_id && status["sprint_id"] == plan["sprint_id"]
+            selection_errors << "#{status_path.relative_path_from(repo.root)}: sprint_id must match its sprint directory and plan"
+          end
+        end
+
+        plan_terminal = %w[complete cancelled].include?(plan["status"].to_s.downcase)
+        status_state = status_documents.dig(path, "state")
+        status_terminal = %w[COMPLETE CANCELLED].include?(status_state)
+        if plan_terminal || status_terminal
+          plan_state = plan["status"].to_s.downcase
+          expected_status_state = plan_state == "complete" ? "COMPLETE" : "CANCELLED"
+          unless plan_terminal && status_terminal && status_state == expected_status_state
+            selection_errors << "#{path.relative_path_from(repo.root)}: plan and status terminal states must agree"
+            next
+          end
+          if plan_state == "cancelled"
+            cancellation_path = path.dirname.join("gates/cancellation.yaml")
+            unless cancellation_path.file?
+              selection_errors << "#{path.relative_path_from(repo.root)}: cancelled sprint terminalization requires an approved cancellation gate"
+              next
+            end
+            cancellation = Verdify.safe_load_yaml(cancellation_path)
+            cancellation_errors = SchemaValidator.new.validate(cancellation, SchemaValidator.load_document(Verdify::ROOT.join("schemas/human-gate.schema.yaml")))
+            cancellation_errors.concat(SemanticValidator.validate(cancellation))
+            cancellation_errors << "cancellation gate sprint_id must match" unless cancellation["sprint_id"] == expected_sprint_id
+            cancellation_errors << "cancellation gate must be an approved decision" unless cancellation["type"] == "decision" && cancellation["status"] == "approved" && cancellation["decision"].to_s.downcase == "cancel"
+            selection_errors.concat(cancellation_errors.map { |error| "#{cancellation_path.relative_path_from(repo.root)}: #{error}" })
+            verified_terminal_plans[path] = "cancelled" if cancellation_errors.empty?
+            next
+          end
+
+          delivery_evidence = validate_delivery_evidence(repo, path.dirname, expected_sprint_id)
+          release = delivery_evidence["release"]
+          outcome = delivery_evidence["outcome"]
+          terminal_errors = delivery_evidence["errors"]
+          if release && outcome
+            terminal_errors << "release verification must be verified" unless release["status"] == "verified"
+            terminal_errors << "outcome review must be accepted" unless %w[accepted accepted_with_risks].include?(outcome["decision"])
+          else
+            terminal_errors << "COMPLETE requires committed release verification and outcome review"
+          end
+          selection_errors.concat(terminal_errors.map { |error| "#{path.relative_path_from(repo.root)}: #{error}" })
+          verified_terminal_plans[path] = "complete" if terminal_errors.empty?
+        end
       end
+      unless selection_errors.empty?
+        evidence << { "source" => sprint_root_relative, "finding" => selection_errors.join("; ") }
+        return route_hash(repo, "SPRINT_PLAN_INVALID", "sprint-planning", "lane-transaction", "Committed sprint plans and statuses must validate and agree with their directory identity before sprint selection.", evidence, missing, open_gates)
+      end
+
+      active_plans = plans.reject { |path| verified_terminal_plans.key?(path) }
+      routeable_plans = active_plans
+      if requested_sprint_id
+        selected = active_plans.select { |path| plan_documents.fetch(path)["sprint_id"] == requested_sprint_id }
+        if selected.empty?
+          evidence << { "source" => sprint_root_relative, "finding" => "requested active sprint #{requested_sprint_id.inspect} was not found" }
+          return route_hash(repo, "SPRINT_SELECTION_REQUIRED", "project-router", "route", "The requested sprint is not an active committed transaction.", evidence, missing, open_gates)
+        end
+        routeable_plans = selected
+      end
+      if routeable_plans.length > 1
+        evidence << { "source" => sprint_root_relative, "finding" => "multiple active sprint plans: #{routeable_plans.map { |path| path.dirname.basename.to_s }.join(', ')}" }
+        return route_hash(repo, "SPRINT_TRANSACTION_AMBIGUOUS", "project-router", "route", "Multiple committed sprint transactions are active; rerun route with --sprint ID.", evidence, missing, open_gates)
+      end
+      plan_path = routeable_plans.first
       unless plan_path
         strategy_route = route_for_strategy(repo, root, evidence, missing, open_gates)
         return strategy_route if strategy_route
@@ -1226,9 +1500,21 @@ module Verdify
         return strategy_handoff_route(repo, root, evidence, missing, open_gates)
       end
 
-      plan = Verdify.safe_load_yaml(plan_path)
+      plan = plan_documents.fetch(plan_path)
       sprint_id = plan["sprint_id"]
       evidence << { "source" => plan_path.relative_path_from(repo.root).to_s, "finding" => "active sprint #{sprint_id} has status #{plan['status']}" }
+      plan_errors = SchemaValidator.new.validate(plan, SchemaValidator.load_document(Verdify::ROOT.join("schemas/sprint-plan.schema.yaml")))
+      plan_errors.concat(SemanticValidator.validate(plan))
+      unless plan_errors.empty?
+        evidence << { "source" => plan_path.relative_path_from(repo.root).to_s, "finding" => plan_errors.join("; ") }
+        return route_hash(repo, "SPRINT_PLAN_INVALID", "sprint-planning", "lane-transaction", "The committed sprint plan does not satisfy its schema and semantic contract.", evidence, missing, open_gates)
+      end
+      plan_relative_path = plan_path.relative_path_from(repo.root)
+      plan_commit = repo.last_change_sha(plan_relative_path, ref: repo.head_sha)
+      if plan_commit.nil? || repo.file_at(plan_commit, plan_relative_path) != plan_path.binread
+        evidence << { "source" => plan_relative_path.to_s, "finding" => "sprint plan is uncommitted or differs from its committed snapshot" }
+        return route_hash(repo, "SPRINT_PLAN_UNCOMMITTED", "sprint-planning", "lane-transaction", "The atomic sprint plan must be committed before routing can evaluate its lanes.", evidence, missing, open_gates)
+      end
       unless plan.dig("approval", "status") == "approved"
         return route_hash(repo, "SPRINT_PLAN_UNAPPROVED", "sprint-planning", "plan-approval", "The complete sprint/lane transaction is not approved.", evidence, missing, open_gates)
       end
@@ -1239,8 +1525,47 @@ module Verdify
         return route_hash(repo, "LANE_TRANSACTION_INCOMPLETE", "sprint-planning", "lane-transaction", "The approved sprint has no lane contracts.", evidence, missing, open_gates)
       end
 
+      planned_lanes = Array(plan["lanes"])
+      contract_documents = contracts.to_h { |path| [path, Verdify.safe_load_yaml(path)] }
+      planned_by_lane = planned_lanes.to_h { |lane| [lane["lane_id"], lane] }
+      contracts_by_lane = contract_documents.to_h { |path, contract| [contract["lane_id"], [path, contract]] }
+      transaction_errors = []
       contracts.each do |contract_path|
-        contract = Verdify.safe_load_yaml(contract_path)
+        relative = contract_path.relative_path_from(repo.root)
+        commit = repo.last_change_sha(relative, ref: repo.head_sha)
+        unless commit && repo.file_at(commit, relative) == contract_path.binread
+          transaction_errors << "#{relative}: lane contract is uncommitted or differs from its committed snapshot"
+        end
+      end
+      transaction_errors << "sprint plan contains duplicate lane IDs" unless planned_by_lane.length == planned_lanes.length
+      transaction_errors << "lane contracts contain duplicate lane IDs" unless contracts_by_lane.length == contracts.length
+      unless planned_by_lane.keys.sort == contracts_by_lane.keys.sort
+        transaction_errors << "planned lane IDs must exactly match contract lane IDs"
+      end
+      contracts_by_lane.each do |lane_id, (contract_path, contract)|
+        schema = SchemaValidator.load_document(Verdify::ROOT.join("schemas/lane-contract.schema.yaml"))
+        validation_errors = SchemaValidator.new.validate(contract, schema) + SemanticValidator.validate(contract)
+        transaction_errors.concat(validation_errors.map { |error| "#{lane_id}: #{error}" })
+        unless %w[approved dispatched changes_requested].include?(contract["status"]) && contract.dig("approval", "status") == "approved"
+          transaction_errors << "#{lane_id}: lane contract is not approved for execution"
+        end
+        transaction_errors << "#{lane_id}: lane contract sprint_id differs from the active sprint" unless contract["sprint_id"] == sprint_id
+        planned_lane = planned_by_lane[lane_id]
+        next unless planned_lane
+
+        transaction_errors << "#{lane_id}: issue assignment differs between sprint plan and contract" unless Array(planned_lane["issue_ids"]) == Array(contract["issue_ids"])
+        transaction_errors << "#{lane_id}: branch differs between sprint plan and contract" unless planned_lane["branch"] == contract["branch"]
+        actual_contract_path = contract_path.relative_path_from(repo.root).to_s
+        transaction_errors << "#{lane_id}: sprint plan contract_path does not identify the loaded contract" unless planned_lane["contract_path"] == actual_contract_path
+      end
+      unless transaction_errors.empty?
+        evidence << { "source" => plan_path.relative_path_from(repo.root).to_s, "finding" => transaction_errors.join("; ") }
+        return route_hash(repo, "LANE_TRANSACTION_INCOMPLETE", "sprint-planning", "lane-transaction", "The approved sprint and executable lane-contract set do not reconcile exactly.", evidence, missing, open_gates)
+      end
+
+      lane_review_results = {}
+      contracts.each do |contract_path|
+        contract = contract_documents.fetch(contract_path)
         lane_id = contract["lane_id"]
         closeout_path = plan_path.dirname.join("lanes/closeout/#{lane_id}.closeout.yaml")
         unless closeout_path.file?
@@ -1248,10 +1573,51 @@ module Verdify
           return route_hash(repo, "LANES_REQUIRE_ORCHESTRATION", "sprint-orchestrator", "platform-dispatch", "At least one approved lane has no worker closeout.", evidence, missing, open_gates)
         end
         critic_path = plan_path.dirname.join("critic/#{lane_id}.critic.yaml")
+        branch_tip = repo.commit_exists?(contract["branch"]) ? repo.head_sha(contract["branch"]) : nil
+        if repo.github_slug
+          begin
+            live_pull = repo.github_pull_request_for_branch(contract["branch"])
+            fetched_head = repo.fetch_pull_request_head(live_pull["number"])
+            evidence_document = Verdify.safe_load_yaml(critic_path.file? ? critic_path : closeout_path)
+            unless fetched_head == live_pull["head_sha"] && live_pull["number"] == evidence_document["pull_request"]
+              raise CommandError, "fetched lane PR head or number does not match the lane evidence"
+            end
+            branch_tip = fetched_head
+          rescue CommandError => e
+            source = critic_path.file? ? critic_path : closeout_path
+            evidence << { "source" => source.relative_path_from(repo.root).to_s, "finding" => e.message }
+            return route_hash(repo, "LANE_REVIEW_EVIDENCE_INVALID", "sprint-orchestrator", "gate-management", "The live lane PR head could not be fetched for evidence validation.", evidence, missing, open_gates)
+          end
+        end
         unless critic_path.file?
+          lane_tip = branch_tip || repo.head_sha
+          evidence_head = repo.last_change_sha(closeout_path.relative_path_from(repo.root), ref: lane_tip)
+          validation = LaneReviewValidator.new(
+            repo: repo,
+            contract_path: contract_path,
+            closeout_path: closeout_path
+          ).validate_closeout(evidence_head_sha: evidence_head)
+          unless validation.valid?
+            evidence << { "source" => closeout_path.relative_path_from(repo.root).to_s, "finding" => validation.errors.join("; ") }
+            return route_hash(repo, "LANE_CLOSEOUT_EVIDENCE_INVALID", "lane-delivery", "fix-forward", "The worker closeout or its implementation-to-evidence Git chain is invalid.", evidence, missing, open_gates)
+          end
           missing << critic_path.relative_path_from(repo.root).to_s
           return route_hash(repo, "LANE_READY_FOR_CRITIC", "independent-critic", "lane-review", "A worker closeout awaits fresh independent review.", evidence, missing, open_gates)
         end
+        review_validator = LaneReviewValidator.new(
+          repo: repo,
+          contract_path: contract_path,
+          closeout_path: closeout_path,
+          critic_path: critic_path
+        )
+        candidate_tips = [branch_tip, repo.head_sha].compact.uniq
+        candidate_results = candidate_tips.map { |tip| review_validator.validate_critic(tip_sha: tip) }
+        validation = candidate_results.find(&:valid?) || candidate_results.last
+        unless validation.valid?
+          evidence << { "source" => critic_path.relative_path_from(repo.root).to_s, "finding" => validation.errors.join("; ") }
+          return route_hash(repo, "LANE_REVIEW_EVIDENCE_INVALID", "sprint-orchestrator", "gate-management", "The critic artifact or implementation/evidence/report Git chain is invalid and cannot advance.", evidence, missing, open_gates)
+        end
+        lane_review_results[lane_id] = validation
         critic = Verdify.safe_load_yaml(critic_path)
         unless %w[approve approve_with_risks].include?(critic["outcome"])
           return route_hash(repo, "CRITIC_ACTION_REQUIRED", "sprint-orchestrator", "gate-management", "A critic outcome requires fixes, blocking, or human review.", evidence, missing, open_gates)
@@ -1261,9 +1627,128 @@ module Verdify
       review_path = plan_path.dirname.join("review/review-inbox-packet.yaml")
       unless review_path.file?
         missing << review_path.relative_path_from(repo.root).to_s
-        return route_hash(repo, "REVIEW_INBOX_REQUIRED", "release-verification", "review-inbox", "Critic-approved lanes need a review inbox packet before integration or human review.", evidence, missing, open_gates)
+        return route_hash(repo, "REVIEW_INBOX_REQUIRED", "release-verification", "review-inbox", "Lanes with approving critic outcomes need a review inbox packet before integration or human review.", evidence, missing, open_gates)
       end
       review = Verdify.safe_load_yaml(review_path)
+      review_errors = SchemaValidator.new.validate(review, SchemaValidator.load_document(Verdify::ROOT.join("schemas/review-inbox-packet.schema.yaml")))
+      review_errors.concat(SemanticValidator.validate(review))
+      unless review_errors.empty?
+        evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => review_errors.join("; ") }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet does not validate against the current evidence contract.", evidence, missing, open_gates)
+      end
+      review_relative_path = review_path.relative_path_from(repo.root)
+      review_commit = repo.last_change_sha(review_relative_path, ref: repo.head_sha)
+      packet_commit_is_atomic = review_commit &&
+                                repo.commit_parents(review_commit).length == 1 &&
+                                repo.changed_paths(review_commit) == [review_relative_path.to_s]
+      packet_snapshot_valid = review_commit &&
+                              repo.ancestor?(review_commit, repo.head_sha) &&
+                              repo.file_at(review_commit, review_relative_path) == review_path.binread
+      if review_commit.nil? || !packet_commit_is_atomic || !packet_snapshot_valid
+        evidence << { "source" => review_relative_path.to_s, "finding" => "review packet is uncommitted, differs from its committed snapshot, is not on the controller history, or shares its commit with another path" }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet must be the only changed path in its authoritative controller commit.", evidence, missing, open_gates)
+      end
+      release_verification_relative = plan_path.dirname.join("release/release-verification.yaml").relative_path_from(repo.root).to_s
+      outcome_review_relative = plan_path.dirname.join("outcome/outcome-review.yaml").relative_path_from(repo.root).to_s
+      status_relative = plan_path.dirname.join("status.yaml").relative_path_from(repo.root).to_s
+      post_packet_allowed_paths = [release_verification_relative, outcome_review_relative, status_relative, plan_relative_path.to_s]
+      post_packet_errors = []
+      repo.commits_between(review_commit, repo.head_sha).each do |commit|
+        post_packet_errors << "post-packet controller suffix contains merge commit #{commit}" unless repo.commit_parents(commit).length == 1
+        paths = repo.changed_paths(commit)
+        unauthorized = paths - post_packet_allowed_paths
+        post_packet_errors << "post-packet controller commit #{commit} changes unauthorized paths: #{unauthorized.join(', ')}" unless unauthorized.empty?
+        if paths.include?(plan_relative_path.to_s) && paths.sort != [plan_relative_path.to_s, status_relative].sort
+          post_packet_errors << "sprint-plan terminalization must atomically change only sprint-plan.yaml and status.yaml"
+        end
+      end
+      unless post_packet_errors.empty?
+        evidence << { "source" => review_relative_path.to_s, "finding" => post_packet_errors.join("; ") }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "Only canonical release, outcome, status, and atomic terminalization artifacts may follow the review packet.", evidence, missing, open_gates)
+      end
+      controller_ref = review.dig("traceability", "head_ref")
+      expected_controller_ref = "controller/#{Verdify.slug(sprint_id)}"
+      current_branch = repo.current_branch
+      lane_branches = contract_documents.values.map { |contract| contract["branch"] }
+      remote_controller_head = begin
+        current_branch.to_s.empty? ? nil : repo.remote_branch_sha(current_branch)
+      rescue CommandError
+        nil
+      end
+      unless !current_branch.to_s.empty? &&
+             controller_ref == current_branch &&
+             controller_ref == expected_controller_ref &&
+             !lane_branches.include?(current_branch) &&
+             remote_controller_head == repo.head_sha
+        evidence << { "source" => review_relative_path.to_s, "finding" => "review packet controller ref is detached, lane-owned, unpushed, stale, or not the declared head_ref" }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet must exist on a pushed authoritative controller branch separate from lane PR branches.", evidence, missing, open_gates)
+      end
+      controller_baseline = plan["baseline_sha"].to_s
+      controller_allowed_paths = [
+        plan_relative_path.to_s,
+        review_relative_path.to_s,
+        plan_path.dirname.join("release/wave-release-plan.yaml").relative_path_from(repo.root).to_s,
+        release_verification_relative,
+        outcome_review_relative,
+        status_relative,
+        *contracts.map { |path| path.relative_path_from(repo.root).to_s },
+        *lane_review_results.keys.flat_map do |lane_id|
+          [
+            plan_path.dirname.join("lanes/closeout/#{lane_id}.closeout.yaml").relative_path_from(repo.root).to_s,
+            plan_path.dirname.join("critic/#{lane_id}.critic.yaml").relative_path_from(repo.root).to_s
+          ]
+        end
+      ].uniq.sort
+      controller_history_errors = []
+      unless controller_baseline.match?(/\A[0-9a-f]{40}\z/i) && repo.commit_exists?(controller_baseline) && repo.ancestor?(controller_baseline, repo.head_sha)
+        controller_history_errors << "controller evidence branch must descend from the SprintPlan baseline_sha"
+      else
+        repo.commits_between(controller_baseline, repo.head_sha).each do |commit|
+          controller_history_errors << "controller evidence branch contains merge commit #{commit}" unless repo.commit_parents(commit).length == 1
+          unauthorized = repo.changed_paths(commit) - controller_allowed_paths
+          unless unauthorized.empty?
+            controller_history_errors << "controller evidence commit #{commit} changes unauthorized paths: #{unauthorized.join(', ')}"
+          end
+        end
+      end
+      lane_review_results.each do |lane_id, result|
+        {
+          plan_relative_path.to_s => plan_path,
+          plan_path.dirname.join("release/wave-release-plan.yaml").relative_path_from(repo.root).to_s => plan_path.dirname.join("release/wave-release-plan.yaml")
+        }.each do |relative, working_path|
+          begin
+            unless working_path.file? && repo.file_at(result.critic_report_head_sha, relative) == working_path.binread
+              controller_history_errors << "#{lane_id}: controller #{relative} does not match the externally reviewed lane head"
+            end
+          rescue CommandError => e
+            controller_history_errors << "#{lane_id}: could not verify #{relative} at the reviewed lane head: #{e.message}"
+          end
+        end
+      end
+      unless controller_history_errors.empty?
+        evidence << { "source" => review_relative_path.to_s, "finding" => controller_history_errors.join("; ") }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The controller branch is evidence-only: it must linearly copy the approved transaction and lane evidence without implementation changes.", evidence, missing, open_gates)
+      end
+      packet_scope_errors = []
+      expected_lane_ids = lane_review_results.keys.sort
+      expected_issue_ids = lane_review_results.values.flat_map { |result| result.closeout["issue_ids"] }.uniq.sort
+      expected_pull_requests = lane_review_results.values.map { |result| result.critic["pull_request"] }.uniq.sort
+      packet_scope_errors << "scope.sprint_id does not match active sprint" unless review.dig("scope", "sprint_id") == sprint_id
+      packet_scope_errors << "scope.lane_ids do not match validated lanes" unless Array(review.dig("scope", "lane_ids")).sort == expected_lane_ids
+      packet_scope_errors << "scope.issue_ids do not match validated lane issues" unless Array(review.dig("scope", "issue_ids")).sort == expected_issue_ids
+      submission_pull_requests = Array(review.dig("traceability", "review_submissions")).map { |item| item["pull_request"] }.sort
+      packet_scope_errors << "review/status bindings do not match validated lane pull requests" unless submission_pull_requests == expected_pull_requests
+      packet_pull_requests = Array(review["pull_requests"]).filter_map do |item|
+        item["identifier"].to_s[/([0-9]+)\z/, 1]&.to_i
+      end.sort
+      packet_scope_errors << "pull_requests do not match validated lane pull requests" unless packet_pull_requests == expected_pull_requests
+      if repo.github_slug && review.dig("traceability", "repository") != repo.github_slug
+        packet_scope_errors << "traceability.repository does not match GitHub repository"
+      end
+      unless packet_scope_errors.empty?
+        evidence << { "source" => review_relative_path.to_s, "finding" => packet_scope_errors.join("; ") }
+        return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet is not bound to the active sprint, lanes, issues, and pull requests.", evidence, missing, open_gates)
+      end
       evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => "review packet status is #{review['status'].inspect}, evidence verdict is #{review.dig('evidence_completeness', 'verdict').inspect}, recommendation is #{review.dig('recommendation', 'outcome').inspect}" }
       unless %w[ready approved].include?(review["status"]) &&
              review.dig("evidence_completeness", "verdict") == "complete" &&
@@ -1271,19 +1756,124 @@ module Verdify
         return route_hash(repo, "REVIEW_INBOX_INCOMPLETE", "release-verification", "review-inbox", "The review inbox packet is missing complete evidence or an approve recommendation.", evidence, missing, open_gates)
       end
 
-      release_path = plan_path.dirname.join("release/release-verification.yaml")
-      unless release_path.file?
-        missing << release_path.relative_path_from(repo.root).to_s
-        return route_hash(repo, "READY_FOR_INTEGRATION", "release-verification", "integration", "All required lanes have current critic approval; integration evidence is missing.", evidence, missing, open_gates)
+      delivery_evidence = validate_delivery_evidence(repo, plan_path.dirname, sprint_id)
+      unless delivery_evidence["errors"].empty?
+        evidence << { "source" => plan_path.dirname.relative_path_from(repo.root).to_s, "finding" => delivery_evidence["errors"].join("; ") }
+        return route_hash(repo, "RELEASE_EVIDENCE_INVALID", "release-verification", "integration", "Committed release or outcome evidence is invalid.", evidence, missing, open_gates)
       end
-      release = Verdify.safe_load_yaml(release_path)
+      release = delivery_evidence["release"]
+      outcome = delivery_evidence["outcome"]
+      post_integration = delivery_phase(release) == "post_integration"
+
+      review_submissions = Array(review.dig("traceability", "review_submissions"))
+      transport_neutral_integration = true
+      lane_review_results.each_value do |lane_result|
+        pull_request = lane_result.critic["pull_request"]
+        recorded_submission = review_submissions.find { |item| item["pull_request"] == pull_request }
+        unless recorded_submission
+          evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => "missing review/status binding for PR ##{pull_request}" }
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Every lane requires its own commit-bound critic status or human review record.", evidence, missing, open_gates)
+        end
+        begin
+          pull_evidence = repo.github_pull_request_evidence(pull_request)
+          github_policy = lane_github_policy(repo, lane_result)
+          expected_base = github_policy.fetch("base_ref")
+          dev_integration = expected_base == "dev"
+          transport_neutral_integration &&= dev_integration
+          unless review.dig("traceability", "base_ref") == expected_base
+            raise CommandError, "review packet base_ref does not match the lane implementation's committed repository policy"
+          end
+          if post_integration
+            integrated_sha = release["integrated_sha"].to_s
+            remote_base_sha = repo.remote_branch_sha(expected_base)
+            fetched_base_sha = repo.fetch_branch_head(expected_base)
+            unless integrated_sha.match?(/\A[0-9a-f]{40}\z/i) && remote_base_sha == integrated_sha && fetched_base_sha == integrated_sha
+              raise CommandError, "release integrated_sha does not equal the current remote integration branch head"
+            end
+            merge_commit_sha = pull_evidence["merge_commit_sha"].to_s
+            unless merge_commit_sha.match?(/\A[0-9a-f]{40}\z/i) && repo.commit_exists?(merge_commit_sha) && repo.ancestor?(merge_commit_sha, integrated_sha)
+              raise CommandError, "merged pull request commit is not contained in release integrated_sha"
+            end
+          end
+          ref_identity_ok = pull_evidence["head_ref"] == lane_result.contract["branch"] &&
+                            pull_evidence["base_ref"] == expected_base
+          state_ok = if post_integration
+                       pull_evidence["merged"] == true && pull_evidence["state"].to_s.downcase == "merged"
+                     else
+                       pull_evidence["state"].to_s.downcase == "open" && pull_evidence["draft"] == false
+                     end
+          unless ref_identity_ok && state_ok
+            phase = post_integration ? "merged" : "open review-ready"
+            raise CommandError, "pull request is not a #{phase} lane PR on the expected head/base refs"
+          end
+          checks = Array(pull_evidence["checks"])
+          required_checks = github_policy.fetch("required_checks")
+          checks_ok = required_checks_succeed?(checks, required_checks)
+          merge_state_ok = post_integration || %w[CLEAN HAS_HOOKS].include?(pull_evidence["merge_state_status"].to_s.upcase)
+          unless checks_ok && merge_state_ok
+            raise CommandError, "live pull request checks or phase-appropriate merge state are not valid at the current head"
+          end
+          contract_path = contracts.find { |path| Verdify.safe_load_yaml(path)["lane_id"] == lane_result.contract["lane_id"] }
+          lane_validator = LaneReviewValidator.new(
+            repo: repo,
+            contract_path: contract_path,
+            closeout_path: plan_path.dirname.join("lanes/closeout/#{lane_result.contract['lane_id']}.closeout.yaml"),
+            critic_path: plan_path.dirname.join("critic/#{lane_result.contract['lane_id']}.critic.yaml")
+          )
+          if dev_integration
+            submission_validation = lane_validator.validate_critic_status(
+              result: lane_result,
+              pull_request_head_sha: pull_evidence["head_sha"]
+            )
+            unless recorded_submission["review_submission_head_sha"] == lane_result.critic_report_head_sha
+              raise CommandError, "recorded critic status head does not match the critic report head"
+            end
+          else
+            reviewer_permission = repo.github_collaborator_permission(recorded_submission["reviewer_login"])
+            unless reviewer_permission["login"].to_s.casecmp?(recorded_submission["reviewer_login"].to_s) &&
+                   reviewer_permission["id"] == recorded_submission["reviewer_id"]
+              raise CommandError, "recorded reviewer identity does not match GitHub collaborator identity"
+            end
+            submission_validation = lane_validator.validate_submission(
+              result: lane_result,
+              review_submission_head_sha: recorded_submission["review_submission_head_sha"],
+              expected_reviewer_login: recorded_submission["reviewer_login"],
+              expected_reviewer_id: recorded_submission["reviewer_id"],
+              reviewer_permission: reviewer_permission["permission"],
+              pull_request_head_sha: pull_evidence["head_sha"],
+              pull_request_author: pull_evidence["author"],
+              pull_request_author_id: pull_evidence["author_id"],
+              submitted_reviews: pull_evidence["reviews"]
+            )
+          end
+        rescue CommandError => e
+          evidence << { "source" => "GitHub PR ##{pull_request}", "finding" => e.message }
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Live current-head critic or GitHub review evidence could not be verified.", evidence, missing, open_gates)
+        end
+        unless submission_validation.valid?
+          evidence << { "source" => "GitHub PR ##{pull_request}", "finding" => submission_validation.errors.join("; ") }
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "The phase-appropriate critic or human review evidence does not agree with the live pull-request head.", evidence, missing, open_gates)
+        end
+      end
+
+      if release.nil? || release["status"] == "pending"
+        missing << plan_path.dirname.join("release/release-verification.yaml").relative_path_from(repo.root).to_s
+        reason = if transport_neutral_integration
+                   "All required critic-report heads have current transport-neutral critic status; integration evidence is missing."
+                 else
+                   "All required critic-report heads have current external admin or maintainer approval; integration evidence is missing."
+                 end
+        return route_hash(repo, "READY_FOR_INTEGRATION", "release-verification", "integration", reason, evidence, missing, open_gates)
+      end
+      if release["status"] == "integration_failed"
+        return route_hash(repo, "INTEGRATION_FAILED", "release-verification", "integration", "The recorded integration attempt failed and requires fix-forward before deployment.", evidence, missing, open_gates)
+      end
       unless release["status"] == "verified"
         return route_hash(repo, "DEPLOYMENT_NOT_VERIFIED", "release-verification", "deployment-verification", "The integrated revision has not been verified in the target environment.", evidence, missing, open_gates)
       end
 
-      outcome_path = plan_path.dirname.join("outcome/outcome-review.yaml")
-      unless outcome_path.file? && %w[accepted accepted_with_risks].include?(Verdify.safe_load_yaml(outcome_path)["decision"])
-        missing << outcome_path.relative_path_from(repo.root).to_s
+      unless outcome && %w[accepted accepted_with_risks].include?(outcome["decision"])
+        missing << plan_path.dirname.join("outcome/outcome-review.yaml").relative_path_from(repo.root).to_s
         return route_hash(repo, "OUTCOME_REVIEW_REQUIRED", "release-verification", "outcome-review", "Runtime verification exists but human outcome acceptance is missing or incomplete.", evidence, missing, open_gates)
       end
 
@@ -1304,9 +1894,130 @@ module Verdify
       end
 
       head = repo.head_sha
-      return nil if strategy["baseline_sha"].to_s == head
+      baseline = strategy["baseline_sha"].to_s
+      strategy_paths = [
+        strategy_path,
+        root.join("strategy/state-of-union.md"),
+        root.join("strategy/github-backlog-sync.yaml")
+      ].select(&:file?).map { |path| path.relative_path_from(repo.root).to_s }
+      baseline_valid = baseline.match?(/\A[0-9a-f]{40}\z/i) &&
+                       repo.commit_exists?(baseline) &&
+                       repo.ancestor?(baseline, head)
+      suffix_paths = if baseline_valid
+                       repo.commits_between(baseline, head).flat_map { |commit| repo.changed_paths(commit) }.uniq.sort
+                     else
+                       []
+                     end
+      unauthorized_paths = suffix_paths - strategy_paths
+      snapshot_errors = strategy_paths.filter_map do |relative|
+        commit = repo.last_change_sha(relative, ref: head)
+        path = repo.root.join(relative)
+        relative unless commit && repo.file_at(commit, relative) == path.binread
+      end
+      if baseline_valid && unauthorized_paths.empty? && snapshot_errors.empty?
+        return nil
+      end
+
+      findings = []
+      findings << "baseline_sha must be a full ancestor commit" unless baseline_valid
+      findings << "post-assessment changes include non-strategy paths: #{unauthorized_paths.join(', ')}" unless unauthorized_paths.empty?
+      findings << "strategy artifacts are uncommitted or differ from HEAD: #{snapshot_errors.join(', ')}" unless snapshot_errors.empty?
+      evidence << { "source" => strategy_path.relative_path_from(repo.root).to_s, "finding" => findings.join("; ") }
 
       route_hash(repo, "STATE_OF_UNION_STALE", "state-of-union", "strategy-refresh", "The approved strategy was assessed against a different repository baseline.", evidence, missing, open_gates)
+    end
+
+    def lane_github_policy(repo, lane_result)
+      sprint_id = lane_result.contract["sprint_id"]
+      lane_id = lane_result.contract["lane_id"]
+      authority_sha = lane_result.dispatch_head_sha
+      raise CommandError, "approved dispatch head is unavailable" unless authority_sha
+      relative = ".agent-workflow/sprints/#{sprint_id}/release/wave-release-plan.yaml"
+      content = repo.file_at(authority_sha, relative)
+      policy = YAML.safe_load(content, permitted_classes: [], aliases: false) || {}
+      schema = SchemaValidator.load_document(Verdify::ROOT.join("schemas/wave-release-plan.schema.yaml"))
+      validation_errors = SchemaValidator.new.validate(policy, schema) + SemanticValidator.validate(policy)
+      validation_errors << "wave release plan must be approved" unless policy["status"] == "approved" && policy.dig("approval", "status") == "approved"
+      validation_errors << "wave release plan sprint_id must match the lane" unless policy.dig("scope", "sprint_id") == sprint_id
+      validation_errors << "wave release plan must include the lane" unless Array(policy.dig("scope", "lane_ids")).include?(lane_id)
+      if repo.github_slug && policy.dig("github", "repository") != repo.github_slug
+        validation_errors << "wave release plan repository must match the GitHub remote"
+      end
+      working_path = repo.root.join(relative)
+      validation_errors << "controller wave release plan must match the approved lane-contract snapshot" unless working_path.file? && working_path.binread == content
+      base_ref = policy.dig("branch_model", "base_ref").to_s
+      required_checks = Array(policy.dig("github", "required_checks")).map(&:to_s).reject(&:empty?)
+      required_checks << "critic-gate" if base_ref == "dev"
+      required_checks.uniq!
+      validation_errors << "wave release plan must define a base_ref and required checks" if base_ref.empty? || required_checks.empty?
+      raise CommandError, validation_errors.join("; ") unless validation_errors.empty?
+
+      { "base_ref" => base_ref, "required_checks" => required_checks }
+    rescue Psych::Exception, CommandError => e
+      raise CommandError, "could not load the wave release policy from the approved lane-contract snapshot: #{e.message}"
+    end
+
+    def validate_delivery_evidence(repo, sprint_root, sprint_id)
+      result = { "release" => nil, "outcome" => nil, "errors" => [] }
+      {
+        "release" => [sprint_root.join("release/release-verification.yaml"), "release-verification.schema.yaml"],
+        "outcome" => [sprint_root.join("outcome/outcome-review.yaml"), "outcome-review.schema.yaml"]
+      }.each do |name, (path, schema_name)|
+        next unless path.file?
+
+        relative = path.relative_path_from(repo.root)
+        commit = repo.last_change_sha(relative, ref: repo.head_sha)
+        unless commit && repo.file_at(commit, relative) == path.binread
+          result["errors"] << "#{relative}: artifact is uncommitted or differs from its committed snapshot"
+          next
+        end
+        document = Verdify.safe_load_yaml(path)
+        errors = SchemaValidator.new.validate(document, SchemaValidator.load_document(Verdify::ROOT.join("schemas", schema_name)))
+        errors.concat(SemanticValidator.validate(document))
+        errors << "sprint_id must match the active sprint" unless document["sprint_id"] == sprint_id
+        if name == "release" && document["status"] == "verified"
+          integrated_sha = document["integrated_sha"].to_s
+          errors << "verified release integrated_sha must be a full commit SHA" unless integrated_sha.match?(/\A[0-9a-f]{40}\z/i)
+          errors << "verified deployment observed_revision must equal integrated_sha" unless document.dig("deployment", "observed_revision") == integrated_sha
+          errors << "verified release cannot contain failed integration results" if Array(document["integration_results"]).any? { |item| item["result"] == "failed" }
+          errors << "verified release cannot contain failed runtime checks" if Array(document["runtime_checks"]).any? { |item| item["result"] == "failed" }
+          errors << "verified release must record verified_at and verifier" if document["verified_at"].to_s.empty? || document["verifier"].to_s.empty?
+        end
+        result["errors"].concat(errors.map { |error| "#{relative}: #{error}" })
+        result[name] = document
+      end
+      if result["outcome"] && !result["release"]
+        result["errors"] << "outcome review cannot precede release verification"
+      end
+      result
+    rescue CommandError => e
+      result["errors"] << e.message
+      result
+    end
+
+    def delivery_phase(release)
+      return "pre_integration" unless release
+
+      %w[ready_for_deployment deployment_failed rolled_back verified].include?(release["status"]) ? "post_integration" : "pre_integration"
+    end
+
+    def required_checks_succeed?(checks, required_names)
+      return false if required_names.empty?
+
+      required_names.all? do |required_name|
+        matches = checks.select { |check| check["name"] == required_name }
+        next false if matches.empty?
+
+        latest = if matches.length == 1
+                   matches.first
+                 elsif matches.all? { |check| !(check["started_at"] || check["completed_at"]).to_s.empty? }
+                   matches.max_by do |check|
+                     [check["started_at"] || check["completed_at"], check["id"].to_s]
+                   end
+                 end
+        terminal = latest && (latest["status"].to_s.empty? || latest["status"].to_s.upcase == "COMPLETED")
+        terminal && latest["conclusion"].to_s.upcase == "SUCCESS"
+      end
     end
 
     def strategy_handoff_route(repo, root, evidence, missing, open_gates)
@@ -1534,6 +2245,64 @@ module Verdify
       contract
     end
 
+    def load_lane_dispatch_artifacts(contract_path, contract)
+      source_repo = GitRepository.new(contract_path.dirname)
+      sprint_root = source_repo.root.join(".agent-workflow/sprints", contract["sprint_id"])
+      paths = [
+        sprint_root.join("sprint-plan.yaml"),
+        sprint_root.join("release/wave-release-plan.yaml"),
+        contract_path
+      ]
+      paths.each { |path| raise UsageError, "approved lane dispatch artifact not found: #{path}" unless path.file? }
+      plan = Verdify.safe_load_yaml(paths[0])
+      wave = Verdify.safe_load_yaml(paths[1])
+      validation_errors = []
+      {
+        paths[0] => "sprint-plan.schema.yaml",
+        paths[1] => "wave-release-plan.schema.yaml"
+      }.each do |path, schema_name|
+        document = path == paths[0] ? plan : wave
+        errors = SchemaValidator.new.validate(document, SchemaValidator.load_document(Verdify::ROOT.join("schemas", schema_name)))
+        errors.concat(SemanticValidator.validate(document))
+        validation_errors.concat(errors.map { |error| "#{path}: #{error}" })
+      end
+      planned_lane = Array(plan["lanes"]).find { |lane| lane["lane_id"] == contract["lane_id"] }
+      validation_errors << "sprint plan must be approved" unless plan.dig("approval", "status") == "approved"
+      validation_errors << "sprint plan must identify the approved lane contract and branch" unless planned_lane &&
+                                                                                               planned_lane["contract_path"] == contract_path.relative_path_from(source_repo.root).to_s &&
+                                                                                               planned_lane["branch"] == contract["branch"]
+      validation_errors << "wave release plan must be approved" unless wave["status"] == "approved" && wave.dig("approval", "status") == "approved"
+      validation_errors << "wave release plan must include the lane" unless wave.dig("scope", "sprint_id") == contract["sprint_id"] &&
+                                                                          Array(wave.dig("scope", "lane_ids")).include?(contract["lane_id"])
+      paths.each do |path|
+        relative = path.relative_path_from(source_repo.root)
+        commit = source_repo.last_change_sha(relative, ref: source_repo.head_sha)
+        unless commit && source_repo.file_at(commit, relative) == path.binread
+          validation_errors << "#{relative}: dispatch artifact must be committed exactly at the source HEAD"
+        end
+      end
+      raise UsageError, "invalid lane dispatch transaction:\n#{validation_errors.join("\n")}" unless validation_errors.empty?
+
+      paths.map do |path|
+        [path.relative_path_from(source_repo.root).to_s, path.binread]
+      end
+    end
+
+    def seed_lane_dispatch_artifacts(worktree_path, artifacts, lane_id)
+      worktree = Pathname.new(worktree_path)
+      artifacts.each do |relative, content|
+        destination = worktree.join(relative)
+        FileUtils.mkdir_p(destination.dirname)
+        Verdify.atomic_write(destination, content) unless destination.file? && destination.binread == content
+      end
+      worktree_repo = GitRepository.new(worktree)
+      worktree_repo.git("add", "--", *artifacts.map(&:first))
+      staged = worktree_repo.git("diff", "--cached", "--quiet", allow_failure: true)
+      return if staged.last.success?
+
+      worktree_repo.git("commit", "-m", "chore(verdify): seed approved dispatch for #{lane_id}")
+    end
+
     def enforce_lane_contract!(contract, options)
       raise UsageError, "contract lane_id does not match --lane-id" unless contract["lane_id"] == options[:lane_id]
       raise UsageError, "contract sprint_id does not match --sprint" unless contract["sprint_id"] == options[:sprint]
@@ -1665,6 +2434,291 @@ module Verdify
       errors = SchemaValidator.new.validate(document, schema)
       errors.concat(SemanticValidator.validate(document))
       raise Error, "#{label} failed validation:\n#{errors.join("\n")}" unless errors.empty?
+    end
+
+    def skill_packs
+      Dir[Verdify::ROOT.join("packs/*/pack.yaml")].sort.map do |path|
+        load_skill_pack(Pathname.new(path).dirname.basename.to_s)
+      end
+    end
+
+    def load_skill_pack(name)
+      raise UsageError, "invalid pack name: #{name.inspect}" unless name.to_s.match?(/\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/)
+
+      path = Verdify::ROOT.join("packs", name, "pack.yaml")
+      raise UsageError, "unknown skill pack #{name.inspect}; run `verdify pack list`" unless path.file?
+
+      pack = Verdify.safe_load_yaml(path)
+      validate_hash!(pack, "skill-pack.schema.yaml", "skill pack #{name}")
+      raise UsageError, "pack name does not match directory: #{name}" unless pack["name"] == name
+
+      unknown = pack_skill_names(pack, true) - all_skill_names
+      raise UsageError, "pack #{name} references unknown skills: #{unknown.join(', ')}" unless unknown.empty?
+
+      pack
+    end
+
+    def pack_skill_names(pack, include_optional)
+      skills = Array(pack.dig("includes", "required")).map(&:to_s)
+      skills += Array(pack.dig("includes", "optional")).map(&:to_s) if include_optional
+      skills.uniq
+    end
+
+    def all_skill_names
+      Dir[Verdify::ROOT.join("skills/*/SKILL.md")].sort.map { |path| Pathname.new(path).dirname.basename.to_s }
+    end
+
+    def install_pack_transaction(repo_root, pack, skills, options)
+      hosts = options[:host] == "all" ? %w[codex claude] : [options[:host]]
+      host_dirs = { "codex" => ".agents/skills", "claude" => ".claude/skills" }
+      manifest_path = repo_root.join(".agent-skills/verdify-packs/#{pack['name']}.yaml")
+      manifest_content = pack_manifest_content(pack, skills, options)
+      targets = hosts.flat_map do |current_host|
+        skills.map do |skill|
+          source = Verdify::ROOT.join("skills", skill)
+          raise UsageError, "missing source skill #{skill}" unless source.join("SKILL.md").file?
+
+          {
+            path: repo_root.join(host_dirs.fetch(current_host), skill),
+            kind: :symlink,
+            source: source
+          }
+        end
+      end
+      targets << { path: manifest_path, kind: :file, content: manifest_content }
+
+      targets.each do |target|
+        ensure_pack_parent_path!(repo_root, target.fetch(:path).dirname)
+        path = target.fetch(:path)
+        next unless path.exist? || path.symlink?
+
+        same = if target.fetch(:kind) == :symlink
+                 begin
+                   path.symlink? && path.realpath == target.fetch(:source).realpath
+                 rescue Errno::ENOENT
+                   false
+                 end
+               else
+                 path.file? && !path.symlink? && path.read == target.fetch(:content)
+               end
+        target[:keep] = same
+        raise UsageError, "refusing to replace #{path}; pass --force" unless same || options[:force]
+      end
+
+      changed_targets = targets.reject { |target| target[:keep] }
+      operator_targets = changed_targets.select { |target| pack_path_present?(target.fetch(:path)) }
+      backup_root = Pathname.new(Dir.mktmpdir("verdify-pack-rollback-"))
+      backups = {}
+      created_paths = []
+      replaced_paths = []
+      created_dirs = []
+      committed = false
+      rollback_errors = []
+
+      begin
+        # Copy and verify every operator-owned target before the first mutation.
+        # A backup failure therefore leaves the entire destination tree intact.
+        operator_targets.each_with_index do |target, index|
+          path = target.fetch(:path)
+          inject_pack_failure!("backup-#{index}")
+          backup = backup_root.join(index.to_s)
+          snapshot = pack_path_snapshot(path)
+          copy_pack_backup!(path, backup, snapshot)
+          backups[path.to_s] = { path: path, backup: backup, snapshot: snapshot }
+        end
+
+        changed_targets.each_with_index do |target, index|
+          path = target.fetch(:path)
+          inject_pack_failure!("write-#{index}")
+          if (backup = backups[path.to_s])
+            raise Error, "pack target changed after backup: #{path}" unless pack_path_snapshot(path) == backup.fetch(:snapshot)
+
+            FileUtils.rm_rf(path)
+            replaced_paths << path
+          end
+
+          missing = []
+          cursor = path.dirname
+          until cursor == repo_root || cursor.exist? || cursor.symlink?
+            missing << cursor
+            cursor = cursor.dirname
+          end
+          FileUtils.mkdir_p(path.dirname)
+          created_dirs.concat(missing.reverse)
+
+          if target.fetch(:kind) == :symlink
+            source = target.fetch(:source)
+            File.symlink(source.relative_path_from(path.dirname), path)
+            created_paths << path unless backups.key?(path.to_s)
+          end
+        end
+
+        inject_pack_failure!("before-manifest")
+
+        manifest_target = changed_targets.find { |target| target.fetch(:kind) == :file }
+        if manifest_target
+          Verdify.atomic_write(manifest_target.fetch(:path), manifest_target.fetch(:content))
+          manifest_path = manifest_target.fetch(:path)
+          created_paths << manifest_path unless backups.key?(manifest_path.to_s)
+        end
+        inject_pack_failure!("after-manifest")
+        committed = true
+      rescue StandardError => original_error
+        created_paths.reverse_each do |path|
+          FileUtils.rm_rf(path) if pack_path_present?(path)
+        rescue StandardError => rollback_error
+          rollback_errors << "remove created #{path}: #{rollback_error.message}"
+        end
+        replaced_paths.reverse_each.with_index do |path, index|
+          backup = backups.fetch(path.to_s)
+          begin
+            restore_pack_backup!(path, backup_root, backup.fetch(:backup), backup.fetch(:snapshot), index)
+          rescue StandardError => rollback_error
+            rollback_errors << "restore #{path}: #{rollback_error.message}"
+          end
+        end
+        created_dirs.reverse_each do |dir|
+          Dir.rmdir(dir) if dir.directory? && dir.children.empty?
+        rescue StandardError => rollback_error
+          rollback_errors << "remove directory #{dir}: #{rollback_error.message}"
+        end
+        unless rollback_errors.empty?
+          raise Error, "#{original_error.message}; rollback incomplete (#{rollback_errors.join('; ')}); verified backups retained at #{backup_root}"
+        end
+        raise original_error
+      ensure
+        FileUtils.rm_rf(backup_root) if committed || rollback_errors.empty?
+      end
+    end
+
+    def pack_path_present?(path)
+      path.exist? || path.symlink?
+    end
+
+    def pack_path_snapshot(path)
+      stat = path.lstat
+      mode = stat.mode & 0o7777
+      if stat.symlink?
+        [:symlink, mode, path.readlink.to_s]
+      elsif stat.file?
+        [:file, mode, stat.size, Digest::SHA256.file(path).hexdigest]
+      elsif stat.directory?
+        children = path.children.sort_by { |child| child.basename.to_s }.map do |child|
+          [child.basename.to_s, pack_path_snapshot(child)]
+        end
+        [:directory, mode, children]
+      else
+        raise UsageError, "pack target has unsupported file type: #{path}"
+      end
+    end
+
+    def copy_pack_backup!(path, backup, expected_snapshot)
+      staging = backup.sub_ext(".staging")
+      FileUtils.rm_rf(staging)
+      FileUtils.copy_entry(path, staging, true, false, true)
+      raise Error, "pack backup verification failed for #{path}" unless pack_path_snapshot(staging) == expected_snapshot
+
+      File.rename(staging, backup)
+      fsync_pack_backup!(backup)
+      raise Error, "pack backup changed while becoming durable for #{path}" unless pack_path_snapshot(backup) == expected_snapshot
+    ensure
+      FileUtils.rm_rf(staging) if staging && pack_path_present?(staging)
+    end
+
+    def fsync_pack_backup!(path)
+      if path.file? && !path.symlink?
+        File.open(path, "rb", &:fsync)
+      elsif path.directory? && !path.symlink?
+        path.children.each { |child| fsync_pack_backup!(child) }
+      end
+      File.open(path.dirname, File::RDONLY, &:fsync)
+    rescue Errno::EINVAL, Errno::ENOTSUP
+      # Some filesystems do not expose directory fsync; file contents were still
+      # flushed and the verified backup remains available for rollback.
+      nil
+    end
+
+    def restore_pack_backup!(path, backup_root, backup, expected_snapshot, index)
+      restore = backup_root.join("restore-#{index}")
+      FileUtils.rm_rf(restore)
+      FileUtils.copy_entry(backup, restore, true, false, true)
+      raise Error, "pack restore staging verification failed for #{path}" unless pack_path_snapshot(restore) == expected_snapshot
+
+      FileUtils.rm_rf(path) if pack_path_present?(path)
+      FileUtils.mkdir_p(path.dirname)
+      File.rename(restore, path)
+      raise Error, "pack restore verification failed for #{path}" unless pack_path_snapshot(path) == expected_snapshot
+      inject_pack_failure!("restore-#{index}")
+    ensure
+      FileUtils.rm_rf(restore) if restore && pack_path_present?(restore)
+    end
+
+    def inject_pack_failure!(point)
+      failures = ENV.fetch("VERDIFY_TEST_PACK_FAILURE", "").split(",")
+      return unless ENV["VERDIFY_TESTING"] == "1" && failures.include?(point)
+
+      raise Error, "injected pack transaction failure at #{point}"
+    end
+
+    def ensure_pack_parent_path!(repo_root, parent)
+      relative = parent.relative_path_from(repo_root)
+      cursor = repo_root
+      relative.each_filename do |component|
+        cursor = cursor.join(component)
+        next unless cursor.exist? || cursor.symlink?
+
+        raise UsageError, "pack destination parent is a symlink: #{cursor}" if cursor.symlink?
+        raise UsageError, "pack destination parent is not a directory: #{cursor}" unless cursor.directory?
+      end
+    end
+
+    def pack_manifest_content(pack, skills, options)
+      manifest = {
+        "schema_ref" => "skill-pack.schema.yaml",
+        "kind" => "VerdifySkillPack",
+        "schema_version" => "1.0",
+        "name" => pack["name"],
+        "display_name" => pack["display_name"],
+        "description" => pack["description"],
+        "category" => pack["category"],
+        "maturity" => pack["maturity"],
+        "includes" => {
+          "required" => skills,
+          "optional" => []
+        },
+        "provides" => pack["provides"],
+        "depends_on" => pack["depends_on"],
+        "conflicts" => pack["conflicts"],
+        "install" => {
+          "hosts" => options[:host] == "all" ? %w[codex claude] : [options[:host]],
+          "default_profile" => pack.dig("install", "default_profile")
+        }
+      }
+      validate_hash!(manifest, "skill-pack.schema.yaml", "installed skill pack manifest")
+      YAML.dump(manifest)
+    end
+
+    def command_init_for_pack(repo, force)
+      return if repo.root.join(".agent-workflow/config.yaml").file? && !force
+
+      root = repo.root.join(".agent-workflow")
+      FileUtils.mkdir_p(root)
+      Verdify.atomic_write(root.join(".gitignore"), "github/snapshot.json\nruntime/\n*.tmp\nnorthstar/collateral/sources/\n")
+      Verdify.atomic_write(root.join("README.md"), "# Verdify project artifacts\n\nCanonical approved definitions, architecture, module contracts, sprint contracts, gates, status, and evidence live here.\n")
+      Verdify.atomic_write(root.join("config.yaml"), YAML.dump({
+        "schema_ref" => "project-config.schema.yaml",
+        "kind" => "VerdifyProjectConfig",
+        "schema_version" => "1.0",
+        "initialized_at" => Verdify.utc_now,
+        "default_branch" => repo.default_branch,
+        "github_repository" => repo.github_slug,
+        "policy" => {
+          "one_issue_per_lane" => true,
+          "one_coding_session_per_worktree" => true,
+          "fresh_critic_required" => true,
+          "runtime_verification_required" => true
+        }
+      }))
     end
 
     def split_list(value)

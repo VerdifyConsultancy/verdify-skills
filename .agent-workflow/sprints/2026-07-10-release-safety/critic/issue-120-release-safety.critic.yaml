@@ -1,0 +1,202 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-release-safety
+lane_id: issue-120-release-safety
+pull_request: 184
+worker_agent: codex-fix-2
+worker_session_id: worker-120-release-safety-fix3-20260710t0940z
+critic_agent: codex-critic-3
+implementation_head_sha: "369b6df89865ce8321dde74a7557702fca7d3aba"
+evidence_head_sha: "4f1c1233fcfcab7937712e693e245b04f5f5e0af"
+reviewed_head_sha: "4f1c1233fcfcab7937712e693e245b04f5f5e0af"
+closeout_path: .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
+closeout_sha256: "e87160207930b81f3f470cf7e5fea442a156f912999d2c00046256d990ff7b1c"
+critic_session_id: critic-120-release-safety-fix3-20260710t1000z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-release-safety/critic-issue-120-release-safety-fix3
+outcome: approve
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        Two independent E4 builds and both packed-artifact runs produced the
+        same exact tarball SHA-256
+        c8d8812eb81bad4c8b79723eabe9ffd3441b1811a1ca9d8f3f3812b1a4d313f3;
+        the publish workflow contains one candidate builder invocation, tests
+        that exact path before the privileged job, retains it by final source
+        SHA, and passes that path once to npm publish without repacking.
+      - >-
+        The I3 evidence tarball SHA-256
+        6322ff413c91a23fcefc46991362e019866d7e0d6a44a4f6058e7f4e4ed4c28e
+        and E4 tarball have identical member sets. Their only unpacked byte
+        difference is package/package.json gitHead changing from I3
+        369b6df89865ce8321dde74a7557702fca7d3aba to E4
+        4f1c1233fcfcab7937712e693e245b04f5f5e0af, as deliberately injected by
+        build-release-candidate.sh for source binding. The release ZIP and
+        checksum remain byte-identical at SHA-256 7c1aa64e282343a3aee2c4c98419073ef63682b04c3071a3a1729e98474330fd
+        and 35aa83df06c132696346dc72015b5464a4dcb53cb9f0ead3a118198112ec310e.
+      - >-
+        All 28 normalized SKILL.md comparisons differ from baseline only in
+        metadata.version 1.2.1 to 1.3.0; VERSION, package.json, and CHANGELOG
+        agree on 1.3.0.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        The exact E4 tarball independently passed fresh install, same-version
+        reinstall, installed npm test, collision, corruption, rollback, and
+        installed-command checks in the focused and full suites.
+      - >-
+        tests/test_npm_install.sh downloaded the real published 1.2.1 tarball,
+        verified its fixed SHA-1 and SHA-512 integrity, ran its initializer,
+        and upgraded that repository to the exact 1.3.0 candidate. The same
+        candidate passed substantive Node 18 version, pack-list, init, doctor,
+        pack-install, and rollback paths.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        The independent CLI runs passed conflict-at-first/middle/last and
+        manifest-conflict preflight with zero newly created state, plus first,
+        middle, and later backup failures before mutation.
+      - >-
+        Injected write, before/after-manifest, and restore failures preserved
+        every operator byte, target type, mode, directory content, and symlink
+        target. A rollback error is surfaced only after the destination is safe,
+        with verified backups retained for recovery if restoration itself cannot
+        complete.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - >-
+        Repeated ZIP and checksum builds were byte-identical. Missing, altered,
+        extra, duplicate, unsafe, and wrong-type members all failed exact-set
+        verification; every expected manifest member remained a regular file
+        and every discovery link had its fixed safe target.
+      - >-
+        scripts/package-file-list.rb remains unchanged at blob
+        23dadc1d138fdd5b8269ffc76d11d691f2faed9b at baseline, D, I3, and E4,
+        and the immutable Git-index staging regression passed.
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - >-
+        Prepared through completed, npm-published retry, partial-release retry,
+        unknown authority, corrupt prior ledger, and completed-ledger digest
+        fixtures passed. Retried candidates were copied and compared byte for
+        byte without invoking the candidate builder.
+      - >-
+        Independent tamper fixtures failed closed for candidate and external
+        binding raw archive/API digests, repository, workflow path, main route,
+        source SHA, run ID, run attempt, artifact ID/name/digest, provenance
+        digest/file/map, and sidecar identity. The schema-valid ledger records
+        both Actions artifact identities and emits no publish action on mismatch.
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - >-
+        Release preflight independently accepted only the exact
+        VerdifyConsultancy/verdify-skills dev-to-main route. Duplicate identities,
+        conflicting open route candidates, wrong base/head refs, wrong base/head
+        repositories, and foreign fork lookalikes in open, closed, and merged
+        states all failed before issue or pull-request mutation.
+      - >-
+        Live read-only preflight returned create/new_unpublished_version for
+        @verdify-cli/cli@1.3.0 over main 1.2.1. Both workflows pin actions and npm
+        immutably, retain OIDC provenance, inventory all issue/PR states with
+        pagination, and pass only the verified tarball path to npm publish.
+  - criterion_id: LANE-AC-07
+    assessment: satisfied
+    evidence:
+      - >-
+        Independent ruby scripts/validate-repo.rb, every focused contract suite,
+        and make test passed at E4. The full suite reported 28 skills, 48 schemas,
+        446 manifest entries, 90 runs, 533 assertions, and zero failures, errors,
+        or skips.
+      - >-
+        actionlint passed for both modified release workflows. gitleaks 8.30.1
+        scanned all 11 lane commits and approximately 274.41 KB with redaction
+        and no findings. Live E4 validate and compliance checks pass; the expected
+        stale-S2 pull-request-policy result must rerun against this report-only S3
+        head before external approval.
+evidence_assessment:
+  - >-
+    The active lease critic-issue-120-release-safety-critic-120-release-safet
+    identifies agent codex-critic-3, session
+    critic-120-release-safety-fix3-20260710t1000z, detached worktree
+    /Users/jason/repos/verdify-worktrees/2026-07-10-release-safety/critic-issue-120-release-safety-fix3,
+    and E4 baseline 4f1c1233fcfcab7937712e693e245b04f5f5e0af. The live PR
+    head matched E4 before report creation, and critic identity differs from
+    closeout worker codex-fix-2/session
+    worker-120-release-safety-fix3-20260710t0940z.
+  - >-
+    D 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3 is the first child of
+    baseline da2f43392e768c7554fd35d750507eea64ca0fb3 and contains only
+    the approved sprint plan, wave release plan, and lane contract. All three
+    dispatch artifacts are byte-identical through E4 and the contract SHA-256 is
+    a59c8c57bc52606de707e812fd87bb8b8d446f7754f3c0109e26d001bcf405ef.
+  - >-
+    The complete D/I/E/S/I2/E2/S2/I3/E3/E4 history is linear. I3 changes only
+    contract-owned workflow, transaction, schema, documentation, manifest, and
+    test paths after S2. E3 and E4 each change only the canonical closeout; E4 is
+    an allowed closeout-only bookkeeping suffix correcting the worker lease
+    identity. The independently computed E4 closeout SHA-256 is
+    e87160207930b81f3f470cf7e5fea442a156f912999d2c00046256d990ff7b1c.
+  - >-
+    All five S1 findings were reconstructed: retained no-repack recovery and
+    deterministic ZIPs now pass; backup failures precede all mutation; archive
+    identity is recomputed; closed candidate identities reconcile without
+    duplication; and real 1.2.1 plus Node 18 regressions are durable. Both S2
+    findings were also reconstructed: PR authority is now the exact same-repository
+    dev-to-main route, and the candidate plus separate non-recursive binding
+    artifacts are bound by raw API archive digests and complete provenance identity.
+  - >-
+    I3 and E4 tarball digest drift is fully explained by the intentionally injected
+    Git head and is deterministic. The publish workflow does not claim that I3
+    bytes survive later authorized evidence or promotion commits: at final main it
+    builds one candidate from that final source, runs the full consumer matrix on
+    those exact bytes, retains that source-named artifact for retries, and publishes
+    only its verified tarball.
+  - >-
+    At E4, validate and compliance / compliance passed at GitHub Actions jobs
+    86324893862 and 86324893595. Pull-request-policy job 86324893312 failed only
+    because the live head still contained the stale S2 critic report; this report
+    is the authorized sole post-E4 correction and must make policy green at S3.
+  - >-
+    No npm publication, tag push, GitHub release mutation, issue/PR release-candidate
+    mutation, main promotion, GitHub review, merge, deployment, release credential
+    use, or private-advisory disclosure was performed by this critic.
+integration_risks:
+  - >-
+    The approving critic outcome is not an advancing GitHub approval. The final
+    report-only S3 head still requires successful exact-head validate,
+    pull-request-policy, and compliance checks plus a commit-bound APPROVED review
+    from a repository admin or maintainer other than PR author jvallery.
+  - >-
+    Issue #121 delivery controls and live rule reconciliation remain required
+    before the generated dev-to-main release PR can be approved or promoted.
+    Dev has advanced beyond the lane baseline, so the controller must reconcile
+    current dev without rewriting the immutable lane history.
+  - >-
+    npm publication, tag push, GitHub release creation, completed-ledger upload,
+    and main promotion were intentionally not exercised and remain separate
+    authorized release-verification gates.
+residual_risks:
+  - >-
+    Candidate and external binding artifacts retain recovery bytes for 90 days.
+    If either becomes unavailable after an immutable npm, tag, or release mutation,
+    recovery stops for manual reconciliation and never repacks.
+  - >-
+    npm and GitHub authority unavailability produces a schema-valid failed/resumable
+    ledger and requires an authorized operator retry after authority recovery.
+  - >-
+    Whole-repository actionlint also reports inherited ShellCheck SC2012 info in
+    unmodified, contract-prohibited .github/workflows/compliance-gate.yml:55. The
+    same diagnostic exists at the lane baseline; both modified release workflows
+    lint clean and the live compliance check passes.
+  - >-
+    Any commit after the report-only S3 head invalidates the exact-head checks and
+    any later external approval.
+reviewed_at: "2026-07-10T09:10:00Z"
