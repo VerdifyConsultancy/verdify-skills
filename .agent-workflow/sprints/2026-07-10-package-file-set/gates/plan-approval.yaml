@@ -1,0 +1,20 @@
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: "1.0"
+gate_id: plan-approval-2026-07-10-package-file-set
+sprint_id: 2026-07-10-package-file-set
+lane_id: null
+type: plan_approval
+status: approved
+question: "Approve the completed issue #130 sprint plan, lane topology, contract, risks, review milestones, and no-release boundary?"
+owner: Jason Vallery
+evidence_required:
+  - Approved state-of-union and Wave 0 artifacts.
+  - "Ready GitHub issue #130 with observed host-file contamination."
+  - Sprint plan, lane map, lane contract, wave release plan, risk review, and validation results.
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: "The user directed continued repository recovery and main publication; issue #130 is the approved first dependency and this transaction is bounded to shipped-file integrity."
+opened_at: "2026-07-10T03:07:38Z"
+resolved_at: "2026-07-10T03:07:48Z"
+resume_state: READY

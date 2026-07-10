@@ -1,0 +1,120 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-package-file-set
+lane_id: issue-130-package-file-set
+title: Reproducible tracked package file set
+status: approved
+issue_ids: [130]
+coupling_justification: null
+objective: Replace raw-worktree manifest and archive selection with one explicit reproducible shipped-file boundary.
+desired_outcome: Ignored and untracked host state cannot affect MANIFEST.sha256, package archives, exact-set checks, or clean repository validation.
+non_goals:
+  - Change VERSION or package.json version.
+  - Modify publish workflows, GitHub protections, npm state, provenance, or release ledgers.
+  - "Recover timeline-historian, evidence, or branches from issue #126."
+  - Delete, rewrite, or dereference local ignored files and discovery-link targets.
+baseline_sha: "32038e3a0637192699af09ad60da48031b7575bc"
+branch: lane/130-package-file-set
+module_contracts: [release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [package-file-selection, manifest-integrity, archive-staging, package-regression]
+  owned_paths:
+    - scripts/gen-manifest.sh
+    - scripts/package.sh
+    - scripts/package-file-list.*
+    - tests/test_package_file_set.sh
+    - Makefile
+    - MANIFEST.sha256
+    - docs/vendoring-standard.md
+  prohibited_paths:
+    - .agent-workflow/northstar/**
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/strategy/**
+    - .agent-workflow/hygiene/**
+    - .github/workflows/**
+    - package.json
+    - VERSION
+    - skills/timeline-historian/**
+    - evaluations/timeline-historian/**
+  coordination_required_paths:
+    - scripts/setup-agent-hosts.rb
+    - scripts/verify-package.sh
+    - tests/test_npm_install.sh
+    - .agents/**
+    - .claude/skills/**
+  owned_interfaces:
+    - Canonical shipped-file selection consumed by root manifest generation and release archive staging.
+dependencies:
+  hard: []
+  soft:
+    - lane_id: issue-126-recover-historian
+      coordination: Preserve a stable file-selection interface that the following recovery sprint can use without modifying this lane.
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: Root manifest generation and archive staging consume the same explicit intended tracked file set.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [selector diff, manifest/archive selected-path equality test]
+  - id: LANE-AC-02
+    statement: Ignored and untracked fixtures do not alter manifest output or archive contents.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [contaminated-worktree regression including .claude/scheduled_tasks.lock]
+  - id: LANE-AC-03
+    statement: Tracked discovery links and intended shipped inputs remain represented without dereferencing host-local targets.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [host-link check, symlink/file-mode assertions, exact archive listing]
+  - id: LANE-AC-04
+    statement: Repository, package, and GitHub validation pass at the exact implementation and critic-report heads.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [repository validation, focused test, make test, required checks]
+validation_commands:
+  - id: package-file-set-regression
+    command: bash tests/test_package_file_set.sh
+    purpose: Prove positive tracked inputs and negative ignored/untracked fixtures for manifest and archive selection.
+    required: true
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Verify skills, schemas, references, host links, and repository integrity.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run manifest, schema, CLI, policy, release-preflight, and installed-package tests.
+    required: true
+required_evidence:
+  - Exact implementation head and changed-path audit against this contract.
+  - Before/after manifest comparison from clean and contaminated worktrees.
+  - Archive entry list proving ignored and untracked fixtures are absent.
+  - Tracked host-link identity and non-dereference proof.
+  - Clean detached full-suite output and live required GitHub check URLs.
+  - Worker closeout, fresh critic report, and independent current-head maintainer review.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - Any required package input is generated but not tracked and cannot be represented by the approved selector.
+  - The change requires package.json, VERSION, publish workflows, provenance, release ledger, or live GitHub policy mutation.
+  - Symlink handling would dereference a path outside the repository or expose host-local content.
+  - Validation requires deleting or modifying Jason's ignored scheduler file.
+  - "The lane requires timeline-historian or North Star evidence scope from issue #126."
+definition_of_done:
+  - All lane and sprint acceptance criteria have exact evidence at implementation head I.
+  - Worker evidence head E adds only the closeout after substantive implementation.
+  - A different critic agent and session commits only the critic report at S and approves or approves with explicit risks.
+  - Validate, pull-request-policy, and compliance checks pass at S.
+  - A repository admin or maintainer other than the PR author submits the latest effective APPROVED review at S.
+  - Review inbox, dev integration, release verification, and outcome acceptance remain separate controller steps.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T03:07:48Z"

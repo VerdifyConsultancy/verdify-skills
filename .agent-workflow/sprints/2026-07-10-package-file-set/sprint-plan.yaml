@@ -1,0 +1,108 @@
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: "1.0"
+sprint_id: 2026-07-10-package-file-set
+status: approved
+goal: Make manifest and package generation select one reproducible tracked shipped-file set independent of ignored or untracked host state.
+baseline_sha: "32038e3a0637192699af09ad60da48031b7575bc"
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+issue_ids: [130]
+scope:
+  - Define one canonical shipped-file selection used by root manifest generation and release archive staging.
+  - Exclude ignored and untracked host state while preserving intended tracked files and discovery links.
+  - Add deterministic regressions that contaminate a worktree and compare manifest and archive contents.
+  - Prove repository, manifest, package, host-link, and installed-package checks on the exact lane head.
+non_goals:
+  - Change package version, publish npm, create a GitHub release, or promote dev to main.
+  - "Implement the broader exact-tarball and resumable release transaction from issue #120."
+  - "Recover timeline-historian or mutate North Star evidence from issue #126."
+  - Delete Jason's ignored .claude/scheduled_tasks.lock file or other host-owned state.
+acceptance_criteria:
+  - id: SPR-AC-01
+    statement: Manifest and archive staging consume one explicit reproducible shipped-file selection derived from intended tracked inputs.
+    lane_ids: [issue-130-package-file-set]
+    evidence_expected: [shared selector implementation, manifest/archive file-list comparison]
+  - id: SPR-AC-02
+    statement: Ignored and untracked files, including .claude/scheduled_tasks.lock, do not change MANIFEST.sha256 or enter the release archive.
+    lane_ids: [issue-130-package-file-set]
+    evidence_expected: [contaminated-worktree regression, archive entry assertions]
+  - id: SPR-AC-03
+    statement: Tracked host discovery links and every intended shipped file remain present, valid, and covered by exact-set verification.
+    lane_ids: [issue-130-package-file-set]
+    evidence_expected: [setup-agent-hosts check, tracked link audit, verify-package result]
+  - id: SPR-AC-04
+    statement: The clean exact lane head passes repository validation, the full suite, and required GitHub checks without weakening release verification.
+    lane_ids: [issue-130-package-file-set]
+    evidence_expected: [make test, package smoke test, required check rollup]
+risks:
+  - id: RISK-01
+    severity: high
+    statement: A tracked package input could be silently omitted if the canonical selector does not match the supported source and archive surfaces.
+    mitigation: Compare the selected set with Git tracked paths, package expectations, host links, and archive contents in positive and negative tests.
+  - id: RISK-02
+    severity: high
+    statement: Following symlinks or raw paths could expose local files or secrets outside the repository.
+    mitigation: Preserve tracked symlink identity without dereferencing host targets and reject non-tracked worktree additions.
+  - id: RISK-03
+    severity: medium
+    statement: "The lane could absorb the broader artifact-first publication scope from issue #120."
+    mitigation: Limit ownership to file selection and regressions; escalate any version, workflow, provenance, ledger, or publish change.
+lanes:
+  - lane_id: issue-130-package-file-set
+    issue_ids: [130]
+    contract_path: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/contracts/issue-130-package-file-set.contract.yaml
+    branch: lane/130-package-file-set
+    owner: package-file-set-worker
+    reviewer: fresh-independent-critic
+    summary: Implement and prove one tracked shipped-file selector for manifests and archives.
+dependency_order:
+  - [issue-130-package-file-set]
+deployment_expectations:
+  - No runtime or npm deployment is authorized for this sprint.
+  - The lane integrates to dev only after exact-head criticism, independent maintainer review, and required checks.
+  - Release verification records integration and package smoke evidence separately after merge.
+review_plan:
+  qa_milestones:
+    - id: QA-01
+      name: Contaminated-worktree shipped-set proof
+      due: before worker closeout
+      evidence_expected:
+        - Regression creates ignored and untracked host fixtures and proves manifest bytes remain unchanged.
+        - Package archive omits every fixture and contains intended tracked discovery links without dereferencing them.
+    - id: QA-02
+      name: Exact-head package gate
+      due: before critic review
+      evidence_expected:
+        - Repository validation and clean detached make test pass on the implementation head.
+        - Manifest and package verification commands identify the same shipped-file set.
+  human_review_milestones:
+    - id: HR-01
+      name: Independent current-head package-integrity review
+      owner: James Vallery or another repository admin/maintainer other than the PR author
+      trigger: Fresh critic approves report head S and validate, pull-request-policy, and compliance checks pass on S.
+      review_packet_path: .agent-workflow/sprints/2026-07-10-package-file-set/review/review-inbox-packet.yaml
+  user_stories_for_review:
+    - id: US-01
+      statement: As a maintainer, I can run tests and package from a contaminated checkout without local machine files changing the manifest or archive.
+      issue_ids: [130]
+      lane_ids: [issue-130-package-file-set]
+      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03, SPR-AC-04]
+  reporting_summary:
+    included:
+      - "Issue #130 canonical shipped-file selection, contaminated-worktree regression, host-link preservation, and package proof."
+    deferred:
+      - "Issue #126 timeline-historian and evidence recovery until this fix integrates."
+      - "Issue #120 exact tarball publication, provenance, ledger, and recovery transaction."
+      - "Issue #121 live branch protection and approval transport."
+    ownership:
+      - lane_id: issue-130-package-file-set
+        owner: package-file-set-worker
+        responsibility: Change only file selection, package staging, focused tests, and required manifest/docs outputs within the approved contract.
+    next_review: Fresh critic review, exact-head required checks, independent maintainer approval, review inbox, then dev integration and release verification.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T03:07:48Z"
