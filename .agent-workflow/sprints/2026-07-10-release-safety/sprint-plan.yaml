@@ -2,7 +2,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: "1.0"
 sprint_id: 2026-07-10-release-safety
-status: approved
+status: complete
 goal: Build, exercise, and recover one exact new-version package artifact before any npm publication or main promotion can occur.
 baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
 github:
