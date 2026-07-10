@@ -74,7 +74,7 @@ source_freshness:
     captured_at: "2026-07-10T02:32:25Z"
     limitation: Closed duplicate release PRs are retained as delivery-history evidence.
   - surface: github_checks
-    source_ref: live check rollups and workflow runs through PR #141
+    source_ref: "live check rollups and workflow runs through PR #141"
     status: fresh
     captured_at: "2026-07-10T02:32:25Z"
     limitation: Earlier failed reruns are retained alongside final successful checks.
@@ -112,12 +112,12 @@ source_freshness:
     source_ref: completed sprint closeout and critic records
     status: fresh
     captured_at: "2026-07-10T02:32:25Z"
-    limitation: PRs #122 and #123 lack GitHub APPROVED reviews, preserved in their outcome records.
+    limitation: "PRs #122 and #123 lack GitHub APPROVED reviews, preserved in their outcome records."
   - surface: review_artifacts
-    source_ref: PRs #78, #122, #123, #131, #136, and #139
+    source_ref: "PRs #78, #122, #123, #131, #136, and #139"
     status: fresh
     captured_at: "2026-07-10T02:32:25Z"
-    limitation: Single-identity approval remains an open delivery-control constraint in issue #121.
+    limitation: "Single-identity approval remains an open delivery-control constraint in issue #121."
   - surface: deployment_runtime
     source_ref: npm deployment 5350587304 and GitHub release v1.2.1
     status: fresh
@@ -152,7 +152,7 @@ source_freshness:
     source_ref: npm registry and GitHub release API
     status: fresh
     captured_at: "2026-07-10T02:32:25Z"
-    limitation: GitHub Support cleanup from the private advisory remains external and issue #120-owned.
+    limitation: "GitHub Support cleanup from the private advisory remains external and issue #120-owned."
 planning_inventory:
   - artifact_type: other
     location: .agent-workflow/hygiene/repo-hygiene.yaml
@@ -173,7 +173,7 @@ planning_inventory:
     location: .agent-workflow/architecture/architecture.yaml
     status: current
     finding: Release-package and planning-hygiene ownership boundaries support the recovery sequence.
-    action: Keep #130, #126, #120, and #121 within their module contracts.
+    action: "Keep #130, #126, #120, and #121 within their module contracts."
   - artifact_type: module_contracts
     location: .agent-workflow/modules/contracts
     status: current
@@ -198,9 +198,9 @@ planning_inventory:
     location: .agent-workflow/sprints/*/outcome/outcome-review.yaml
     status: current
     finding: Prior outcomes are accepted, with missing external GitHub reviews preserved as risk.
-    action: Carry the review-identity gap into #121 rather than reopening completed scope.
+    action: "Carry the review-identity gap into #121 rather than reopening completed scope."
   - artifact_type: documentation
-    location: issue #126 recovery comments
+    location: "issue #126 recovery comments"
     status: current
     finding: Local, remote, merged, superseded, and recovery refs have an interim durable disposition.
     action: Convert the interim inventory into a checked-in final recovery ledger before ref deletion.
@@ -242,25 +242,25 @@ delivery_health:
       statement: Generated dev-to-main transactions repeatedly target already-published version 1.2.1 and fail release preflight.
       severity: high
       evidence_refs: ["PR #125", "PR #128", "PR #133", "PR #138", "PR #141", "issue #120"]
-      action: Implement resumable new-version release state in #120 before another promotion is accepted.
+      action: "Implement resumable new-version release state in #120 before another promotion is accepted."
     - id: HEALTH-002
       statement: Raw-worktree manifest and package selection includes ignored host-local files.
       severity: high
       evidence_refs: ["issue #130", ".claude/scheduled_tasks.lock reproduction"]
-      action: Make #130 the first implementation dependency in the next sprint.
+      action: "Make #130 the first implementation dependency in the next sprint."
 issue_inventory:
   - issue: 153
     title: Record Wave 0 assessment and controller scope
     state: CLOSED
     classification: done
-    rationale: PR #154 integrated the approved hygiene report and active repo-controller scope.
+    rationale: "PR #154 integrated the approved hygiene report and active repo-controller scope."
     dependencies: []
     action: No action.
   - issue: 143
     title: Accept an artifact-only state-of-union commit over its assessed baseline
     state: CLOSED
     classification: done
-    rationale: PR #147 accepts only committed strategy-artifact suffixes over a full ancestor baseline and rejects unrelated changes.
+    rationale: "PR #147 accepts only committed strategy-artifact suffixes over a full ancestor baseline and rejects unrelated changes."
     dependencies: []
     action: No action after this strategy refresh proves the integrated route.
   - issue: 130
@@ -276,7 +276,7 @@ issue_inventory:
     classification: candidate
     rationale: Exact recovery refs and selective content are known; final cleanup and default-branch completeness depend on it.
     dependencies: ["issue #130"]
-    action: Execute after #130 in the next sprint and route recovered evidence through North Star ingestion.
+    action: "Execute after #130 in the next sprint and route recovered evidence through North Star ingestion."
   - issue: 120
     title: Test and publish the exact packed artifact as an atomic, recoverable transaction
     state: OPEN
@@ -337,7 +337,7 @@ issue_inventory:
     title: Make semantic validation and evals consumer merge-blocking
     state: OPEN
     classification: deferred
-    rationale: Consumer CI enforcement follows the trusted package artifact boundary in #120.
+    rationale: "Consumer CI enforcement follows the trusted package artifact boundary in #120."
     dependencies: ["issue #120"]
     action: Sequence after the trusted release transaction.
   - issue: 75
@@ -386,39 +386,39 @@ issue_inventory:
     title: Reconcile and lock the four-project North Star
     state: CLOSED
     classification: done
-    rationale: PR #122 and downstream definition/architecture artifacts completed the outcome.
+    rationale: "PR #122 and downstream definition/architecture artifacts completed the outcome."
     dependencies: []
     action: No action.
   - issue: 135
     title: Reconcile completed sprint state
     state: CLOSED
     classification: done
-    rationale: PR #139 terminalized the sprints and restored global routing.
+    rationale: "PR #139 terminalized the sprints and restored global routing."
     dependencies: []
     action: No action.
 gaps:
   - id: GAP-001
     type: delivery
-    statement: Package and manifest selection is host-dependent until issue #130 is integrated.
-    owner: issue #130
+    statement: "Package and manifest selection is host-dependent until issue #130 is integrated."
+    owner: "issue #130"
     blocking: false
     apply_through: github_issue
   - id: GAP-002
     type: evidence
-    statement: Authoritative historian and registered research artifacts remain only on recovery refs until issue #126 is integrated.
-    owner: issue #126
+    statement: "Authoritative historian and registered research artifacts remain only on recovery refs until issue #126 is integrated."
+    owner: "issue #126"
     blocking: false
     apply_through: github_issue
   - id: GAP-003
     type: delivery
     statement: Exact artifact publication and resumable release identity are incomplete.
-    owner: issue #120
+    owner: "issue #120"
     blocking: false
     apply_through: github_issue
   - id: GAP-004
     type: delivery
     statement: Live dev/main protections and independent approval transport do not enforce the approved branch model.
-    owner: issue #121
+    owner: "issue #121"
     blocking: false
     apply_through: github_issue
 recommended_sequence:
@@ -486,22 +486,22 @@ next_sprint_candidates:
 actions:
   - id: ACT-005
     type: update_issue
-    target: issue #143 committed-strategy baseline routing
+    target: "issue #143 committed-strategy baseline routing"
     owner: state-of-union
     status: applied
   - id: ACT-001
     type: update_issue
-    target: issue #126 recovery evidence and ref inventory
+    target: "issue #126 recovery evidence and ref inventory"
     owner: state-of-union
     status: applied
   - id: ACT-002
     type: set_dependency
-    target: issue #126 depends on issue #130
+    target: "issue #126 depends on issue #130"
     owner: sprint-planning
     status: proposed
   - id: ACT-003
     type: plan_sprint
-    target: issues #130 and #126
+    target: "issues #130 and #126"
     owner: sprint-planning
     status: proposed
   - id: ACT-004
@@ -512,7 +512,7 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: issue-readiness
-  reason: Issues #130 and #126 are the dependency-ordered, issue-backed recovery slice required before exact release and live delivery-control work.
+  reason: "Issues #130 and #126 are the dependency-ordered, issue-backed recovery slice required before exact release and live delivery-control work."
   required_before_handoff: []
 approval:
   status: approved

@@ -20,11 +20,11 @@ snapshot:
   freshness: live_only
   api_sources:
     - surface: issues
-      source_ref: live GitHub Issues API through issue #142
+      source_ref: "live GitHub Issues API through issue #142"
       captured: true
       limitation: No milestones or assignees are configured on the recovery issues.
     - surface: pulls
-      source_ref: live GitHub Pull Requests API through PR #141
+      source_ref: "live GitHub Pull Requests API through PR #141"
       captured: true
       limitation: Closed duplicate release transactions remain visible as history.
     - surface: checks
@@ -58,9 +58,9 @@ snapshot:
     - surface: dependencies
       source_ref: issue bodies and strategy sequence
       captured: false
-      limitation: The #130 before #126 dependency must be encoded in the sprint transaction.
+      limitation: "The #130 before #126 dependency must be encoded in the sprint transaction."
     - surface: timeline
-      source_ref: issue and PR comments for #120, #126, #135, and #139
+      source_ref: "issue and PR comments for #120, #126, #135, and #139"
       captured: true
       limitation: Only delivery-relevant comments were inspected.
     - surface: search
@@ -131,7 +131,7 @@ issue_findings:
     project_refs: []
     evidence_refs: ["fe1f94e", "f425515", "issue #126 recovery comments"]
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/126"]
-    required_action: Plan after #130; selectively recover skill/evidence and commit the final ref ledger.
+    required_action: "Plan after #130; selectively recover skill/evidence and commit the final ref ledger."
   - issue: 120
     title: Test and publish the exact packed artifact as an atomic recoverable transaction
     state: OPEN
@@ -396,14 +396,14 @@ delivery_findings:
 actions:
   - id: GBSA-005
     type: update_issue
-    target: issue #143
+    target: "issue #143"
     owner: state-of-union
     status: applied
     apply_through: github_issue
     evidence_refs: ["route_for_strategy exact-HEAD comparison", "state-of-union baseline contract"]
   - id: GBSA-001
     type: update_issue
-    target: issue #126
+    target: "issue #126"
     owner: state-of-union
     status: applied
     apply_through: github_issue
@@ -417,7 +417,7 @@ actions:
     evidence_refs: ["issue #130 reproduction", "state-of-union SEQ-001/SEQ-002"]
   - id: GBSA-003
     type: route
-    target: issues #130 and #126
+    target: "issues #130 and #126"
     owner: project-router
     status: proposed
     apply_through: state_of_union
@@ -432,4 +432,4 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: issue-readiness
-  reason: Issues #130 and #126 are ready and dependency ordered after the completed #143 router repair; #120 and #121 remain the required post-recovery release sequence.
+  reason: "Issues #130 and #126 are ready and dependency ordered after the completed #143 router repair; #120 and #121 remain the required post-recovery release sequence."

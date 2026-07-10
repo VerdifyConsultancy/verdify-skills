@@ -125,10 +125,10 @@ safe_cleanup:
     action: Remove detached validation worktrees after their commands finish.
     status: applied
   - path: .claude/scheduled_tasks.lock
-    action: Preserve the ignored Jason-owned scheduler file; issue #130 must exclude it from package selection.
+    action: "Preserve the ignored Jason-owned scheduler file; issue #130 must exclude it from package selection."
     status: skipped
   - path: local and origin recovery or merged refs
-    action: Defer deletion until issue #126 commits the final ledger and accepted content reaches main.
+    action: "Defer deletion until issue #126 commits the final ledger and accepted content reaches main."
     status: skipped
 issues_to_open: []
 gates_to_open: []
@@ -142,7 +142,7 @@ completion_criteria:
 handoff:
   next_skill: state-of-union
   next_mode: strategy-refresh
-  reason: Wave 0 is complete with approved issue-backed exceptions; refresh the strategy baseline after this hygiene transaction, then route to sprint planning for #130 and #126.
+  reason: "Wave 0 is complete with approved issue-backed exceptions; refresh the strategy baseline after this hygiene transaction, then route to sprint planning for #130 and #126."
 approval:
   status: approved
   approver: "Jason (continue the repository recovery and publish-to-main objective)"
