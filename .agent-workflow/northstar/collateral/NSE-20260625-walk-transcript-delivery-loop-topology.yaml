@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260625-walk-transcript-delivery-loop-topology
+reference: northstar://evidence/NSE-20260625-walk-transcript-delivery-loop-topology
+title: 'Walk transcript: wave/loop/lane SDLC topology design (Jason + James)'
+evidence_type: transcript
+evidence_status: reported
+ingested_at: '2026-06-26T01:28:09Z'
+source:
+  uri:
+  original_path: "/private/tmp/claude-501/-Users-jason-repos-verdify-skills/39aead7e-7347-4580-8fdd-3fe13a68d2ef/scratchpad/walk-transcript-loop-topology.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260625-walk-transcript-delivery-loop-topology-walk-transcript-loop-topology-md"
+  sha256: 24fc5f198fe2d5f22dfbd8d4558df6d834791b78ca2289e0d0266cd55bb9784f
+summary: Principal design conversation defining how Verdify lifecycle skills compose
+  into runtime loops, waves, milestones, and lanes; source for the delivery-loop-architecture
+  decisions.
+tags:
+- controller-loop
+- delivery-loop
+- lane-model
+- traceability
+- wave
+claims:
+- A wave accrues to a set of user stories and is the moment the inner loop asks the
+  human/Orbit outer loop for review; wave exit is CI/CD green deployed to dev plus
+  the targeted user stories.
+- Traceability must run North Star vision -> milestone/epic -> wave -> user story
+  -> GitHub issue (the granular unit), with full interdependency tracing.
+- The controller checks in with lane agents on a configurable cadence, resolves conflicts,
+  escalates decisions, and drives lanes to converge/merge on a branch then deploys
+  it.
+planning_relevance:
+- Primary source for ADR-0011..0018 (wave state machine, controller reconciler, dynamic
+  lanes, rolling-wave, two-tier verification, event-driven adapter, vocabulary, build
+  order).
+limitations: []

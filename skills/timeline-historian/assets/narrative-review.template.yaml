@@ -1,0 +1,14 @@
+schema: timeline-historian.narrative-review.v1
+reviewed_at: "<iso8601>"
+reviewer: "<agent or human>"
+scope: "<window or narrative path>"
+verdict: "needs-work"
+checks:
+  source_identity: "unknown"
+  source_coverage: "unknown"
+  ocr_stability: "unknown"
+  claim_anchors: "unknown"
+  claim_treatment: "unknown"
+  public_access: "unknown"
+findings: []
+required_actions: []

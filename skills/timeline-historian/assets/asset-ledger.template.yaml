@@ -1,0 +1,19 @@
+schema: timeline-historian.asset-ledger.v1
+generated_at: "<iso8601>"
+assets:
+  - asset_id: "sha256:<content_sha256>"
+    content_sha256: "<sha256>"
+    sha12: "<first 12 hex chars>"
+    source_uri: "<uri or path>"
+    source_paths: []
+    collection: "<collection or vault>"
+    category: "<document category>"
+    date_evidence:
+      selected_year:
+      selected_period:
+      confidence:
+      candidates: []
+    rights: "unknown"
+    access: "unknown"
+    derived_artifacts: []
+    notes: []

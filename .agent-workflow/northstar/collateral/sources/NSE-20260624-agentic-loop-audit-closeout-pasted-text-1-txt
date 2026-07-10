@@ -1,0 +1,33 @@
+
+  I ingested the attached report as NSE-20260624-agentic-loop-sdlc-best-practices, then built
+  the adversarial audit here: .agent-workflow/northstar/AGENTIC_LOOP_SKILL_AUDIT.md. It now
+  covers all 19 validating Verdify skills, the full SDLC chain, compliance/drift/missing
+  controls, missing skills/capabilities, existing operating decisions, and the live
+  agents.vallery.net platform baseline.
+
+  I also updated the North Star drafts:
+
+  - .agent-workflow/northstar/northstar-plan.md
+  - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+  - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+
+  New jvallery/agents platform issues created:
+
+  - #1995 runtime governance bundle
+  - #1996 spend/rate/retry budget controls
+  - #1997 emergency brake/read-only mode
+  - #1998 tool-call and policy-denial telemetry
+  - #1999 untrusted-input guardrails
+  - #2000 supply-chain provenance
+
+  Validation passed:
+
+  - ruby scripts/validate-repo.rb -> passed, 19 skills / 40 schemas
+  - artifact validation passed for the evidence registry, evidence item, North Star artifact
+    index, and route decision
+
+  - evidence query confirms the new agentic-loop item is registered
+
+  Current route remains intentionally open: NORTHSTAR_ARTIFACTS_INCOMPLETE, next skill
+  northstar-planning, mode artifact-loop. The audit/plan is now in place, but North Star sign-
+  off is still a separate approval step.

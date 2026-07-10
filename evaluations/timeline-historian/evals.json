@@ -1,0 +1,38 @@
+{
+  "skill_name": "timeline-historian",
+  "evals": [
+    {
+      "id": "source-backed-window-summary",
+      "prompt": "The user asks for a 1960s historical narrative from an archive export with manifest rows, OCR text, and source cards.",
+      "expected_output": "Builds asset, search, claim, claim-treatment, window-summary, and narrative-review artifacts before writing a decade narrative, and ties claims to source anchors.",
+      "files": [],
+      "assertions": [
+        "Source assets are inventoried with stable IDs, hashes, date evidence, access status, and derived OCR/index artifacts.",
+        "Claims remain atomic and point to source anchors before any broad narrative is written.",
+        "A critical-historian review checks source coverage, OCR stability, claim treatment, and publication constraints before rollup."
+      ]
+    },
+    {
+      "id": "shepard-style-claim-treatment",
+      "prompt": "The user provides an existing narrative and asks whether new documents change the interpretation.",
+      "expected_output": "Searches for support and counterevidence, updates a Shepard-style treatment ledger, and marks claims as supported, qualified, contradicted, superseded, distinguished, duplicated, or needing review.",
+      "files": [],
+      "assertions": [
+        "The agent does not overwrite old claims without recording treatment history.",
+        "Contradictory and qualifying evidence is recorded separately from direct support.",
+        "Rollup or rewrite recommendations cite claim-treatment rows and residual uncertainty."
+      ]
+    },
+    {
+      "id": "sunshine-vault-smoke-test",
+      "prompt": "The user asks to test the skill against the Sunshine vault without changing source files.",
+      "expected_output": "Uses the Sunshine manifest as a read-only seed, treats content_sha256 as durable identity, writes a local evidence bundle, validates it, and leaves vault files untouched.",
+      "files": [],
+      "assertions": [
+        "The Sunshine manifest is read without moving, deleting, or rewriting vault files.",
+        "The generated bundle includes asset, search, claim, treatment, summary, and review artifacts.",
+        "The next enrichment steps call for OCR/page spans, semantic or hybrid search, source-card checks, and public-access review."
+      ]
+    }
+  ]
+}

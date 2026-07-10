@@ -1,0 +1,35 @@
+schema_ref: skill-pack.schema.yaml
+kind: VerdifySkillPack
+schema_version: "1.0"
+name: research-analysis
+display_name: Research Analysis
+description: General research skills for ingesting evidence, resolving question sets, preparing interviews, and producing consensus-ready review packets.
+category: utility
+maturity: experimental
+includes:
+  required:
+    - northstar-research-ingest
+    - northstar-question-resolution
+    - northstar-interview
+  optional:
+    - transcript-replan
+    - northstar-planning
+    - consensus-audit-workflow
+provides:
+  capabilities:
+    - evidence-ingest
+    - question-inventory
+    - question-clustering
+    - interview-prep
+    - consensus-review
+depends_on:
+  packs: []
+  tools:
+    - git
+    - web-research
+conflicts: []
+install:
+  hosts:
+    - codex
+    - claude
+  default_profile: research-analyst

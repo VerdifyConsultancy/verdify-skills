@@ -1,0 +1,41 @@
+schema_ref: skill-pack.schema.yaml
+kind: VerdifySkillPack
+schema_version: "1.0"
+name: fleet-operations
+display_name: Fleet Operations
+description: Operational skills for repository bootstrap, hygiene, controller state, platform readiness, Gravity readiness, and orchestrated delivery.
+category: integration
+maturity: beta
+includes:
+  required:
+    - repo-bootstrap
+    - repo-hygiene
+    - controller-loop
+    - platform-readiness
+    - gravity-readiness
+    - sprint-orchestrator
+  optional:
+    - release-verification
+    - consensus-audit-workflow
+    - issue-triage
+provides:
+  capabilities:
+    - repo-bootstrap
+    - repo-hygiene
+    - controller-loop
+    - platform-readiness
+    - gravity-readiness
+    - orchestration
+depends_on:
+  packs:
+    - sdlc-core
+  tools:
+    - git
+    - github
+    - kubernetes
+conflicts: []
+install:
+  hosts:
+    - codex
+    - claude
+  default_profile: operator

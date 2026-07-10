@@ -1,0 +1,98 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-recovery-publication
+lane_id: issue-126-recovery-publication
+pull_request: 173
+worker_agent: codex
+worker_session_id: worker-126-recovery-20260710t0505z
+critic_agent: codex-critic
+implementation_head_sha: "b13f17baa4787ef377377babb4b2e959007c383f"
+evidence_head_sha: "abdc6bec6dd2a418ea6061c2e3aa6a822cea87a8"
+reviewed_head_sha: "abdc6bec6dd2a418ea6061c2e3aa6a822cea87a8"
+closeout_path: .agent-workflow/sprints/2026-07-10-recovery-publication/lanes/closeout/issue-126-recovery-publication.closeout.yaml
+closeout_sha256: "01d95bde9da97c2cc0aa82d11a352d7d752afea6f710c6040c80283686b96e3e"
+critic_session_id: critic-126-recovery-20260710t0530z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-recovery-publication/critic-issue-126-recovery-publication
+outcome: approve_with_risks
+findings:
+  - id: FIND-001
+    severity: low
+    statement: >-
+      The timeline bundle validator accepts any 64-character content_sha256 value,
+      including non-hexadecimal text, and does not bind asset_id to the declared digest.
+      The recovered Sunshine fixture uses valid hashes, so this does not invalidate the
+      reviewed evidence, but malformed future bundles can receive valid=true.
+    evidence:
+      - "skills/timeline-historian/scripts/validate_timeline_bundle.py:54 checks presence and line 62 checks only string length despite the line 63 error calling the value hexadecimal."
+      - "An independent critic probe replaced a seeded asset digest with 64 lowercase z characters and updated its references; validate_timeline_bundle.py returned valid=true with an empty errors array."
+    requested_action: >-
+      Track a follow-up hardening change that enforces exactly 64 lowercase hexadecimal
+      characters and verifies asset_id equals sha256:<content_sha256>; keep this lane's
+      exact recovered source and current acceptance evidence unchanged.
+  - id: FIND-002
+    severity: low
+    statement: >-
+      Pack installation is not transactional when an existing target conflicts without
+      --force: links created before the conflict remain even though the command exits 2
+      and no installed-pack manifest is written.
+    evidence:
+      - "lib/verdify/cli.rb:2449-2472 mutates each selected link as it iterates and discovers later conflicts only after earlier links have been created; the manifest is written afterward at lines 2474-2499."
+      - "An independent research-analysis install probe placed a conflict at the second required Codex link; the command exited 2, preserved the conflicting operator directory, left the first new skill link active, and wrote no .agent-skills/verdify-packs/research-analysis.yaml manifest."
+    requested_action: >-
+      Track a follow-up installer hardening change that preflights every selected host
+      target and manifest destination before mutation, or rolls back all created links
+      when installation fails.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - "The fe1f94e historian selection contains 20 non-link source files: 18 are byte-identical, while SKILL.md carries only the 1.2.1 metadata adaptation and sunshine_manifest_seed.py adds only the missing sys import; both regenerated host links resolve to the canonical skill."
+      - "The timeline evidence registry item is structurally identical to fe1f94e, and its copied source, registry, and collateral SHA-256 values all equal 6d688411cbe15a12899bdf016737ebb6da39ee4bb3a58d2f1765ef0acade1d98."
+      - "Independent quick_validate checks passed for timeline-historian; windowing, read-only filtered seeding, invalid-manifest error handling, and bundle validation passed against a two-asset synthetic fixture without changing the read-only manifest."
+      - "The real /Volumes/sunshine/decades/_manifest/decade-export-manifest.jsonl path is unavailable in this critic environment, matching the closeout's explicit limitation."
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - "The nine selected f425515 evidence/audit files are byte-identical, and all four registry items are structurally identical to the source-ref registry entries."
+      - "All four copied sources independently match the registry and collateral hashes: 72d145fdbdec193afd79a4ea42968cf049f44a00d7db7307eaee31dcb7d85e7f, 809ebfc0a2726ee12eaf176c5851d275d908109db045c765523593b4655d27a1, 5d7f2802de90d26f1418b1612595ebc54dd5a620f722453c34764413a2232387, and 24fc5f198fe2d5f22dfbd8d4558df6d834791b78ca2289e0d0266cd55bb9784f."
+      - "The alternate North Star architecture, ADR/controller implementation, and wave/task/worker-run schemas have no diff from baseline 17b3762 through I."
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - "The 22f81bd new-file audit has 15 non-link CRM/pack source files: 12 are byte-identical and the three documented CRM skill/helper/page adaptations are limited to version 1.2.1 and offline dry-run safety."
+      - "Independent pack list, clean-target link/install, installed-manifest, npm dl/init, CRM help, and credential-free no-network dry-run checks passed; the dry-run exposed neither a sentinel credential nor fixture body."
+      - "VERSION and package.json both remain 1.2.1; VERSION, scripts/package-file-list.rb, and scripts/package.sh have the exact same Git blob IDs at baseline and I."
+      - "The immutable-index package regression, 439-entry manifest check, exact archive verification, npm dry-run content audit, and npm install suite passed."
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - "docs/recovery-ledger-2026-07-10.md cross-links issue 126 and accounts for fe1f94e, f425515, 22f81bd, selected and rejected artifacts, merged branches, superseded refs, the reported shared runner checkpoint, and deferred cleanup gates."
+      - "Every listed local branch head, remote source/divergent head, main-contained ref, and dev-only ref matched the current Git graph and live remote heads; the lane's expected post-snapshot advance to E is explicitly anticipated by the ledger."
+      - "All three rescue refs remain live at their exact recorded commits, and no branch, worktree, rescue ref, shared runner checkout, or live CRM/email data was mutated by this critic."
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - "Independent make test passed at E with 28 skills, 47 schemas, 90 runs, 533 assertions, zero failures/errors/skips, and passing CLI, PR-policy, release-preflight, package file-set, npm install, manifest, and repository validations."
+      - "Protected-base scripts/pr-policy.rb validated live PR 173 metadata and the candidate checkout at E; protected-base artifact validation passed for the contract, closeout, and evidence registry."
+      - "gitleaks scanned all three commits from 17b3762 through E with redaction and found no leaks; the exact I package stager blobs and final package version were independently verified."
+      - "Live E checks validate, pull-request-policy, and compliance / compliance are successful; the report-only S head must rerun exact-head secret and GitHub checks before external approval."
+evidence_assessment:
+  - "The active critic lease, detached worktree, local lane ref, remote lane ref, and live PR head all matched E before report creation; critic agent codex-critic and session critic-126-recovery-20260710t0530z differ from worker agent codex and session worker-126-recovery-20260710t0505z."
+  - "D b4ea69b1aa9d3142057239123f13d9178ca4c2ec is the first post-baseline commit and adds only the approved sprint plan, wave release plan, and lane contract; all three dispatch artifacts remain immutable through E."
+  - "I b13f17baa4787ef377377babb4b2e959007c383f changes 64 contract-owned paths, no coordination-required or prohibited paths, and E abdc6bec6dd2a418ea6061c2e3aa6a822cea87a8 adds only the canonical closeout in a linear D-I-E history."
+  - "The independently computed closeout SHA-256 is 01d95bde9da97c2cc0aa82d11a352d7d752afea6f710c6040c80283686b96e3e, and its contract hash equals the immutable contract hash 0d285707210535d1dc93815aa16e1c7842a193c388f60b4e4ad08a6f1c512bba."
+  - "All five recovered evidence records are unique, sorted, queryable, structurally source-identical, and hash-consistent across registry, collateral item, copied source, and source ref."
+  - "Independent source-tree comparisons corroborate every documented adaptation and every rejected stale path; no source ref was merged or cherry-picked wholesale."
+  - "Worker evidence is revision-bound to I and consistent with independent validation. Both the worker and critic worktrees were clean at E before this report-only transaction."
+integration_risks:
+  - "The approving critic outcome is not an advancing GitHub approval. The final report-only S head still requires successful exact-head validate, pull-request-policy, and compliance checks plus a commit-bound APPROVED review from a repository admin or maintainer other than PR author jvallery."
+  - "The dev branch advanced to c78db1bf86d85719a367e0a5c461db6e6f92e22e after dispatch. PR 173 is currently mergeable and clean, but the controller must reconcile current dev without rewriting the immutable D-I-E-S chain."
+  - "FIND-001 and FIND-002 are bounded failure-path weaknesses outside the clean-fixture acceptance cases; future historian validation and pack installation should not treat those behaviors as stronger guarantees than this report records."
+  - "No npm publication, GitHub release, dev integration, main promotion, runtime deployment, destructive cleanup, or shared-runner mutation is authorized by this lane or critic report."
+residual_risks:
+  - "The real Sunshine manifest was not mounted; source fidelity, helper behavior, and a deterministic synthetic read-only bundle passed, but a real-vault smoke remains a later environment-bound check."
+  - "One exact, hash-bound f425515 historical source retains trailing spaces and a raw ESC byte 0x1b at byte offset 2312. It is untrusted evidence and is not executed, but any downstream terminal/log renderer must escape or visualize control bytes rather than print them verbatim."
+  - "The three rescue refs and reported shared Agent Platform checkout must remain retained until reviewed dev integration, a later new-version main release, and a fresh cleanup audit prove alternate durable retrieval and no unique uncommitted data."
+  - "Any commit after the report-only S head invalidates exact-head checks and any later external approval."
+reviewed_at: "2026-07-10T05:45:01Z"

@@ -1,0 +1,36 @@
+schema_ref: skill-pack.schema.yaml
+kind: VerdifySkillPack
+schema_version: "1.0"
+name: northstar-strategy
+display_name: North Star Strategy
+description: Strategy and evidence skills for turning transcripts, research, questions, and review feedback into product and architecture direction.
+category: domain
+maturity: beta
+includes:
+  required:
+    - transcript-replan
+    - northstar-research-ingest
+    - northstar-planning
+    - northstar-interview
+    - northstar-question-resolution
+  optional:
+    - consensus-audit-workflow
+    - state-of-union
+provides:
+  capabilities:
+    - transcript-intake
+    - evidence-registry
+    - research-synthesis
+    - question-resolution
+    - decision-pack
+depends_on:
+  packs: []
+  tools:
+    - git
+    - web-research
+conflicts: []
+install:
+  hosts:
+    - codex
+    - claude
+  default_profile: research-analyst

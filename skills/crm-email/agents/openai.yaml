@@ -1,0 +1,6 @@
+interface:
+  display_name: "CRM Email"
+  short_description: "Draft and send CRM-backed email safely"
+  default_prompt: "Use $crm-email to draft, review, search CRM context, or send email through the Verdify CRM API using credential references only."
+policy:
+  allow_implicit_invocation: true

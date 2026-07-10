@@ -82,6 +82,14 @@ module Verdify
       when "prompt" then command_prompt
       when "github" then command_github
       when "gate" then command_gate
+      when "pack" then command_pack
+      when "dl"
+        pack_name = @argv.shift
+        if pack_name&.start_with?("-")
+          @argv.unshift(pack_name)
+          pack_name = nil
+        end
+        command_pack_install(pack_name)
       else
         raise UsageError, "unknown command #{command.inspect}\n\n#{help}"
       end
@@ -113,6 +121,9 @@ module Verdify
           github snapshot            Cache current issues and pull requests locally
           github reconcile           Compare sprint lane contracts with a snapshot
           gate compliance            Assess fleet-standard-shape conformance of a repo
+          pack list                  List skill packs in this registry package
+          pack install               Link one skill pack into a target repository
+          dl                         Shortcut for `pack install --pack NAME`
 
         Run `bin/verdify <command> --help` for command options.
       HELP
@@ -300,6 +311,81 @@ module Verdify
         warn errors.map { |e| "#{file}: #{e}" }.join("\n")
         1
       end
+    end
+
+    def command_pack
+      subcommand = @argv.shift
+      case subcommand
+      when "list" then command_pack_list
+      when "install" then command_pack_install
+      else
+        raise UsageError, "Usage: bin/verdify pack <list|install>"
+      end
+    end
+
+    def command_pack_list
+      options = { json: false }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify pack list [--json]"
+        o.on("--json", "Emit JSON") { options[:json] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      packs = skill_packs.map do |pack|
+        {
+          "name" => pack["name"],
+          "display_name" => pack["display_name"],
+          "category" => pack["category"],
+          "maturity" => pack["maturity"],
+          "required_skills" => Array(pack.dig("includes", "required")),
+          "optional_skills" => Array(pack.dig("includes", "optional")),
+          "capabilities" => Array(pack.dig("provides", "capabilities"))
+        }
+      end
+      if options[:json]
+        puts JSON.pretty_generate({ "count" => packs.length, "packs" => packs })
+      else
+        puts format("%-22s %-12s %-12s %s", "PACK", "CATEGORY", "MATURITY", "REQUIRED SKILLS")
+        packs.each do |pack|
+          puts format("%-22s %-12s %-12s %s",
+                      pack["name"], pack["category"], pack["maturity"], pack["required_skills"].join(","))
+        end
+      end
+      0
+    end
+
+    def command_pack_install(initial_pack = nil)
+      options = {
+        repo: Dir.pwd,
+        pack: initial_pack,
+        host: "codex",
+        include_optional: false,
+        force: false,
+        init_workflow: false
+      }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify pack install --pack NAME [--repo PATH] [--host codex|claude|all] [--include-optional] [--force] [--init-workflow]"
+        o.on("--repo PATH", "Target Git repository") { |v| options[:repo] = v }
+        o.on("--pack NAME", "Skill pack to install") { |v| options[:pack] = v }
+        o.on("--host HOST", %w[codex claude all], "Host links to write") { |v| options[:host] = v }
+        o.on("--include-optional", "Install optional skills declared by the pack") { options[:include_optional] = true }
+        o.on("--force", "Replace conflicting links or directories") { options[:force] = true }
+        o.on("--init-workflow", "Also initialize .agent-workflow if missing") { options[:init_workflow] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      raise UsageError, "--pack is required" if options[:pack].to_s.empty?
+
+      pack = load_skill_pack(options[:pack])
+      selected = pack_skill_names(pack, options[:include_optional])
+      repo = GitRepository.new(options[:repo])
+      command_init_for_pack(repo, options[:force]) if options[:init_workflow]
+      install_skill_links(repo.root, selected, options[:host], options[:force])
+      write_pack_manifest(repo.root, pack, selected, options)
+      puts "Installed skill pack #{pack['name']} (#{selected.length} skills) into #{repo.root}"
+      puts "Hosts: #{options[:host]}"
+      puts "Manifest: .agent-skills/verdify-packs/#{pack['name']}.yaml"
+      0
     end
 
     def command_northstar
@@ -2326,6 +2412,114 @@ module Verdify
       errors = SchemaValidator.new.validate(document, schema)
       errors.concat(SemanticValidator.validate(document))
       raise Error, "#{label} failed validation:\n#{errors.join("\n")}" unless errors.empty?
+    end
+
+    def skill_packs
+      Dir[Verdify::ROOT.join("packs/*/pack.yaml")].sort.map do |path|
+        load_skill_pack(Pathname.new(path).dirname.basename.to_s)
+      end
+    end
+
+    def load_skill_pack(name)
+      raise UsageError, "invalid pack name: #{name.inspect}" unless name.to_s.match?(/\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z/)
+
+      path = Verdify::ROOT.join("packs", name, "pack.yaml")
+      raise UsageError, "unknown skill pack #{name.inspect}; run `verdify pack list`" unless path.file?
+
+      pack = Verdify.safe_load_yaml(path)
+      validate_hash!(pack, "skill-pack.schema.yaml", "skill pack #{name}")
+      raise UsageError, "pack name does not match directory: #{name}" unless pack["name"] == name
+
+      unknown = pack_skill_names(pack, true) - all_skill_names
+      raise UsageError, "pack #{name} references unknown skills: #{unknown.join(', ')}" unless unknown.empty?
+
+      pack
+    end
+
+    def pack_skill_names(pack, include_optional)
+      skills = Array(pack.dig("includes", "required")).map(&:to_s)
+      skills += Array(pack.dig("includes", "optional")).map(&:to_s) if include_optional
+      skills.uniq
+    end
+
+    def all_skill_names
+      Dir[Verdify::ROOT.join("skills/*/SKILL.md")].sort.map { |path| Pathname.new(path).dirname.basename.to_s }
+    end
+
+    def install_skill_links(repo_root, skills, host, force)
+      hosts = host == "all" ? %w[codex claude] : [host]
+      host_dirs = { "codex" => ".agents/skills", "claude" => ".claude/skills" }
+      hosts.each do |current_host|
+        dir = repo_root.join(host_dirs.fetch(current_host))
+        FileUtils.mkdir_p(dir)
+        skills.each do |skill|
+          source = Verdify::ROOT.join("skills", skill)
+          raise UsageError, "missing source skill #{skill}" unless source.join("SKILL.md").file?
+
+          link = dir.join(skill)
+          if link.exist? || link.symlink?
+            begin
+              next if link.symlink? && link.realpath == source.realpath
+            rescue Errno::ENOENT
+              # Replace broken link below.
+            end
+            raise UsageError, "refusing to replace #{link}; pass --force" unless force
+            FileUtils.rm_rf(link)
+          end
+          File.symlink(source.relative_path_from(link.dirname), link)
+        end
+      end
+    end
+
+    def write_pack_manifest(repo_root, pack, skills, options)
+      dir = repo_root.join(".agent-skills/verdify-packs")
+      FileUtils.mkdir_p(dir)
+      manifest = {
+        "schema_ref" => "skill-pack.schema.yaml",
+        "kind" => "VerdifySkillPack",
+        "schema_version" => "1.0",
+        "name" => pack["name"],
+        "display_name" => pack["display_name"],
+        "description" => pack["description"],
+        "category" => pack["category"],
+        "maturity" => pack["maturity"],
+        "includes" => {
+          "required" => skills,
+          "optional" => []
+        },
+        "provides" => pack["provides"],
+        "depends_on" => pack["depends_on"],
+        "conflicts" => pack["conflicts"],
+        "install" => {
+          "hosts" => options[:host] == "all" ? %w[codex claude] : [options[:host]],
+          "default_profile" => pack.dig("install", "default_profile")
+        }
+      }
+      validate_hash!(manifest, "skill-pack.schema.yaml", "installed skill pack manifest")
+      Verdify.atomic_write(dir.join("#{pack['name']}.yaml"), YAML.dump(manifest))
+    end
+
+    def command_init_for_pack(repo, force)
+      return if repo.root.join(".agent-workflow/config.yaml").file? && !force
+
+      root = repo.root.join(".agent-workflow")
+      FileUtils.mkdir_p(root)
+      Verdify.atomic_write(root.join(".gitignore"), "github/snapshot.json\nruntime/\n*.tmp\nnorthstar/collateral/sources/\n")
+      Verdify.atomic_write(root.join("README.md"), "# Verdify project artifacts\n\nCanonical approved definitions, architecture, module contracts, sprint contracts, gates, status, and evidence live here.\n")
+      Verdify.atomic_write(root.join("config.yaml"), YAML.dump({
+        "schema_ref" => "project-config.schema.yaml",
+        "kind" => "VerdifyProjectConfig",
+        "schema_version" => "1.0",
+        "initialized_at" => Verdify.utc_now,
+        "default_branch" => repo.default_branch,
+        "github_repository" => repo.github_slug,
+        "policy" => {
+          "one_issue_per_lane" => true,
+          "one_coding_session_per_worktree" => true,
+          "fresh_critic_required" => true,
+          "runtime_verification_required" => true
+        }
+      }))
     end
 
     def split_list(value)

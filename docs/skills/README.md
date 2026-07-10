@@ -1,13 +1,14 @@
 # Verdify Skills Reference
 
-This is the reference manual for the **25 Verdify lifecycle skills** — what each
-one does, what it reads, what it writes, the schemas it owns, the tools it calls,
-and how it hands off. It complements the prose in [`../lifecycle.md`](../lifecycle.md)
+This is the reference manual for the **25 Verdify lifecycle skills, two
+standalone skills, and one registry skill** — what each one does, what it reads,
+what it writes, the schemas it owns, the tools it calls, and how it hands off.
+It complements the prose in [`../lifecycle.md`](../lifecycle.md)
 (stages and gates), [`../authority-model.md`](../authority-model.md) (who owns what
 truth), and [`../github-operating-model.md`](../github-operating-model.md).
 
 - **Per-skill pages:** [`per-skill/`](per-skill/) — one page per skill.
-- **Schema catalog:** [`schemas-catalog.md`](schemas-catalog.md) — all 46 schemas, owners, producers/consumers.
+- **Schema catalog:** [`schemas-catalog.md`](schemas-catalog.md) — all 47 schemas, owners, producers/consumers.
 - **Tools & MCP:** [`tools-and-mcp.md`](tools-and-mcp.md) — `bin/verdify` CLI, Agent Platform MCP/API, GitHub primitives.
 - **Sequences:** [`sequences.md`](sequences.md) — end-to-end flows as mermaid sequence diagrams.
 
@@ -94,7 +95,7 @@ flowchart LR
     REVb --> DONE["wave accepted"]
 ```
 
-## The 25 skills
+## The skill registry
 
 | # | Skill | Does | Owns schemas |
 |---|---|---|---|
@@ -124,6 +125,8 @@ flowchart LR
 | 24 | [adversarial-audit](per-skill/adversarial-audit.md) | Product, engineering, security, and business lens audit | — |
 | 25 | [consensus-audit-workflow](per-skill/consensus-audit-workflow.md) | Skill audit + consensus review | — |
 | — | [issue-triage](per-skill/issue-triage.md) | Standalone: research and create GitHub issues | — |
+| — | [timeline-historian](per-skill/timeline-historian.md) | Standalone: source-backed historical narratives and claim treatment | — |
+| — | [crm-email](per-skill/crm-email.md) | Registry: CRM-backed email drafting and approved send/log workflows | — |
 
 ## How to read a per-skill page
 

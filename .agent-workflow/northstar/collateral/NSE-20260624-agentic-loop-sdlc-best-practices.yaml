@@ -1,0 +1,53 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260624-agentic-loop-sdlc-best-practices
+reference: northstar://evidence/NSE-20260624-agentic-loop-sdlc-best-practices
+title: Agentic loop execution and SDLC best practices
+evidence_type: research_report
+evidence_status: reported
+ingested_at: '2026-06-24T16:42:05Z'
+source:
+  uri: codex-attachment://33a637a2-c48a-4aa3-b7d7-f3d1e4ef30df/pasted-text-1.txt
+  original_path: "/Users/jason/.codex/attachments/33a637a2-c48a-4aa3-b7d7-f3d1e4ef30df/pasted-text-1.txt"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260624-agentic-loop-sdlc-best-practices-pasted-text-1-txt"
+  sha256: 809ebfc0a2726ee12eaf176c5851d275d908109db045c765523593b4655d27a1
+summary: Attached research report establishing planner-executor-validator loops, bounded
+  autonomy, evidence-backed stop rules, evals, adversarial testing, telemetry, incident
+  response, reproducibility, and governance requirements for Codex/Claude-style software
+  delivery agents.
+tags:
+- agentic-loop
+- evals
+- governance
+- observability
+- platform
+- sdlc
+- security
+- skills
+claims:
+- Software-engineering agents should use bounded autonomy with explicit evidence,
+  least-privilege permissions, validation, and stop conditions rather than unbounded
+  autonomy.
+- The safest default SDLC architecture is a planner-executor-validator loop with separate
+  planning, tool execution, validation, repair, and human-review paths.
+- Agent harnesses should be treated as versioned product code, including prompts,
+  tool contracts, validators, approval policies, memory or compaction policy, and
+  telemetry.
+- Testing should include unit, integration, task-eval, adversarial/red-team, and chaos
+  layers covering prompt injection, permission boundaries, retry exhaustion, stale
+  caches, and partial failures.
+- Production agent operations need tracing, audit logs, spend and rate controls, incident
+  response, rollback triggers, reproducible model/prompt/tool bundles, and supply-chain
+  provenance.
+planning_relevance:
+- Baseline for adversarial audit of every Verdify lifecycle skill against agentic-loop
+  and SDLC best practices.
+- Supports North Star updates for end-to-end requirements, architecture, planning,
+  implementation, QA, deployment, observability, incident response, and learning loops.
+- Supports backlog and platform capability issues for agents.vallery.net MCP/runtime
+  gaps.
+limitations:
+- Research is a synthesized planning report, not direct verification of Verdify skills,
+  jvallery/agents implementation, or live agents.vallery.net MCP capabilities.

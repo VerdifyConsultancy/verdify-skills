@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260627-timeline-historian-claims-provenance-and
+reference: northstar://evidence/NSE-20260627-timeline-historian-claims-provenance-and
+title: Timeline historian claims provenance and OCR research
+evidence_type: research_note
+evidence_status: observed
+ingested_at: '2026-06-27T22:13:55Z'
+source:
+  uri:
+  original_path: "/Users/jason/repos/verdify-skills/.agent-workflow/northstar/research-inbox/2026-06-27-timeline-historian-claims-provenance-brave-research.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260627-timeline-historian-claims-provenance-and-2026-06-27-timeline-historian-claims-provenance"
+  sha256: 6d688411cbe15a12899bdf016737ebb6da39ee4bb3a58d2f1765ef0acade1d98
+summary: Brave Search API research on a historian and critical-historian skill design
+  covering Shepard-style claim treatment, asset traceability, semantic search, OCR
+  provenance, discovery metadata, and source-backed rollup narratives.
+tags:
+- historian
+- ocr
+- provenance
+- research
+- semantic-search
+- skills
+claims:
+- W3C PROV supports modeling historian output as lineage across source assets, OCR
+  and correction steps, search and index activities, generated claims, reviews, and
+  narratives.
+- IIIF, Web Annotation, and ALTO support source anchors at canvas, region, text span,
+  and OCR layout levels, so historian claims should retain page, image, and span traceability
+  rather than only document-level citations.
+- Legal Shepardizing and citator guidance supports tracking later treatment of an
+  authority, so the historian should maintain a claim-treatment ledger for support,
+  contradiction, qualification, supersession, distinction, and stale or contested
+  claims.
+planning_relevance: []
+limitations: []

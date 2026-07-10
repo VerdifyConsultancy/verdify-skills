@@ -24,13 +24,16 @@ const COPY_ENTRIES = [
   "bin",
   "config",
   "docs",
+  "evaluations",
   "examples",
   "lib",
   "npm",
+  "packs",
   "package.json",
   "schemas",
   "scripts",
   "skills",
+  "templates",
   "verdify.workflow.yaml"
 ];
 
@@ -39,19 +42,61 @@ function usage() {
 
 Usage:
   npx @verdify-cli/cli@${version} init [--repo PATH] [--host codex|claude|all] [--force]
+  npx @verdify-cli/cli@${version} dl PACK [--repo PATH] [--host codex|claude|all] [--include-optional] [--force]
   npx @verdify-cli/cli@${version} <verdify-command> [options]
 
 The init command installs the skills package under .agent-skills, links agent
 skills into .agents/skills, writes AGENTS.md instructions, and initializes
-.agent-workflow lifecycle artifacts. Other commands are forwarded to the
-packaged Ruby lifecycle CLI.
+.agent-workflow lifecycle artifacts. The dl command installs a specific skill
+pack from the package registry without initializing lifecycle artifacts. Other
+commands are forwarded to the packaged Ruby CLI.
 `;
+}
+
+function parseInstallArgs(argv, options = {}) {
+  const parsed = {
+    repo: options.repo || process.cwd(),
+    host: options.host || "codex",
+    pack: options.pack || "all",
+    force: false,
+    includeOptional: false
+  };
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === "--repo") {
+      i += 1;
+      if (!argv[i]) fail("--repo requires a path", 2);
+      parsed.repo = argv[i];
+    } else if (arg === "--host") {
+      i += 1;
+      if (!["codex", "claude", "all"].includes(argv[i])) fail("--host must be codex, claude, or all", 2);
+      parsed.host = argv[i];
+    } else if (arg === "--pack") {
+      i += 1;
+      if (!argv[i]) fail("--pack requires a name", 2);
+      parsed.pack = argv[i];
+    } else if (arg === "--include-optional") {
+      parsed.includeOptional = true;
+    } else if (arg === "--force") {
+      parsed.force = true;
+    } else if (arg === "-h" || arg === "--help") {
+      process.stdout.write(usage());
+      process.exit(0);
+    } else {
+      fail(`unknown option: ${arg}`, 2);
+    }
+  }
+
+  return parsed;
 }
 
 function parseInitArgs(argv) {
   const options = {
     repo: process.cwd(),
     host: "codex",
+    pack: "all",
+    includeOptional: false,
     force: false
   };
 
@@ -65,6 +110,12 @@ function parseInitArgs(argv) {
       i += 1;
       if (!["codex", "claude", "all"].includes(argv[i])) fail("--host must be codex, claude, or all", 2);
       options.host = argv[i];
+    } else if (arg === "--pack") {
+      i += 1;
+      if (!argv[i]) fail("--pack requires a name", 2);
+      options.pack = argv[i];
+    } else if (arg === "--include-optional") {
+      options.includeOptional = true;
     } else if (arg === "--force") {
       options.force = true;
     } else if (arg === "-h" || arg === "--help") {
@@ -173,6 +224,28 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function upsertPackBlock(repoRoot, installDir, packName) {
+  const file = path.join(repoRoot, "AGENTS.md");
+  const relativeInstall = path.relative(repoRoot, installDir);
+  const start = "<!-- BEGIN VERDIFY SKILL PACKS -->";
+  const end = "<!-- END VERDIFY SKILL PACKS -->";
+  const block = `${start}
+# Verdify Skill Packs
+
+Installed Verdify skill package: \`${relativeInstall}\`.
+Installed pack: \`${packName}\`.
+Use the linked skills under \`.agents/skills\` or \`.claude/skills\` according to host setup. Packs are installable subsets of the package registry under \`${relativeInstall}/packs\`.
+${end}
+`;
+
+  const existing = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+  const pattern = new RegExp(`${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}\\n?`);
+  const next = pattern.test(existing)
+    ? existing.replace(pattern, block)
+    : `${existing.replace(/\s*$/, "")}${existing.trim() ? "\n\n" : ""}${block}`;
+  fs.writeFileSync(file, next, "utf8");
+}
+
 function init(argv) {
   const options = parseInitArgs(argv);
   const repoRoot = findRepoRoot(options.repo);
@@ -180,13 +253,49 @@ function init(argv) {
   const copied = copyPackage(installDir, options.force);
 
   run("ruby", [path.join(installDir, "bin", "verdify"), "init", "--repo", repoRoot].concat(options.force ? ["--force"] : []));
-  run("ruby", [path.join(installDir, "scripts", "setup-agent-hosts.rb"), "--root", repoRoot, "--source", installDir, "--host", options.host]);
+  run("ruby", [
+    path.join(installDir, "scripts", "setup-agent-hosts.rb"),
+    "--root", repoRoot,
+    "--source", installDir,
+    "--host", options.host,
+    "--pack", options.pack
+  ].concat(options.includeOptional ? ["--include-optional"] : []));
   upsertAgentsBlock(repoRoot, installDir);
+  upsertPackBlock(repoRoot, installDir, options.pack);
+  if (options.pack !== "all") {
+    run("ruby", [path.join(installDir, "bin", "verdify"), "pack", "install", "--repo", repoRoot, "--pack", options.pack, "--host", options.host, "--force"].concat(options.includeOptional ? ["--include-optional"] : []));
+  }
   run("ruby", [path.join(installDir, "bin", "verdify"), "route", "--repo", repoRoot, "--write"]);
 
   process.stdout.write(`Verdify skills ${version} ${copied ? "installed" : "already installed"} in ${path.relative(repoRoot, installDir)}\n`);
+  process.stdout.write(`Skill pack: ${options.pack}\n`);
   process.stdout.write("Workflow artifacts: .agent-workflow\n");
   process.stdout.write("Agent skills: .agents/skills\n");
+}
+
+function dl(argv) {
+  if (argv.length === 0 || argv[0] === "-h" || argv[0] === "--help") {
+    process.stdout.write(usage());
+    process.exit(0);
+  }
+  const packName = argv[0];
+  const options = parseInstallArgs(argv.slice(1), { pack: packName });
+  const repoRoot = findRepoRoot(options.repo);
+  const installDir = path.join(repoRoot, ".agent-skills", "verdify-skills", version);
+  const copied = copyPackage(installDir, options.force);
+  const args = [
+    path.join(installDir, "bin", "verdify"),
+    "pack",
+    "install",
+    "--repo", repoRoot,
+    "--pack", options.pack,
+    "--host", options.host
+  ];
+  if (options.includeOptional) args.push("--include-optional");
+  if (options.force) args.push("--force");
+  run("ruby", args);
+  upsertPackBlock(repoRoot, installDir, options.pack);
+  process.stdout.write(`Verdify skill pack ${options.pack} ${copied ? "downloaded" : "already downloaded"} from @verdify-cli/cli ${version}\n`);
 }
 
 function forwardToRuby(argv) {
@@ -206,6 +315,8 @@ if (argv[0] === "version" || argv[0] === "--version" || argv[0] === "-v") {
 
 if (argv[0] === "init") {
   init(argv.slice(1));
+} else if (argv[0] === "dl") {
+  dl(argv.slice(1));
 } else {
   forwardToRuby(argv);
 }

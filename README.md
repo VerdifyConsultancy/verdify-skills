@@ -1,6 +1,6 @@
 # Verdify Lifecycle Skills
 
-Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages twenty-five coherent lifecycle Agent Skills, one standalone issue-triage skill, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
+Verdify is an end-to-end, GitHub-native operating system for moving software work from uncertain project context to verified deployment. It packages twenty-five coherent lifecycle Agent Skills, standalone issue-triage and timeline-historian skills, a CRM email registry skill, installable skill packs, deterministic repository tooling, schemas, GitHub templates, and a lane/worktree execution model.
 
 The repository is deliberately not one giant sprint prompt. Lifecycle skills own bounded responsibilities, consume durable artifacts, produce durable artifacts, and hand off without relying on hidden chat history. Standalone skills support adjacent GitHub-native work without entering the lifecycle graph.
 
@@ -107,7 +107,8 @@ See `config/authority-matrix.yaml`, `COMMON_OPERATING_CONTRACT.md`, and `docs/la
 ## Repository contents
 
 ```text
-skills/                     Twenty-five lifecycle skills plus issue-triage
+skills/                     Lifecycle, standalone, and registry skills
+packs/                      Installable skill-pack manifests
 .agents/skills/             Codex discovery links
 .claude/skills/             Claude Code discovery links
 bin/verdify                 Dependency-free lifecycle CLI
@@ -352,9 +353,26 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should configure rulesets for protected branches with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), strict up-to-date checks, conversation resolution, no direct pushes, and no force pushes or branch deletion. Every implementation lane also requires a commit-bound `APPROVED` review on the critic-report head from a repository admin or maintainer other than the PR author. The generated `dev -> main` release and package publication remain separately authorized; deployment environments and their approvers remain project-specific.
 
+## Skill packs
+
+Verdify keeps atomic capabilities in the flat `skills/` registry and composes
+installable subsets under `packs/`. The full lifecycle remains available through
+`init`; narrower workflows can install a named pack without initializing the
+lifecycle.
+
+```bash
+bin/verdify pack list
+bin/verdify pack install --pack research-analysis --repo /path/to/repo
+npx @verdify-cli/cli dl crm-email --repo /path/to/repo
+```
+
+Pack manifests validate against `schemas/skill-pack.schema.yaml`. See
+`docs/skill-packs.md` for pack contents and installation behavior.
+
 ## Design documentation
 
-- **`docs/skills/README.md` — the skills reference manual**: per-skill purpose, inputs, outputs, owned schemas, sequence diagrams, tools/MCP, and handoffs for all 25 lifecycle skills plus the standalone issue-triage skill, plus a 46-schema catalog, a CLI/MCP/GitHub tools reference, and end-to-end sequence diagrams
+- **`docs/skills/README.md` — the skills reference manual**: per-skill purpose, inputs, outputs, owned schemas, sequence diagrams, tools/MCP, and handoffs for all 25 lifecycle skills plus standalone and registry skills, plus a 47-schema catalog, a CLI/MCP/GitHub tools reference, and end-to-end sequence diagrams
+- `docs/skill-packs.md` — installable pack manifests and download/install commands
 - `docs/lifecycle.md` — stages, handoffs, and gates
 - `docs/authority-model.md` — typed source-of-truth boundaries
 - `docs/github-operating-model.md` — issues, PRs, Projects, checks, and deployments

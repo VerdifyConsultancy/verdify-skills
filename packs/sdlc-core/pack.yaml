@@ -1,0 +1,48 @@
+schema_ref: skill-pack.schema.yaml
+kind: VerdifySkillPack
+schema_version: "1.0"
+name: sdlc-core
+display_name: SDLC Core
+description: Core Verdify software delivery lifecycle skills, from routing through planning, lane delivery, critic review, and release verification.
+category: workflow
+maturity: stable
+includes:
+  required:
+    - project-router
+    - transcript-replan
+    - northstar-research-ingest
+    - northstar-planning
+    - northstar-interview
+    - northstar-question-resolution
+    - project-definition
+    - architecture-contracts
+    - state-of-union
+    - sprint-planning
+    - sprint-orchestrator
+    - lane-delivery
+    - independent-critic
+    - release-verification
+  optional:
+    - consensus-audit-workflow
+    - issue-triage
+    - repo-hygiene
+    - controller-loop
+provides:
+  capabilities:
+    - lifecycle-routing
+    - northstar-planning
+    - sprint-planning
+    - lane-delivery
+    - independent-review
+    - release-verification
+depends_on:
+  packs: []
+  tools:
+    - git
+    - github
+conflicts: []
+install:
+  hosts:
+    - codex
+    - claude
+  default_profile: repo-controller
