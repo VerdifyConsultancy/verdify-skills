@@ -9,8 +9,9 @@ metadata:
 
 # Controller Loop
 
-Own durable orchestration state. Do not implement lane code, review your own
-work, or bypass human gates.
+Own durable orchestration state. Do not implement lane code or review your own
+work. Advance automatically inside recorded authority; never manufacture or
+bypass a genuinely protected decision.
 
 ## Operating model
 
@@ -57,10 +58,19 @@ standalone `.agent-workflow/controller/waves/<wave-id>.yaml` artifacts.
    tool, or documented manual handoff.
 7. Monitor durable events: status, blockers, closeout, critic outcome, CI,
    deployment, review feedback, gate decisions, and session loss.
-8. Pause at human gates and protected transitions.
+8. Pause only at an open typed human gate or a protected decision outside the
+   approved authority/risk/rollback envelope. Routine transitions and passing
+   machine gates advance automatically.
 9. Append session-ledger events for lifecycle-significant transitions and
    record explicit exceptions for missing coverage.
 10. Write updated controller state and session ledger.
+11. After release verification R and accepted outcome O, run
+    `bin/verdify sprint receipt` from a branch created at the exact protected
+    `dev` head. Open the exact receipt-only PR, monitor trusted checks, enable
+    auto-merge, and block later implementation merges until it lands.
+12. Do not dispatch another worker, critic, or human reviewer for that
+    deterministic receipt. On success rerun global `project-router`; on failure
+    record the typed receipt/policy error and fix the same receipt transaction.
 
 Read `references/session-ledger.md` before creating or reconciling
 `.agent-workflow/controller/session-ledger.yaml`.

@@ -92,6 +92,7 @@ else
   else
     base_ref = pull_request.dig("base", "ref").to_s
     head_ref = pull_request.dig("head", "ref").to_s
+    base_sha = pull_request.dig("base", "sha").to_s
     head_sha = pull_request.dig("head", "sha").to_s
     event_repository = event.dig("repository", "full_name").to_s
     base_repository = pull_request.dig("base", "repo", "full_name").to_s
@@ -104,30 +105,81 @@ else
 
     if base_ref == development_branch
       body = pull_request["body"].to_s
-      lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-      contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-      unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
-        errors << "dev critic gate requires exact lane and contract metadata"
-      else
-        contract_path = candidate.root.join(contract_relative)
-        sprint_root = contract_path.dirname.parent.parent
-        closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
-        critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
-        if !critic_path.file?
-          errors << "current head does not contain the canonical critic report"
-        else
-          validator = Verdify::LaneReviewValidator.new(
-            repo: candidate,
-            contract_path: contract_path,
-            closeout_path: closeout_path,
-            critic_path: critic_path
+      changed_paths = if full_sha?(base_sha) && candidate.commit_exists?(base_sha)
+                        candidate.git("diff", "--name-only", "#{base_sha}...#{head_sha}").first.lines.map(&:strip).reject(&:empty?).uniq.sort
+                      else
+                        []
+                      end
+      marker_pattern = /<!--[ \t]*verdify-terminal-receipt:([a-z0-9][a-z0-9-]*):([0-9a-f]{40})[ \t]*-->/
+      markers = body.scan(marker_pattern)
+      marker_comments = body.scan(/<!--[ \t]*verdify-terminal-receipt:[^\n]*?-->/)
+      receipt_paths = changed_paths.grep(%r{\A\.agent-workflow/sprints/[^/]+/terminal/terminal-receipt\.yaml\z})
+      receipt_pr = !markers.empty? || !marker_comments.empty? || !receipt_paths.empty?
+      cutover_active = full_sha?(base_sha) && candidate.git(
+        "cat-file", "-e", "#{base_sha}:schemas/sprint-terminal-receipt.schema.yaml", allow_failure: true
+      ).last.success?
+      unterminated = if cutover_active
+                       Verdify::SprintTerminalReceipt.new(repo: candidate).integrated_unterminated_sprints(ref: base_sha)
+                     else
+                       []
+                     end
+
+      if receipt_pr
+        errors << "terminal receipt gate requires exactly one valid marker" unless markers.length == 1 && marker_comments.length == 1
+        marker_id, marker_base = markers.first || []
+        errors << "terminal receipt marker base must match the pull request base" unless marker_base == base_sha
+        receipt_mode = marker_id == Verdify::SprintTerminalReceipt::RECOVERY_BUNDLE ? "recovery" : "normal"
+        sprint_ids = receipt_paths.map { |path| path.split("/")[3] }.uniq.sort
+        expected_sprints = if receipt_mode == "recovery"
+                             Verdify::SprintTerminalReceipt::RECOVERY_SPRINT_IDS
+                           elsif marker_id
+                             [marker_id]
+                           else
+                             []
+                           end
+        errors << "terminal receipt marker and sprint set do not match" unless sprint_ids == expected_sprints.sort
+        errors << "terminal receipt must resolve exactly the integrated unterminated sprint set" unless sprint_ids == unterminated
+        errors << "terminal receipt gate rejects mixed or incomplete paths" unless changed_paths == Verdify::SprintTerminalReceipt.allowed_receipt_paths(expected_sprints)
+        expected_branch = marker_base && "receipt/#{receipt_mode == 'recovery' ? Verdify::SprintTerminalReceipt::RECOVERY_BUNDLE : marker_id}/#{marker_base[0, 12]}"
+        errors << "terminal receipt branch must be #{expected_branch}" unless expected_branch && head_ref == expected_branch
+        validator = Verdify::SprintTerminalReceipt.new(repo: candidate)
+        sprint_ids.each do |sprint_id|
+          result = validator.validate_full(
+            receipt_path: candidate.root.join(Verdify::SprintTerminalReceipt.paths(sprint_id).fetch(:receipt)),
+            expected_base_sha: base_sha,
+            expected_mode: receipt_mode
           )
-          result = validator.validate_critic(tip_sha: head_sha)
-          status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
-          errors.concat(status.errors)
-          expected_pull_request = pull_request["number"] || event["number"]
-          if status.critic && status.critic["pull_request"] != expected_pull_request
-            errors << "critic report pull request does not match the event"
+          errors.concat(result.errors.map { |error| "#{sprint_id}: #{error}" })
+        end
+      else
+        unless unterminated.empty?
+          errors << "integrated sprint(s) require terminal receipts before another implementation can merge: #{unterminated.join(', ')}"
+        end
+        lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+        contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+        unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
+          errors << "dev critic gate requires exact lane and contract metadata"
+        else
+          contract_path = candidate.root.join(contract_relative)
+          sprint_root = contract_path.dirname.parent.parent
+          closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
+          critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
+          if !critic_path.file?
+            errors << "current head does not contain the canonical critic report"
+          else
+            validator = Verdify::LaneReviewValidator.new(
+              repo: candidate,
+              contract_path: contract_path,
+              closeout_path: closeout_path,
+              critic_path: critic_path
+            )
+            result = validator.validate_critic(tip_sha: head_sha)
+            status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
+            errors.concat(status.errors)
+            expected_pull_request = pull_request["number"] || event["number"]
+            if status.critic && status.critic["pull_request"] != expected_pull_request
+              errors << "critic report pull request does not match the event"
+            end
           end
         end
       end

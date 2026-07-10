@@ -57,10 +57,30 @@ end
 
 config = YAML.safe_load(ROOT.join("config/github-primitives.yaml").read, permitted_classes: [], aliases: false)
 
+candidate_repo = nil
+changed_paths = []
+if options[:repo]
+  begin
+    candidate_repo = Verdify::GitRepository.new(options[:repo])
+    if base_sha && head_sha && candidate_repo.commit_exists?(base_sha) && candidate_repo.commit_exists?(head_sha)
+      changed_paths = candidate_repo.git("diff", "--name-only", "#{base_sha}...#{head_sha}").first.lines.map(&:strip).reject(&:empty?).uniq.sort
+    end
+  rescue Verdify::Error => e
+    errors << "could not inspect candidate history: #{e.message}"
+  end
+end
+
+receipt_marker_pattern = /<!--[ \t]*verdify-terminal-receipt:([a-z0-9][a-z0-9-]*):([0-9a-f]{40})[ \t]*-->/
+receipt_markers = body.scan(receipt_marker_pattern)
+receipt_marker_comments = body.scan(/<!--[ \t]*verdify-terminal-receipt:[^\n]*?-->/)
+receipt_paths = changed_paths.grep(%r{\A\.agent-workflow/sprints/[^/]+/terminal/terminal-receipt\.yaml\z})
+receipt_pr = !receipt_markers.empty? || !receipt_marker_comments.empty? || !receipt_paths.empty?
+
 # Mode selection, in precedence order:
 # 1. release: the generated dev -> main release PR (decided by refs; labels cannot demote it);
-# 2. lightweight: an exempt-labelled PR using the reduced contract;
-# 3. standard: the full implementation-lane contract.
+# 2. terminal receipt: generated evidence-only completion on dev;
+# 3. lightweight: an exempt-labelled PR using the reduced contract;
+# 4. standard: the full implementation-lane contract.
 development_branch = config.dig("release_branch_flow", "development_branch") || "dev"
 release_branch = config.dig("release_branch_flow", "release_branch") || "main"
 configured_repository = config.dig("release_branch_flow", "repository").to_s
@@ -82,7 +102,7 @@ elsif !base_ref.to_s.empty? && base_ref != development_branch && !release_refs
 end
 exempt_labels = Array(config["lightweight_pull_request_labels"])
 exempt_labels = %w[verdify:policy-exempt type:docs type:chore] if exempt_labels.empty?
-lightweight = !release_pr && labels.any? { |label| exempt_labels.include?(label) }
+lightweight = !release_pr && !receipt_pr && labels.any? { |label| exempt_labels.include?(label) }
 lane = nil
 contract = nil
 
@@ -110,6 +130,60 @@ end
 # Every PR, in every mode, must link the issue it closes.
 closing = body.scan(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?[ \t]+#(\d+)\b/i).flatten.map(&:to_i).uniq
 errors << "PR body must link at least one issue with a closing keyword" if closing.empty?
+
+receipt_sprint_ids = receipt_paths.map { |path| path.split("/")[3] }.uniq.sort
+cutover_active = candidate_repo && base_sha && candidate_repo.git(
+  "cat-file", "-e", "#{base_sha}:schemas/sprint-terminal-receipt.schema.yaml", allow_failure: true
+).last.success?
+unterminated_sprints = if cutover_active
+                         Verdify::SprintTerminalReceipt.new(repo: candidate_repo).integrated_unterminated_sprints(ref: base_sha)
+                       else
+                         []
+                       end
+
+if base_ref == development_branch && !unterminated_sprints.empty? && !receipt_pr
+  errors << "integrated sprint(s) require terminal receipts before another implementation can merge: #{unterminated_sprints.join(', ')}"
+end
+
+if receipt_pr && !release_pr
+  errors << "terminal receipt PR requires candidate repository history" unless candidate_repo
+  errors << "terminal receipt PR must target dev" unless base_ref == development_branch
+  errors << "terminal receipt PR must be same-repository" unless same_repository
+  errors << "terminal receipt PR must contain exactly one valid marker" unless receipt_markers.length == 1 && receipt_marker_comments.length == 1
+  marker_id, marker_base = receipt_markers.first || []
+  errors << "terminal receipt marker base must match the pull request base" unless marker_base == base_sha
+  expected_marker = "<!-- verdify-terminal-receipt:#{marker_id}:#{marker_base} -->" if marker_id && marker_base
+  errors << "terminal receipt marker must be the first non-whitespace content" if expected_marker && !body.lstrip.start_with?(expected_marker)
+
+  receipt_mode = marker_id == Verdify::SprintTerminalReceipt::RECOVERY_BUNDLE ? "recovery" : "normal"
+  expected_sprints = if receipt_mode == "recovery"
+                       Verdify::SprintTerminalReceipt::RECOVERY_SPRINT_IDS
+                     elsif marker_id
+                       [marker_id]
+                     else
+                       []
+                     end
+  errors << "terminal receipt marker and receipt sprint IDs do not match" unless receipt_sprint_ids == expected_sprints.sort
+  errors << "terminal receipt must resolve exactly the integrated unterminated sprint set" unless receipt_sprint_ids == unterminated_sprints
+  expected_paths = Verdify::SprintTerminalReceipt.allowed_receipt_paths(expected_sprints)
+  errors << "terminal receipt PR must change the exact canonical artifact set" unless changed_paths == expected_paths
+  expected_branch = marker_base && "receipt/#{receipt_mode == 'recovery' ? Verdify::SprintTerminalReceipt::RECOVERY_BUNDLE : marker_id}/#{marker_base[0, 12]}"
+  errors << "terminal receipt branch must be #{expected_branch}" unless expected_branch && head_ref == expected_branch
+
+  if candidate_repo && base_sha
+    errors << "checked-out repository head does not match pull request head" unless !head_sha || candidate_repo.head_sha == head_sha
+    receipt_validator = Verdify::SprintTerminalReceipt.new(repo: candidate_repo)
+    receipt_sprint_ids.each do |sprint_id|
+      receipt_path = candidate_repo.root.join(Verdify::SprintTerminalReceipt.paths(sprint_id).fetch(:receipt))
+      result = receipt_validator.validate_full(
+        receipt_path: receipt_path,
+        expected_base_sha: base_sha,
+        expected_mode: receipt_mode
+      )
+      errors.concat(result.errors.map { |error| "#{sprint_id}: #{error}" })
+    end
+  end
+end
 
 if release_pr
   Array(config["required_release_pull_request_sections"]).each do |section|
@@ -142,6 +216,10 @@ if release_pr
   release_markers = body.scan(/<!--[ \t]*verdify-release-candidate:[^\n]*?-->/)
   errors << "release PR must contain exactly the durable marker #{expected_marker}" unless release_markers == [expected_marker]
   errors << "release marker must be the first non-whitespace content" unless body.lstrip.start_with?(expected_marker)
+elsif receipt_pr
+  # The exact marker, branch, base, path set, receipt documents, controller
+  # evidence, merged lanes, and trusted checks are validated above. Receipts do
+  # not create another implementation lane or critic cycle.
 elsif lightweight
   # Reduced contract for docs/chore/exempt PRs: outcome + evidence only.
   %w[Outcome Evidence].each do |section|
@@ -168,6 +246,8 @@ if release_pr
   # mandatory; the value is not compared because dev may legitimately advance
   # after the body is generated (release SHA race).
   errors << "Current head SHA must be a 40-character commit SHA" unless reported_head
+elsif receipt_pr
+  # The event base/head and receipt marker provide the immutable PR binding.
 elsif lightweight
   errors << "reported head SHA does not match the pull request head" if reported_head && head_sha && reported_head != head_sha
 else
@@ -182,7 +262,7 @@ else
 end
 errors << "base and head SHA are identical" if base_sha && head_sha && base_sha == head_sha
 
-if !release_pr && !lightweight && options[:repo] && implementation_head && evidence_head && reported_head && reported_baseline && lane && contract
+if !release_pr && !receipt_pr && !lightweight && options[:repo] && implementation_head && evidence_head && reported_head && reported_baseline && lane && contract
   begin
     repo = Verdify::GitRepository.new(options[:repo])
     errors << "checked-out repository head does not match pull request head" unless repo.head_sha == head_sha
@@ -243,14 +323,20 @@ if !release_pr && !lightweight && options[:repo] && implementation_head && evide
   end
 end
 
-allowed_html_comments = release_pr && defined?(expected_marker) ? [expected_marker] : []
+allowed_html_comments = (release_pr || receipt_pr) && defined?(expected_marker) && expected_marker ? [expected_marker] : []
 unresolved_html_comments = body.scan(/<!--.*?-->/m) - allowed_html_comments
 if unresolved_html_comments.any?
   errors << "pull request template still contains unresolved HTML placeholders"
 end
 
 if errors.empty?
-  kind = release_pr ? "release" : "implementation"
+  kind = if release_pr
+           "release"
+         elsif receipt_pr
+           "terminal receipt"
+         else
+           "implementation"
+         end
   mode = lightweight ? " (lightweight)" : ""
   puts "Verdify #{kind} pull request policy passed#{mode} for issue(s): #{closing.map { |n| "##{n}" }.join(', ')}"
   exit 0

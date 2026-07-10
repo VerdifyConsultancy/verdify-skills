@@ -41,6 +41,9 @@ authorities:
     owner: github_deployment_or_platform_deployment_record
   verified_runtime_outcome:
     owner: deployment_evidence_plus_outcome_acceptance
+  terminal_sprint_state:
+    owner: default_branch:.agent-workflow/sprints/<sprint-id>/terminal/terminal-receipt.yaml
+    notes: "Post-cutover COMPLETE authority is a schema-valid receipt merged through the protected dev receipt path. Controller branches, tags, commit statuses, workflow URLs, and chat claims are evidence inputs, not terminal authority."
   incident_policy:
     owner: config/authority-matrix.yaml
     authorized_resolver: outcome_owner_or_repository_policy_named_incident_commander

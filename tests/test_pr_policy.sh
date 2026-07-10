@@ -222,6 +222,21 @@ git -C "$LIGHT_REPO" commit -qm "docs update"
 LIGHT_DOCS_HEAD="$(git -C "$LIGHT_REPO" rev-parse HEAD)"
 ruby -rjson -e 'puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1]},"head"=>{"sha"=>ARGV[2]},"labels"=>[{"name"=>"type:docs"}]}}.to_json)' "$TMP/light.md" "$LIGHT_BASE" "$LIGHT_DOCS_HEAD" > "$TMP/light-docs-event.json"
 ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/light-docs-event.json" --repo "$LIGHT_REPO"
+
+# Receipt mode is selected by its exact marker/path, never by a lightweight
+# label. A marker without the generated canonical receipt transaction fails
+# closed even when the PR is labelled as docs.
+cat > "$TMP/receipt-incomplete.md" <<EOF
+<!-- verdify-terminal-receipt:test-sprint:$LIGHT_BASE -->
+
+Closes #135
+EOF
+ruby -rjson -e 'repo={"full_name"=>"VerdifyConsultancy/verdify-skills"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"dev","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"receipt/test-sprint/#{ARGV[1][0,12]}","repo"=>repo},"labels"=>[{"name"=>"type:docs"}]},"repository"=>repo}.to_json)' "$TMP/receipt-incomplete.md" "$LIGHT_BASE" "$LIGHT_DOCS_HEAD" > "$TMP/receipt-incomplete.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/receipt-incomplete.json" --repo "$LIGHT_REPO" > /dev/null 2> "$TMP/receipt-incomplete.err"; then
+  echo "expected an incomplete receipt marker transaction to fail closed" >&2
+  exit 1
+fi
+grep -Eq 'receipt sprint IDs|canonical artifact set|resolve exactly' "$TMP/receipt-incomplete.err"
 printf 'puts :substantive\n' > "$LIGHT_REPO/app.rb"
 git -C "$LIGHT_REPO" add app.rb
 git -C "$LIGHT_REPO" commit -qm "substantive code under docs label"

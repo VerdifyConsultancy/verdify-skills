@@ -55,6 +55,8 @@ module Verdify
         validate_agent_platform_control_request(document, errors)
       when "OutcomeReview"
         validate_outcome(document, errors)
+      when "SprintTerminalReceipt"
+        validate_terminal_receipt(document, errors)
       when "HumanGate"
         validate_gate(document, errors)
       when "LaneLease"
@@ -292,6 +294,38 @@ module Verdify
       end
       if document["decision"] == "accepted_with_risks" && Array(document["residual_risks"]).empty?
         errors << "$.residual_risks: accepted_with_risks requires at least one risk"
+      end
+    end
+
+    def validate_terminal_receipt(document, errors)
+      validate_sha(document["receipt_base_sha"], "$.receipt_base_sha", errors)
+      controller = document["controller"] || {}
+      %w[head_sha packet_commit_sha release_commit_sha outcome_commit_sha].each do |field|
+        validate_sha(controller[field], "$.controller.#{field}", errors)
+      end
+      terminal = document["terminal"] || {}
+      validate_sha(terminal["integrated_sha"], "$.terminal.integrated_sha", errors)
+      sprint_id = document["sprint_id"].to_s
+      expected_ref = "controller/#{sprint_id}"
+      expected_packet = ".agent-workflow/sprints/#{sprint_id}/review/review-inbox-packet.yaml"
+      errors << "$.controller.ref: must be #{expected_ref}" unless controller["ref"] == expected_ref
+      errors << "$.controller.packet_path: must be #{expected_packet}" unless controller["packet_path"] == expected_packet
+
+      lanes = Array(document["lanes"])
+      lane_ids = lanes.map { |lane| lane["lane_id"] }
+      errors << "$.lanes: lane IDs must be unique" unless lane_ids.uniq.length == lane_ids.length
+      pull_requests = lanes.map { |lane| lane["pull_request"] }
+      errors << "$.lanes: pull requests must be unique" unless pull_requests.uniq.length == pull_requests.length
+      lanes.each_with_index do |lane, index|
+        %w[dispatch_head_sha implementation_head_sha evidence_head_sha critic_report_head_sha merge_commit_sha].each do |field|
+          validate_sha(lane[field], "$.lanes[#{index}].#{field}", errors)
+        end
+      end
+
+      if document["mode"] == "normal"
+        errors << "$.recovery_bundle: normal receipts cannot name a recovery bundle" unless document["recovery_bundle"].nil?
+      elsif document["recovery_bundle"] != "issue-135-recovery-v1"
+        errors << "$.recovery_bundle: recovery receipts require issue-135-recovery-v1"
       end
     end
 

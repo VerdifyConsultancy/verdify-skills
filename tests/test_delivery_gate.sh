@@ -141,6 +141,12 @@ dev_event = File.join(tmp, "dev.json")
 event(dev_event, head: chain[:head], body: body)
 run_gate(root, dev_event, valid_repo)
 
+receipt_body = "<!-- verdify-terminal-receipt:test-sprint:#{'b' * 40} -->\n"
+event(dev_event, head: chain[:head], body: receipt_body, source: "receipt/test-sprint/#{('b' * 40)[0, 12]}")
+receipt_error = run_gate(root, dev_event, valid_repo, success: false)
+raise "incomplete receipt transaction was not rejected" unless receipt_error.include?("marker and sprint set") || receipt_error.include?("mixed or incomplete paths")
+event(dev_event, head: chain[:head], body: body)
+
 File.write(File.join(valid_repo, "post-report.txt"), "stale\n")
 git(valid_repo, "add", "post-report.txt")
 git(valid_repo, "commit", "-qm", "post-report change")

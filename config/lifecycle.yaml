@@ -90,7 +90,7 @@ skills:
     modes: [reconcile, merge-ready, return-for-fix, integration-handoff]
   - name: release-verification
     order: 22
-    modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review]
+    modes: [review-inbox, observability-diagnostics, integration, deployment-verification, outcome-review, terminal-receipt]
   - name: sprint-handoff
     order: 23
     modes: [status-record, next-plan-summary, agent-handoff, human-attention]

@@ -123,3 +123,17 @@ from weakening the approved contract or wave policy inside an implementation
 commit and then asking that weakened policy to certify itself.
 The controller branch is durable evidence, not a combined implementation or
 release candidate; integration still merges each approved lane PR separately.
+
+## Terminal receipt addendum
+
+After P/R/O completes, terminal sprint authority moves through a separate
+generated PR to protected `dev`. The PR contains one
+`terminal/terminal-receipt.yaml` plus the exact plan, status, release, and
+outcome paths for that sprint. The receipt binds controller P/R/O digests,
+D/I/E/S, merged PR commits, exact trusted workflow checks, integrated SHA, and
+its direct protected-base parent. It adds no implementation lane, critic, or
+routine human review. Protected-base policy blocks later implementation while
+an integrated sprint lacks this receipt. The one-time issue-135 recovery bundle
+is compiled to six exact sprint IDs and PR #213's merge base; future receipts
+are one sprint per PR. Tags, custom statuses, workflow URLs, and controller
+branch heads are not terminal authority.

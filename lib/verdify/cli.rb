@@ -113,6 +113,7 @@ module Verdify
           northstar ingest-research  Register research in the North Star evidence registry
           northstar evidence list    Query registered North Star evidence
           sprint init                Create a draft sprint skeleton and approval gate
+          sprint receipt             Generate a protected-dev terminal receipt transaction
           lane create                Create and lock one worker worktree/lease
           lane review                Create a fresh detached critic worktree/lease
           lane list                  List local Verdify leases and Git worktrees
@@ -581,8 +582,15 @@ module Verdify
 
     def command_sprint
       subcommand = @argv.shift
-      raise UsageError, "Usage: bin/verdify sprint init --id SPRINT-ID [--repo PATH]" unless subcommand == "init"
+      case subcommand
+      when "init" then command_sprint_init
+      when "receipt" then command_sprint_receipt
+      else
+        raise UsageError, "Usage: bin/verdify sprint <init|receipt>"
+      end
+    end
 
+    def command_sprint_init
       options = { repo: Dir.pwd, id: nil, milestone: nil, force: false }
       parser = OptionParser.new do |o|
         o.banner = "Usage: bin/verdify sprint init --id SPRINT-ID [--repo PATH] [--milestone NAME] [--force]"
@@ -676,6 +684,51 @@ module Verdify
       Verdify.atomic_write(sprint_dir.join("gates/plan-approval.yaml"), YAML.dump(gate))
       Verdify.atomic_write(sprint_dir.join("status.yaml"), YAML.dump(status))
       puts "Initialized sprint #{options[:id]} at #{sprint_dir}"
+      0
+    end
+
+    def command_sprint_receipt
+      options = {
+        repo: Dir.pwd,
+        sprint: nil,
+        controller_ref: nil,
+        base: nil,
+        mode: "normal",
+        generator: "verdify-controller",
+        json: false
+      }
+      parser = OptionParser.new do |o|
+        o.banner = "Usage: bin/verdify sprint receipt --sprint ID --controller-ref REF --base SHA [options]"
+        o.on("--repo PATH", "Receipt worktree") { |v| options[:repo] = v }
+        o.on("--sprint ID", "Sprint transaction to terminalize") { |v| options[:sprint] = v }
+        o.on("--controller-ref REF", "Pushed controller/<sprint-id> evidence ref") { |v| options[:controller_ref] = v }
+        o.on("--base SHA", "Exact protected dev head used to create the receipt branch") { |v| options[:base] = v }
+        o.on("--mode MODE", %w[normal recovery], "Normal one-sprint receipt or bounded issue-135 recovery") { |v| options[:mode] = v }
+        o.on("--generator ID", "Controller identity recorded in the receipt") { |v| options[:generator] = v }
+        o.on("--json", "Emit generated receipt JSON") { options[:json] = true }
+        o.on("-h", "--help") { puts o; return 0 }
+      end
+      parse_options(parser)
+      %i[sprint controller_ref base].each do |key|
+        raise UsageError, "--#{key.to_s.tr('_', '-')} is required" if options[key].to_s.empty?
+      end
+
+      repo = GitRepository.new(options[:repo])
+      receipt = SprintTerminalReceipt.new(repo: repo).write!(
+        sprint_id: options[:sprint],
+        controller_ref: options[:controller_ref],
+        receipt_base_sha: options[:base],
+        mode: options[:mode],
+        generator: options[:generator]
+      )
+      if options[:json]
+        puts JSON.pretty_generate(receipt)
+      else
+        paths = SprintTerminalReceipt.paths(options[:sprint])
+        puts "Generated #{options[:mode]} terminal receipt for #{options[:sprint]}"
+        puts "Receipt: #{paths.fetch(:receipt)}"
+        puts "Branch: receipt/#{options[:mode] == 'recovery' ? SprintTerminalReceipt::RECOVERY_BUNDLE : options[:sprint]}/#{options[:base][0, 12]}"
+      end
       0
     end
 
@@ -1370,7 +1423,7 @@ module Verdify
       end
 
       sprint_root_relative = root.join("sprints").relative_path_from(repo.root).to_s
-      transaction_path_pattern = %r{\A#{Regexp.escape(sprint_root_relative)}/[^/]+/(?:sprint-plan\.yaml|status\.yaml|lanes/contracts/[^/]+\.yaml|release/(?:wave-release-plan|release-verification)\.yaml|outcome/outcome-review\.yaml|gates/cancellation\.yaml)\z}
+      transaction_path_pattern = %r{\A#{Regexp.escape(sprint_root_relative)}/[^/]+/(?:sprint-plan\.yaml|status\.yaml|lanes/contracts/[^/]+\.yaml|release/(?:wave-release-plan|release-verification)\.yaml|outcome/outcome-review\.yaml|terminal/terminal-receipt\.yaml|gates/cancellation\.yaml)\z}
       committed_transaction_paths = repo.tracked_paths(ref: repo.head_sha, pathspec: sprint_root_relative).grep(transaction_path_pattern)
       working_transaction_paths = [
         root.join("sprints/*/sprint-plan.yaml"),
@@ -1379,6 +1432,7 @@ module Verdify
         root.join("sprints/*/release/wave-release-plan.yaml"),
         root.join("sprints/*/release/release-verification.yaml"),
         root.join("sprints/*/outcome/outcome-review.yaml"),
+        root.join("sprints/*/terminal/terminal-receipt.yaml"),
         root.join("sprints/*/gates/cancellation.yaml")
       ].flat_map { |pattern| Dir[pattern] }
        .map { |path| Pathname.new(path).relative_path_from(repo.root).to_s }
@@ -1457,6 +1511,15 @@ module Verdify
             selection_errors.concat(cancellation_errors.map { |error| "#{cancellation_path.relative_path_from(repo.root)}: #{error}" })
             verified_terminal_plans[path] = "cancelled" if cancellation_errors.empty?
             next
+          end
+
+
+          receipt_validator = SprintTerminalReceipt.new(repo: repo)
+          if receipt_validator.receipt_required_for_terminal?(path.relative_path_from(repo.root).to_s, ref: repo.head_sha)
+            unless receipt_validator.terminal_at?(expected_sprint_id, ref: repo.head_sha)
+              selection_errors << "#{path.relative_path_from(repo.root)}: post-cutover COMPLETE requires a valid protected-dev terminal receipt"
+              next
+            end
           end
 
           delivery_evidence = validate_delivery_evidence(repo, path.dirname, expected_sprint_id)
@@ -1874,7 +1937,15 @@ module Verdify
 
       unless outcome && %w[accepted accepted_with_risks].include?(outcome["decision"])
         missing << plan_path.dirname.join("outcome/outcome-review.yaml").relative_path_from(repo.root).to_s
-        return route_hash(repo, "OUTCOME_REVIEW_REQUIRED", "release-verification", "outcome-review", "Runtime verification exists but human outcome acceptance is missing or incomplete.", evidence, missing, open_gates)
+        return route_hash(repo, "OUTCOME_REVIEW_REQUIRED", "release-verification", "outcome-review", "Runtime verification exists but authorized outcome acceptance is missing or incomplete.", evidence, missing, open_gates)
+      end
+
+      receipt_schema_relative = "schemas/sprint-terminal-receipt.schema.yaml"
+      receipt_cutover_active = repo.git("cat-file", "-e", "#{repo.head_sha}:#{receipt_schema_relative}", allow_failure: true).last.success?
+      if receipt_cutover_active
+        receipt_relative = SprintTerminalReceipt.paths(sprint_id).fetch(:receipt)
+        missing << receipt_relative
+        return route_hash(repo, "TERMINAL_RECEIPT_REQUIRED", "release-verification", "terminal-receipt", "Release and outcome evidence are accepted; generate and auto-merge the protected-dev terminal receipt before later implementation.", evidence, missing, open_gates)
       end
 
       route_hash(repo, "SPRINT_COMPLETE", "state-of-union", "strategy-review", "The current sprint is accepted and verified; reconcile the backlog against the north-star goal before selecting the next outcome.", evidence, missing, open_gates)

@@ -1,0 +1,67 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://verdify.example/schemas/sprint-terminal-receipt.schema.yaml
+title: Verdify Sprint Terminal Receipt
+type: object
+additionalProperties: false
+required: [schema_ref, kind, schema_version, sprint_id, mode, recovery_bundle, receipt_base_sha, integration_branch, controller, lanes, artifacts, terminal, generated_at, generator]
+properties:
+  schema_ref: {const: sprint-terminal-receipt.schema.yaml}
+  kind: {const: SprintTerminalReceipt}
+  schema_version: {const: "1.0"}
+  sprint_id: {type: string, pattern: '^[a-z0-9][a-z0-9-]*$'}
+  mode: {type: string, enum: [normal, recovery]}
+  recovery_bundle: {type: [string, 'null'], enum: [null, issue-135-recovery-v1]}
+  receipt_base_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  integration_branch: {const: dev}
+  controller:
+    type: object
+    additionalProperties: false
+    required: [ref, head_sha, packet_commit_sha, release_commit_sha, outcome_commit_sha, packet_path, packet_sha256, release_sha256, outcome_sha256]
+    properties:
+      ref: {type: string, pattern: '^controller/[a-z0-9][a-z0-9-]*$'}
+      head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+      packet_commit_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+      release_commit_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+      outcome_commit_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+      packet_path: {type: string, pattern: '^\.agent-workflow/sprints/[a-z0-9][a-z0-9-]*/review/review-inbox-packet\.yaml$'}
+      packet_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      release_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      outcome_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+  lanes:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [lane_id, issue_ids, branch, pull_request, dispatch_head_sha, implementation_head_sha, evidence_head_sha, critic_report_head_sha, merge_commit_sha]
+      properties:
+        lane_id: {type: string, pattern: '^[a-z0-9][a-z0-9-]*$'}
+        issue_ids: {type: array, minItems: 1, items: {type: integer, minimum: 1}}
+        branch: {type: string, minLength: 1}
+        pull_request: {type: integer, minimum: 1}
+        dispatch_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+        implementation_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+        evidence_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+        critic_report_head_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+        merge_commit_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+  artifacts:
+    type: object
+    additionalProperties: false
+    required: [plan_sha256, status_sha256, release_sha256, outcome_sha256]
+    properties:
+      plan_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      status_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      release_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      outcome_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+  terminal:
+    type: object
+    additionalProperties: false
+    required: [integrated_sha, plan_status, status_state, release_status, outcome_decision]
+    properties:
+      integrated_sha: {type: string, pattern: '^[a-f0-9]{40}$'}
+      plan_status: {const: complete}
+      status_state: {const: COMPLETE}
+      release_status: {const: verified}
+      outcome_decision: {type: string, enum: [accepted, accepted_with_risks]}
+  generated_at: {type: string, minLength: 1}
+  generator: {type: string, minLength: 1}

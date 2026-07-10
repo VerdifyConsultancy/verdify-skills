@@ -17,6 +17,11 @@ Decide exactly one next lifecycle action without doing that action's substantive
 2. Read `../../config/authority-matrix.yaml` when records disagree.
 3. Use live GitHub state when available. A local snapshot is only a cache.
 4. Never infer that a missing artifact was approved.
+5. Treat a post-cutover sprint as terminal only when its protected-dev
+   `terminal/terminal-receipt.yaml` validates with plan/status/R/O and Git
+   ancestry. Legacy terminal commits before the receipt cutover remain valid;
+   controller refs, tags, statuses, and workflow URLs never substitute for the
+   receipt.
 
 ## Procedure
 
@@ -66,7 +71,9 @@ Use the first unmet condition:
 13. Worker closeout awaiting fresh review -> `independent-critic`.
 14. Critic-approved lane or wave missing a review inbox packet -> `release-verification` in `review-inbox` mode.
 15. Approved lanes awaiting integration, observability diagnostics, deployment proof, or outcome acceptance -> `release-verification`.
-16. Completed cycle -> route to `state-of-union` for the next outcome.
+16. Accepted outcome without a protected-dev terminal receipt ->
+    `release-verification` in `terminal-receipt` mode.
+17. Completed receipt-backed cycle -> route to `state-of-union` for the next outcome.
 
 An urgent incident may route directly to `release-verification` only when the repository's incident policy authorizes it and the decision is recorded.
 
