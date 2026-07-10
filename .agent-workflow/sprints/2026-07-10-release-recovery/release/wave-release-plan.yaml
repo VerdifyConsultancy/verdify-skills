@@ -1,0 +1,124 @@
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: "1.0"
+wave_id: wave-2026-07-10-release-recovery
+status: approved
+scope:
+  sprint_id: 2026-07-10-release-recovery
+  issue_ids: [200]
+  lane_ids: [issue-200-relative-tarball]
+  northstar_ids: [FR-012, AC-012]
+  summary: Integrate the reviewed relative-tarball fix, repromote dev, and resume the exact unpublished 1.3.0 transaction.
+  non_goals: [version change, repack after immutable authority, worker release mutation]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: main
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-200
+  decision_notes: One recovery lane targets protected dev; only a generated same-repository dev-to-main PR may repromote.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+    - name: validate
+      required: true
+      event_triggers: [pull_request, push]
+      timeout_minutes: 30
+      evidence_expected: [full suite, npm install, packed artifact]
+    - name: delivery-gate
+      required: true
+      event_triggers: [pull_request, push, workflow_dispatch]
+      timeout_minutes: 15
+      evidence_expected: [exact-head critic, current release approval]
+  artifacts: [candidate tarball, provenance, binding, completed release ledger]
+  required_events: [pull_request, push, workflow_dispatch]
+environments:
+  - name: npm
+    environment_type: production
+    required: true
+    namespace: null
+    url: https://www.npmjs.com/package/@verdify-cli/cli
+    quota_policy: null
+    limit_policy: null
+    network_policy: null
+    ttl: null
+    secrets_scope: Existing npm trusted publishing only; unavailable to worker and critic.
+    protection_rules: [fresh critic, protected main approval, exact candidate verification]
+    expected_revision_source: main release merge commit
+gitops:
+  controller: none
+  desired_state_refs: [.github/workflows/publish-npm.yml]
+  sync_order:
+    - phase: recovery
+      wave: 1
+      resource: reviewed dev fix
+      purpose: Correct relative candidate consumption.
+    - phase: recovery
+      wave: 2
+      resource: dev-to-main promotion
+      purpose: Resume publication from the corrected final main source.
+  reconciliation_checks: [npm version, tag target, release assets, provenance, completed ledger]
+  remediation_policy: Stop without repacking if any immutable authority appears with mismatched identity.
+deployment_strategy:
+  type: manual
+  progressive_delivery: true
+  traffic_policy: null
+  steps:
+    - id: STEP-01
+      action: Merge fresh-critic-approved issue #200 to dev.
+      success_criteria: Exact S checks pass on protected dev PR.
+      rollback_trigger: Any material critic finding or failed regression.
+    - id: STEP-02
+      action: Approve and merge the generated dev-to-main recovery PR.
+      success_criteria: Current non-author owner approval and all required main checks pass.
+      rollback_trigger: npm, tag, or release authority no longer matches the unpublished recovery state.
+    - id: STEP-03
+      action: Verify the resumed publish transaction.
+      success_criteria: npm, tag, release assets, provenance, and completed ledger bind to one main source.
+      rollback_trigger: Partial or mismatched authority state.
+observability:
+  dashboards: [GitHub Actions, npm registry, GitHub release]
+  logs: [publish-npm candidate and publish jobs]
+  metrics: []
+  traces: []
+  runtime_checks: [npm metadata, tag target, release asset digests, ledger state]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Stop before mutation or resume from retained exact bytes after partial mutation; never repack.
+  known_good_ref: "611f863690b0af3b04f1421755804fc37bf061fe"
+  procedure: Use release-transaction reconciliation and retained artifact identities.
+  validation_steps: [requery npm, tag, release, Actions artifacts, and ledger]
+release_health:
+  stabilization_window: until completed ledger and external authorities agree
+  signals:
+    - name: exact candidate consumer
+      source: packed artifact and npm install suites
+      threshold: Relative and absolute candidate paths pass with no Git transport.
+      blocking: true
+    - name: completed release
+      source: npm, tag, GitHub release, and ledger
+      threshold: All identities bind to the final main SHA and exact retained bytes.
+      blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-10-release-recovery/review/review-inbox-packet.yaml
+  human_test_steps: [inspect path normalization, exact artifact proof, current release approval]
+  approval_gate: Fresh critic for dev and a separate current non-author owner review for main.
+risks:
+  - id: RISK-01
+    severity: high
+    statement: Recovery could accidentally publish different bytes or duplicate an immutable authority.
+    mitigation: Requery all authorities, retain one candidate, and fail closed on any mismatch.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T11:22:00Z"
+prepared_at: "2026-07-10T11:22:00Z"
+planner: root-release-recovery-controller
