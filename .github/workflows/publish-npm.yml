@@ -576,6 +576,7 @@ jobs:
           SIDECAR="$(find dist -maxdepth 1 -type f -name '*.release-candidate.json' -print)"
           [ "$(printf '%s\n' "${SIDECAR}" | grep -c .)" = 1 ]
           TARBALL="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("tarball", "filename")' "${SIDECAR}")"
+          TARBALL="$(ruby -e "puts File.realpath(ARGV.fetch(0))" "${TARBALL}")"
           ARCHIVE="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "filename")' "${SIDECAR}")"
           CHECKSUM="dist/$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("archive", "checksum_filename")' "${SIDECAR}")"
           PROVENANCE="dist/candidate-provenance.json"

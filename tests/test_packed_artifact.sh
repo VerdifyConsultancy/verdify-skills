@@ -113,8 +113,12 @@ ruby -e '
   candidate = workflow.index("candidate:") or abort "unprivileged candidate job is missing"
   tests = workflow.index("bash tests/test_packed_artifact.sh") or abort "full candidate matrix is missing"
   publish = workflow.index("publish:", candidate + 1) or abort "privileged publish job is missing"
+  canonicalize = workflow.index(%q{TARBALL="$(ruby -e "puts File.realpath(ARGV.fetch(0))" "${TARBALL}")"}, publish) or abort "privileged tarball canonicalization is missing"
+  reconcile = workflow.index("reconcile() {", publish) or abort "release transaction reconciliation is missing"
   npm_publish = workflow.index(%q{npm publish "${TARBALL}" --access public --provenance}) or abort "exact tarball publish is missing"
-  abort "consumer matrix is not separated from privileged publish" unless candidate < tests && tests < publish && publish < npm_publish
+  abort "consumer matrix is not separated from privileged publish" unless candidate < tests && tests < publish
+  abort "tarball must be canonicalized before release transaction and npm publish" unless publish < canonicalize && canonicalize < reconcile && reconcile < npm_publish
+  abort "privileged tarball canonicalization must be unique" unless workflow.scan(%q{TARBALL="$(ruby -e "puts File.realpath(ARGV.fetch(0))" "${TARBALL}")"}).length == 1
   abort "publish job repacks the candidate" unless workflow.scan("build-release-candidate.sh").length == 1
   abort "stable candidate artifact name is missing" unless workflow.include?("verdify-release-candidate-v${VERSION}-${SOURCE_SHA}")
   abort "candidate retention is not explicit" unless workflow.include?("retention-days: 90")
