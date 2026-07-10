@@ -19,6 +19,15 @@ jobs:
   delivery-policy:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out protected-base delivery policy
+        if: github.event.pull_request != null
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-policy
+          fetch-depth: 1
+          persist-credentials: false
       - name: Check out candidate delivery policy
         # actions/checkout v4.2.2
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -26,6 +35,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: candidate
           fetch-depth: 0
+          persist-credentials: false
       # ruby/setup-ruby reviewed v1 head on 2026-07-10
       - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
         with:
@@ -53,13 +63,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           EVENT_PATH="${GITHUB_EVENT_PATH}"
           if [[ "${EVENT_NAME}" != pull_request* ]]; then
             EVENT_PATH="${RUNNER_TEMP}/release-event.json"
           fi
-          ruby candidate/scripts/pr-policy.rb \
+          ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/pr-policy.rb"
+          if [[ "${EVENT_NAME}" == pull_request* ]]; then
+            ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/pr-policy.rb"
+          else
+            [[ "${REF_NAME}" == "dev" ]] || { echo "candidate policy is trusted only at dev" >&2; exit 1; }
+          fi
+          [[ -f "${ENGINE}" ]] || { echo "trusted policy engine is unavailable" >&2; exit 1; }
+          ruby "${ENGINE}" \
             --event "${EVENT_PATH}" \
             --repo "${GITHUB_WORKSPACE}/candidate"
 
@@ -74,6 +92,7 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           path: trusted-policy
           fetch-depth: 1
+          persist-credentials: false
       - name: Check out candidate evidence history
         # actions/checkout v4.2.2
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -81,6 +100,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: candidate
           fetch-depth: 0
+          persist-credentials: false
       # ruby/setup-ruby reviewed v1 head on 2026-07-10
       - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
         with:
@@ -126,6 +146,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           EVENT_PATH="${GITHUB_EVENT_PATH}"
@@ -133,9 +154,12 @@ jobs:
             EVENT_PATH="${RUNNER_TEMP}/release-event.json"
           fi
           ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/delivery-gate.rb"
-          if [[ -f "${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb" ]]; then
+          if [[ "${EVENT_NAME}" == pull_request* ]]; then
             ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb"
+          else
+            [[ "${REF_NAME}" == "dev" ]] || { echo "candidate gate is trusted only at dev" >&2; exit 1; }
           fi
+          [[ -f "${ENGINE}" ]] || { echo "trusted delivery gate is unavailable" >&2; exit 1; }
           REVIEWS=()
           BASE_REF="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).dig("pull_request", "base", "ref")' "${EVENT_PATH}")"
           if [[ "${BASE_REF}" == "main" ]]; then

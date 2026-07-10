@@ -667,8 +667,8 @@ module Verdify
       REQUIRED_CHECKS.each do |name, workflow_path|
         matches = Array(checks).select { |check| check["name"] == name }
         ordered = matches.filter_map do |check|
-          check_id = Integer(check["id"], exception: false)
-          next unless check_id&.positive?
+          check_id = GitRepository.parse_positive_check_id(check["id"])
+          next unless check_id
 
           [check_id, check]
         end

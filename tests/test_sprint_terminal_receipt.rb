@@ -380,7 +380,11 @@ class SprintTerminalReceiptTest < Minitest::Test
 
     {
       "duplicate" => [raw_check("validate", 8, 601), raw_check("validate", 8, 602)],
-      "malformed" => [raw_check("validate", "not-an-id", 603), raw_check("validate", 9, 604)]
+      "malformed" => [raw_check("validate", "not-an-id", 603), raw_check("validate", 9, 604)],
+      "fractional-float" => [raw_check("validate", 8.75, 605), raw_check("validate", 9, 606)],
+      "fractional-string" => [raw_check("validate", "8.75", 607), raw_check("validate", 9, 608)],
+      "leading-zero" => [raw_check("validate", "08", 609), raw_check("validate", 9, 610)],
+      "explicit-positive" => [raw_check("validate", "+8", 611), raw_check("validate", 9, 612)]
     }.each do |label, fixture|
       current_checks.replace(fixture)
       requests.clear
@@ -392,6 +396,22 @@ class SprintTerminalReceiptTest < Minitest::Test
       refute requests.any? { |path| path.include?("/actions/runs/") }, label
       assert errors.any? { |error| error.include?("uniquely ordered latest trusted validate check") }, label
     end
+  end
+
+  def test_trusted_check_validator_rejects_fractional_and_noncanonical_ids
+    repo = github_repository_fixture
+    head = "d" * 40
+    validator = Verdify::SprintTerminalReceipt.new(repo: repo)
+
+    { "fractional-float" => 1.75, "fractional-string" => "1.75", "leading-zero" => "01", "explicit-positive" => "+1" }.each do |label, check_id|
+      checks = trusted_checks(head)
+      checks.find { |check| check["name"] == "validate" }["id"] = check_id
+      errors = []
+      validator.send(:validate_trusted_checks, checks, PR, head, errors)
+
+      assert errors.any? { |error| error.include?("uniquely ordered latest trusted validate check") }, label
+    end
+    assert_equal 12, Verdify::GitRepository.parse_positive_check_id("12")
   end
 
   def test_six_receipt_evidence_uses_42_requests_below_fail_closed_ceiling
@@ -449,11 +469,12 @@ class SprintTerminalReceiptTest < Minitest::Test
     failure_status = command_status(false)
     repo.define_singleton_method(:capture) do |*command, allow_failure: false|
       commands << command
-      [response, "gh: forbidden (HTTP 403)", failure_status]
+      [response, "gh: forbidden for #{token} (HTTP 403)", failure_status]
     end
 
+    resource = "repos/example/#{token}\nforged-header\u0000\e[31m" + ("x" * 400)
     error = with_gh_token(token) do
-      assert_raises(Verdify::CommandError) { repo.github_api_json("repos/example/test") }
+      assert_raises(Verdify::CommandError) { repo.github_api_json(resource) }
     end
 
     assert_equal ["gh"], commands.map(&:first).uniq
@@ -466,6 +487,34 @@ class SprintTerminalReceiptTest < Minitest::Test
     refute_includes error.message, token
     refute_includes error.message, "X-Arbitrary-Secret"
     refute_includes error.message, "do-not-report-this"
+    refute_match(/[[:cntrl:]]/, error.message)
+    sanitized_resource = error.message[/resource=(.*?); status=/, 1]
+    assert sanitized_resource
+    assert_operator sanitized_resource.length, :<=, 256
+  end
+
+  def test_authenticated_cli_and_invalid_json_failures_sanitize_resource_without_curl
+    repo = github_repository_fixture
+    token = "resource-token-sentinel"
+    resource = "repos/#{token}\nforged\u0000" + ("z" * 400)
+    mode = :unavailable
+    commands = []
+    success_status = command_status(true)
+    repo.define_singleton_method(:capture) do |*command, allow_failure: false|
+      commands << command
+      raise Verdify::CommandError, "gh unavailable for #{token}" if mode == :unavailable
+
+      ["HTTP/2.0 200 OK\n\nnot-json", "", success_status]
+    end
+
+    with_gh_token(token) do
+      unavailable = assert_raises(Verdify::CommandError) { repo.github_api_json(resource) }
+      assert_sanitized_resource(unavailable, token)
+      mode = :invalid_json
+      invalid_json = assert_raises(Verdify::CommandError) { repo.github_api_json(resource) }
+      assert_sanitized_resource(invalid_json, token)
+    end
+    assert_equal ["gh"], commands.map(&:first).uniq
   end
 
   def test_api_without_token_preserves_anonymous_curl_compatibility
@@ -545,6 +594,14 @@ class SprintTerminalReceiptTest < Minitest::Test
     yield
   ensure
     previous.nil? ? ENV.delete("GH_TOKEN") : ENV["GH_TOKEN"] = previous
+  end
+
+  def assert_sanitized_resource(error, token)
+    refute_includes error.message, token
+    refute_match(/[[:cntrl:]]/, error.message)
+    resource = error.message[/resource=(.*?); (?:status|message)=/, 1]
+    assert resource
+    assert_operator resource.length, :<=, 256
   end
 
   def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil, packet_blocked: false, packet_blocking_question: false, release_failed: false)

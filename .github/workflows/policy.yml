@@ -18,6 +18,7 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           path: trusted-policy
           fetch-depth: 1
+          persist-credentials: false
       - name: Check out candidate head and full evidence history
         # actions/checkout v4.2.2
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -25,6 +26,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: candidate
           fetch-depth: 0
+          persist-credentials: false
       # ruby/setup-ruby reviewed v1 head on 2026-07-10
       - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
         with:
@@ -34,12 +36,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: |
-          if ruby trusted-policy/scripts/pr-policy.rb --help | grep -q -- '--repo PATH'; then
-            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
-          else
-            # One-time bootstrap for the change that introduces trusted-candidate
-            # separation. The protected-base policy remains authoritative; the
-            # candidate validator is supplemental until this lands on dev.
-            ruby trusted-policy/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH"
-            ruby candidate/scripts/pr-policy.rb --event "$GITHUB_EVENT_PATH" --repo "$GITHUB_WORKSPACE/candidate"
-          fi
+          set -euo pipefail
+          ruby trusted-policy/scripts/pr-policy.rb \
+            --event "$GITHUB_EVENT_PATH" \
+            --repo "$GITHUB_WORKSPACE/candidate"
