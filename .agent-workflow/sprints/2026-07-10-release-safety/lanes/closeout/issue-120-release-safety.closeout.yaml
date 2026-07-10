@@ -7,8 +7,8 @@ status: ready_for_critic
 issue_ids: [120]
 pull_request: 184
 baseline_sha: "da2f43392e768c7554fd35d750507eea64ca0fb3"
-implementation_head_sha: "0c3189e75b8d8ada1e27dc3b058c53a21f970a1d"
-validated_head_sha: "0c3189e75b8d8ada1e27dc3b058c53a21f970a1d"
+implementation_head_sha: "369b6df89865ce8321dde74a7557702fca7d3aba"
+validated_head_sha: "369b6df89865ce8321dde74a7557702fca7d3aba"
 contract_hash: "a59c8c57bc52606de707e812fd87bb8b8d446f7754f3c0109e26d001bcf405ef"
 changed_paths:
   - .github/workflows/publish-npm.yml
@@ -70,97 +70,97 @@ validation_results:
     command: ruby scripts/validate-repo.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:45:35Z"
-    artifact: "28 skills and 48 schemas validated at 0c3189e75b8d8ada1e27dc3b058c53a21f970a1d"
+    executed_at: "2026-07-10T08:43:20Z"
+    artifact: "28 skills and 48 schemas validated at 369b6df89865ce8321dde74a7557702fca7d3aba"
   - id: packed-artifact-suite
     command: bash tests/test_packed_artifact.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:45:46Z"
-    artifact: "Two clean builds were byte-identical; exact tarball SHA-256 d4c1411eef1d5eba759a6f4a7addaf80e38c4e06a09de6a4c508832385463bc7 passed the complete consumer matrix"
+    executed_at: "2026-07-10T08:44:20Z"
+    artifact: "Two clean builds were byte-identical; exact tarball SHA-256 6322ff413c91a23fcefc46991362e019866d7e0d6a44a4f6058e7f4e4ed4c28e passed the complete consumer matrix"
   - id: release-transaction-suite
     command: bash tests/test_release_transaction.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:46:30Z"
-    artifact: "Prepared through completed states, retained-byte retries after npm and partial release, 21 local identity mismatch fields, authority mismatch, unknown authority, corrupt ledger, and finalization passed"
+    executed_at: "2026-07-10T08:44:00Z"
+    artifact: "Prepared through completed states and stable retained-byte retries passed; candidate and binding artifact archives, API digests, IDs, runs, attempts, repository/workflow/main route/source/name, provenance file/digest/map, and sidecar tampering all failed closed"
   - id: release-preflight-suite
     command: bash tests/test_release_preflight.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:46:30Z"
-    artifact: "Open, closed-unmerged, merged, and conflicting durable release issue/PR identities plus npm preflight ordering passed"
+    executed_at: "2026-07-10T08:43:50Z"
+    artifact: "Exact repository-owned dev-to-main open, closed-unmerged, and merged candidates passed; independent conflicts, wrong base/head refs, wrong base/head repositories, and fork lookalikes failed before mutation with paginated all-state inventory"
   - id: package-file-set-suite
     command: bash tests/test_package_file_set.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:46:30Z"
+    executed_at: "2026-07-10T08:43:20Z"
     artifact: "Repeated ZIP builds were byte-identical; immutable Git staging and missing, changed, extra, duplicate, unsafe, and wrong-type archive mutations passed"
   - id: cli-suite
     command: bash tests/test_cli.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:46:30Z"
+    executed_at: "2026-07-10T08:43:40Z"
     artifact: "Full verified backup preflight and first, middle, last, write, manifest, restore, and rollback-failure fixtures preserved every operator byte, type, mode, and symlink target"
   - id: npm-install-suite
     command: bash tests/test_npm_install.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:46:30Z"
+    executed_at: "2026-07-10T08:43:20Z"
     artifact: "Digest-pinned published 1.2.1 init and exact 1.3.0 upgrade passed; Node 18 installed validation, init, pack, and rollback paths passed"
   - id: full-suite
     command: make test
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:48:01Z"
+    executed_at: "2026-07-10T08:44:20Z"
     artifact: "90 runs, 533 assertions, 446 manifest entries, and all package, release, CLI, policy, schema, and npm suites passed"
   - id: changed-commit-secret-scan
     command: 'gitleaks git --no-banner --redact --log-opts="da2f43392e768c7554fd35d750507eea64ca0fb3..HEAD"'
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:48:10Z"
-    artifact: "Six commits and approximately 191.56 KB scanned; no leaks found"
+    executed_at: "2026-07-10T08:42:50Z"
+    artifact: "Nine commits and approximately 269.34 KB scanned; no leaks found"
   - id: workflow-and-critic-reproductions
     command: actionlint .github/workflows/publish-npm.yml .github/workflows/release-pr.yml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:48:10Z"
-    artifact: "Pinned workflows linted; deterministic ZIP, backup-failure, false-sidecar, cross-attempt, closed-candidate, real-upgrade, and Node 18 critic reproductions passed"
+    executed_at: "2026-07-10T08:44:20Z"
+    artifact: "Pinned workflows linted; exact-route/fork candidate reproduction and API/archive/provenance/binding tamper reproduction passed alongside every prior deterministic ZIP, destructive rollback, false-sidecar, cross-attempt, real-upgrade, and Node 18 probe"
   - id: retained-candidate-identity
-    command: bash scripts/build-release-candidate.sh /tmp/issue-120-I2-package
+    command: bash scripts/build-release-candidate.sh /tmp/issue-120-I3-package-369b6df
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:49:00Z"
-    artifact: "identity v1.3.0-0c3189e75b8d8ada1e27dc3b058c53a21f970a1d; tarball size 424201; SHA-1 13b052dd1d580ef5da615475495615e38dfc1939; SHA-256 d4c1411eef1d5eba759a6f4a7addaf80e38c4e06a09de6a4c508832385463bc7; SHA-512 db648288dde075cb6cd907f3d9972043a46b7d4cabee19f9dc2a184d2a6d09318dedf256bef704a18d2edba1185d840c9f9da3a95ad9ffb3761e3a8bff3f840e; archive SHA-256 74afbb0380adbbcd33d80e4138bf40c51e13be81d0643c896ff280886da5ad15; sidecar SHA-256 b50179ba45e2886aafc6898b9f98ad7c1f811cf655515f7034763ba2e20cbf51; 428 npm members; pack count 1"
-  - id: live-release-reconciliation
-    command: ruby scripts/release-transaction.rb --sidecar /tmp/issue-120-I2-package/verdify-cli-cli-1.3.0.tgz.release-candidate.json --ledger /tmp/issue-120-I2-package/release-transaction-v1.3.0.json --repository VerdifyConsultancy/verdify-skills
+    executed_at: "2026-07-10T08:42:20Z"
+    artifact: "identity v1.3.0-369b6df89865ce8321dde74a7557702fca7d3aba; tarball size 429295; SHA-1 56a43821e42dd3589faa1c227eeae1c6ce58d0dc; SHA-256 6322ff413c91a23fcefc46991362e019866d7e0d6a44a4f6058e7f4e4ed4c28e; SHA-512 6c77da0bcb894d1b7e2c29c088498d565f31bec3785b449a065821f781df2a5c7d6ffc83def2cf5aa655acc76b5efafe5264602fb3fc8fbde721bc970655d8d8; archive size 790668/SHA-256 7c1aa64e282343a3aee2c4c98419073ef63682b04c3071a3a1729e98474330fd; sidecar SHA-256 6de944ae46f682a3ba93cdab941641708c2a305f1fb3e11aa6142aa4fad27308; checksum SHA-256 35aa83df06c132696346dc72015b5464a4dcb53cb9f0ead3a118198112ec310e; 428 npm members; pack count 1"
+  - id: isolated-release-reconciliation
+    command: bash tests/test_release_transaction.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:49:20Z"
-    artifact: "state artifact_verified; next_action publish_npm; npm, v1.3.0 tag, and GitHub release absent; zero errors; no mutation"
+    executed_at: "2026-07-10T08:44:00Z"
+    artifact: "Schema-valid prepared through completed ledgers retained candidate and external-binding artifact IDs/digests; completed retry reconstructed byte-identically and every identity/tamper fixture stopped with no publish action"
   - id: live-release-pr-preflight
     command: ruby scripts/release-preflight.rb --release-pr-base origin/main --json
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:49:20Z"
+    executed_at: "2026-07-10T08:42:20Z"
     artifact: "decision create; reason new_unpublished_version; package @verdify-cli/cli@1.3.0; base 1.2.1; npm unpublished"
   - id: dispatch-scope-audit
     command: verify D-only first post-baseline commit, immutable dispatch inputs, owned paths, 28 skill-body diffs, and package-file-list blob
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:49:20Z"
+    executed_at: "2026-07-10T08:42:30Z"
     artifact: "D 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3; zero changed dispatch inputs after D; zero prohibited paths; package-file-list blob 23dadc1d138fdd5b8269ffc76d11d691f2faed9b"
   - id: github-checks
     command: gh pr checks 184 --repo VerdifyConsultancy/verdify-skills --watch --interval 10
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:52:01Z"
-    artifact: "validate https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29077846520/job/86313446305; pull-request-policy https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29077863658/job/86313500843; compliance https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29077846610/job/86313446709"
+    executed_at: "2026-07-10T08:45:50Z"
+    artifact: "validate https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29080703473/job/86322629155; pull-request-policy https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29080727458/job/86322703364; compliance https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29080703545/job/86322629234"
   - id: closeout-validation
     command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T07:52:01Z"
+    executed_at: "2026-07-10T08:47:00Z"
     artifact: .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -176,7 +176,7 @@ acceptance_evidence:
     evidence_ids: [package-file-set-suite, packed-artifact-suite, dispatch-scope-audit]
     assessment: satisfied
   - criterion_id: LANE-AC-05
-    evidence_ids: [release-transaction-suite, live-release-reconciliation, retained-candidate-identity]
+    evidence_ids: [release-transaction-suite, isolated-release-reconciliation, retained-candidate-identity]
     assessment: satisfied
   - criterion_id: LANE-AC-06
     evidence_ids: [release-preflight-suite, live-release-pr-preflight, workflow-and-critic-reproductions, github-checks]
@@ -187,16 +187,16 @@ acceptance_evidence:
 discovered_issues: []
 residual_risks:
   - "The privileged publish transaction was structurally and read-only tested, but npm publication, tag push, GitHub release creation, main promotion, and deployment were intentionally not performed by this worker."
-  - "Actions retains the provenance-bound candidate for 90 days. If that artifact becomes unavailable after an immutable authority mutation, the workflow stops for manual reconciliation and never repacks."
+  - "Actions retains both the provenance-bound candidate and its separate external binding artifact for 90 days. If either becomes unavailable after an immutable authority mutation, the workflow stops for manual reconciliation and never repacks."
   - "npm or GitHub authority unavailability stops recovery with a schema-valid failed/resumable ledger; an authorized release operator must retry after authority availability returns."
   - "Issue #121 delivery controls, a fresh critic, and a distinct admin or maintainer approval at the final report head remain required before integration or final promotion."
 worktree_clean: true
-worker_agent: codex-fix
-worker_session_id: worker-120-release-safety-fix1-20260710t0720z
-completed_at: "2026-07-10T07:52:01Z"
+worker_agent: codex-fix-2
+worker_session_id: worker-120-release-safety-fix2-20260710t0840z
+completed_at: "2026-07-10T08:47:00Z"
 limitations:
-  - "The immutable dispatch-only commit remains 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3; its sprint plan, wave release plan, and lane contract are unchanged through I2."
-  - "Prior implementation/evidence/report heads a6e886046886108d3f38f5728a39edb849172fdc, 84360737d1ba142c4f895e08a0ec0db122101c40, and 0ca4830bdbdad73bcea3c3f6036f18c562571331 are superseded by this fix-forward chain."
-  - "The old critic report remains stale request-fixes evidence and was not edited by this worker; a fresh critic must replace it after E2."
-  - "This closeout is the only changed path after implementation head 0c3189e75b8d8ada1e27dc3b058c53a21f970a1d."
+  - "The immutable dispatch-only commit remains 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3; its sprint plan, wave release plan, and lane contract are unchanged through I3."
+  - "Prior I/E/S and I2/E2/S2 heads are superseded by implementation head 369b6df89865ce8321dde74a7557702fca7d3aba and this closeout-only E3."
+  - "The existing critic report remains stale request-fixes evidence and was not edited by this worker; a fresh critic must replace it after E3."
+  - "This closeout is the only changed path after implementation head 369b6df89865ce8321dde74a7557702fca7d3aba."
   - "No npm publication, tag or GitHub release mutation, main promotion, GitHub review, merge, deployment, credential use, or private-advisory disclosure was performed."
