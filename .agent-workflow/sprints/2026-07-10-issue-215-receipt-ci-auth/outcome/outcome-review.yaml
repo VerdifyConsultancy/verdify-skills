@@ -1,0 +1,37 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-215-receipt-ci-auth
+decision: accepted_with_risks
+reviewed_at: '2026-07-10T22:59:05Z'
+reviewer: codex-root under Jason Vallery delegated outcome authority
+intended_outcome: Make terminal-receipt GitHub evidence reads authenticated, least-privilege, bounded, and fail-closed so valid receipt transactions pass CI without administrative exceptions.
+delivered_outcomes:
+- Three exact validation steps receive ephemeral github.token with only read-only actions, checks, contents, and pull-request permissions.
+- Pull-request validation executes same-repository protected dev/main policy code; non-PR candidate code requires exact refs/heads/dev; every checkout disables credential persistence.
+- Required check evidence retains the complete matching set, strictly rejects noncanonical IDs, hydrates only uniquely ordered highest checks, and deduplicates shared workflow runs.
+- Authenticated failures never retry anonymously and expose only bounded, allowlisted, token-redacted diagnostics.
+- The six-receipt equivalent uses 42 GitHub API reads under the fail-closed ceiling of 48, and a live exact-S probe used five reads.
+- Fresh criticism found and drove three security remediations plus a protected-ref remediation; final S3 has zero unresolved findings and all exact-head checks are green.
+- PR 217 merged exact S3 to protected dev as 52fbcbe957e69e81db014989bfdcf26b6863669f with branch protections restored.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/issues/215
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/217
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/217#issuecomment-4940169487
+- git:655d5a116023f2930dd7dca88456f2bfeba139af
+- git:52fbcbe957e69e81db014989bfdcf26b6863669f
+- git:c163c8d803914cd70432f86b72d9eef2ac210fef
+- git:c45fba07108309ad0f992a0eac3ba45c530d4000
+incomplete_items: []
+residual_risks:
+- The normal terminal receipt is the remaining deterministic proof that the accepted protected-dev validator closes this sprint through authenticated policy, delivery, and critic jobs.
+- The repository-wide actionlint command retains one unrelated baseline SC2012 finding in compliance-gate.yml; both changed workflows lint cleanly.
+- Protected control-plane paths still require a narrow recorded admin exception when no independent CODEOWNERS identity is available; issue 70 owns the proportional authority policy.
+follow_up_issues:
+- 70
+lessons_learned:
+- Job token scope is insufficient by itself; the engine source ref, repository identity, full ref, checkout credential persistence, diagnostic redaction, and identifier parsing are all part of the authority boundary.
+- One fresh critic with fix-forward loops found actionable security defects without adding unrelated review gates.
+- Request optimization must retain the full matching evidence set and reduce only metadata hydration after deterministic ordering is proven.
+rationale: The bounded issue met its acceptance contract, every critic finding was resolved, exact-head CI and protected-dev integration are verified, and the remaining receipt proof is an automatic deterministic transition rather than unresolved implementation work.
