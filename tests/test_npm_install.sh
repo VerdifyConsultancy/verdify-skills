@@ -14,9 +14,15 @@ if [[ -z "$TARBALL" ]]; then
   bash "$ROOT/scripts/build-release-candidate.sh" "$TMP/candidate" > "$TMP/candidate.outputs"
   TARBALL="$(sed -n 's/^tarball=//p' "$TMP/candidate.outputs")"
   SIDECAR="$(sed -n 's/^sidecar=//p' "$TMP/candidate.outputs")"
+  TARBALL="$(ruby -rpathname -e 'puts Pathname.new(ARGV.fetch(0)).relative_path_from(Pathname.pwd)' "$TARBALL")"
+  SIDECAR="$(ruby -rpathname -e 'puts Pathname.new(ARGV.fetch(0)).relative_path_from(Pathname.pwd)' "$SIDECAR")"
+  [[ "$TARBALL" != /* && "$SIDECAR" != /* ]]
 fi
 [[ -f "$TARBALL" ]] || { echo "exact npm tarball is missing: $TARBALL" >&2; exit 1; }
+TARBALL="$(ruby -e 'puts File.realpath(ARGV.fetch(0))' "$TARBALL")"
 if [[ -n "$SIDECAR" ]]; then
+  [[ -f "$SIDECAR" ]] || { echo "exact npm sidecar is missing: $SIDECAR" >&2; exit 1; }
+  SIDECAR="$(ruby -e 'puts File.realpath(ARGV.fetch(0))' "$SIDECAR")"
   ruby "$ROOT/scripts/verify-npm-tarball.rb" --tarball "$TARBALL" --sidecar "$SIDECAR" >/dev/null
 fi
 
