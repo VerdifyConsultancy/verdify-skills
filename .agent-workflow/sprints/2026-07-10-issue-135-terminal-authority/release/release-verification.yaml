@@ -6,8 +6,8 @@ sprint_id: 2026-07-10-issue-135-terminal-authority
 status: verified
 integrated_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
 release:
-  tag: 
-  url: 
+  tag:
+  url:
 artifact_identity:
 - type: git-commit
   identifier: 27c33f178c747cf239cbf988cd9ffe95039dd732
