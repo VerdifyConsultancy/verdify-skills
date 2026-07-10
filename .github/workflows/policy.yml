@@ -1,6 +1,7 @@
 name: policy
 on:
   pull_request:
+    branches: [dev, main]
     types: [opened, edited, synchronize, reopened, ready_for_review, labeled, unlabeled]
 permissions:
   actions: read
@@ -9,6 +10,10 @@ permissions:
   pull-requests: read
 jobs:
   pull-request-policy:
+    if: >-
+      github.event.pull_request.base.repo.full_name == github.repository &&
+      (github.event.pull_request.base.ref == 'dev' ||
+       github.event.pull_request.base.ref == 'main')
     runs-on: ubuntu-latest
     steps:
       - name: Check out trusted policy engine from protected base
@@ -34,9 +39,17 @@ jobs:
       - name: Check Verdify pull request contract
         env:
           GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
+          [[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]] || { echo "pull request base repository is not trusted" >&2; exit 1; }
+          case "${BASE_REF}" in
+            dev|main) ;;
+            *) echo "pull request base ref is not protected" >&2; exit 1 ;;
+          esac
           ruby trusted-policy/scripts/pr-policy.rb \
             --event "$GITHUB_EVENT_PATH" \
             --repo "$GITHUB_WORKSPACE/candidate"

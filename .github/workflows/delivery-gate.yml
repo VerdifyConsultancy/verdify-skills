@@ -2,6 +2,7 @@ name: delivery-gate
 
 on:
   pull_request:
+    branches: [dev, main]
     types: [opened, edited, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted, edited, dismissed]
@@ -17,6 +18,13 @@ permissions:
 
 jobs:
   delivery-policy:
+    if: >-
+      (github.event.pull_request != null &&
+       github.event.pull_request.base.repo.full_name == github.repository &&
+       (github.event.pull_request.base.ref == 'dev' ||
+        github.event.pull_request.base.ref == 'main')) ||
+      (github.event.pull_request == null &&
+       github.ref == 'refs/heads/dev')
     runs-on: ubuntu-latest
     steps:
       - name: Check out protected-base delivery policy
@@ -44,12 +52,12 @@ jobs:
         if: github.event.pull_request == null
         env:
           GH_TOKEN: ${{ github.token }}
+          FULL_REF: ${{ github.ref }}
           HEAD_SHA: ${{ github.sha }}
-          REF_NAME: ${{ github.ref_name }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          [[ "${REF_NAME}" == "dev" ]] || { echo "release bootstrap must run at dev" >&2; exit 1; }
+          [[ "${FULL_REF}" == "refs/heads/dev" ]] || { echo "release bootstrap must run at refs/heads/dev" >&2; exit 1; }
           gh api --paginate --slurp \
             "repos/${REPOSITORY}/pulls?state=open&base=main&per_page=100" \
             | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
@@ -61,20 +69,28 @@ jobs:
       - name: Check candidate-side delivery route
         env:
           GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
           EVENT_NAME: ${{ github.event_name }}
+          FULL_REF: ${{ github.ref }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
-          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           EVENT_PATH="${GITHUB_EVENT_PATH}"
           if [[ "${EVENT_NAME}" != pull_request* ]]; then
             EVENT_PATH="${RUNNER_TEMP}/release-event.json"
           fi
-          ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/pr-policy.rb"
           if [[ "${EVENT_NAME}" == pull_request* ]]; then
+            [[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]] || { echo "pull request base repository is not trusted" >&2; exit 1; }
+            case "${BASE_REF}" in
+              dev|main) ;;
+              *) echo "pull request base ref is not protected" >&2; exit 1 ;;
+            esac
             ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/pr-policy.rb"
           else
-            [[ "${REF_NAME}" == "dev" ]] || { echo "candidate policy is trusted only at dev" >&2; exit 1; }
+            [[ "${FULL_REF}" == "refs/heads/dev" ]] || { echo "candidate policy is trusted only at refs/heads/dev" >&2; exit 1; }
+            ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/pr-policy.rb"
           fi
           [[ -f "${ENGINE}" ]] || { echo "trusted policy engine is unavailable" >&2; exit 1; }
           ruby "${ENGINE}" \
@@ -82,6 +98,13 @@ jobs:
             --repo "${GITHUB_WORKSPACE}/candidate"
 
   critic-gate:
+    if: >-
+      (github.event.pull_request != null &&
+       github.event.pull_request.base.repo.full_name == github.repository &&
+       (github.event.pull_request.base.ref == 'dev' ||
+        github.event.pull_request.base.ref == 'main')) ||
+      (github.event.pull_request == null &&
+       github.ref == 'refs/heads/dev')
     runs-on: ubuntu-latest
     steps:
       - name: Check out protected-base gate
@@ -109,12 +132,12 @@ jobs:
         if: github.event.pull_request == null
         env:
           GH_TOKEN: ${{ github.token }}
+          FULL_REF: ${{ github.ref }}
           HEAD_SHA: ${{ github.sha }}
-          REF_NAME: ${{ github.ref_name }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          [[ "${REF_NAME}" == "dev" ]] || { echo "release bootstrap must run at dev" >&2; exit 1; }
+          [[ "${FULL_REF}" == "refs/heads/dev" ]] || { echo "release bootstrap must run at refs/heads/dev" >&2; exit 1; }
           gh api --paginate --slurp \
             "repos/${REPOSITORY}/pulls?state=open&base=main&per_page=100" \
             | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
@@ -144,20 +167,28 @@ jobs:
       - name: Validate current-head critic or release approval
         env:
           GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
           EVENT_NAME: ${{ github.event_name }}
+          FULL_REF: ${{ github.ref }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
-          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           EVENT_PATH="${GITHUB_EVENT_PATH}"
           if [[ "${EVENT_NAME}" != pull_request* ]]; then
             EVENT_PATH="${RUNNER_TEMP}/release-event.json"
           fi
-          ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/delivery-gate.rb"
           if [[ "${EVENT_NAME}" == pull_request* ]]; then
+            [[ "${BASE_REPOSITORY}" == "${REPOSITORY}" ]] || { echo "pull request base repository is not trusted" >&2; exit 1; }
+            case "${BASE_REF}" in
+              dev|main) ;;
+              *) echo "pull request base ref is not protected" >&2; exit 1 ;;
+            esac
             ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb"
           else
-            [[ "${REF_NAME}" == "dev" ]] || { echo "candidate gate is trusted only at dev" >&2; exit 1; }
+            [[ "${FULL_REF}" == "refs/heads/dev" ]] || { echo "candidate gate is trusted only at refs/heads/dev" >&2; exit 1; }
+            ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/delivery-gate.rb"
           fi
           [[ -f "${ENGINE}" ]] || { echo "trusted delivery gate is unavailable" >&2; exit 1; }
           REVIEWS=()
