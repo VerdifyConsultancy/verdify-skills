@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-autonomous-platform-strategy
+mode: recovery
+recovery_bundle: issue-135-recovery-v1
+receipt_base_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-autonomous-platform-strategy
+  head_sha: aaa84af6ac34f4812c82187dddf6589422853487
+  packet_commit_sha: e12db203ae66dd386a7cf44f01c0458861040f07
+  release_commit_sha: dade6f12477f71eba67ef2f85bc5a4a3b2ef50b3
+  outcome_commit_sha: aaa84af6ac34f4812c82187dddf6589422853487
+  packet_path: ".agent-workflow/sprints/2026-07-10-autonomous-platform-strategy/review/review-inbox-packet.yaml"
+  packet_sha256: 4f488b7025cbeb24aa1a6c0eedee1ff19b76e5372f3f410bc0714819b0b4d30b
+  release_sha256: fa5111572231929d934c4489939ba5c7904198f4500c30220cfabf1cfe08e269
+  outcome_sha256: 4f0610327d3e80bda6773addb4f6d48f48011656c39e5f490ad132fda5fd2cc1
+lanes:
+- lane_id: issue-211-autonomous-platform-strategy
+  issue_ids:
+  - 211
+  branch: lane/211-autonomous-platform-strategy
+  pull_request: 212
+  dispatch_head_sha: d75a6bc089ac89f7ed467248bfa566360949be93
+  implementation_head_sha: 754d1369062cbd66283a05b4f1c66fab3d788182
+  evidence_head_sha: 01327ba5a48e947dac381c59a9f40e9c5af2b139
+  critic_report_head_sha: 6868ffb41c951c3820e61a3efc34aa2671e50b66
+  merge_commit_sha: 1cd75f4556d88d2ddbfaf70e719d1380e962f51c
+artifacts:
+  plan_sha256: 2af1f9840700989431e791c42a359756ae631591545bae6035021c8d85f8dde3
+  status_sha256: 3be92bf3fea4582a1503f0056446e36ec1502de402d4efa41c24fd4eafb21718
+  release_sha256: fa5111572231929d934c4489939ba5c7904198f4500c30220cfabf1cfe08e269
+  outcome_sha256: 4f0610327d3e80bda6773addb4f6d48f48011656c39e5f490ad132fda5fd2cc1
+terminal:
+  integrated_sha: 1cd75f4556d88d2ddbfaf70e719d1380e962f51c
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-10T20:57:58Z'
+generator: verdify-controller

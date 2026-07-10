@@ -1,84 +1,133 @@
+---
 schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
-schema_version: "1.0"
+schema_version: '1.0'
 sprint_id: 2026-07-10-release-recovery
-status: approved
-goal: Repair the relative-tarball consumer path that stopped the first 1.3.0 publish run, then repromote and verify the still-unpublished exact release.
-baseline_sha: "a6ebbfae1c54950bbe3a51828e50db36095a3d2e"
+status: complete
+goal: Repair the relative-tarball consumer path that stopped the first 1.3.0 publish
+  run, then repromote and verify the still-unpublished exact release.
+baseline_sha: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
 github:
   repository: VerdifyConsultancy/verdify-skills
-  milestone: null
-  project: null
-issue_ids: [200]
+  milestone:
+  project:
+issue_ids:
+- 200
 scope:
-  - Normalize an existing supplied candidate tarball path before npm install treats it as a package spec.
-  - Prove relative and absolute candidate paths preserve exact-byte verification and consumer behavior.
-  - Repromote dev to main only after a fresh critic and current non-author owner approval.
+- Normalize an existing supplied candidate tarball path before npm install treats
+  it as a package spec.
+- Prove relative and absolute candidate paths preserve exact-byte verification and
+  consumer behavior.
+- Repromote dev to main only after a fresh critic and current non-author owner approval.
 non_goals:
-  - Change version 1.3.0, package contents outside the path fix, release authority rules, provenance, or rollback behavior.
-  - Publish, tag, create a GitHub release, or mutate branch protection from the worker lane.
+- Change version 1.3.0, package contents outside the path fix, release authority rules,
+  provenance, or rollback behavior.
+- Publish, tag, create a GitHub release, or mutate branch protection from the worker
+  lane.
 acceptance_criteria:
-  - id: SPR-AC-01
-    statement: Relative and absolute local candidate tarball paths install the exact file without Git transport.
-    lane_ids: [issue-200-relative-tarball]
-    evidence_expected: [relative-path regression, absolute-path regression, missing and corrupt rejection]
-  - id: SPR-AC-02
-    statement: Exact artifact, npm upgrade, release transaction, and full repository tests remain green.
-    lane_ids: [issue-200-relative-tarball]
-    evidence_expected: [npm install suite, packed artifact suite, make test, secret scan]
-  - id: SPR-AC-03
-    statement: The corrected unpublished 1.3.0 candidate is independently reviewed before promotion and publication recovery.
-    lane_ids: [issue-200-relative-tarball]
-    evidence_expected: [D/I/E/S chain, GitHub checks, current owner review, release verification]
+- id: SPR-AC-01
+  statement: Relative and absolute local candidate tarball paths install the exact
+    file without Git transport.
+  lane_ids:
+  - issue-200-relative-tarball
+  evidence_expected:
+  - relative-path regression
+  - absolute-path regression
+  - missing and corrupt rejection
+- id: SPR-AC-02
+  statement: Exact artifact, npm upgrade, release transaction, and full repository
+    tests remain green.
+  lane_ids:
+  - issue-200-relative-tarball
+  evidence_expected:
+  - npm install suite
+  - packed artifact suite
+  - make test
+  - secret scan
+- id: SPR-AC-03
+  statement: The corrected unpublished 1.3.0 candidate is independently reviewed before
+    promotion and publication recovery.
+  lane_ids:
+  - issue-200-relative-tarball
+  evidence_expected:
+  - D/I/E/S chain
+  - GitHub checks
+  - current owner review
+  - release verification
 risks:
-  - id: RISK-01
-    severity: high
-    statement: Treating a local tarball as a registry or Git spec can execute the wrong transport or block publication.
-    mitigation: Canonicalize only an already verified existing filesystem path and regression-test both path forms.
-  - id: RISK-02
-    severity: high
-    statement: A recovery attempt after an immutable release mutation could repack different bytes.
-    mitigation: Confirm npm, tag, and release remain absent and retain the one-candidate transaction gates.
+- id: RISK-01
+  severity: high
+  statement: Treating a local tarball as a registry or Git spec can execute the wrong
+    transport or block publication.
+  mitigation: Canonicalize only an already verified existing filesystem path and regression-test
+    both path forms.
+- id: RISK-02
+  severity: high
+  statement: A recovery attempt after an immutable release mutation could repack different
+    bytes.
+  mitigation: Confirm npm, tag, and release remain absent and retain the one-candidate
+    transaction gates.
 lanes:
-  - lane_id: issue-200-relative-tarball
-    issue_ids: [200]
-    contract_path: .agent-workflow/sprints/2026-07-10-release-recovery/lanes/contracts/issue-200-relative-tarball.contract.yaml
-    branch: lane/200-relative-tarball
-    owner: release-recovery-worker
-    reviewer: fresh-independent-critic
-    summary: Normalize the supplied candidate path and prove exact consumer behavior without release mutation.
+- lane_id: issue-200-relative-tarball
+  issue_ids:
+  - 200
+  contract_path: ".agent-workflow/sprints/2026-07-10-release-recovery/lanes/contracts/issue-200-relative-tarball.contract.yaml"
+  branch: lane/200-relative-tarball
+  owner: release-recovery-worker
+  reviewer: fresh-independent-critic
+  summary: Normalize the supplied candidate path and prove exact consumer behavior
+    without release mutation.
 dependency_order:
-  - [issue-200-relative-tarball]
+- - issue-200-relative-tarball
 deployment_expectations:
-  - Worker and critic make no npm, tag, GitHub release, main, branch-protection, or credential mutation.
-  - ROOT merges reviewed code to dev, approves the generated dev-to-main recovery PR as non-author, and verifies the resumed release separately.
+- Worker and critic make no npm, tag, GitHub release, main, branch-protection, or
+  credential mutation.
+- ROOT merges reviewed code to dev, approves the generated dev-to-main recovery PR
+  as non-author, and verifies the resumed release separately.
 review_plan:
   qa_milestones:
-    - id: QA-01
-      name: Relative candidate regression
-      due: before worker closeout
-      evidence_expected: [relative path installs locally, absolute path remains green, no Git transport]
+  - id: QA-01
+    name: Relative candidate regression
+    due: before worker closeout
+    evidence_expected:
+    - relative path installs locally
+    - absolute path remains green
+    - no Git transport
   human_review_milestones:
-    - id: HR-01
-      name: Independent recovery review
-      owner: Fresh critic and release controller
-      trigger: Exact D/I/E chain and full tests pass.
-      review_packet_path: .agent-workflow/sprints/2026-07-10-release-recovery/review/review-inbox-packet.yaml
+  - id: HR-01
+    name: Independent recovery review
+    owner: Fresh critic and release controller
+    trigger: Exact D/I/E chain and full tests pass.
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-release-recovery/review/review-inbox-packet.yaml"
   user_stories_for_review:
-    - id: US-01
-      statement: As a release owner, I can retry 1.3.0 knowing the candidate consumer uses the exact local tarball.
-      issue_ids: [200]
-      lane_ids: [issue-200-relative-tarball]
-      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03]
+  - id: US-01
+    statement: As a release owner, I can retry 1.3.0 knowing the candidate consumer
+      uses the exact local tarball.
+    issue_ids:
+    - 200
+    lane_ids:
+    - issue-200-relative-tarball
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+    - SPR-AC-03
   reporting_summary:
-    included: [relative tarball path recovery, exact artifact regression, independent criticism]
-    deferred: [controller-owned npm, tag, release, and completed-ledger verification]
+    included:
+    - relative tarball path recovery
+    - exact artifact regression
+    - independent criticism
+    deferred:
+    - controller-owned npm
+    - tag
+    - release
+    - and completed-ledger verification
     ownership:
-      - lane_id: issue-200-relative-tarball
-        owner: release-recovery-worker
-        responsibility: Implement and validate the bounded path fix only.
-    next_review: Fresh critic at exact E, then protected dev integration and release recovery.
+    - lane_id: issue-200-relative-tarball
+      owner: release-recovery-worker
+      responsibility: Implement and validate the bounded path fix only.
+    next_review: Fresh critic at exact E, then protected dev integration and release
+      recovery.
 approval:
   status: approved
   approver: Jason Vallery
-  approved_at: "2026-07-10T11:22:00Z"
+  approved_at: '2026-07-10T11:22:00Z'

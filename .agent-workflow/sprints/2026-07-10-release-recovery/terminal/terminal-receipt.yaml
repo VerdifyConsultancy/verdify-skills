@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-release-recovery
+mode: recovery
+recovery_bundle: issue-135-recovery-v1
+receipt_base_sha: 27c33f178c747cf239cbf988cd9ffe95039dd732
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-release-recovery
+  head_sha: 234d530c64e4a83fa1aedf70b742f7a53c270ccc
+  packet_commit_sha: 39e0216d6ac9a472a4aa5186a9e004cbaeaa1657
+  release_commit_sha: d301cb36596e14ac46896eda5a681b3e129eadf6
+  outcome_commit_sha: 234d530c64e4a83fa1aedf70b742f7a53c270ccc
+  packet_path: ".agent-workflow/sprints/2026-07-10-release-recovery/review/review-inbox-packet.yaml"
+  packet_sha256: 714a4f34381daeb0354ac6affe12d46f0e1ba3fa3a194db28be65f7bb35b038c
+  release_sha256: b29725dc0ae32d64b65afb2e6c925047e9dc0d37cac90164d578994067338073
+  outcome_sha256: 36637c53687d2c5487991e0a9dd9bb301d9d28711d07287e8d67ac7dde15183d
+lanes:
+- lane_id: issue-200-relative-tarball
+  issue_ids:
+  - 200
+  branch: lane/200-relative-tarball
+  pull_request: 201
+  dispatch_head_sha: 98cdc993561d6288142daf10ca9eeb53f1416857
+  implementation_head_sha: 97b102a78ac8e675300791c8e759136432a1be2c
+  evidence_head_sha: 4f0dd1775cdc03b198cafa2fce4c9eace24fc9ea
+  critic_report_head_sha: ec8c8e50e66cbdea7ef59e8f43932ecd2bc27998
+  merge_commit_sha: 2f6843dd24e7d955c8328963aeb4086b3fad1688
+artifacts:
+  plan_sha256: '0348d0148845b94e762d612954e2f776512b7064179827e10ad8830940a7b294'
+  status_sha256: 037017d61c9e9c2a8e4184334c1a7d68684dc030fd36f674805b18ad22c31323
+  release_sha256: b29725dc0ae32d64b65afb2e6c925047e9dc0d37cac90164d578994067338073
+  outcome_sha256: 36637c53687d2c5487991e0a9dd9bb301d9d28711d07287e8d67ac7dde15183d
+terminal:
+  integrated_sha: 2f6843dd24e7d955c8328963aeb4086b3fad1688
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted
+generated_at: '2026-07-10T20:58:11Z'
+generator: verdify-controller

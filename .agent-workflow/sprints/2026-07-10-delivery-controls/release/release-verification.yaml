@@ -1,0 +1,58 @@
+---
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: '1.0'
+sprint_id: 2026-07-10-delivery-controls
+status: verified
+integrated_sha: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+release:
+  tag:
+  url:
+artifact_identity:
+- type: git-commit
+  identifier: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+integration_results:
+- name: validate
+  result: passed
+  evidence: Trusted pull_request check 86348280037 passed at 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8.
+- name: pull-request-policy
+  result: passed
+  evidence: Trusted pull_request check 86349299384 passed at 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8.
+- name: compliance / compliance
+  result: passed
+  evidence: Trusted pull_request check 86348280991 passed at 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8.
+- name: delivery-policy
+  result: passed
+  evidence: Trusted pull_request check 86349299810 passed at 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8.
+- name: critic-gate
+  result: passed
+  evidence: Trusted pull_request check 86349299834 passed at 9d95f629cea8dd3478b0716f34e6fd957ad6f7a8.
+deployment:
+  environment: protected-dev
+  deployment_id: 196
+  deployed_at: '2026-07-10T11:16:37Z'
+  observed_revision: a6ebbfae1c54950bbe3a51828e50db36095a3d2e
+  deployer: github-merge
+  approval:
+    required: true
+    approved_by: Jason Vallery delegated repository authority
+    approved_at: '2026-07-10T11:16:37Z'
+    evidence: Protected merge evidence at https://github.com/VerdifyConsultancy/verdify-skills/pull/196.
+runtime_checks:
+- name: protected dev ancestry
+  result: passed
+  observed_at: '2026-07-10T20:53:00Z'
+  evidence: Merge a6ebbfae1c54950bbe3a51828e50db36095a3d2e is an ancestor of the accepted
+    receipt base.
+migrations:
+- name: repository-only
+  result: not_applicable
+  evidence: No data migration exists.
+rollback:
+  ready: true
+  known_good_revision: 91828dd4f0b632a2833a3d4f62cf4f92c1e35901
+  procedure: Revert merge a6ebbfae1c54950bbe3a51828e50db36095a3d2e on dev and regenerate
+    terminal evidence.
+incidents: []
+verified_at: '2026-07-10T20:53:00Z'
+verifier: codex-root-recovery-verifier

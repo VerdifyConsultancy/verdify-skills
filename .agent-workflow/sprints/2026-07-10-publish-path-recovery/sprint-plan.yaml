@@ -1,84 +1,134 @@
+---
 schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
-schema_version: "1.0"
+schema_version: '1.0'
 sprint_id: 2026-07-10-publish-path-recovery
-status: approved
-goal: Repair the privileged publish path that stopped the second 1.3.0 publish run, then independently review the exact recovery before another release retry.
-baseline_sha: "0c6d46a59057b7e52dc65c77076ce343f373c015"
+status: complete
+goal: Repair the privileged publish path that stopped the second 1.3.0 publish run,
+  then independently review the exact recovery before another release retry.
+baseline_sha: 0c6d46a59057b7e52dc65c77076ce343f373c015
 github:
   repository: VerdifyConsultancy/verdify-skills
-  milestone: null
-  project: null
-issue_ids: [204]
+  milestone:
+  project:
+issue_ids:
+- 204
 scope:
-  - Canonicalize the already verified candidate tarball before the privileged npm publish invocation.
-  - Prove canonicalization precedes npm publish without weakening provenance, access, or transaction controls.
-  - Preserve the unpublished 1.3.0 state for controller-owned retry and verification.
+- Canonicalize the already verified candidate tarball before the privileged npm publish
+  invocation.
+- Prove canonicalization precedes npm publish without weakening provenance, access,
+  or transaction controls.
+- Preserve the unpublished 1.3.0 state for controller-owned retry and verification.
 non_goals:
-  - Change version 1.3.0, package contents, provenance, release transaction, rollback behavior, or release authority rules.
-  - Publish, tag, create a GitHub release, merge, or mutate branch protection from the worker lane.
+- Change version 1.3.0, package contents, provenance, release transaction, rollback
+  behavior, or release authority rules.
+- Publish, tag, create a GitHub release, merge, or mutate branch protection from the
+  worker lane.
 acceptance_criteria:
-  - id: SPR-AC-01
-    statement: The privileged publish job resolves its already verified tarball to a canonical local path before immutable transaction code can invoke npm.
-    lane_ids: [issue-204-publish-tarball]
-    evidence_expected: [workflow path canonicalization, ordering regression, exact npm publish flags]
-  - id: SPR-AC-02
-    statement: Packed-artifact, workflow, repository, and secret-scan validation remain green without release mutation.
-    lane_ids: [issue-204-publish-tarball]
-    evidence_expected: [actionlint, packed artifact suite, full repository suite, secret scan]
-  - id: SPR-AC-03
-    statement: npm version 1.3.0, tag v1.3.0, and GitHub release v1.3.0 remain absent through worker and critic review.
-    lane_ids: [issue-204-publish-tarball]
-    evidence_expected: [registry query, tag query, release query, D/I/E/S chain]
+- id: SPR-AC-01
+  statement: The privileged publish job resolves its already verified tarball to a
+    canonical local path before immutable transaction code can invoke npm.
+  lane_ids:
+  - issue-204-publish-tarball
+  evidence_expected:
+  - workflow path canonicalization
+  - ordering regression
+  - exact npm publish flags
+- id: SPR-AC-02
+  statement: Packed-artifact, workflow, repository, and secret-scan validation remain
+    green without release mutation.
+  lane_ids:
+  - issue-204-publish-tarball
+  evidence_expected:
+  - actionlint
+  - packed artifact suite
+  - full repository suite
+  - secret scan
+- id: SPR-AC-03
+  statement: npm version 1.3.0, tag v1.3.0, and GitHub release v1.3.0 remain absent
+    through worker and critic review.
+  lane_ids:
+  - issue-204-publish-tarball
+  evidence_expected:
+  - registry query
+  - tag query
+  - release query
+  - D/I/E/S chain
 risks:
-  - id: RISK-01
-    severity: high
-    statement: A relative tarball passed to npm can be interpreted as a Git package spec instead of the verified local release candidate.
-    mitigation: Canonicalize the existing verified file with Ruby File.realpath before the release transaction and assert ordering in tests.
-  - id: RISK-02
-    severity: high
-    statement: A recovery lane could accidentally mutate an immutable npm, tag, or release authority.
-    mitigation: Deny release mutation to worker and critic, query all authorities before handoff, and leave retry to ROOT.
+- id: RISK-01
+  severity: high
+  statement: A relative tarball passed to npm can be interpreted as a Git package
+    spec instead of the verified local release candidate.
+  mitigation: Canonicalize the existing verified file with Ruby File.realpath before
+    the release transaction and assert ordering in tests.
+- id: RISK-02
+  severity: high
+  statement: A recovery lane could accidentally mutate an immutable npm, tag, or release
+    authority.
+  mitigation: Deny release mutation to worker and critic, query all authorities before
+    handoff, and leave retry to ROOT.
 lanes:
-  - lane_id: issue-204-publish-tarball
-    issue_ids: [204]
-    contract_path: .agent-workflow/sprints/2026-07-10-publish-path-recovery/lanes/contracts/issue-204-publish-tarball.contract.yaml
-    branch: lane/204-publish-tarball
-    owner: codex-publish-path-recovery
-    reviewer: fresh-independent-critic
-    summary: Canonicalize the privileged tarball path and prove it is absolute before npm publish.
+- lane_id: issue-204-publish-tarball
+  issue_ids:
+  - 204
+  contract_path: ".agent-workflow/sprints/2026-07-10-publish-path-recovery/lanes/contracts/issue-204-publish-tarball.contract.yaml"
+  branch: lane/204-publish-tarball
+  owner: codex-publish-path-recovery
+  reviewer: fresh-independent-critic
+  summary: Canonicalize the privileged tarball path and prove it is absolute before
+    npm publish.
 dependency_order:
-  - [issue-204-publish-tarball]
+- - issue-204-publish-tarball
 deployment_expectations:
-  - Worker and critic make no npm, tag, GitHub release, main, branch-protection, credential, or retained-artifact mutation.
-  - ROOT merges reviewed code to dev, generates and approves the dev-to-main recovery PR through protected controls, and verifies release separately.
+- Worker and critic make no npm, tag, GitHub release, main, branch-protection, credential,
+  or retained-artifact mutation.
+- ROOT merges reviewed code to dev, generates and approves the dev-to-main recovery
+  PR through protected controls, and verifies release separately.
 review_plan:
   qa_milestones:
-    - id: QA-01
-      name: Privileged publish path regression
-      due: before worker closeout
-      evidence_expected: [canonicalization precedes publish, npm flags unchanged, packed artifact suite green]
+  - id: QA-01
+    name: Privileged publish path regression
+    due: before worker closeout
+    evidence_expected:
+    - canonicalization precedes publish
+    - npm flags unchanged
+    - packed artifact suite green
   human_review_milestones:
-    - id: HR-01
-      name: Independent publish recovery review
-      owner: Fresh critic and release controller
-      trigger: Exact D/I/E chain and required validation pass.
-      review_packet_path: .agent-workflow/sprints/2026-07-10-publish-path-recovery/review/review-inbox-packet.yaml
+  - id: HR-01
+    name: Independent publish recovery review
+    owner: Fresh critic and release controller
+    trigger: Exact D/I/E chain and required validation pass.
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-publish-path-recovery/review/review-inbox-packet.yaml"
   user_stories_for_review:
-    - id: US-01
-      statement: As a release owner, I can retry 1.3.0 knowing npm publish receives the exact verified local tarball rather than a Git shorthand.
-      issue_ids: [204]
-      lane_ids: [issue-204-publish-tarball]
-      acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03]
+  - id: US-01
+    statement: As a release owner, I can retry 1.3.0 knowing npm publish receives
+      the exact verified local tarball rather than a Git shorthand.
+    issue_ids:
+    - 204
+    lane_ids:
+    - issue-204-publish-tarball
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+    - SPR-AC-03
   reporting_summary:
-    included: [privileged tarball path recovery, ordering regression, independent criticism]
-    deferred: [controller-owned merge, npm publish, tag, release, and completed-ledger verification]
+    included:
+    - privileged tarball path recovery
+    - ordering regression
+    - independent criticism
+    deferred:
+    - controller-owned merge
+    - npm publish
+    - tag
+    - release
+    - and completed-ledger verification
     ownership:
-      - lane_id: issue-204-publish-tarball
-        owner: codex-publish-path-recovery
-        responsibility: Implement and validate the bounded workflow path fix only.
-    next_review: Fresh critic at exact E, then protected dev integration and release recovery.
+    - lane_id: issue-204-publish-tarball
+      owner: codex-publish-path-recovery
+      responsibility: Implement and validate the bounded workflow path fix only.
+    next_review: Fresh critic at exact E, then protected dev integration and release
+      recovery.
 approval:
   status: approved
   approver: Jason Vallery
-  approved_at: "2026-07-10T12:01:00Z"
+  approved_at: '2026-07-10T12:01:00Z'
