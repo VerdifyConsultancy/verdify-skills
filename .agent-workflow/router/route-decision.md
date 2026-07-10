@@ -1,14 +1,14 @@
 # Route decision
 
-- Current state: `PROJECT_DEFINITION_INCOMPLETE`
-- Next skill: `project-definition`
-- Next mode: `discovery`
+- Current state: `ARCHITECTURE_INCOMPLETE`
+- Next skill: `architecture-contracts`
+- Next mode: `north-star-architecture`
 
-The earliest project-definition mode is not approved.
+Approved architecture is missing or incomplete.
 
 ## Missing artifacts
 
-None.
+- .agent-workflow/architecture/architecture.yaml
 
 ## Open gates
 

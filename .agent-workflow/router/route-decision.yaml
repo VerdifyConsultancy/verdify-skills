@@ -2,12 +2,12 @@
 schema_ref: route-decision.schema.yaml
 kind: RouteDecision
 schema_version: '1.0'
-generated_at: '2026-07-10T00:24:55Z'
+generated_at: '2026-07-10T02:02:47Z'
 repository: VerdifyConsultancy/verdify-skills
-current_state: PROJECT_DEFINITION_INCOMPLETE
-next_skill: project-definition
-next_mode: discovery
-reason: The earliest project-definition mode is not approved.
+current_state: ARCHITECTURE_INCOMPLETE
+next_skill: architecture-contracts
+next_mode: north-star-architecture
+reason: Approved architecture is missing or incomplete.
 evidence:
 - source: ".agent-workflow/intake/transcript-replan.yaml"
   finding: transcript-replan status is "routed"
@@ -17,7 +17,6 @@ evidence:
   finding: northstar-plan status is "approved"
 - source: ".agent-workflow/northstar/northstar-artifacts.yaml"
   finding: northstar-artifacts status is "approved"
-- source: ".agent-workflow/project/project-definition.yaml"
-  finding: stage_status.discovery is "draft"
-missing_artifacts: []
+missing_artifacts:
+- ".agent-workflow/architecture/architecture.yaml"
 open_gates: []
