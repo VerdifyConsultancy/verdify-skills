@@ -1,0 +1,190 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-delivery-controls
+lane_id: issue-121-delivery-controls
+title: Protected dev integration and release-only main promotion
+status: approved
+issue_ids: [121]
+coupling_justification: null
+objective: Implement deterministic repository and GitHub delivery controls that enforce critic-approved dev integration and real owner-approved release-only main promotion.
+desired_outcome: Ordinary work merges only to protected dev after a fresh current-head critic status, while main accepts only the exact same-repository dev-to-main release route after a genuine current-head approval by Jason or James other than the author.
+non_goals:
+  - "Merge PR #189 or mutate main, npm, tags, GitHub releases, release assets, the completed release ledger, or runtime services."
+  - Apply live branch protection or repository settings from the worker worktree.
+  - Enable workflow-generated PR approvals or represent an administrator exception as an APPROVED GitHub review.
+  - Change North Star, project definition, architecture contracts, package version, publish-npm workflow, release transaction implementation, or recovery refs.
+  - "Implement issues #71, #73, #74, #75, #116, or #174."
+baseline_sha: "91828dd4f0b632a2833a3d4f62cf4f92c1e35901"
+branch: lane/121-delivery-controls
+module_contracts: [governance, release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [github-delivery-policy, critic-status, branch-protection, release-approval]
+  owned_paths:
+    - .github/CODEOWNERS
+    - .github/workflows/delivery-gate.yml
+    - .github/workflows/policy.yml
+    - .github/workflows/release-pr.yml
+    - COMMON_OPERATING_CONTRACT.md
+    - MANIFEST.sha256
+    - Makefile
+    - config/github-delivery-controls.yaml
+    - config/github-primitives.yaml
+    - docs/decisions/ADR-0017-lane-review-evidence-chain.md
+    - docs/github-operating-model.md
+    - docs/lifecycle.md
+    - lib/verdify/cli.rb
+    - lib/verdify/lane_review_validator.rb
+    - scripts/delivery-gate.rb
+    - scripts/gen-manifest.sh
+    - scripts/github-delivery-controls.rb
+    - scripts/pr-policy.rb
+    - scripts/validate-repo.rb
+    - skills/controller-merge/SKILL.md
+    - skills/independent-critic/SKILL.md
+    - skills/release-verification/SKILL.md
+    - tests/test_cli.sh
+    - tests/test_delivery_gate.sh
+    - tests/test_github_delivery_controls.sh
+    - tests/test_lane_review_validator.rb
+    - tests/test_pr_policy.sh
+  prohibited_paths:
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+    - .github/workflows/publish-npm.yml
+    - scripts/build-release-candidate.sh
+    - scripts/release-transaction.rb
+    - schemas/release-transaction.schema.yaml
+    - .agent-workflow/northstar/**
+    - .agent-workflow/project/**
+    - .agent-workflow/architecture/**
+    - .agent-workflow/strategy/**
+    - docs/recovery-ledger-2026-07-10.md
+    - packs/**
+    - evaluations/**
+    - skills/crm-email/**
+    - skills/timeline-historian/**
+  coordination_required_paths:
+    - schemas/manifest.json
+    - scripts/setup-agent-hosts.rb
+  owned_interfaces:
+    - Pull request base/head/repository policy.
+    - Current-head critic status for dev.
+    - Current-head human owner approval for release promotion.
+    - Pre-release and steady-state GitHub branch-protection desired state.
+dependencies:
+  hard:
+    - lane_id: issue-120-release-safety
+      required_output: "Version 1.3.0 release safety integrated and terminal on dev with PR #189 open and unmerged."
+  soft:
+    - lane_id: release-189-verification
+      coordination: "Final release approval and publication wait for reviewed issue #121 code plus live pre-release rule verification."
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: Policy rejects every ordinary non-dev base, every non-dev head to main, every cross-repository release route, and every malformed release marker while accepting ordinary dev and exact same-repository dev-to-main fixtures.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [event fixture matrix, candidate repository validation, trusted-base bootstrap behavior]
+  - id: LANE-AC-02
+    statement: Dev critic-gate validates the exact report-only current head, independent worker and critic identities, valid D/I/E/S suffix, and approve or approve_with_risks outcome without requiring impossible author self-approval.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [valid chain fixture, stale and post-report commit rejection, self-critic and non-approving outcome rejection]
+  - id: LANE-AC-03
+    statement: Main critic-gate accepts only a latest effective APPROVED review on the current head by jvallery or jrvallery who is not the PR author, and rejects workflow identity, stale approval, author approval, and unresolved changes requests.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [review history fixtures, allowed owner list, current commit binding, author and workflow rejection]
+  - id: LANE-AC-04
+    statement: The delivery-gate workflow creates distinct delivery-policy and critic-gate contexts for pull request, review, dev push, and manual bootstrap events without write permission to reviews.
+    sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03, SPR-AC-04]
+    evidence_required: [actionlint, static permission audit, "PR #189 bootstrap fixture", steady-state trigger fixture]
+  - id: LANE-AC-05
+    statement: Declarative controls produce exact idempotent pre-release and steady-state payloads, preserve admin/conversation/no-force/no-delete rules, require PRs and strict checks, and support snapshot rollback plus live GET verification.
+    sprint_acceptance_ids: [SPR-AC-04, SPR-AC-05]
+    evidence_required: [dry-run JSON, mock API apply, second-apply no-op, rollback fixture, exact live-verification comparison]
+  - id: LANE-AC-06
+    statement: CODEOWNERS assigns repository ownership to jvallery and jrvallery, dev requires critic-gate with zero review count, and main requires one stale-dismissing code-owner review plus phase-appropriate checks.
+    sprint_acceptance_ids: [SPR-AC-03, SPR-AC-05]
+    evidence_required: [CODEOWNERS audit, desired-state checks and review fields, docs/config parity]
+  - id: LANE-AC-07
+    statement: Lifecycle routing and documentation accept transport-neutral approving critic status for dev but preserve real human GitHub approval for main release promotion.
+    sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
+    evidence_required: [router/controller tests, operating contract audit, no weakened North Star authority]
+  - id: LANE-AC-08
+    statement: Exact implementation and report heads pass focused, full, security, workflow, manifest, policy, and GitHub checks without live worker mutation.
+    sprint_acceptance_ids: [SPR-AC-06]
+    evidence_required: [focused suites, make test, actionlint, gitleaks, check URLs, no-live-mutation statement]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate repository shape, workflow/control declarations, manifest, and skill/package contracts.
+    required: true
+  - id: pull-request-policy-suite
+    command: bash tests/test_pr_policy.sh
+    purpose: Prove dev/main route, repository identity, candidate marker, and trusted-candidate behavior.
+    required: true
+  - id: delivery-gate-suite
+    command: bash tests/test_delivery_gate.sh
+    purpose: Prove dev critic status and main human review identity against current-head fixtures.
+    required: true
+  - id: github-controls-suite
+    command: bash tests/test_github_delivery_controls.sh
+    purpose: Prove phase-specific branch payloads, dry-run/apply/verify idempotency, and rollback behavior.
+    required: true
+  - id: lane-review-suite
+    command: ruby tests/test_lane_review_validator.rb
+    purpose: Preserve exact D/I/E/S validation while enabling transport-neutral dev integration state.
+    required: true
+  - id: cli-suite
+    command: bash tests/test_cli.sh
+    purpose: Prove router, review, and release modes remain coherent.
+    required: true
+  - id: workflow-lint
+    command: actionlint .github/workflows/delivery-gate.yml .github/workflows/policy.yml .github/workflows/release-pr.yml
+    purpose: Validate workflow syntax and expressions.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run complete schema, manifest, CLI, policy, release, package, npm, and delivery-control gates.
+    required: true
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="91828dd4f0b632a2833a3d4f62cf4f92c1e35901..HEAD"
+    purpose: Scan every lane commit with match values redacted.
+    required: true
+required_evidence:
+  - Exact accepted and rejected PR route matrix including wrong repo, wrong refs, fork, and marker cases.
+  - Valid and invalid current-head critic chains with independent identity proof.
+  - Valid and invalid human review histories including allowed owners, author, stale commits, changes requests, and workflow identity.
+  - Pre-release and steady-state branch payloads, dry-run diff, idempotent apply fixture, rollback snapshot, and exact verification result.
+  - CODEOWNERS/config/docs/workflow parity and proof no workflow can approve PR reviews.
+  - Full local checks, exact GitHub check URLs, clean worktree, worker closeout, and fresh critic report.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The solution requires weakening real human approval for main, enabling workflow review approval, or fabricating a review.
+  - "Live branch protection cannot be applied without locking out the exact approved PR #189 or disabling admin/conversation/no-force/no-delete controls."
+  - A current-head critic check cannot be represented independently from worker or author identity.
+  - The worker must mutate live GitHub settings, main, npm, tags, releases, credentials, North Star, project definition, architecture, or package version.
+  - The exact 1.3.0 release route or James authorship changes before controller live application.
+definition_of_done:
+  - D is dispatch-only and all implementation changes stay within owned paths.
+  - I contains deterministic code, tests, desired state, workflows, and docs with no live mutation.
+  - E adds only the canonical closeout with status ready_for_critic.
+  - A fresh critic independently reproduces route, critic, review, permission, payload, idempotency, and rollback cases and commits only S.
+  - Exact S passes validate, pull-request-policy, compliance, and all contract checks.
+  - ROOT records the bootstrap admin exception without self-approval, merges to dev, dry-runs/applies pre-release controls, and verifies live state separately.
+  - "PR #189 remains unmerged until Jason supplies a real current-head review and release-verification owns final promotion."
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T09:38:46Z"

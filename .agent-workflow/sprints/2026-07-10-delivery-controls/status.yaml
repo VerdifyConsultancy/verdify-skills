@@ -1,0 +1,9 @@
+schema_ref: status.schema.yaml
+kind: SprintStatus
+schema_version: "1.0"
+sprint_id: 2026-07-10-delivery-controls
+state: READY
+updated_at: "2026-07-10T09:38:46Z"
+active_lanes: []
+blockers: []
+next_action: Dispatch the approved issue-121-delivery-controls lane from dev baseline 91828dd using the local leased-worktree fallback.
