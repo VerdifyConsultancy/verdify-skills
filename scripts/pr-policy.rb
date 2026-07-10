@@ -34,6 +34,7 @@ labels = options[:labels].dup
 event_payload = nil
 base_repository = nil
 head_repository = nil
+event_repository = nil
 
 if options[:body]
   body = File.read(options[:body])
@@ -47,6 +48,7 @@ elsif options[:event]
   head_ref ||= pr.dig("head", "ref")
   base_repository = pr.dig("base", "repo", "full_name") || event_payload.dig("repository", "full_name")
   head_repository = pr.dig("head", "repo", "full_name")
+  event_repository = event_payload.dig("repository", "full_name")
   labels.concat(Array(pr["labels"]).map { |l| l.is_a?(Hash) ? l["name"].to_s : l.to_s })
 else
   warn "--event or --body is required"
@@ -61,10 +63,23 @@ config = YAML.safe_load(ROOT.join("config/github-primitives.yaml").read, permitt
 # 3. standard: the full implementation-lane contract.
 development_branch = config.dig("release_branch_flow", "development_branch") || "dev"
 release_branch = config.dig("release_branch_flow", "release_branch") || "main"
+configured_repository = config.dig("release_branch_flow", "repository").to_s
 release_refs = base_ref == release_branch && head_ref == development_branch
-same_repository = event_payload.nil? || (!base_repository.to_s.empty? && base_repository == head_repository)
+same_repository = event_payload.nil? || (
+  !event_repository.to_s.empty? &&
+  base_repository == event_repository &&
+  head_repository == event_repository
+)
 release_pr = release_refs && same_repository
 errors << "cross-repository pull requests cannot use the privileged release path" if release_refs && !same_repository
+if release_refs && event_payload && !configured_repository.empty? && event_repository != configured_repository
+  errors << "release route repository must be #{configured_repository}"
+end
+if base_ref == release_branch && head_ref != development_branch
+  errors << "main accepts only the exact dev-to-main release route"
+elsif !base_ref.to_s.empty? && base_ref != development_branch && !release_refs
+  errors << "ordinary pull requests must target dev"
+end
 exempt_labels = Array(config["lightweight_pull_request_labels"])
 exempt_labels = %w[verdify:policy-exempt type:docs type:chore] if exempt_labels.empty?
 lightweight = !release_pr && labels.any? { |label| exempt_labels.include?(label) }
@@ -123,6 +138,10 @@ if release_pr
   package_name = package["name"].to_s
   errors << "release package.json must define name and version" if package_name.empty? || package_version.empty?
   errors << "release PR package line must be #{package_name}@#{version}" unless package_line == "#{package_name}@#{version}"
+  expected_marker = "<!-- verdify-release-candidate:#{package_name}@#{version} -->"
+  release_markers = body.scan(/<!--[ \t]*verdify-release-candidate:[^\n]*?-->/)
+  errors << "release PR must contain exactly the durable marker #{expected_marker}" unless release_markers == [expected_marker]
+  errors << "release marker must be the first non-whitespace content" unless body.lstrip.start_with?(expected_marker)
 elsif lightweight
   # Reduced contract for docs/chore/exempt PRs: outcome + evidence only.
   %w[Outcome Evidence].each do |section|
@@ -224,7 +243,9 @@ if !release_pr && !lightweight && options[:repo] && implementation_head && evide
   end
 end
 
-if body.include?("<!--")
+allowed_html_comments = release_pr && defined?(expected_marker) ? [expected_marker] : []
+unresolved_html_comments = body.scan(/<!--.*?-->/m) - allowed_html_comments
+if unresolved_html_comments.any?
   errors << "pull request template still contains unresolved HTML placeholders"
 end
 

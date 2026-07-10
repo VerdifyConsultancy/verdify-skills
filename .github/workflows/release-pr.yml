@@ -147,6 +147,8 @@ jobs:
           - \`validate\`
           - \`pull-request-policy\`
           - \`compliance / compliance\`
+          - \`delivery-policy\`
+          - \`critic-gate\`
 
           Current head SHA: \`${HEAD_SHA}\`
 

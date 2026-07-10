@@ -45,6 +45,10 @@ lightweight_pull_request_labels:
 release_branch_flow:
   development_branch: dev
   release_branch: main
+  repository: VerdifyConsultancy/verdify-skills
+  release_marker: "<!-- verdify-release-candidate:%{package}@%{version} -->"
+  allowed_release_approvers: [jvallery, jrvallery]
+  dev_critic_outcomes: [approve, approve_with_risks]
   release_trigger: merge_release_pr_to_main
   release_pr_source: ".github/workflows/release-pr.yml"
   publish_workflow: ".github/workflows/publish-npm.yml"
@@ -59,6 +63,8 @@ recommended_default_branch_rules:
     - "validate"
     - "pull-request-policy"
     - "compliance / compliance"
+    - "delivery-policy"
+    - "critic-gate"
   approving_reviews: 1
   dismiss_stale_reviews: true
   require_code_owner_review: true
@@ -66,3 +72,4 @@ recommended_default_branch_rules:
   block_force_pushes: true
   block_deletions: true
   merge_queue_for_busy_repositories: true
+  declarative_source: config/github-delivery-controls.yaml

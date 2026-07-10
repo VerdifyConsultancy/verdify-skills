@@ -1737,7 +1737,7 @@ module Verdify
       packet_scope_errors << "scope.lane_ids do not match validated lanes" unless Array(review.dig("scope", "lane_ids")).sort == expected_lane_ids
       packet_scope_errors << "scope.issue_ids do not match validated lane issues" unless Array(review.dig("scope", "issue_ids")).sort == expected_issue_ids
       submission_pull_requests = Array(review.dig("traceability", "review_submissions")).map { |item| item["pull_request"] }.sort
-      packet_scope_errors << "review submissions do not match validated lane pull requests" unless submission_pull_requests == expected_pull_requests
+      packet_scope_errors << "review/status bindings do not match validated lane pull requests" unless submission_pull_requests == expected_pull_requests
       packet_pull_requests = Array(review["pull_requests"]).filter_map do |item|
         item["identifier"].to_s[/([0-9]+)\z/, 1]&.to_i
       end.sort
@@ -1766,17 +1766,20 @@ module Verdify
       post_integration = delivery_phase(release) == "post_integration"
 
       review_submissions = Array(review.dig("traceability", "review_submissions"))
+      transport_neutral_integration = true
       lane_review_results.each_value do |lane_result|
         pull_request = lane_result.critic["pull_request"]
         recorded_submission = review_submissions.find { |item| item["pull_request"] == pull_request }
         unless recorded_submission
-          evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => "missing review submission for PR ##{pull_request}" }
-          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Every lane requires its own commit-bound review submission.", evidence, missing, open_gates)
+          evidence << { "source" => review_path.relative_path_from(repo.root).to_s, "finding" => "missing review/status binding for PR ##{pull_request}" }
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Every lane requires its own commit-bound critic status or human review record.", evidence, missing, open_gates)
         end
         begin
           pull_evidence = repo.github_pull_request_evidence(pull_request)
           github_policy = lane_github_policy(repo, lane_result)
           expected_base = github_policy.fetch("base_ref")
+          dev_integration = expected_base == "dev"
+          transport_neutral_integration &&= dev_integration
           unless review.dig("traceability", "base_ref") == expected_base
             raise CommandError, "review packet base_ref does not match the lane implementation's committed repository policy"
           end
@@ -1810,41 +1813,57 @@ module Verdify
           unless checks_ok && merge_state_ok
             raise CommandError, "live pull request checks or phase-appropriate merge state are not valid at the current head"
           end
-          reviewer_permission = repo.github_collaborator_permission(recorded_submission["reviewer_login"])
-          unless reviewer_permission["login"].to_s.casecmp?(recorded_submission["reviewer_login"].to_s) &&
-                 reviewer_permission["id"] == recorded_submission["reviewer_id"]
-            raise CommandError, "recorded reviewer identity does not match GitHub collaborator identity"
-          end
           contract_path = contracts.find { |path| Verdify.safe_load_yaml(path)["lane_id"] == lane_result.contract["lane_id"] }
-          submission_validation = LaneReviewValidator.new(
+          lane_validator = LaneReviewValidator.new(
             repo: repo,
             contract_path: contract_path,
             closeout_path: plan_path.dirname.join("lanes/closeout/#{lane_result.contract['lane_id']}.closeout.yaml"),
             critic_path: plan_path.dirname.join("critic/#{lane_result.contract['lane_id']}.critic.yaml")
-          ).validate_submission(
-            result: lane_result,
-            review_submission_head_sha: recorded_submission["review_submission_head_sha"],
-            expected_reviewer_login: recorded_submission["reviewer_login"],
-            expected_reviewer_id: recorded_submission["reviewer_id"],
-            reviewer_permission: reviewer_permission["permission"],
-            pull_request_head_sha: pull_evidence["head_sha"],
-            pull_request_author: pull_evidence["author"],
-            pull_request_author_id: pull_evidence["author_id"],
-            submitted_reviews: pull_evidence["reviews"]
           )
+          if dev_integration
+            submission_validation = lane_validator.validate_critic_status(
+              result: lane_result,
+              pull_request_head_sha: pull_evidence["head_sha"]
+            )
+            unless recorded_submission["review_submission_head_sha"] == lane_result.critic_report_head_sha
+              raise CommandError, "recorded critic status head does not match the critic report head"
+            end
+          else
+            reviewer_permission = repo.github_collaborator_permission(recorded_submission["reviewer_login"])
+            unless reviewer_permission["login"].to_s.casecmp?(recorded_submission["reviewer_login"].to_s) &&
+                   reviewer_permission["id"] == recorded_submission["reviewer_id"]
+              raise CommandError, "recorded reviewer identity does not match GitHub collaborator identity"
+            end
+            submission_validation = lane_validator.validate_submission(
+              result: lane_result,
+              review_submission_head_sha: recorded_submission["review_submission_head_sha"],
+              expected_reviewer_login: recorded_submission["reviewer_login"],
+              expected_reviewer_id: recorded_submission["reviewer_id"],
+              reviewer_permission: reviewer_permission["permission"],
+              pull_request_head_sha: pull_evidence["head_sha"],
+              pull_request_author: pull_evidence["author"],
+              pull_request_author_id: pull_evidence["author_id"],
+              submitted_reviews: pull_evidence["reviews"]
+            )
+          end
         rescue CommandError => e
           evidence << { "source" => "GitHub PR ##{pull_request}", "finding" => e.message }
-          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Live commit-bound GitHub review evidence could not be verified.", evidence, missing, open_gates)
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "Live current-head critic or GitHub review evidence could not be verified.", evidence, missing, open_gates)
         end
         unless submission_validation.valid?
           evidence << { "source" => "GitHub PR ##{pull_request}", "finding" => submission_validation.errors.join("; ") }
-          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "The review submission, independent reviewer, live pull-request head, and critic-report head do not agree.", evidence, missing, open_gates)
+          return route_hash(repo, "LANE_REVIEW_SUBMISSION_UNVERIFIED", "release-verification", "review-inbox", "The phase-appropriate critic or human review evidence does not agree with the live pull-request head.", evidence, missing, open_gates)
         end
       end
 
       if release.nil? || release["status"] == "pending"
         missing << plan_path.dirname.join("release/release-verification.yaml").relative_path_from(repo.root).to_s
-        return route_hash(repo, "READY_FOR_INTEGRATION", "release-verification", "integration", "All required critic-report heads have current external admin or maintainer approval; integration evidence is missing.", evidence, missing, open_gates)
+        reason = if transport_neutral_integration
+                   "All required critic-report heads have current transport-neutral critic status; integration evidence is missing."
+                 else
+                   "All required critic-report heads have current external admin or maintainer approval; integration evidence is missing."
+                 end
+        return route_hash(repo, "READY_FOR_INTEGRATION", "release-verification", "integration", reason, evidence, missing, open_gates)
       end
       if release["status"] == "integration_failed"
         return route_hash(repo, "INTEGRATION_FAILED", "release-verification", "integration", "The recorded integration attempt failed and requires fix-forward before deployment.", evidence, missing, open_gates)
@@ -1928,6 +1947,8 @@ module Verdify
       validation_errors << "controller wave release plan must match the approved lane-contract snapshot" unless working_path.file? && working_path.binread == content
       base_ref = policy.dig("branch_model", "base_ref").to_s
       required_checks = Array(policy.dig("github", "required_checks")).map(&:to_s).reject(&:empty?)
+      required_checks << "critic-gate" if base_ref == "dev"
+      required_checks.uniq!
       validation_errors << "wave release plan must define a base_ref and required checks" if base_ref.empty? || required_checks.empty?
       raise CommandError, validation_errors.join("; ") unless validation_errors.empty?
 

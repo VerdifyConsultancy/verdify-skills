@@ -1,0 +1,107 @@
+name: delivery-gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  delivery-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out candidate delivery policy
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          fetch-depth: 0
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+      - name: Check candidate-side delivery route
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" == pull_request* ]]; then
+            ruby candidate/scripts/pr-policy.rb \
+              --event "${GITHUB_EVENT_PATH}" \
+              --repo "${GITHUB_WORKSPACE}/candidate"
+          else
+            ruby candidate/scripts/delivery-gate.rb \
+              --bootstrap \
+              --repo "${GITHUB_WORKSPACE}/candidate"
+          fi
+
+  critic-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out protected-base gate
+        if: github.event.pull_request != null
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-policy
+          fetch-depth: 1
+      - name: Check out candidate evidence history
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate
+          fetch-depth: 0
+      # ruby/setup-ruby reviewed v1 head on 2026-07-10
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9
+        with:
+          ruby-version: "3.3"
+      - name: Read review history without review mutation permission
+        if: github.event.pull_request.base.ref == 'main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api --paginate --slurp \
+            "repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100" \
+            | ruby -rjson -e 'puts JSON.generate(JSON.parse(STDIN.read).flatten)' \
+            > "${RUNNER_TEMP}/reviews.json"
+      - name: Validate current-head critic or release approval
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" != pull_request* ]]; then
+            ruby candidate/scripts/delivery-gate.rb \
+              --bootstrap \
+              --repo "${GITHUB_WORKSPACE}/candidate"
+            exit 0
+          fi
+
+          ENGINE="${GITHUB_WORKSPACE}/candidate/scripts/delivery-gate.rb"
+          if [[ -f "${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb" ]]; then
+            ENGINE="${GITHUB_WORKSPACE}/trusted-policy/scripts/delivery-gate.rb"
+          fi
+          REVIEWS=()
+          if [[ "${BASE_REF}" == "main" ]]; then
+            REVIEWS=(--reviews "${RUNNER_TEMP}/reviews.json")
+          fi
+          ruby "${ENGINE}" \
+            --event "${GITHUB_EVENT_PATH}" \
+            --repo "${GITHUB_WORKSPACE}/candidate" \
+            "${REVIEWS[@]}"

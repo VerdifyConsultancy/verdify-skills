@@ -37,8 +37,9 @@ Pushing to `dev` runs validation and `.github/workflows/release-pr.yml`. That
 workflow opens or updates one release PR from `dev` to `main`, creates or reuses
 a GitHub Issue for the package version, and writes a release-specific PR body.
 The PR policy treats this as a release gate rather than a worker lane, but still
-requires a closing GitHub Issue, exact package version evidence, current head
-SHA, and rollback notes.
+requires a closing GitHub Issue, the exact durable release marker and package
+version evidence, current head SHA, and rollback notes. Every other PR targets
+`dev`; forks and ordinary branches cannot use the privileged `main` route.
 
 Automatic release PR creation requires a `VERDIFY_RELEASE_PR_TOKEN` repository
 secret with issue and pull-request write access. The VerdifyConsultancy
@@ -51,17 +52,43 @@ blocked by branch protection or a repository ruleset.
 
 ## Required controls
 
-Configure a repository ruleset or protected branch for `main` to require:
+`config/github-delivery-controls.yaml` is the declarative authority for the two
+phases. `scripts/github-delivery-controls.rb` supports dry-run, apply, exact GET
+verification, idempotent reapply, snapshot rollback, and a mock API for tests.
+Only an authorized controller applies live state, always with an explicit
+repository confirmation and snapshot.
 
-- validation, policy, and compliance self-test checks;
+Protected `dev` requires PRs, strict `validate`, `pull-request-policy`,
+`compliance / compliance`, and `critic-gate` checks, resolved conversations,
+admin enforcement, and no force push or deletion. Its approving review count is
+zero and code-owner review is false because independent criticism is represented
+by the exact-head status rather than an impossible author self-review.
+
+Protected `main` requires:
+
+- validation, compliance, candidate-side `delivery-policy`, and `critic-gate`;
+- one stale-dismissing code-owner approval from `jvallery` or `jrvallery`, who
+  must not be the author;
 - strict up-to-date checks;
 - resolved conversations;
 - no direct pushes;
 - no force pushes or branch deletion;
 
-The current release flow does not require approving reviews. Add review gates,
-code-owner gates after CODEOWNERS is configured, or a merge queue only through
-an explicit governance decision.
+Pre-release intentionally omits trusted-base `pull-request-policy` from main
+protection because current main has the incompatible 1.2.1 validator. Current
+main also has placeholder CODEOWNERS, so pre-release identity is independently
+enforced by `critic-gate` plus one required approval; candidate CODEOWNERS cannot
+govern the base branch. After 1.3.0 reaches main, steady-state adds
+`pull-request-policy` and the effective CODEOWNERS makes the code-owner setting
+independently enforceable. Workflow tokens retain read/check permissions only
+and cannot approve pull-request reviews.
+
+During the one-time pre-release bootstrap, the candidate workflow is first
+created by the `dev` synchronization of the open release PR. If GitHub does not
+discover `pull_request_review` from a workflow absent on current `main`, rerun
+that existing failed PR-head `delivery-gate` run after the genuine approval; it
+reads the live review history and remains bound to the same head. Do not add a
+commit after approval or substitute a workflow-generated review.
 
 ## Deployments
 

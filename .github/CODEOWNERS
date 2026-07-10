@@ -1,6 +1,3 @@
-# Configure real owners before requiring CODEOWNERS approval.
-# Examples:
-# *                         @your-org/maintainers
-# /schemas/                 @your-org/architecture
-# /skills/                  @your-org/agent-platform
-# /.github/workflows/       @your-org/security
+# Repository-wide release ownership. Main promotion accepts either owner only
+# when the reviewer is not the pull request author.
+* @jvallery @jrvallery
