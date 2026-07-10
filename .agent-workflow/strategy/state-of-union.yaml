@@ -4,8 +4,8 @@ schema_version: "1.0"
 strategy_id: iteration-25-recovery-and-trusted-release
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: "933150a4bf2c15e9a57f89409dd8caa51b491a29"
-assessed_at: "2026-07-10T02:58:30Z"
+baseline_sha: "af44997ea79ae4f919fa29cf951334c4f291d5ff"
+assessed_at: "2026-07-10T03:02:57Z"
 inputs:
   - id: IN-001
     type: north-star
@@ -34,8 +34,8 @@ inputs:
     evidence_status: verified
   - id: IN-006
     type: git
-    location: "dev@933150a4bf2c15e9a57f89409dd8caa51b491a29"
-    summary: Clean integration head containing approved foundations, terminal sprint recovery, committed-strategy routing, Wave 0 hygiene, and controller scope.
+    location: "dev@af44997ea79ae4f919fa29cf951334c4f291d5ff"
+    summary: Clean integration head containing approved foundations, terminal sprint recovery, committed-strategy routing, Wave 0 hygiene, controller scope, and lossless issue references.
     evidence_status: verified
   - id: IN-007
     type: git

@@ -1,7 +1,7 @@
 # State of union
 
 Iteration 25 product, project, architecture, strategy, and Wave 0 hygiene are
-approved on `dev@933150a4bf2c15e9a57f89409dd8caa51b491a29`. All historical
+approved on `dev@af44997ea79ae4f919fa29cf951334c4f291d5ff`. All historical
 sprint transactions are terminal, the repo-controller scope is active, and
 global routing no longer needs a sprint selector.
 
