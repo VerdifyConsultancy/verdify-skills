@@ -1,0 +1,23 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: plan-approval-2026-07-10-issue-71-route-authority
+sprint_id: 2026-07-10-issue-71-route-authority
+lane_id: null
+type: plan_approval
+status: approved
+question: Approve the one-issue route-authority validation and derived-cache repair at the current protected-dev baseline?
+owner: Jason Vallery
+evidence_required:
+- Verdify Skills issue 71 and its post-135 narrowed-scope comment
+- reproduced malformed project-definition route bypass
+- reproduced protected-head live versus committed route disagreement
+- approved post-215 state of union on protected dev
+- single-lane sprint plan, contract, and wave release plan
+allowed_decisions: [approve, revise, reject]
+decision: approve
+rationale: Jason explicitly delegated autonomous execution of issue 71 in this sequence. The plan fixes only reproduced authority gaps, retains one fresh implementation critic and exact-head CI, removes a competing cache authority, and excludes later evaluation, policy, and cross-project work.
+opened_at: '2026-07-10T23:22:14Z'
+resolved_at: '2026-07-10T23:22:14Z'
+resume_state: READY
