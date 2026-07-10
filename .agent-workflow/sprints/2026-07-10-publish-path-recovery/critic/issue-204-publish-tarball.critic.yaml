@@ -1,0 +1,109 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-publish-path-recovery
+lane_id: issue-204-publish-tarball
+pull_request: 205
+worker_agent: codex-publish-path-recovery
+worker_session_id: worker-204-publish-tarball-20260710t1201z
+critic_agent: codex-publish-path-critic
+implementation_head_sha: "311c04813a79104aabbe047fd770ef2e92f75164"
+evidence_head_sha: "ef0bd37be299bc6ed35445a34d510928d69e36b2"
+reviewed_head_sha: "ef0bd37be299bc6ed35445a34d510928d69e36b2"
+closeout_path: .agent-workflow/sprints/2026-07-10-publish-path-recovery/lanes/closeout/issue-204-publish-tarball.closeout.yaml
+closeout_sha256: "731798b86f197541bed15be33d8165b6fbaa218e1e24ac147d21dc4bd00681ed"
+critic_session_id: critic-204-publish-tarball-20260710t1212z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-publish-path-recovery/critic-issue-204-publish-tarball
+outcome: approve
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        Live run 29091087534 job 86356458657 failed with exit 128 because
+        npm invoked git ls-remote for
+        ssh://git@github.com/dist/verdify-cli-cli-1.3.0.tgz.git.
+      - >-
+        An independent npm publish dry-run against the same raw
+        repository-relative candidate path reproduced exit 128 and the exact
+        GitHub SSH shorthand without publishing.
+      - >-
+        Static review and the independently executed packed-artifact regression
+        prove the unique File.realpath assignment occurs after the verified
+        candidate is selected and before release reconciliation or npm publish.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        The workflow still invokes npm publish with the exact canonical TARBALL
+        variable and unchanged --access public --provenance flags.
+      - >-
+        Release reconciliation continues to reconstruct and verify the exact
+        tarball, archive, checksum, provenance, and external artifact binding
+        from the sealed sidecar; canonicalizing only the later publish variable
+        does not bypass or weaken these checks.
+      - >-
+        actionlint and the independently executed packed-artifact suite passed;
+        the latter built, verified, and installed exact version 1.3.0 with
+        candidate digest
+        0167c4ca7e92b1ceede11f9951db41d7d7f32f92b4e6fbb4610cb064e465ec1e.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        ruby scripts/validate-repo.rb, actionlint
+        .github/workflows/publish-npm.yml, bash tests/test_packed_artifact.sh,
+        and the complete make test suite independently passed at E.
+      - >-
+        gitleaks independently scanned all three post-baseline lane commits with
+        redaction and found no leaks.
+      - >-
+        Live authority queries returned npm E404 for @verdify-cli/cli@1.3.0,
+        no remote v1.3.0 tag, and GitHub release HTTP 404 immediately before
+        report creation.
+evidence_assessment:
+  - >-
+    The detached review worktree and live PR head matched E
+    ef0bd37be299bc6ed35445a34d510928d69e36b2 before report creation; critic
+    agent codex-publish-path-critic and session
+    critic-204-publish-tarball-20260710t1212z differ from the committed worker
+    identity and session.
+  - >-
+    D 070ee848fdf086f66b7797a14f57be422f38056e is the first post-baseline
+    commit and adds only the approved sprint plan, wave release plan, and lane
+    contract; all three remain byte-identical through E.
+  - >-
+    I 311c04813a79104aabbe047fd770ef2e92f75164 changes only the contract-owned
+    publish workflow, packed-artifact regression, and manifest, while E
+    ef0bd37be299bc6ed35445a34d510928d69e36b2 adds only the canonical closeout
+    in a linear D-I-E history.
+  - >-
+    The independently computed contract SHA-256 is
+    a0226b05d6dbd8e77f20d70cf22860bc2bdb26761b90119b0442f78073a36b99 and
+    closeout SHA-256 is
+    731798b86f197541bed15be33d8165b6fbaa218e1e24ac147d21dc4bd00681ed,
+    matching the closeout backlink and sealed review inputs.
+  - >-
+    Static review confirms File.realpath occurs exactly once, follows candidate
+    extraction, precedes reconcile() and npm publish, and leaves exact candidate
+    identity, provenance flags, release transaction gates, and artifact
+    verification unchanged.
+integration_risks:
+  - >-
+    This report-only S commit must become the exact live PR head and pass the
+    critic gate plus protected dev checks before integration; no post-S GitHub
+    validation result is claimed in this report.
+  - >-
+    PR 205 is a dev-targeted recovery lane. Integration does not authorize npm
+    publication, a tag, a GitHub release, main promotion, branch-protection
+    mutation, or release-ledger mutation; ROOT retains those authorities.
+residual_risks:
+  - >-
+    A protected dev-to-main promotion still requires a current commit-bound
+    APPROVED review from an allowed maintainer other than the PR author before
+    the separately authorized release transaction.
+  - >-
+    Any commit after the report-only S head invalidates exact-head critic status
+    and requires a fresh review chain.
+reviewed_at: "2026-07-10T12:16:47Z"
