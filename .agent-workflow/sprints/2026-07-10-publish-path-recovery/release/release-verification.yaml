@@ -6,8 +6,8 @@ sprint_id: 2026-07-10-publish-path-recovery
 status: verified
 integrated_sha: b5c106c3ee62f8530f85a00b4576c8e28cbfb92c
 release:
-  tag: 
-  url: 
+  tag:
+  url:
 artifact_identity:
 - type: git-commit
   identifier: b5c106c3ee62f8530f85a00b4576c8e28cbfb92c
