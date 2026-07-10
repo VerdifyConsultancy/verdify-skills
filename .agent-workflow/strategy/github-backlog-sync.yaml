@@ -4,7 +4,7 @@ schema_version: "1.0"
 sync_id: gbs-verdify-skills-20260710-recovery
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: "2026-07-10T02:47:25Z"
+captured_at: "2026-07-10T02:58:30Z"
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -16,7 +16,7 @@ source_authority:
     - Deployment records cover npm publication only; this repository has no long-running application runtime.
 snapshot:
   snapshot_ref: null
-  captured_at: "2026-07-10T02:47:25Z"
+  captured_at: "2026-07-10T02:58:30Z"
   freshness: live_only
   api_sources:
     - surface: issues
@@ -76,6 +76,20 @@ snapshot:
       captured: true
       limitation: Ref deletion remains gated on the final checked-in recovery ledger and main verification.
 issue_findings:
+  - issue: 153
+    title: Record Wave 0 assessment and controller scope
+    state: CLOSED
+    classification: done
+    labels: [documentation]
+    assignees: []
+    milestone: null
+    dependencies: []
+    sub_issues: []
+    linked_prs: ["#154"]
+    project_refs: []
+    evidence_refs: [".agent-workflow/hygiene/repo-hygiene.yaml", ".agent-workflow/hygiene/repo-agent-scope.yaml"]
+    github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/153"]
+    required_action: No action.
   - issue: 143
     title: Accept an artifact-only state-of-union commit over its assessed baseline
     state: CLOSED
@@ -245,6 +259,17 @@ issue_findings:
     github_refs: ["https://github.com/VerdifyConsultancy/verdify-skills/issues/142"]
     required_action: Merge and close the strategy transaction.
 pr_findings:
+  - pr: 154
+    branch: hygiene/153-wave0-controller-scope
+    base_branch: dev
+    state: MERGED
+    draft: false
+    linked_issues: [153]
+    head_sha: "9985d503bd9835cff25c3b0dd90002d7b1fc413b"
+    checks_status: pass
+    deployment_status: not_applicable
+    finding: Integrated the approved Wave 0 report and bounded repo-controller scope.
+    evidence_refs: ["dev@933150a4bf2c15e9a57f89409dd8caa51b491a29", "issue #153"]
   - pr: 147
     branch: fix/143-strategy-baseline-routing
     base_branch: dev

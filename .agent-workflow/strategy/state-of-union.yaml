@@ -4,8 +4,8 @@ schema_version: "1.0"
 strategy_id: iteration-25-recovery-and-trusted-release
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: "ce912de11605879188d32675293fb1a49a25a56d"
-assessed_at: "2026-07-10T02:47:25Z"
+baseline_sha: "933150a4bf2c15e9a57f89409dd8caa51b491a29"
+assessed_at: "2026-07-10T02:58:30Z"
 inputs:
   - id: IN-001
     type: north-star
@@ -34,8 +34,8 @@ inputs:
     evidence_status: verified
   - id: IN-006
     type: git
-    location: "dev@ce912de11605879188d32675293fb1a49a25a56d"
-    summary: Clean integration head containing approved foundations, terminal sprint recovery, and committed-strategy baseline routing.
+    location: "dev@933150a4bf2c15e9a57f89409dd8caa51b491a29"
+    summary: Clean integration head containing approved foundations, terminal sprint recovery, committed-strategy routing, Wave 0 hygiene, and controller scope.
     evidence_status: verified
   - id: IN-007
     type: git
@@ -154,6 +154,11 @@ source_freshness:
     captured_at: "2026-07-10T02:32:25Z"
     limitation: GitHub Support cleanup from the private advisory remains external and issue #120-owned.
 planning_inventory:
+  - artifact_type: other
+    location: .agent-workflow/hygiene/repo-hygiene.yaml
+    status: current
+    finding: Wave 0 is complete with approved issue-backed exceptions and an active repo-agent scope.
+    action: Proceed to sprint planning without treating hygiene completion as release approval.
   - artifact_type: north_star
     location: .agent-workflow/northstar
     status: current
@@ -209,9 +214,10 @@ north_star:
   source_refs: [IN-001, IN-002, IN-003, IN-004]
 current_state:
   summary: >-
-    Approved foundations and terminal historical sprints are on dev; main and
-    npm remain at 1.2.1 while selective unpublished work, host-dependent package
-    selection, release transaction safety, and live branch controls remain open.
+    Approved foundations, terminal historical sprints, committed-strategy
+    routing, and Wave 0 hygiene are on dev; main and npm remain at 1.2.1 while
+    selective unpublished work, host-dependent package selection, release
+    transaction safety, and live branch controls remain open.
   lifecycle_state: READY
   active_sprint: null
   open_gates: []
@@ -243,6 +249,13 @@ delivery_health:
       evidence_refs: ["issue #130", ".claude/scheduled_tasks.lock reproduction"]
       action: Make #130 the first implementation dependency in the next sprint.
 issue_inventory:
+  - issue: 153
+    title: Record Wave 0 assessment and controller scope
+    state: CLOSED
+    classification: done
+    rationale: PR #154 integrated the approved hygiene report and active repo-controller scope.
+    dependencies: []
+    action: No action.
   - issue: 143
     title: Accept an artifact-only state-of-union commit over its assessed baseline
     state: CLOSED
