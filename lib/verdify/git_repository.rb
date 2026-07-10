@@ -150,7 +150,7 @@ module Verdify
         "head_sha" => final.dig("head", "sha"),
         "head_ref" => final.dig("head", "ref"),
         "base_ref" => final.dig("base", "ref"),
-        "state" => final["state"],
+        "state" => final["merged"] == true ? "merged" : final["state"],
         "draft" => final["draft"],
         "merged" => final["merged"] == true,
         "merge_commit_sha" => final["merge_commit_sha"],

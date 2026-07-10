@@ -170,6 +170,7 @@ module Verdify
       errors << "receipt mode must be #{expected_mode}" if expected_mode && receipt["mode"] != expected_mode
       receipt_commit = @repo.last_change_sha(self.class.paths(receipt["sprint_id"]).fetch(:receipt), ref: @repo.head_sha)
       errors << "receipt pull request head must equal the one direct-parent receipt commit" unless receipt_commit == @repo.head_sha
+      validate_protected_base_snapshot(receipt, errors, ref: @repo.head_sha)
       validate_controller(receipt, errors)
       validate_live_lanes(receipt, errors)
       if receipt["mode"] == "recovery"
@@ -194,6 +195,7 @@ module Verdify
       receipt_paths = self.class.paths(sprint_id)
       validate_ref_snapshot(receipt, receipt_paths, errors, ref: ref)
       validate_committed_shape(receipt, receipt_paths, errors, ref: ref)
+      validate_protected_base_snapshot(receipt, errors, ref: ref)
       errors.empty?
     rescue Error, CommandError
       false
@@ -255,6 +257,10 @@ module Verdify
       sprint_ids.flat_map { |sprint_id| paths(sprint_id).values }.uniq.sort
     end
 
+    def self.sprint_id_from_receipt_path(path)
+      path.to_s[%r{\A\.agent-workflow/sprints/([^/]+)/terminal/terminal-receipt\.yaml\z}, 1]
+    end
+
     private
 
     def validate_mode!(sprint_id, mode)
@@ -310,7 +316,7 @@ module Verdify
         end
 
         pull = pull_request_evidence(critic.fetch("pull_request"))
-        unless pull["merged"] == true && pull["state"].to_s.downcase == "merged"
+        unless pull["merged"] == true
           raise CommandError, "PR ##{critic['pull_request']} is not merged"
         end
         merge_sha = pull["merge_commit_sha"].to_s
@@ -353,6 +359,14 @@ module Verdify
       raise CommandError, "review packet scope does not match #{sprint_id}" unless packet.dig("scope", "sprint_id") == sprint_id
       unless %w[ready approved].include?(packet["status"]) && packet.dig("evidence_completeness", "verdict") == "complete" && packet.dig("recommendation", "outcome") == "approve"
         raise CommandError, "review packet is not approved and complete"
+      end
+      completeness = packet["evidence_completeness"] || {}
+      blocking_questions = Array(packet["questions"]).select { |question| question["blocking"] == true && question["status"] == "open" }
+      unless Array(completeness["missing_required"]).empty? &&
+             Array(completeness["blockers"]).empty? &&
+             Array(packet.dig("security", "unresolved_findings")).empty? &&
+             blocking_questions.empty?
+        raise CommandError, "review packet is complete/approve but retains missing evidence, blockers, unresolved security findings, or open blocking questions"
       end
       raise CommandError, "release verification is not verified for #{sprint_id}" unless release["sprint_id"] == sprint_id && release["status"] == "verified"
       unless outcome["sprint_id"] == sprint_id && %w[accepted accepted_with_risks].include?(outcome["decision"])
@@ -473,8 +487,58 @@ module Verdify
       outcome = documents[:outcome]
       errors << "terminal plan must match the receipt sprint and be complete" unless plan && plan["sprint_id"] == sprint_id && plan["status"] == receipt.dig("terminal", "plan_status")
       errors << "terminal status must match the receipt sprint and be COMPLETE" unless status && status["sprint_id"] == sprint_id && status["state"] == receipt.dig("terminal", "status_state")
+      if status
+        errors << "terminal status active_lanes must be empty" unless status["active_lanes"] == []
+        errors << "terminal status blockers must be empty" unless status["blockers"] == []
+        errors << "terminal status next_action is not canonical" unless status["next_action"] == "Terminal receipt accepted on protected dev; rerun project-router."
+      end
       errors << "release verification must match the receipt" unless release && release["sprint_id"] == sprint_id && release["status"] == receipt.dig("terminal", "release_status") && release["integrated_sha"] == receipt.dig("terminal", "integrated_sha")
       errors << "outcome review must match the receipt" unless outcome && outcome["sprint_id"] == sprint_id && outcome["decision"] == receipt.dig("terminal", "outcome_decision")
+    end
+
+    def validate_protected_base_snapshot(receipt, errors, ref:)
+      sprint_id = receipt["sprint_id"]
+      paths = self.class.paths(sprint_id)
+      base = receipt["receipt_base_sha"].to_s
+      return unless full_sha?(base) && @repo.commit_exists?(base) && @repo.commit_exists?(ref)
+
+      base_plan = load_yaml_at(base, paths.fetch(:plan), "protected-base sprint plan")
+      terminal_plan = load_yaml_at(ref, paths.fetch(:plan), "terminal sprint plan")
+      expected_plan = base_plan.merge("status" => "complete")
+      errors << "terminal plan must equal the protected-base plan with only status changed to complete" unless terminal_plan == expected_plan
+
+      sprint_root = ".agent-workflow/sprints/#{sprint_id}"
+      contract_paths = @repo.tracked_paths(ref: base, pathspec: "#{sprint_root}/lanes/contracts").grep(/\.ya?ml\z/).sort
+      contracts = contract_paths.map { |path| [path, load_yaml_at(base, path, "protected-base lane contract")] }
+      contract_lane_ids = contracts.map { |_path, contract| contract["lane_id"].to_s }
+      plan_lanes = Array(base_plan["lanes"])
+      plan_lane_ids = plan_lanes.map { |lane| lane["lane_id"].to_s }
+      receipt_lane_ids = Array(receipt["lanes"]).map { |lane| lane["lane_id"].to_s }
+
+      errors << "protected-base lane contracts contain duplicate lane IDs" unless contract_lane_ids.uniq.length == contract_lane_ids.length
+      errors << "protected-base sprint plan contains duplicate lane IDs" unless plan_lane_ids.uniq.length == plan_lane_ids.length
+      errors << "terminal receipt contains duplicate lane IDs" unless receipt_lane_ids.uniq.length == receipt_lane_ids.length
+      canonical_lane_ids = contract_lane_ids.sort
+      errors << "protected-base sprint plan lane set does not match its contracts" unless plan_lane_ids.sort == canonical_lane_ids
+      errors << "terminal receipt lane set must equal every protected-base lane contract" unless receipt_lane_ids.sort == canonical_lane_ids
+
+      contracts.each do |contract_path, contract|
+        lane_id = contract["lane_id"].to_s
+        plan_lane = plan_lanes.find { |lane| lane["lane_id"].to_s == lane_id }
+        next unless plan_lane
+
+        errors << "protected-base plan contract_path does not match lane #{lane_id}" unless plan_lane["contract_path"] == contract_path
+        errors << "protected-base plan issue_ids do not match lane #{lane_id}" unless plan_lane["issue_ids"] == contract["issue_ids"]
+        errors << "protected-base plan branch does not match lane #{lane_id}" unless plan_lane["branch"] == contract["branch"]
+      end
+
+      controller = receipt["controller"] || {}
+      release_bytes = @repo.file_at(ref, paths.fetch(:release))
+      outcome_bytes = @repo.file_at(ref, paths.fetch(:outcome))
+      errors << "terminal release bytes do not match controller R" unless Digest::SHA256.hexdigest(release_bytes) == controller["release_sha256"]
+      errors << "terminal outcome bytes do not match controller O" unless Digest::SHA256.hexdigest(outcome_bytes) == controller["outcome_sha256"]
+    rescue Error, CommandError => e
+      errors << "protected-base terminal snapshot validation failed: #{e.message}"
     end
 
     def validate_lane_snapshots(receipt, errors, ref:)
@@ -536,6 +600,21 @@ module Verdify
       errors << "controller release last-change commit does not match R" unless @repo.last_change_sha(paths.fetch(:release), ref: head) == r_sha
       errors << "controller outcome last-change commit does not match O" unless @repo.last_change_sha(paths.fetch(:outcome), ref: head) == o_sha
 
+      base = receipt["receipt_base_sha"].to_s
+      controller_plan_bytes = @repo.file_at(head, paths.fetch(:plan))
+      protected_plan_bytes = @repo.file_at(base, paths.fetch(:plan))
+      errors << "controller sprint plan differs from the protected-base reviewed plan" unless controller_plan_bytes == protected_plan_bytes
+      Array(receipt["lanes"]).each do |lane|
+        lane_id = lane["lane_id"]
+        [
+          "#{File.dirname(paths.fetch(:plan))}/lanes/contracts/#{lane_id}.contract.yaml",
+          "#{File.dirname(paths.fetch(:plan))}/lanes/closeout/#{lane_id}.closeout.yaml",
+          "#{File.dirname(paths.fetch(:plan))}/critic/#{lane_id}.critic.yaml"
+        ].each do |path|
+          errors << "controller lane artifact differs from protected-base reviewed artifact: #{path}" unless @repo.file_at(head, path) == @repo.file_at(base, path)
+        end
+      end
+
       packet_bytes = @repo.file_at(p_sha, controller["packet_path"])
       release_bytes = @repo.file_at(r_sha, paths.fetch(:release))
       outcome_bytes = @repo.file_at(o_sha, paths.fetch(:outcome))
@@ -567,7 +646,7 @@ module Verdify
     def validate_live_lanes(receipt, errors)
       Array(receipt["lanes"]).each do |lane|
         pull = pull_request_evidence(lane["pull_request"])
-        unless pull["merged"] == true && pull["state"].to_s.downcase == "merged"
+        unless pull["merged"] == true
           errors << "PR ##{lane['pull_request']} is not merged"
           next
         end
@@ -584,13 +663,14 @@ module Verdify
     def validate_trusted_checks(checks, pull_request, expected_head, errors)
       REQUIRED_CHECKS.each do |name, workflow_path|
         matches = Array(checks).select { |check| check["name"] == name }
-        latest = matches.max_by do |check|
-          observed_at = %w[created_at started_at completed_at].filter_map do |field|
-            value = check[field].to_s
-            value unless value.empty?
-          end.max.to_s
-          [observed_at, check["id"].to_i]
+        ordered = matches.filter_map do |check|
+          check_id = Integer(check["id"], exception: false)
+          next unless check_id&.positive?
+
+          [check_id, check]
         end
+        ordering_complete = ordered.length == matches.length && ordered.map(&:first).uniq.length == ordered.length
+        latest = ordering_complete ? ordered.max_by(&:first)&.last : nil
         trusted = latest &&
                   latest["status"].to_s.downcase == "completed" &&
                   latest["conclusion"].to_s.downcase == "success" &&

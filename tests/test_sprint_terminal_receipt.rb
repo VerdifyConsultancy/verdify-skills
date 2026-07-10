@@ -65,14 +65,67 @@ class SprintTerminalReceiptTest < Minitest::Test
     assert result.errors.any? { |error| error.include?("share one receipt commit") }
   end
 
+  def test_full_validation_rejects_hand_authored_plan_that_is_not_the_base_status_transition
+    fixture = build_fixture
+    validator = receipt_validator(fixture)
+    generate_and_commit_receipt(fixture, validator)
+    rewrite_terminal_commit do |documents, _receipt|
+      documents.fetch(:plan)["goal"] = "forged terminal goal"
+    end
+
+    result = validator.validate_full(receipt_path: receipt_path, expected_base_sha: fixture[:base], expected_mode: "normal")
+    refute result.valid?
+    assert result.errors.any? { |error| error.include?("only status changed to complete") }
+  end
+
+  def test_full_validation_rejects_local_release_and_outcome_that_diverge_from_controller
+    fixture = build_fixture
+    validator = receipt_validator(fixture)
+    generate_and_commit_receipt(fixture, validator)
+    rewrite_terminal_commit do |documents, _receipt|
+      documents.fetch(:release).fetch("artifact_identity").first["identifier"] = "forged-artifact"
+      documents.fetch(:outcome).fetch("delivered_outcomes")[0] = "Forged delivered outcome."
+    end
+
+    result = validator.validate_full(receipt_path: receipt_path, expected_base_sha: fixture[:base], expected_mode: "normal")
+    refute result.valid?
+    assert result.errors.any? { |error| error.include?("release bytes do not match controller R") }
+    assert result.errors.any? { |error| error.include?("outcome bytes do not match controller O") }
+  end
+
+  def test_full_validation_requires_canonical_complete_status
+    fixture = build_fixture
+    validator = receipt_validator(fixture)
+    generate_and_commit_receipt(fixture, validator)
+    rewrite_terminal_commit do |documents, _receipt|
+      documents.fetch(:status)["next_action"] = "Continue without rerouting."
+    end
+
+    result = validator.validate_full(receipt_path: receipt_path, expected_base_sha: fixture[:base], expected_mode: "normal")
+    refute result.valid?
+    assert result.errors.any? { |error| error.include?("status next_action is not canonical") }
+  end
+
+  def test_full_validation_rejects_receipt_that_omits_a_protected_base_lane
+    fixture = build_fixture
+    validator = receipt_validator(fixture)
+    generate_and_commit_receipt(fixture, validator)
+    base_with_second_lane = add_second_lane_to_base_and_rebuild_receipt
+
+    result = validator.validate_full(receipt_path: receipt_path, expected_base_sha: base_with_second_lane, expected_mode: "normal")
+    refute result.valid?
+    assert result.errors.any? { |error| error.include?("lane set must equal every protected-base lane contract") }
+  end
+
   def test_full_validation_rejects_newer_in_progress_trusted_check
     fixture = build_fixture
     checks = trusted_checks(fixture[:report])
+    checks.find { |check| check["name"] == "validate" }["completed_at"] = "2026-07-10T02:00:00Z"
     checks << checks.find { |check| check["name"] == "validate" }.merge(
       "id" => 99,
       "status" => "in_progress",
       "conclusion" => nil,
-      "created_at" => "2026-07-10T01:00:00Z",
+      "created_at" => nil,
       "started_at" => "2026-07-10T01:00:01Z",
       "completed_at" => nil
     )
@@ -156,6 +209,25 @@ class SprintTerminalReceiptTest < Minitest::Test
     assert_includes error.message, "packet base_ref must be dev"
   end
 
+  def test_generator_rejects_complete_packet_with_explicit_blockers
+    fixture = build_fixture(packet_blocked: true)
+    validator = receipt_validator(fixture)
+    error = assert_raises(Verdify::CommandError) do
+      validator.write!(sprint_id: SPRINT, controller_ref: "controller/#{SPRINT}", receipt_base_sha: fixture[:base])
+    end
+    assert_includes error.message, "retains missing evidence, blockers"
+  end
+
+  def test_generator_rejects_failed_migration_and_unready_rollback
+    fixture = build_fixture(release_failed: true)
+    validator = receipt_validator(fixture)
+    error = assert_raises(Verdify::CommandError) do
+      validator.write!(sprint_id: SPRINT, controller_ref: "controller/#{SPRINT}", receipt_base_sha: fixture[:base])
+    end
+    assert_includes error.message, "failed migration"
+    assert_includes error.message, "requires a ready rollback"
+  end
+
   def test_generator_rejects_unmerged_lane_pr
     fixture = build_fixture
     pull = {
@@ -220,9 +292,31 @@ class SprintTerminalReceiptTest < Minitest::Test
     assert_equal 6, Verdify::SprintTerminalReceipt::RECOVERY_SPRINT_IDS.length
   end
 
+  def test_terminal_pull_request_loader_normalizes_rest_closed_merged_state
+    build_fixture
+    repo = Verdify::GitRepository.new(@root)
+    payload = {
+      "state" => "closed", "merged" => true, "merge_commit_sha" => "f" * 40, "draft" => false,
+      "head" => { "sha" => "e" * 40, "ref" => "lane/test" },
+      "base" => { "ref" => "dev" }, "user" => { "login" => "worker", "id" => 1 }
+    }
+    repo.define_singleton_method(:github_slug) { "example/test" }
+    repo.define_singleton_method(:github_api_json) { |_path| payload }
+
+    evidence = repo.github_terminal_pull_request_evidence(456)
+    assert evidence["merged"]
+    assert_equal "merged", evidence["state"]
+  end
+
+  def test_receipt_path_parser_returns_the_sprint_segment
+    path = ".agent-workflow/sprints/test-sprint/terminal/terminal-receipt.yaml"
+    assert_equal "test-sprint", Verdify::SprintTerminalReceipt.sprint_id_from_receipt_path(path)
+    assert_nil Verdify::SprintTerminalReceipt.sprint_id_from_receipt_path(".agent-workflow/sprints/test-sprint/terminal/other.yaml")
+  end
+
   private
 
-  def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil)
+  def build_fixture(release_integrated: nil, packet_base_ref: "dev", controller_issue_ids: nil, packet_blocked: false, release_failed: false)
     @root = Dir.mktmpdir("verdify-terminal-receipt-")
     git("init", "-q", "-b", "main")
     git("config", "user.name", "Verdify Test")
@@ -285,11 +379,11 @@ class SprintTerminalReceiptTest < Minitest::Test
     end
     git("add", ".agent-workflow")
     git("commit", "-qm", "assemble controller evidence")
-    write_packet(report, base_ref: packet_base_ref, issue_ids: controller_issue_ids || [123])
+    write_packet(report, base_ref: packet_base_ref, issue_ids: controller_issue_ids || [123], blocked: packet_blocked)
     git("add", relative_packet_path)
     git("commit", "-qm", "packet P")
     packet = sha
-    write_release(release_integrated == :baseline ? baseline : merge)
+    write_release(release_integrated == :baseline ? baseline : merge, failed: release_failed)
     git("add", relative_release_path)
     git("commit", "-qm", "release R")
     release = sha
@@ -362,7 +456,7 @@ class SprintTerminalReceiptTest < Minitest::Test
     write_relative(relative_critic_path, YAML.dump(critic))
   end
 
-  def write_packet(report, base_ref: "dev", issue_ids: [123])
+  def write_packet(report, base_ref: "dev", issue_ids: [123], blocked: false)
     packet = Verdify::SchemaValidator.load_document(
       Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/#{SPRINT}/review/review-inbox-packet.yaml")
     )
@@ -377,18 +471,23 @@ class SprintTerminalReceiptTest < Minitest::Test
     packet["pull_requests"].first["identifier"] = "##{PR}"
     packet["evidence_completeness"]["verdict"] = "complete"
     packet["evidence_completeness"]["missing_required"] = []
-    packet["evidence_completeness"]["blockers"] = []
+    packet["evidence_completeness"]["blockers"] = blocked ? ["critical blocker"] : []
+    packet["security"]["unresolved_findings"] = blocked ? ["critical authorization defect"] : []
     packet["recommendation"]["outcome"] = "approve"
     write_relative(relative_packet_path, YAML.dump(packet))
   end
 
-  def write_release(integrated_sha)
+  def write_release(integrated_sha, failed: false)
     release = Verdify::SchemaValidator.load_document(
       Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/#{SPRINT}/release/release-verification.yaml")
     )
     release["sprint_id"] = SPRINT
     release["integrated_sha"] = integrated_sha
     release["deployment"]["observed_revision"] = integrated_sha
+    if failed
+      release.fetch("migrations").first["result"] = "failed"
+      release.fetch("rollback")["ready"] = false
+    end
     write_relative(relative_release_path, YAML.dump(release))
   end
 
@@ -403,7 +502,7 @@ class SprintTerminalReceiptTest < Minitest::Test
   def receipt_validator(fixture, checks: trusted_checks(fixture[:report]))
     pull = {
       "number" => PR, "head_sha" => fixture[:report], "head_ref" => "lane/#{LANE}", "base_ref" => "dev",
-      "state" => "merged", "merged" => true, "merge_commit_sha" => fixture[:merge]
+      "state" => "closed", "merged" => true, "merge_commit_sha" => fixture[:merge]
     }
     Verdify::SprintTerminalReceipt.new(
       repo: @root,
@@ -425,12 +524,73 @@ class SprintTerminalReceiptTest < Minitest::Test
     receipt
   end
 
+  def rewrite_terminal_commit
+    paths = Verdify::SprintTerminalReceipt.paths(SPRINT)
+    documents = %i[plan status release outcome].to_h do |kind|
+      [kind, YAML.safe_load(File.read(File.join(@root, paths.fetch(kind))), permitted_classes: [], aliases: false)]
+    end
+    receipt = YAML.safe_load(File.read(receipt_path), permitted_classes: [], aliases: false)
+    yield documents, receipt
+    documents.each do |kind, document|
+      bytes = YAML.dump(document)
+      File.write(File.join(@root, paths.fetch(kind)), bytes)
+      receipt.fetch("artifacts")["#{kind}_sha256"] = Digest::SHA256.hexdigest(bytes)
+    end
+    File.write(receipt_path, YAML.dump(receipt))
+    git("add", *paths.values)
+    git("commit", "--amend", "-qm", "hand-authored terminal receipt")
+  end
+
+  def add_second_lane_to_base_and_rebuild_receipt
+    paths = Verdify::SprintTerminalReceipt.paths(SPRINT)
+    saved = %i[status release outcome receipt].to_h do |kind|
+      path = kind == :receipt ? receipt_path : File.join(@root, paths.fetch(kind))
+      [kind, YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)]
+    end
+
+    git("checkout", "-q", "dev")
+    plan = YAML.safe_load(File.read(plan_path), permitted_classes: [], aliases: false)
+    second_plan_lane = Marshal.load(Marshal.dump(plan.fetch("lanes").first))
+    second_plan_lane["lane_id"] = "issue-124-ui"
+    second_plan_lane["issue_ids"] = [124]
+    second_plan_lane["contract_path"] = ".agent-workflow/sprints/#{SPRINT}/lanes/contracts/issue-124-ui.contract.yaml"
+    second_plan_lane["branch"] = "lane/issue-124-ui"
+    plan.fetch("lanes") << second_plan_lane
+    File.write(plan_path, YAML.dump(plan))
+
+    contract = YAML.safe_load(File.read(File.join(@root, relative_contract_path)), permitted_classes: [], aliases: false)
+    contract["lane_id"] = "issue-124-ui"
+    contract["issue_ids"] = [124]
+    contract["branch"] = "lane/issue-124-ui"
+    second_contract_path = ".agent-workflow/sprints/#{SPRINT}/lanes/contracts/issue-124-ui.contract.yaml"
+    write_relative(second_contract_path, YAML.dump(contract))
+    git("add", relative_plan_path, second_contract_path)
+    git("commit", "-qm", "add second protected-base lane")
+    new_base = sha
+
+    git("checkout", "-q", "receipt/#{SPRINT}")
+    git("reset", "-q", "--hard", new_base)
+    plan["status"] = "complete"
+    terminal_documents = { plan: plan, status: saved.fetch(:status), release: saved.fetch(:release), outcome: saved.fetch(:outcome) }
+    receipt = saved.fetch(:receipt)
+    receipt["receipt_base_sha"] = new_base
+    terminal_documents.each do |kind, document|
+      bytes = YAML.dump(document)
+      write_relative(paths.fetch(kind), bytes)
+      receipt.fetch("artifacts")["#{kind}_sha256"] = Digest::SHA256.hexdigest(bytes)
+    end
+    write_relative(paths.fetch(:receipt), YAML.dump(receipt))
+    git("add", *paths.values)
+    git("commit", "-qm", "receipt omitting second protected-base lane")
+    new_base
+  end
+
   def trusted_checks(head)
     Verdify::SprintTerminalReceipt::REQUIRED_CHECKS.map.with_index do |(name, workflow), index|
       {
         "id" => index + 1, "name" => name, "status" => "completed", "conclusion" => "success",
         "app_slug" => "github-actions", "workflow_path" => workflow, "workflow_event" => "pull_request", "workflow_head_sha" => head,
-        "created_at" => "2026-07-10T00:00:00Z", "started_at" => "2026-07-10T00:00:01Z", "completed_at" => "2026-07-10T00:00:02Z"
+        "created_at" => nil, "started_at" => "2026-07-10T00:00:01Z", "completed_at" => "2026-07-10T00:00:02Z"
       }
     end
   end

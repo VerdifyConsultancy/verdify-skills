@@ -131,7 +131,7 @@ end
 closing = body.scan(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?[ \t]+#(\d+)\b/i).flatten.map(&:to_i).uniq
 errors << "PR body must link at least one issue with a closing keyword" if closing.empty?
 
-receipt_sprint_ids = receipt_paths.map { |path| path.split("/")[3] }.uniq.sort
+receipt_sprint_ids = receipt_paths.filter_map { |path| Verdify::SprintTerminalReceipt.sprint_id_from_receipt_path(path) }.uniq.sort
 cutover_active = candidate_repo && base_sha && candidate_repo.git(
   "cat-file", "-e", "#{base_sha}:schemas/sprint-terminal-receipt.schema.yaml", allow_failure: true
 ).last.success?

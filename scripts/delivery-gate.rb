@@ -129,7 +129,7 @@ else
         marker_id, marker_base = markers.first || []
         errors << "terminal receipt marker base must match the pull request base" unless marker_base == base_sha
         receipt_mode = marker_id == Verdify::SprintTerminalReceipt::RECOVERY_BUNDLE ? "recovery" : "normal"
-        sprint_ids = receipt_paths.map { |path| path.split("/")[3] }.uniq.sort
+        sprint_ids = receipt_paths.filter_map { |path| Verdify::SprintTerminalReceipt.sprint_id_from_receipt_path(path) }.uniq.sort
         expected_sprints = if receipt_mode == "recovery"
                              Verdify::SprintTerminalReceipt::RECOVERY_SPRINT_IDS
                            elsif marker_id

@@ -247,6 +247,10 @@ module Verdify
         errors << "$.runtime_checks[#{index}]: verified release requires passed runtime checks" unless result["result"] == "passed"
       end
       errors << "$.runtime_checks: verified release requires runtime evidence" if Array(document["runtime_checks"]).empty?
+      Array(document["migrations"]).each_with_index do |result, index|
+        errors << "$.migrations[#{index}]: verified release cannot contain a failed migration" if result["result"] == "failed"
+      end
+      errors << "$.rollback.ready: verified release requires a ready rollback" unless document.dig("rollback", "ready") == true
     end
 
     def validate_agent_platform_control_request(document, errors)
