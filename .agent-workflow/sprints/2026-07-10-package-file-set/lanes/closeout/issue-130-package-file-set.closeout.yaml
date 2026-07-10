@@ -7,8 +7,8 @@ status: ready_for_critic
 issue_ids: [130]
 pull_request: 166
 baseline_sha: "32038e3a0637192699af09ad60da48031b7575bc"
-implementation_head_sha: "456a40e670132e5d7ee5ce750a8993ec8f082f50"
-validated_head_sha: "456a40e670132e5d7ee5ce750a8993ec8f082f50"
+implementation_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
+validated_head_sha: "5902e947cad5bd220c072d0593e490dd6baf9bbc"
 contract_hash: "73c399061ac423ab740458a08a7b7634e2e885096174aee2a210b96f66c66674"
 changed_paths:
   - MANIFEST.sha256
@@ -24,31 +24,31 @@ validation_results:
     command: ruby scripts/validate-repo.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T03:59:00Z"
-    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/456a40e670132e5d7ee5ce750a8993ec8f082f50"
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
   - id: package-file-set-regression
     command: bash tests/test_package_file_set.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T03:59:00Z"
-    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/456a40e670132e5d7ee5ce750a8993ec8f082f50"
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
   - id: full-suite
     command: make test
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T03:59:00Z"
-    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/456a40e670132e5d7ee5ce750a8993ec8f082f50"
+    executed_at: "2026-07-10T04:29:43Z"
+    artifact: "https://github.com/VerdifyConsultancy/verdify-skills/commit/5902e947cad5bd220c072d0593e490dd6baf9bbc"
   - id: github-checks
     command: gh pr checks 166 --repo VerdifyConsultancy/verdify-skills --watch --interval 10 --fail-fast
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T03:59:00Z"
+    executed_at: "2026-07-10T04:29:43Z"
     artifact: "https://github.com/VerdifyConsultancy/verdify-skills/pull/166/checks"
   - id: closeout-validation
     command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T03:59:00Z"
+    executed_at: "2026-07-10T04:29:43Z"
     artifact: .agent-workflow/sprints/2026-07-10-package-file-set/lanes/closeout/issue-130-package-file-set.closeout.yaml
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -57,6 +57,8 @@ acceptance_evidence:
       - scripts/gen-manifest.sh
       - scripts/package.sh
       - package-file-set-regression
+      - "Git-index blob OIDs are the only repository-mode byte and symlink-target source"
+      - "manifest hashing and archive generation consume selector-staged snapshots"
     assessment: satisfied
   - criterion_id: LANE-AC-02
     evidence_ids:
@@ -64,12 +66,14 @@ acceptance_evidence:
       - package-file-set-regression
       - "isolated ignored .claude/scheduled_tasks.lock fixture"
       - "byte-identical before/after selector and manifest outputs"
-      - "untracked external symlink ancestor rejected before selection, staging, hashing, or archive creation"
-      - "empty failed-stage and absent failed-package archive assertions"
+      - "dirty tracked regular bytes excluded from direct stage, manifest, and archive"
+      - "indexed regular leaf restored from Git despite local symlink replacement"
+      - "indexed directory and descendant restored from Git despite external symlink ancestor"
     assessment: satisfied
   - criterion_id: LANE-AC-03
     evidence_ids:
       - "tracked .agents/skills/project-router symlink identity assertion"
+      - "tracked discovery-link target restored from its indexed blob despite local target drift"
       - "exact archive entry-list comparison"
       - "Git index 100644 and 100755 mode normalization in direct stage and extracted archive"
       - package-file-set-regression
@@ -79,21 +83,21 @@ acceptance_evidence:
       - repository-validation
       - full-suite
       - github-checks
-      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29067964773/job/86283480788"
-      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29067976716/job/86283516484"
-      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29067964834/job/86283480985"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069115428/job/86286805765"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069115478/job/86286806530"
+      - "https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29069163091/job/86286946563"
     assessment: satisfied
 discovered_issues: []
 residual_risks:
   - "A fresh critic agent and session must re-review this fix-forward closeout-only evidence head from another worktree before integration."
   - "A repository admin or maintainer other than the PR author must submit an APPROVED review bound to the final critic-report head."
-  - "Release archive generation intentionally requires an intact Git index; exported-tree manifest generation remains available without Git metadata."
+  - "Release archive generation requires an intact Git index and reachable indexed blobs; exported-tree manifest generation remains available without Git metadata."
 worktree_clean: true
-worker_agent: codex-subagent-fix1
-worker_session_id: local-issue-130-fix1
-completed_at: "2026-07-10T03:59:00Z"
+worker_agent: codex-subagent-fix2
+worker_session_id: local-issue-130-fix2
+completed_at: "2026-07-10T04:29:43Z"
 limitations:
   - "The first post-baseline commit b5e7d5e2a8443e8c7a7b5d9fe4dab57476004dfe is the immutable dispatch-only commit containing the approved sprint plan, wave release plan, and lane contract."
-  - "The prior critic report at 0e8f1290c97aabe4972cb865ae4b9d4357465655 requested fixes; it remains unchanged as durable review history."
-  - "Fix-forward implementation head 456a40e670132e5d7ee5ce750a8993ec8f082f50 is the last substantive commit; this closeout must be the only path added afterward."
+  - "The prior critic report at c9fbc8d2a337d931b0fe04ffbdf6034221e6f9e6 requested fixes; it remains unchanged as durable review history."
+  - "Fix-forward implementation head 5902e947cad5bd220c072d0593e490dd6baf9bbc is the last substantive commit; this closeout must be the only path added afterward."
   - "No pull request review, merge, release publication, runtime deployment, or deployment verification was performed by this worker."
