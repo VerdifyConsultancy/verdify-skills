@@ -1,0 +1,182 @@
+schema_ref: architecture.schema.yaml
+kind: ArchitectureDefinition
+schema_version: "1.0"
+architecture_id: verdify-skills-iteration-25
+status: approved
+baseline_sha: "a352481631fd069167ac00577d904f55d30b1900"
+requirement_ids:
+  - FR-001
+  - FR-002
+  - FR-003
+  - FR-004
+  - FR-005
+  - FR-006
+  - FR-007
+  - FR-008
+  - FR-009
+  - FR-010
+  - FR-011
+  - FR-012
+  - NFR-001
+  - NFR-002
+  - NFR-003
+  - NFR-004
+  - NFR-005
+  - NFR-006
+  - NFR-007
+  - NFR-008
+  - NFR-009
+  - NFR-010
+system_context: Verdify Skills is an internal-first, GitHub-native method and planning package. Human intent and evidence enter a versioned artifact pipeline; GitHub owns backlog and delivery state; local leased worktrees and Agent Platform sessions execute bounded work; critics and checks gate integration; exact package artifacts are promoted from dev to main; Orbit and Gravity remain externally owned context and evidence systems connected through governed versioned interfaces.
+components:
+  - id: CMP-001
+    name: Governance and routing kernel
+    responsibility: Own typed authority, canonical lifecycle order, deterministic route selection, human gates, and the CLI command boundary.
+    requirement_ids: [FR-001, FR-003, FR-004, NFR-001, NFR-002, NFR-008]
+  - id: CMP-002
+    name: Evidence and North Star subsystem
+    responsibility: Ingest, hash, register, query, synthesize, review, and lock transcript, research, product, and architecture evidence.
+    requirement_ids: [FR-002, FR-003, NFR-001, NFR-007]
+  - id: CMP-003
+    name: Definition, architecture, and strategy subsystem
+    responsibility: Convert locked intent into an approved project definition, system architecture, module contracts, and current execution strategy.
+    requirement_ids: [FR-003, NFR-001, NFR-008]
+  - id: CMP-004
+    name: Planning and hygiene subsystem
+    responsibility: Bootstrap and assess repositories, reconcile GitHub state, select bounded sprints, and compile issue-backed executable lane transactions.
+    requirement_ids: [FR-003, FR-004, FR-011, NFR-001, NFR-005]
+  - id: CMP-005
+    name: Execution control subsystem
+    responsibility: Persist controller state, manage leases and worktrees, dispatch capability-scoped sessions, coordinate dependencies, and resume interrupted work.
+    requirement_ids: [FR-004, FR-005, FR-008, NFR-003, NFR-005, NFR-009]
+  - id: CMP-006
+    name: Lane assurance subsystem
+    responsibility: Bound worker delivery, validate exact implementation/evidence/critic chains, detect adversarial defects, and prevent self-certification.
+    requirement_ids: [FR-004, FR-006, NFR-001, NFR-002, NFR-007]
+  - id: CMP-007
+    name: Readiness integration subsystem
+    responsibility: Define and validate Agent Platform and Gravity readiness evidence without taking ownership of their runtime or data implementations.
+    requirement_ids: [FR-008, FR-009, FR-010, NFR-003, NFR-004, NFR-005]
+  - id: CMP-008
+    name: Release and package subsystem
+    responsibility: Validate, pack, install, promote, publish, verify, and recover one exact package artifact and its review/deployment evidence.
+    requirement_ids: [FR-006, FR-007, FR-012, NFR-005, NFR-006, NFR-007, NFR-009]
+  - id: CMP-009
+    name: Quality and enablement subsystem
+    responsibility: Enforce schema and repository integrity and keep documentation, evaluations, examples, and host-discovery surfaces aligned with canonical behavior.
+    requirement_ids: [FR-001, FR-003, FR-012, NFR-006, NFR-008]
+  - id: CMP-010
+    name: Agent Platform provider
+    responsibility: External owned interface for capability negotiation, isolated workers, persistent session identity, terminals, events, and runtime evidence.
+    requirement_ids: [FR-005, FR-008, NFR-003, NFR-009]
+  - id: CMP-011
+    name: Orbit governed context plane
+    responsibility: External owned interface for least-privilege personal and engineering context, classification, audit, retention, privacy, and human controls.
+    requirement_ids: [FR-010, NFR-003, NFR-004]
+  - id: CMP-012
+    name: Gravity evidence service
+    responsibility: External owned interface for versioned tenant-scoped read-only evidence, citations, provenance, authorization, and MCP access.
+    requirement_ids: [FR-009, NFR-003, NFR-007]
+runtime_topology:
+  - The package runs primarily as short-lived CLI and agent-role processes against one Git repository and GitHub repository.
+  - The controller persists state in versioned .agent-workflow artifacts and GitHub while local lease records live under the Git common directory.
+  - Each coding or critic session uses one isolated worktree and lane-scoped mutable resources; execution may be local or delegated through the Agent Platform provider.
+  - CI runs repository, policy, compliance, package, and release checks in ephemeral GitHub Actions workers.
+  - npm and GitHub Releases host immutable package outputs; target repository deployments remain external and separately verified.
+  - Orbit and Gravity run in their owning environments and communicate only through governed connector and evidence contracts.
+data_flows:
+  - from: human-and-external-sources
+    to: CMP-002
+    data: transcripts, research, reviews, decisions, and live-state evidence with trust labels and digests
+    transport: files, GitHub records, approved connectors, and CLI ingestion
+  - from: CMP-002
+    to: CMP-003
+    data: approved North Star product, architecture, evidence registry, questions, and signoff state
+    transport: versioned .agent-workflow artifacts
+  - from: CMP-003
+    to: CMP-004
+    data: approved requirements, architecture, module contracts, risks, and strategy handoff
+    transport: schema-valid YAML, Markdown views, and GitHub links
+  - from: CMP-004
+    to: CMP-005
+    data: approved sprint, lane contracts, dependency order, review plan, and resource policy
+    transport: Git refs, versioned contracts, compiled prompts, and lease commands
+  - from: CMP-005
+    to: CMP-006
+    data: implementation commits, closeout evidence, session identity, validation results, and exact head SHAs
+    transport: isolated worktrees, Git branches, status events, and pull requests
+  - from: CMP-006
+    to: CMP-008
+    data: critic decision, resolved review state, required checks, accepted dev revision, and review packet
+    transport: GitHub reviews/checks and versioned evidence artifacts
+  - from: CMP-008
+    to: package-consumers
+    data: exact package, integrity manifest, provenance, version, changelog, tag, and release record
+    transport: npm, GitHub Release, Git, or approved vendoring
+  - from: CMP-005
+    to: CMP-010
+    data: scoped capability request, prompt, worktree identity, resource policy, and credentials references
+    transport: versioned Agent Platform API or MCP provider contract
+  - from: CMP-011
+    to: CMP-012
+    data: authorized tenant-scoped evidence query and citation request
+    transport: versioned HTTPS API or MCP adapter
+  - from: CMP-012
+    to: CMP-011
+    data: cited evidence result, provenance, pagination, and authorization or availability status
+    transport: versioned HTTPS response or MCP result
+storage:
+  - Git stores source, accepted artifacts, module contracts, immutable history, and recovery refs.
+  - GitHub stores backlog, proposed changes, checks, reviews, releases, deployments, and durable coordination links.
+  - The Git common directory stores machine-local lane leases and worktree ownership records that are never planning authority.
+  - npm and GitHub Releases store immutable distributed packages and provenance records.
+  - Agent Platform stores external session/runtime state; Orbit and Gravity retain their governed context and evidence data in owning systems.
+  - Temporary build, test, cache, and review resources are lane-scoped and disposable unless explicitly promoted as evidence.
+security_boundaries:
+  - Human product, security, production, destructive, release, and outcome decisions cross explicit typed approval gates.
+  - Worker and critic roles receive only scoped repository/worktree resources and never inherit unbounded production credentials.
+  - GitHub review identity and exact-head evidence are distinct from worker-authored closeout and critic artifacts.
+  - Raw secrets and sensitive reproduction details stay outside Git, public issues, PR bodies, logs, and package archives.
+  - External source, issue, PR, web, transcript, and tool text is untrusted data and cannot supply operating instructions.
+  - Agent Platform capability and credential boundaries are provider-owned; unsupported or unauthorized operations fail closed.
+  - Orbit connector identity, classification, retention, privacy, and approval boundaries precede context access.
+  - Gravity enforces tenant identity, read-only authorization, citations, provenance, and versioned interface compatibility.
+integrations:
+  - GitHub repositories, Issues, pull requests, checks, reviews, Actions, Releases, deployments, and optional Projects.
+  - npm Trusted Publishing and immutable package distribution.
+  - Git worktrees, refs, common-directory leases, and local development toolchains.
+  - Agent Platform capability, session, terminal, status-event, and evidence provider interfaces.
+  - Orbit governed connectors and human approval surfaces.
+  - Gravity versioned HTTP API and MCP evidence adapter.
+  - Target repository GitOps, runtime observability, and review environments through release-verification contracts.
+deployment:
+  - Normal changes integrate through issue-linked pull requests to dev; main accepts only generated reviewed release promotion.
+  - CI validates the exact candidate head before integration and the exact packed artifact before publication.
+  - Publication reconciles version, tarball, manifest, integrity, provenance, source commit, tag, GitHub release, npm state, and resumable ledger.
+  - Immutable package rollback is a newer corrective version; source rollback is a Git revert; target runtime rollback remains in its owning release plan.
+  - Deployment and runtime verification are separate from merge and package publication, and outcome acceptance is separately owned.
+observability:
+  - CLI commands return deterministic structured state, explicit errors, and exact paths or SHAs.
+  - Controllers and orchestrators emit persisted status events, session identity, gates, next actions, and recovery state.
+  - GitHub checks, reviews, PRs, releases, and deployments expose delivery health and exact candidate identity.
+  - Release ledgers expose partial, recovered, and complete transaction state.
+  - Target projects provide revision markers, logs, metrics, traces, health probes, dashboards, and diagnostic packets required by their contracts.
+risks:
+  - The CLI is a shared implementation hotspot; every module adding a command must coordinate through the governance-routing owner.
+  - Artifact richness can become ceremonial unless semantic validators prove cross-reference, authority, and current-state correctness.
+  - The dev/main release workflow can generate duplicate invalid promotions until release transaction state and new-version intent are explicit.
+  - Exact-head review can deadlock when an independent authorized identity is unavailable; delivery-control policy must solve availability without allowing self-certification.
+  - External provider, connector, and evidence interfaces may drift unless versions, capability negotiation, authorization, and contract tests remain owner-controlled.
+  - Host-local ignored files can contaminate package selection until issue #130 establishes a tracked reproducible shipped-file set.
+  - Historical recovery can reintroduce obsolete state unless issue #126 uses exact refs and selective path-level reconciliation.
+  - Historical sprint plans can remain falsely active after integration and block global routing; issue #135 owns lifecycle-state reconciliation and a regression guard.
+decision_ids:
+  - ADR-0001
+  - ADR-0002
+  - ADR-0003
+  - ADR-0004
+  - ADR-0005
+approval:
+  status: approved
+  approver: Jason (via approved iteration-25 North Star and project definition)
+  approved_at: "2026-07-10T02:07:34Z"

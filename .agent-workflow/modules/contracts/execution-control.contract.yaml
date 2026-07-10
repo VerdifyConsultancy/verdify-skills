@@ -1,0 +1,66 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: execution-control
+contract_version: "1.0"
+status: approved
+purpose: Persist controller state, own worktree and lease coordination, dispatch capability-scoped sessions, monitor dependencies, and recover one deterministic next action.
+requirement_ids: [FR-004, FR-005, FR-008, NFR-003, NFR-005, NFR-009]
+owned_paths:
+  - skills/controller-loop/**
+  - skills/sprint-orchestrator/**
+  - skills/subagent-worktree/**
+  - skills/controller-merge/**
+  - schemas/controller-state.schema.yaml
+  - schemas/session-ledger.schema.yaml
+  - schemas/status-event.schema.yaml
+  - schemas/sprint-execution-runbook.schema.yaml
+  - schemas/compiled-prompt-manifest.schema.yaml
+  - lib/verdify/git_repository.rb
+  - .agent-workflow/controller/**
+  - .agent-workflow/sprints/*/execution/**
+  - .agent-workflow/sprints/*/prompts/**
+  - .agent-workflow/sprints/*/status.yaml
+prohibited_paths: [.agent-workflow/sprints/*/lanes/contracts/**, .agent-workflow/sprints/*/critic/**, .github/workflows/publish-npm.yml]
+inputs:
+  - name: approved_sprint
+    schema: Approved sprint, lane contracts, dependency order, review plan, and resource policy
+    producer: planning-hygiene
+  - name: provider_capabilities
+    schema: Versioned capability and session provider response
+    producer: Agent Platform provider or supported local adapter
+outputs:
+  - name: execution_state
+    schema: controller-state, session-ledger, status-event, and sprint-execution-runbook schemas
+    consumers: [controller, lane-assurance, release-package, humans]
+  - name: leased_worktree
+    schema: lane-lease.schema.yaml and Git worktree identity
+    consumers: [one worker or critic session]
+public_interfaces:
+  - name: lane coordination commands
+    location: bin/verdify lane
+    compatibility: Lease identity and exclusive-worktree invariants are stable; changes require migration tests.
+  - name: Agent Platform provider request
+    location: skills/sprint-orchestrator/references/platform-execution.md
+    compatibility: Capabilities are negotiated and unsupported operations fail explicitly.
+dependencies:
+  hard: [governance-routing, planning-hygiene]
+  soft: [readiness-integration, quality-enablement]
+invariants:
+  - One active coding or critic session owns one worktree and lease.
+  - Session, contract, branch, baseline, runtime namespace, and next action remain durable and attributable.
+  - Interrupted execution resumes from persisted state without duplicate dispatch.
+runtime_resources: [Git worktrees and common-directory leases, lane-scoped ports/caches/containers/namespaces, Agent Platform sessions.]
+validation_commands:
+  - id: controller-recovery
+    command: ruby tests/test_lane_controller_recovery.rb
+    purpose: Verify durable recovery behavior.
+  - id: cli-lanes
+    command: bash tests/test_cli.sh
+    purpose: Verify lease and worktree commands.
+required_evidence: [Lease inspection, session IDs, status events, exact branch and SHAs, provider evidence, release of resources]
+definition_of_done: [Dependencies are reconciled, one owner controls each resource, session state is durable, no orphan active lease remains]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"

@@ -1,0 +1,72 @@
+schema_ref: module-contract.schema.yaml
+kind: ModuleContract
+schema_version: "1.0"
+module_id: quality-enablement
+contract_version: "1.0"
+status: approved
+purpose: Enforce repository and schema integrity and keep documentation, examples, evaluations, host discovery, and generated views aligned with canonical behavior.
+requirement_ids: [FR-001, FR-003, FR-012, NFR-006, NFR-008]
+owned_paths:
+  - lib/verdify.rb
+  - lib/verdify/schema_validator.rb
+  - lib/verdify/semantic_validator.rb
+  - scripts/validate-repo.rb
+  - scripts/setup-agent-hosts.rb
+  - scripts/launch-*.sh
+  - tests/test_schema_validator.rb
+  - tests/test_lane_delivery_correctness.rb
+  - tests/test_lane_qr_schemarefs.rb
+  - tests/test_lane_schema_contradictions.rb
+  - docs/**
+  - evaluations/**
+  - examples/**
+  - .agents/**
+  - .claude/skills/**
+  - AGENTS.md
+  - CLAUDE.md
+  - AUTOMATION.md
+  - README.md
+  - WORKFLOW.md
+  - CHANGELOG.md
+  - CONTRIBUTING.md
+  - SECURITY.md
+prohibited_paths: [.github/workflows/**, package.json, VERSION, .agent-workflow/northstar/**]
+inputs:
+  - name: canonical_behavior
+    schema: Skills, schemas, lifecycle config, module contracts, commands, and accepted evidence from all module owners
+    producer: All local module owners
+outputs:
+  - name: validation_result
+    schema: Deterministic pass/fail diagnostics with file and contract context
+    consumers: [developers, CI, release-package, consumers]
+  - name: enablement_surface
+    schema: Aligned docs, examples, evaluations, host links, changelog, and operator guidance
+    consumers: [humans, agents, package consumers]
+public_interfaces:
+  - name: repository validator
+    location: scripts/validate-repo.rb
+    compatibility: New canonical surfaces add fail-closed checks and tests; diagnostics remain actionable.
+  - name: documentation and evaluations
+    location: docs/ and evaluations/
+    compatibility: Derived views follow canonical artifacts and do not introduce authority.
+dependencies:
+  hard: [governance-routing]
+  soft: [evidence-northstar, definition-architecture-strategy, planning-hygiene, execution-control, lane-assurance, readiness-integration, release-package]
+invariants:
+  - Validators check canonical state rather than hard-coded stale narrative counts or machine-local ignored files.
+  - Documentation and examples never override schemas, contracts, code, or GitHub authority.
+  - Host discovery links resolve to canonical skill directories and package contents contain no local runtime state or secrets.
+runtime_resources: [Ephemeral validation and test directories; read-only repository traversal; no production resources.]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Verify skills, schemas, references, host links, artifacts, and documentation invariants.
+  - id: full-suite
+    command: make test
+    purpose: Run repository, schema, CLI, policy, release, and install validation.
+required_evidence: [Validator output, full-suite output, link and reference audit, changed-document traceability]
+definition_of_done: [Canonical and derived surfaces agree, examples validate, tests cover drift risks, package contains intended tracked content only]
+approval:
+  status: approved
+  approver: Jason
+  approved_at: "2026-07-10T02:07:34Z"
