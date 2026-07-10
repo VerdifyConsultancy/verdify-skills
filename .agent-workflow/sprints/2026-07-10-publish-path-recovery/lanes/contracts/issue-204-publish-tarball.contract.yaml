@@ -1,0 +1,114 @@
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-07-10-publish-path-recovery
+lane_id: issue-204-publish-tarball
+title: Canonicalize the privileged npm publish tarball path
+status: approved
+issue_ids: [204]
+coupling_justification: null
+objective: Ensure the privileged publish transaction passes npm the canonical local path of the already verified candidate tarball.
+desired_outcome: The exact 1.3.0 candidate reaches npm publish as an absolute local path with public access and provenance flags unchanged.
+non_goals:
+  - Change package version, package contents, provenance, release transaction, release-preflight, or rollback behavior.
+  - Mutate main, npm, tags, releases, branch protection, credentials, or retained artifacts from the worker.
+baseline_sha: "0c6d46a59057b7e52dc65c77076ce343f373c015"
+branch: lane/204-publish-tarball
+module_contracts: [release-package, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 8
+  critic_ttl_hours: 4
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [release-package, quality-enablement]
+  owned_paths:
+    - .github/workflows/publish-npm.yml
+    - MANIFEST.sha256
+    - tests/test_packed_artifact.sh
+    - .agent-workflow/sprints/2026-07-10-publish-path-recovery/sprint-plan.yaml
+    - .agent-workflow/sprints/2026-07-10-publish-path-recovery/release/wave-release-plan.yaml
+    - .agent-workflow/sprints/2026-07-10-publish-path-recovery/lanes/contracts/issue-204-publish-tarball.contract.yaml
+    - .agent-workflow/sprints/2026-07-10-publish-path-recovery/lanes/closeout/issue-204-publish-tarball.closeout.yaml
+  prohibited_paths:
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+    - .github/workflows/release-pr.yml
+    - .github/workflows/delivery-gate.yml
+    - .github/workflows/delivery-policy.yml
+    - scripts/build-release-candidate.sh
+    - scripts/release-transaction.rb
+    - scripts/release-preflight.rb
+    - schemas/**
+    - skills/**
+    - packs/**
+  coordination_required_paths: []
+  owned_interfaces:
+    - Canonical candidate tarball path passed from the privileged publish job into release-transaction npm publication.
+dependencies:
+  hard:
+    - lane_id: issue-200-relative-tarball
+      required_output: Consumer path recovery is integrated to dev and the later publish failure remains safely pre-mutation.
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: The privileged publish job canonicalizes the already verified tarball with Ruby File.realpath before release-transaction can call npm.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [workflow diff, ordering regression]
+  - id: LANE-AC-02
+    statement: npm publish still receives the exact canonical candidate with --access public and --provenance under all existing transaction and provenance gates.
+    sprint_acceptance_ids: [SPR-AC-01, SPR-AC-02]
+    evidence_required: [packed artifact suite, actionlint, unchanged transaction flags]
+  - id: LANE-AC-03
+    statement: Repository validation and secret scanning pass while npm 1.3.0, tag v1.3.0, and release v1.3.0 remain absent.
+    sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
+    evidence_required: [repository validation, full suite, gitleaks, registry tag and release queries]
+validation_commands:
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    purpose: Validate repository and manifest shape.
+    required: true
+  - id: publish-workflow-actionlint
+    command: actionlint .github/workflows/publish-npm.yml
+    purpose: Validate the changed GitHub Actions workflow.
+    required: true
+  - id: packed-artifact-suite
+    command: bash tests/test_packed_artifact.sh
+    purpose: Prove the privileged canonicalization precedes npm publish and packed candidate behavior remains exact.
+    required: true
+  - id: full-suite
+    command: make test
+    purpose: Run every repository, package, delivery, and release regression.
+    required: true
+  - id: secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="0c6d46a59057b7e52dc65c77076ce343f373c015..HEAD"
+    purpose: Scan every lane commit.
+    required: true
+required_evidence:
+  - Exact failed publish run and root-cause evidence.
+  - Workflow ordering assertion proving File.realpath precedes npm publish authority.
+  - Full packed artifact and repository test results at I.
+  - npm, tag, and GitHub release absence immediately before closeout.
+  - Closeout-only E and fresh report-only S with current GitHub checks.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The fix requires changing version, package contents, release transaction, provenance, credentials, or any prohibited path.
+  - Any npm, tag, release, or retained artifact authority appears before controller recovery.
+definition_of_done:
+  - D contains only the approved sprint plan, wave plan, and lane contract.
+  - I changes only publish-npm.yml, the packed-artifact regression, and manifest.
+  - E adds only the canonical closeout and a fresh critic commits only S.
+  - Exact S receives a commit-bound non-author maintainer APPROVED review and passes protected dev checks before integration.
+  - ROOT separately repromotes, approves, publishes, verifies, and records the recovered release.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-07-10T12:01:00Z"
