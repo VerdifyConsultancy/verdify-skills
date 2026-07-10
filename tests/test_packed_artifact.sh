@@ -108,6 +108,19 @@ grep -Fq 'npm publish "${TARBALL}" --access public --provenance' "$ROOT/.github/
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
 ! grep -En 'npm@(latest|next)|npm install --global npm@[^0-9]' \
   "$ROOT/.github/workflows/publish-npm.yml" "$ROOT/.github/workflows/release-pr.yml"
+ruby -rrubygems/version -e '
+  workflow = File.read(ARGV.fetch(0))
+  candidate = workflow.index("\n  candidate:\n") or abort "candidate job is missing"
+  publish = workflow.index("\n  publish:\n", candidate + 1) or abort "publish job is missing"
+  pin_pattern = /^[ \t]*run: npm install --global npm@([0-9]+\.[0-9]+\.[0-9]+)[ \t]*$/
+  candidate_pins = workflow[candidate...publish].scan(pin_pattern).flatten
+  publish_pins = workflow[publish..].scan(pin_pattern).flatten
+  pins = candidate_pins + publish_pins
+  abort "expected one exact npm pin in each publish job" unless candidate_pins.length == 1 && publish_pins.length == 1
+  abort "expected exactly two identical npm 11.15.0 pins" unless pins == ["11.15.0", "11.15.0"]
+  minimum = Gem::Version.new("11.5.1")
+  abort "npm publish pins must satisfy trusted publishing minimum #{minimum}" unless pins.all? { |pin| Gem::Version.new(pin) >= minimum }
+' "$ROOT/.github/workflows/publish-npm.yml"
 ruby -e '
   workflow = File.read(ARGV.fetch(0))
   candidate = workflow.index("candidate:") or abort "unprivileged candidate job is missing"

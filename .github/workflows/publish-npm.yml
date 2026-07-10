@@ -48,7 +48,7 @@ jobs:
           node-version: "24"
 
       - name: Use reviewed npm
-        run: npm install --global npm@11.4.2
+        run: npm install --global npm@11.15.0
 
       - name: Retrieve or build the final-main candidate
         id: candidate
@@ -443,7 +443,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Use reviewed npm
-        run: npm install --global npm@11.4.2
+        run: npm install --global npm@11.15.0
 
       - name: Check release identity
         run: ruby scripts/release-preflight.rb

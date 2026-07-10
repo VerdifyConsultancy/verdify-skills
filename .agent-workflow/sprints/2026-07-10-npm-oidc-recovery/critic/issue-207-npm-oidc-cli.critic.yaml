@@ -1,0 +1,112 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-10-npm-oidc-recovery
+lane_id: issue-207-npm-oidc-cli
+pull_request: 208
+worker_agent: codex-npm-oidc-recovery
+worker_session_id: worker-207-npm-oidc-20260710t1228z
+critic_agent: codex-npm-oidc-critic
+implementation_head_sha: "c4b519c9f773ca41ac625b54f7fb47a6927a0240"
+evidence_head_sha: "6c9fc3409967fd83f1c73ab24c9eff2028de8514"
+reviewed_head_sha: "6c9fc3409967fd83f1c73ab24c9eff2028de8514"
+closeout_path: .agent-workflow/sprints/2026-07-10-npm-oidc-recovery/lanes/closeout/issue-207-npm-oidc-cli.closeout.yaml
+closeout_sha256: "1af85e761b3219cbfeb1116a8fa1d8b9611f34ac2752193bf1d1eac92ba5a4de"
+critic_session_id: critic-207-npm-oidc-20260710t1238z
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-npm-oidc-recovery/critic-issue-207-npm-oidc-cli
+outcome: approve
+findings: []
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        Repository-wide executable-pin inspection found exactly two
+        `npm install --global npm@11.15.0` steps, at publish-npm.yml lines 51
+        and 446, with one in each publish job. actionlint passed the workflow.
+      - >-
+        npm registry metadata and a fresh `npm pack npm@11.15.0` agreed on
+        version, SHA-1 d1a5bc920f2068774ae4d802916379fad266ba0d,
+        and SHA-512 integrity. Official npm trusted-publishing documentation at
+        https://docs.npmjs.com/trusted-publishers/ requires npm CLI 11.5.1 or
+        later, so exact 11.15.0 satisfies the documented floor.
+      - >-
+        release-pr.yml is byte-unchanged from baseline with SHA-256
+        80ee2381f539a5cbd6b72765f502a58ec9ce08ee28b5fbc37c2c85fcbf9d15b9
+        and retains its contract-excluded npm 11.4.2 pin.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        A fresh exact-E packed-artifact run passed npm installation and all
+        package checks with tarball SHA-256
+        45094b03eb57ed67c5be592b24fed9f0e86f1bd869f2c28d8b1b9acc4ed9445d.
+      - >-
+        The exact assertion block from tests/test_packed_artifact.sh passed the
+        candidate workflow, rejected both pins mutated below the floor to
+        11.4.2, and rejected a non-identical 11.14.0/11.15.0 pair. The same
+        suite preserves the existing latest and next prohibition.
+      - >-
+        The worker full-suite log has SHA-256
+        becfeba05ca1d6890da910276a448c6fe9c0b69015f96053095dc88991c07931,
+        is timestamped between I and E, and records every make-test suite green.
+        A fresh deterministic candidate build at exact I reproduced its
+        tarball SHA-256
+        3f26a76132e9817990703e1320a8bd2ca34a9fc49757dfd4b4d3645e6b2f9230,
+        binding that log to the recorded implementation revision.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        ruby scripts/validate-repo.rb passed at exact E with 28 skills and 48
+        schemas. gitleaks scanned all three B-to-E commits, approximately 21.10
+        KB, with redaction and no findings.
+      - >-
+        Fresh read-only registry, remote-tag, and GitHub release queries at
+        2026-07-10T12:41Z confirmed @verdify-cli/cli@1.3.0, v1.3.0, and the
+        v1.3.0 GitHub release are all absent.
+evidence_assessment:
+  - >-
+    Active critic lease critic-issue-207-npm-oidc-cli-critic-207-npm-oidc-2026
+    binds this detached worktree to E. Critic agent/session
+    codex-npm-oidc-critic / critic-207-npm-oidc-20260710t1238z both differ from
+    worker codex-npm-oidc-recovery / worker-207-npm-oidc-20260710t1228z.
+  - >-
+    D 9f05d365d8c07886753d66137bbc7d33160ed67b is the first post-baseline
+    commit and adds only the approved sprint plan, wave release plan, and lane
+    contract. Their bytes are frozen through E and the independently computed
+    contract SHA-256 is
+    1ec62ff17f07d7494b33a88d5541a3c0ad5400adb4130510483cab2580e59da9.
+  - >-
+    I c4b519c9f773ca41ac625b54f7fb47a6927a0240 changes only the owned publish
+    workflow, packed-artifact regression, and manifest. E
+    6c9fc3409967fd83f1c73ab24c9eff2028de8514 adds only the canonical
+    closeout, whose independently computed SHA-256 is
+    1af85e761b3219cbfeb1116a8fa1d8b9611f34ac2752193bf1d1eac92ba5a4de.
+  - >-
+    PR #208, issue #207, branch, contract, closeout, local detached HEAD, and
+    origin head all referred to exact E before report creation. No release,
+    tag, publish, merge, review, credential, protection, or retained-artifact
+    mutation was performed.
+integration_risks:
+  - >-
+    This report-only commit becomes S and invalidates E-only current-head
+    checks. Exact S must pass validate, pull-request-policy, compliance, and
+    critic-gate before integration.
+  - >-
+    publish-npm.yml is CODEOWNERS-protected. PR author jvallery cannot
+    self-approve; exact S still requires a commit-bound APPROVED GitHub review
+    from another repository admin or maintainer before protected dev merge.
+  - >-
+    Main promotion and the npm, tag, GitHub release, provenance, retained-byte,
+    and completed-ledger transaction remain controller-owned release gates and
+    were intentionally not exercised by this critic.
+residual_risks:
+  - >-
+    Only a protected release run can prove npm OIDC authentication end to end;
+    this review proves the documented CLI floor, registry byte integrity, and
+    deterministic workflow configuration without using publication authority.
+  - >-
+    Any commit after report-only S invalidates this exact-head critic outcome
+    and the required non-author GitHub approval.
+reviewed_at: "2026-07-10T12:42:02Z"
