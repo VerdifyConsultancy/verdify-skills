@@ -604,6 +604,8 @@ class RepoValidator
     end
     error(delivery_workflow, "must bootstrap on dev push") unless delivery_body.include?("branches: [dev]")
     error(delivery_workflow, "must not request pull-request review write permission") if delivery_body.match?(/pull-requests:\s*write/) || delivery_body.match?(/pull_request_review:\s*write/)
+    error(delivery_workflow, "non-PR contexts must discover and validate the exact release PR") unless delivery_body.scan("--prepare-release-event").length == 2 && delivery_body.scan("open-release-pulls.json").length >= 4
+    error(delivery_workflow, "bootstrap mode must not bypass delivery policy or critic approval") if delivery_body.include?("--bootstrap")
     delivery_body.scan(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/).flatten.each do |action|
       error(delivery_workflow, "action must use an immutable commit pin: #{action}") unless action.match?(/@[0-9a-f]{40}\z/i)
     end

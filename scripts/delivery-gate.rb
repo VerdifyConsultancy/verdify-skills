@@ -13,7 +13,8 @@ options = {
   repo: nil,
   reviews: nil,
   config: ROOT.join("config/github-primitives.yaml").to_s,
-  bootstrap: false
+  prepare_release_event: nil,
+  expected_head: nil
 }
 
 OptionParser.new do |parser|
@@ -22,7 +23,8 @@ OptionParser.new do |parser|
   parser.on("--repo PATH") { |value| options[:repo] = value }
   parser.on("--reviews PATH") { |value| options[:reviews] = value }
   parser.on("--config PATH") { |value| options[:config] = value }
-  parser.on("--bootstrap") { options[:bootstrap] = true }
+  parser.on("--prepare-release-event PULLS.json") { |value| options[:prepare_release_event] = value }
+  parser.on("--expected-head SHA") { |value| options[:expected_head] = value }
   parser.on("-h", "--help") { puts parser; exit 0 }
 end.parse!
 
@@ -57,13 +59,30 @@ errors = []
 errors << "delivery configuration must name dev and main" unless development_branch == "dev" && release_branch == "main"
 errors << "delivery configuration must name both release owners" unless allowed_release_approvers.sort == %w[jrvallery jvallery]
 
-if options[:bootstrap]
-  errors << "--repo is required for bootstrap" if options[:repo].to_s.empty?
-  if options[:repo] && !Pathname.new(options[:repo]).join("scripts/delivery-gate.rb").file?
-    errors << "bootstrap repository does not contain scripts/delivery-gate.rb"
+if options[:prepare_release_event]
+  expected_head = options[:expected_head].to_s
+  errors << "--expected-head must be a full 40-character commit SHA" unless full_sha?(expected_head)
+  pulls = load_json(options[:prepare_release_event], "open pull requests")
+  matches = Array(pulls).select do |pull_request|
+    pull_request["state"].to_s.downcase == "open" &&
+      pull_request.dig("base", "ref") == release_branch &&
+      pull_request.dig("head", "ref") == development_branch &&
+      pull_request.dig("base", "repo", "full_name") == expected_repository &&
+      pull_request.dig("head", "repo", "full_name") == expected_repository &&
+      pull_request.dig("head", "sha") == expected_head
+  end
+  errors << "expected exactly one open same-repository dev-to-main release PR at #{expected_head}, found #{matches.length}" unless matches.length == 1
+  if errors.empty?
+    pull_request = matches.first
+    puts JSON.generate(
+      "number" => pull_request["number"],
+      "repository" => pull_request.fetch("base").fetch("repo"),
+      "pull_request" => pull_request
+    )
+    exit 0
   end
 elsif options[:event].to_s.empty? || options[:repo].to_s.empty?
-  warn "--event and --repo are required unless --bootstrap is used"
+  warn "--event and --repo are required unless --prepare-release-event is used"
   exit 2
 else
   event = load_json(options[:event], "event")
@@ -143,7 +162,7 @@ else
 end
 
 if errors.empty?
-  puts(options[:bootstrap] ? "Verdify delivery gate bootstrap passed." : "Verdify critic gate passed.")
+  puts "Verdify critic gate passed."
   exit 0
 end
 

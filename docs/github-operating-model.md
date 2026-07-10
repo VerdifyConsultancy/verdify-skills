@@ -83,12 +83,14 @@ govern the base branch. After 1.3.0 reaches main, steady-state adds
 independently enforceable. Workflow tokens retain read/check permissions only
 and cannot approve pull-request reviews.
 
-During the one-time pre-release bootstrap, the candidate workflow is first
-created by the `dev` synchronization of the open release PR. If GitHub does not
-discover `pull_request_review` from a workflow absent on current `main`, rerun
-that existing failed PR-head `delivery-gate` run after the genuine approval; it
-reads the live review history and remains bound to the same head. Do not add a
-commit after approval or substitute a workflow-generated review.
+During the one-time pre-release bootstrap, each `dev` push or manual run reads
+open pull requests, requires exactly one same-repository `dev -> main` release
+PR at its own SHA, synthesizes that PR event, and executes the real route and
+review gates. It fails `critic-gate` before a genuine owner approval. After the
+approval, rerun that same failed run; it reads current review history and
+remains bound to the same head. This also avoids relying on discovery of a
+candidate-only `pull_request_review` workflow. Do not add a commit after
+approval or substitute a workflow-generated review.
 
 ## Deployments
 

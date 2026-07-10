@@ -33,13 +33,29 @@ def run_gate(root, event, repo, reviews: nil, success: true)
   stderr
 end
 
+def prepare_release_event(root, pulls, expected_head, success: true)
+  stdout, stderr, status = Open3.capture3(
+    "ruby", File.join(root, "scripts/delivery-gate.rb"),
+    "--prepare-release-event", pulls,
+    "--expected-head", expected_head
+  )
+  if success && !status.success?
+    raise "expected release event preparation success: #{stdout}\n#{stderr}"
+  elsif !success && status.success?
+    raise "expected release event preparation failure: #{stdout}\n#{stderr}"
+  end
+  stdout
+end
+
 def build_chain(root, directory, critic_agent: "critic-agent", critic_session: "critic-session", outcome: "approve")
   FileUtils.mkdir_p(directory)
   git(directory, "init", "-q", "-b", "lane/test")
   git(directory, "config", "user.name", "Verdify Test")
   git(directory, "config", "user.email", "verdify-test@example.invalid")
   File.write(File.join(directory, "README.md"), "# fixture\n")
-  git(directory, "add", "README.md")
+  File.write(File.join(directory, "package.json"), JSON.generate("name" => "@verdify/test", "version" => "9.9.9") + "\n")
+  File.write(File.join(directory, "VERSION"), "9.9.9\n")
+  git(directory, "add", ".")
   git(directory, "commit", "-qm", "baseline")
   baseline = git(directory, "rev-parse", "HEAD")
 
@@ -110,7 +126,7 @@ def event(path, head:, body:, base: "dev", source: "lane/test", author: "worker"
     "number" => 456,
     "repository" => repository,
     "pull_request" => {
-      "number" => 456, "body" => body, "user" => { "login" => author },
+      "number" => 456, "state" => "open", "body" => body, "user" => { "login" => author },
       "base" => { "ref" => base, "sha" => "b" * 40, "repo" => { "full_name" => base_repo } },
       "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } }
     }
@@ -144,28 +160,73 @@ event(dev_event, head: reject_chain[:head], body: "- Lane: `test-lane`\n- Contra
 raise "non-approving critic was not rejected" unless run_gate(root, dev_event, reject_repo, success: false).include?("critic outcome")
 
 release_event = File.join(tmp, "release.json")
-event(release_event, head: chain[:head], body: "release", base: "main", source: "dev", author: "jrvallery")
+release_body = <<~BODY
+  <!-- verdify-release-candidate:@verdify/test@9.9.9 -->
+
+  ## Backlog issue
+
+  Closes #121
+
+  ## Release candidate
+
+  Promote dev to main.
+
+  ## Version
+
+  - VERSION: `9.9.9`
+  - Package: `@verdify/test@9.9.9`
+
+  ## Evidence
+
+  Current head SHA: `#{chain[:head]}`
+
+  ## Risk and rollback
+
+  Restore the prior protected head.
+BODY
+event(release_event, head: chain[:head], body: release_body, base: "main", source: "dev", author: "jrvallery")
+release_pull = JSON.parse(File.read(release_event)).fetch("pull_request")
+pulls = File.join(tmp, "open-pulls.json")
+File.write(pulls, JSON.generate([release_pull]))
+push_event = File.join(tmp, "push-release-event.json")
+File.write(push_event, prepare_release_event(root, pulls, chain[:head]))
+stdout, stderr, status = Open3.capture3(
+  "ruby", File.join(root, "scripts/pr-policy.rb"),
+  "--event", push_event,
+  "--repo", valid_repo
+)
+raise "push delivery-policy failed: #{stdout}\n#{stderr}" unless status.success?
 reviews = File.join(tmp, "reviews.json")
+File.write(reviews, "[]\n")
+run_gate(root, push_event, valid_repo, reviews: reviews, success: false)
 File.write(reviews, JSON.generate([{ "id" => 1, "state" => "APPROVED", "commit_id" => chain[:head], "submitted_at" => "2026-07-10T01:00:00Z", "user" => { "login" => "jvallery", "id" => 3_673_164, "type" => "User" } }]))
-run_gate(root, release_event, valid_repo, reviews: reviews)
+run_gate(root, push_event, valid_repo, reviews: reviews)
+
+File.write(pulls, "[]\n")
+prepare_release_event(root, pulls, chain[:head], success: false)
+wrong_route = Marshal.load(Marshal.dump(release_pull))
+wrong_route["head"]["ref"] = "feature"
+File.write(pulls, JSON.generate([wrong_route]))
+prepare_release_event(root, pulls, chain[:head], success: false)
+duplicate = Marshal.load(Marshal.dump(release_pull))
+duplicate["number"] = 457
+File.write(pulls, JSON.generate([release_pull, duplicate]))
+prepare_release_event(root, pulls, chain[:head], success: false)
 
 File.write(reviews, JSON.generate([{ "id" => 1, "state" => "APPROVED", "commit_id" => "a" * 40, "submitted_at" => "2026-07-10T01:00:00Z", "user" => { "login" => "jvallery", "type" => "User" } }]))
-run_gate(root, release_event, valid_repo, reviews: reviews, success: false)
+run_gate(root, push_event, valid_repo, reviews: reviews, success: false)
 File.write(reviews, JSON.generate([{ "id" => 1, "state" => "APPROVED", "commit_id" => chain[:head], "submitted_at" => "2026-07-10T01:00:00Z", "user" => { "login" => "jrvallery", "type" => "User" } }]))
-run_gate(root, release_event, valid_repo, reviews: reviews, success: false)
+run_gate(root, push_event, valid_repo, reviews: reviews, success: false)
 File.write(reviews, JSON.generate([{ "id" => 1, "state" => "APPROVED", "commit_id" => chain[:head], "submitted_at" => "2026-07-10T01:00:00Z", "user" => { "login" => "jvallery", "type" => "Bot" } }]))
-run_gate(root, release_event, valid_repo, reviews: reviews, success: false)
+run_gate(root, push_event, valid_repo, reviews: reviews, success: false)
 File.write(reviews, JSON.generate([
   { "id" => 1, "state" => "APPROVED", "commit_id" => chain[:head], "submitted_at" => "2026-07-10T01:00:00Z", "user" => { "login" => "jvallery", "type" => "User" } },
   { "id" => 2, "state" => "CHANGES_REQUESTED", "commit_id" => chain[:head], "submitted_at" => "2026-07-10T01:01:00Z", "user" => { "login" => "security-reviewer", "type" => "User" } }
 ]))
-raise "unresolved change request was not rejected" unless run_gate(root, release_event, valid_repo, reviews: reviews, success: false).include?("change-request")
+raise "unresolved change request was not rejected" unless run_gate(root, push_event, valid_repo, reviews: reviews, success: false).include?("change-request")
 
 event(release_event, head: chain[:head], body: "release", base: "main", source: "dev", author: "jrvallery", head_repo: "attacker/fork")
 run_gate(root, release_event, valid_repo, reviews: reviews, success: false)
-
-stdout, stderr, status = Open3.capture3("ruby", File.join(root, "scripts/delivery-gate.rb"), "--bootstrap", "--repo", root)
-raise "bootstrap failed: #{stdout}\n#{stderr}" unless status.success?
 RUBY
 
 echo "Delivery gate tests passed."

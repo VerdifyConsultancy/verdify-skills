@@ -67,5 +67,5 @@ phases:
 bootstrap_notes:
   - Pre-release main cannot derive effective ownership from candidate CODEOWNERS because current main has placeholders.
   - Pre-release identity is enforced by critic-gate plus one required approval; steady-state also has effective main CODEOWNERS.
-  - If pre-release pull_request_review discovery does not run a candidate-only workflow, rerun the existing PR-head delivery-gate run after the real approval; it reads current review history.
+  - Dev push and manual runs discover exactly one open same-repo dev-to-main PR at their SHA and execute the real route and review gates; rerun the same failed run after real approval.
   - Workflow review approval remains disabled and is never part of apply payloads.
