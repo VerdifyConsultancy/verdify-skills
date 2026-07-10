@@ -160,7 +160,7 @@ validation_results:
     command: bin/verdify artifact validate --file .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
     exit_status: 0
     result: passed
-    executed_at: "2026-07-10T08:47:00Z"
+    executed_at: "2026-07-10T08:56:00Z"
     artifact: .agent-workflow/sprints/2026-07-10-release-safety/lanes/closeout/issue-120-release-safety.closeout.yaml
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -192,11 +192,11 @@ residual_risks:
   - "Issue #121 delivery controls, a fresh critic, and a distinct admin or maintainer approval at the final report head remain required before integration or final promotion."
 worktree_clean: true
 worker_agent: codex-fix-2
-worker_session_id: worker-120-release-safety-fix2-20260710t0840z
-completed_at: "2026-07-10T08:47:00Z"
+worker_session_id: worker-120-release-safety-fix3-20260710t0940z
+completed_at: "2026-07-10T08:56:00Z"
 limitations:
   - "The immutable dispatch-only commit remains 3c78dd8adcd32eab58fe0eb0d6f57923213ee4c3; its sprint plan, wave release plan, and lane contract are unchanged through I3."
-  - "Prior I/E/S and I2/E2/S2 heads are superseded by implementation head 369b6df89865ce8321dde74a7557702fca7d3aba and this closeout-only E3."
-  - "The existing critic report remains stale request-fixes evidence and was not edited by this worker; a fresh critic must replace it after E3."
-  - "This closeout is the only changed path after implementation head 369b6df89865ce8321dde74a7557702fca7d3aba."
+  - "Prior I/E/S, I2/E2/S2, and closeout-only E3 heads are superseded by implementation head 369b6df89865ce8321dde74a7557702fca7d3aba and this lease-identity correction E4."
+  - "The existing critic report remains stale request-fixes evidence and was not edited by this worker; a fresh critic must replace it after E4."
+  - "E3 and E4 each change only the canonical closeout after implementation head 369b6df89865ce8321dde74a7557702fca7d3aba; E4 corrects the worker session to the active fix3 lease and updates only correction metadata."
   - "No npm publication, tag or GitHub release mutation, main promotion, GitHub review, merge, deployment, credential use, or private-advisory disclosure was performed."
