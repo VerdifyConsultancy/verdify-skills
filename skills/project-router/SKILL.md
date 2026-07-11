@@ -25,9 +25,10 @@ Decide exactly one next lifecycle action without doing that action's substantive
 6. Treat route-decision YAML and Markdown as ignored, untracked local views.
    The fresh computation is authoritative; `generated_at` is provenance only.
 7. Consume an upstream authority artifact only after the CLI validates it
-   against the code-selected expected schema and semantic contract. Invalid
-   artifacts and illegal handoffs route to their producing skill with bounded
-   diagnostics.
+   against the code-selected expected schema and semantic contract. Validate
+   dynamic targets against both lifecycle mode membership and the producer's
+   transition graph. Invalid artifacts and illegal handoffs route to their
+   producing skill with bounded diagnostics.
 
 ## Procedure
 

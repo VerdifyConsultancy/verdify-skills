@@ -50,8 +50,10 @@ only a typed, bounded diagnostic and routes to the owning producer.
 | State of union | `state-of-union.schema.yaml` | `state-of-union / strategy-review` |
 | Repository hygiene | `repo-hygiene.schema.yaml` | `repo-hygiene / assess` |
 
-Dynamic handoffs must also name a skill and mode declared by
-`config/lifecycle.yaml`. An undeclared pair routes to the artifact producer and
-never becomes a router exception or downstream transition.
+Dynamic handoffs must name a skill and mode declared by `config/lifecycle.yaml`,
+and the target skill must be reachable from the artifact producer's state in
+`verdify.workflow.yaml`. A globally declared but producer-illegal pair routes to
+the artifact producer and never becomes a router exception or downstream
+transition.
 
 When authoritative records disagree, stop the transition, reconstruct current state, and use a decision or scope-change gate. Do not edit intent retroactively merely to make an implementation appear compliant.
