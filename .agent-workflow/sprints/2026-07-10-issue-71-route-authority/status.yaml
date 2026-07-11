@@ -3,10 +3,8 @@ schema_ref: status.schema.yaml
 kind: SprintStatus
 schema_version: '1.0'
 sprint_id: 2026-07-10-issue-71-route-authority
-state: CHANGES_REQUESTED
-updated_at: '2026-07-11T00:09:10Z'
+state: VALIDATING
+updated_at: '2026-07-11T00:25:12Z'
 active_lanes: [issue-71-route-authority-validation]
-blockers:
-- FIND-001 high: StateOfUnion accepts a globally declared but illegal lane-delivery/implementation transition.
-- FIND-002 high: PR 221 merged at evidence head E before critic report S while critic-gate was failing.
-next_action: Original worker fixes forward from S1 dff8040731edeb68f61a582ca70ef8d30df8b437, opens a new PR against current dev, and rebuilds I/E for critic re-review.
+blockers: []
+next_action: Fresh critic re-reviews exact E3 12d26d8988c25c9350c05ba6ff79395ad3d17793 on contained draft PR 223 and appends only S2.
