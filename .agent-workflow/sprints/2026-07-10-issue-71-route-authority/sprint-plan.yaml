@@ -3,116 +3,208 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: '1.0'
 sprint_id: 2026-07-10-issue-71-route-authority
-status: approved
-goal: Make every upstream lifecycle authority input fail closed through named schema and semantic validation, and make live routing the sole authority instead of committed route-cache files.
+status: complete
+goal: Make every upstream lifecycle authority input fail closed through named schema
+  and semantic validation, and make live routing the sole authority instead of committed
+  route-cache files.
 baseline_sha: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
 github:
   repository: VerdifyConsultancy/verdify-skills
-  milestone: null
-  project: null
-issue_ids: [71]
+  milestone:
+  project:
+issue_ids:
+- 71
 scope:
-- Add one reusable route artifact loader that selects the expected schema in code, applies schema plus semantic validation, and returns bounded typed errors before callers consume authority fields.
-- Apply the loader to transcript intake, evidence registry, North Star plan and artifact state, project definition, architecture, module contracts, state of union, and repository hygiene.
-- Route invalid or impossible upstream artifacts back to their producing skill without crashing or advancing the lifecycle.
-- Validate dynamic handoff skill and mode pairs while preserving every currently legal handoff.
-- Define route-decision YAML and Markdown as ignored local derived cache, keep route --write generation, and reject re-tracking the cache paths.
-- Add malformed-foundation, illegal-handoff, stale-cache, YAML/Markdown agreement, valid-handoff, and cache-ignore regressions.
+- Add one reusable route artifact loader that selects the expected schema in code,
+  applies schema plus semantic validation, and returns bounded typed errors before
+  callers consume authority fields.
+- Apply the loader to transcript intake, evidence registry, North Star plan and artifact
+  state, project definition, architecture, module contracts, state of union, and repository
+  hygiene.
+- Route invalid or impossible upstream artifacts back to their producing skill without
+  crashing or advancing the lifecycle.
+- Validate dynamic handoff skill and mode pairs while preserving every currently legal
+  handoff.
+- Define route-decision YAML and Markdown as ignored local derived cache, keep route
+  --write generation, and reject re-tracking the cache paths.
+- Add malformed-foundation, illegal-handoff, stale-cache, YAML/Markdown agreement,
+  valid-handoff, and cache-ignore regressions.
 non_goals:
 - Rebuild the existing critic, release, outcome, or terminal-receipt validators.
-- Implement criterion-complete critic evidence from issue 73, the eval runner from issue 75, consumer CI from issue 74, or risk classes and human-gate policy from issue 70.
-- Change schemas, North Star, project definition, architecture, strategy, sprint history, GitHub delivery controls, or runtime infrastructure.
-- Add a live or network-dependent route parity check to every repository validation run.
-- Begin any Agent Platform, Gravity, Orbit, provider, correlated-transaction, or durability lane.
+- Implement criterion-complete critic evidence from issue 73, the eval runner from
+  issue 75, consumer CI from issue 74, or risk classes and human-gate policy from
+  issue 70.
+- Change schemas, North Star, project definition, architecture, strategy, sprint history,
+  GitHub delivery controls, or runtime infrastructure.
+- Add a live or network-dependent route parity check to every repository validation
+  run.
+- Begin any Agent Platform, Gravity, Orbit, provider, correlated-transaction, or durability
+  lane.
 acceptance_criteria:
 - id: SPR-AC-01
-  statement: Every named upstream route-authority artifact is schema and semantic validated through a caller-selected expected schema before any status, handoff, or authority field is consumed.
-  lane_ids: [issue-71-route-authority-validation]
-  evidence_expected: [loader unit tests, malformed artifact matrix, caller mapping assertions]
+  statement: Every named upstream route-authority artifact is schema and semantic
+    validated through a caller-selected expected schema before any status, handoff,
+    or authority field is consumed.
+  lane_ids:
+  - issue-71-route-authority-validation
+  evidence_expected:
+  - loader unit tests
+  - malformed artifact matrix
+  - caller mapping assertions
 - id: SPR-AC-02
-  statement: Invalid YAML, wrong kind or schema, missing fields, semantic violations, and impossible handoffs produce bounded typed evidence and route to the owning producer without advancing or crashing.
-  lane_ids: [issue-71-route-authority-validation]
-  evidence_expected: [producer route matrix, sanitized error assertions, negative handoff tests]
+  statement: Invalid YAML, wrong kind or schema, missing fields, semantic violations,
+    and impossible handoffs produce bounded typed evidence and route to the owning
+    producer without advancing or crashing.
+  lane_ids:
+  - issue-71-route-authority-validation
+  evidence_expected:
+  - producer route matrix
+  - sanitized error assertions
+  - negative handoff tests
 - id: SPR-AC-03
-  statement: Existing specialized sprint, lane, critic, review, release, outcome, and terminal-receipt validation behavior remains intact, and a complete valid fixture reaches its current legal handoff.
-  lane_ids: [issue-71-route-authority-validation]
-  evidence_expected: [full regression suite, valid lifecycle fixture, terminal receipt preservation]
+  statement: Existing specialized sprint, lane, critic, review, release, outcome,
+    and terminal-receipt validation behavior remains intact, and a complete valid
+    fixture reaches its current legal handoff.
+  lane_ids:
+  - issue-71-route-authority-validation
+  evidence_expected:
+  - full regression suite
+  - valid lifecycle fixture
+  - terminal receipt preservation
 - id: SPR-AC-04
-  statement: Route-decision YAML and Markdown are untracked ignored derived caches; route --write still generates an agreeing pair, repository validation rejects re-tracking them, and generated_at is not authority.
-  lane_ids: [issue-71-route-authority-validation]
-  evidence_expected: [git index assertions, ignore assertions, generated pair comparison, stale cache regression]
+  statement: Route-decision YAML and Markdown are untracked ignored derived caches;
+    route --write still generates an agreeing pair, repository validation rejects
+    re-tracking them, and generated_at is not authority.
+  lane_ids:
+  - issue-71-route-authority-validation
+  evidence_expected:
+  - git index assertions
+  - ignore assertions
+  - generated pair comparison
+  - stale cache regression
 - id: SPR-AC-05
-  statement: Focused and full tests, manifest and repository validation, redacted secret scan, one fresh critic, exact-head CI, protected-dev integration, and a normal terminal receipt all pass.
-  lane_ids: [issue-71-route-authority-validation]
-  evidence_expected: [D/I/E/S chain, test logs, fresh critic report, GitHub checks, terminal receipt]
+  statement: Focused and full tests, manifest and repository validation, redacted
+    secret scan, one fresh critic, exact-head CI, protected-dev integration, and a
+    normal terminal receipt all pass.
+  lane_ids:
+  - issue-71-route-authority-validation
+  evidence_expected:
+  - D/I/E/S chain
+  - test logs
+  - fresh critic report
+  - GitHub checks
+  - terminal receipt
 risks:
 - id: RISK-01
   severity: critical
-  statement: A partial loader migration could leave one raw authority field able to bypass validation.
-  mitigation: Enumerate every authority artifact and caller, require a named schema mapping, and test a malformed approved fixture for each producer.
+  statement: A partial loader migration could leave one raw authority field able to
+    bypass validation.
+  mitigation: Enumerate every authority artifact and caller, require a named schema
+    mapping, and test a malformed approved fixture for each producer.
 - id: RISK-02
   severity: high
-  statement: Broad exception handling or artifact diagnostics could hide programmer faults or expose unbounded untrusted content.
-  mitigation: Catch only parse and validation failures, cap and sanitize error evidence, and retain unexpected exceptions as failures.
+  statement: Broad exception handling or artifact diagnostics could hide programmer
+    faults or expose unbounded untrusted content.
+  mitigation: Catch only parse and validation failures, cap and sanitize error evidence,
+    and retain unexpected exceptions as failures.
 - id: RISK-03
   severity: medium
-  statement: Removing tracked route caches could break examples, packaged artifacts, or operators that mistake snapshots for authority.
-  mitigation: Keep route --write behavior, update examples and docs, assert ignore/index state, and run install plus manifest regressions.
+  statement: Removing tracked route caches could break examples, packaged artifacts,
+    or operators that mistake snapshots for authority.
+  mitigation: Keep route --write behavior, update examples and docs, assert ignore/index
+    state, and run install plus manifest regressions.
 lanes:
 - lane_id: issue-71-route-authority-validation
-  issue_ids: [71]
-  contract_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml
+  issue_ids:
+  - 71
+  contract_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml"
   branch: lane/71-route-authority-validation
   owner: codex-issue71-worker
   reviewer: fresh-independent-critic
-  summary: Validate every upstream route authority input before use and remove committed route cache from the authority surface.
+  summary: Validate every upstream route authority input before use and remove committed
+    route cache from the authority surface.
 dependency_order:
-- [issue-71-route-authority-validation]
+- - issue-71-route-authority-validation
 deployment_expectations:
-- The lane changes package routing, validation, tests, docs, and derived-cache tracking only; it has no application runtime deployment.
-- Exact-head CI must exercise the installed/package form as well as source-tree routing and validation.
-- Protected library and validation paths require one fresh critic and the declared exact-head protected-path integration decision.
-- After integration, ROOT must complete the deterministic normal terminal receipt and verify global routing before issue 73 starts.
+- The lane changes package routing, validation, tests, docs, and derived-cache tracking
+  only; it has no application runtime deployment.
+- Exact-head CI must exercise the installed/package form as well as source-tree routing
+  and validation.
+- Protected library and validation paths require one fresh critic and the declared
+  exact-head protected-path integration decision.
+- After integration, ROOT must complete the deterministic normal terminal receipt
+  and verify global routing before issue 73 starts.
 review_plan:
   qa_milestones:
   - id: QA-01
     name: Route authority negative matrix
     due: before worker closeout
-    evidence_expected: [malformed producer fixtures, impossible handoffs, bounded errors, valid handoff preservation]
+    evidence_expected:
+    - malformed producer fixtures
+    - impossible handoffs
+    - bounded errors
+    - valid handoff preservation
   - id: QA-02
     name: Derived cache and package regression
     due: at implementation head
-    evidence_expected: [untracked ignored caches, YAML/Markdown agreement, npm install test, manifest check, make test]
+    evidence_expected:
+    - untracked ignored caches
+    - YAML/Markdown agreement
+    - npm install test
+    - manifest check
+    - make test
   human_review_milestones:
   - id: HR-01
     name: One independent implementation criticism
     owner: Fresh critic
     trigger: Exact implementation and closeout heads pass every required local validation.
-    review_packet_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/review/review-inbox-packet.yaml
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/review/review-inbox-packet.yaml"
   - id: HR-02
     name: Preauthorized protected-path integration exception
     owner: Jason Vallery
-    trigger: Use only if exact approving S has green CI and the available identity cannot satisfy non-author CODEOWNERS review.
-    review_packet_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/gates/protected-path-merge-exception.yaml
+    trigger: Use only if exact approving S has green CI and the available identity
+      cannot satisfy non-author CODEOWNERS review.
+    review_packet_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/gates/protected-path-merge-exception.yaml"
   user_stories_for_review:
   - id: US-01
-    statement: As ROOT, I can trust a lifecycle route only after every upstream authority artifact and handoff has passed its declared validation contract.
-    issue_ids: [71]
-    lane_ids: [issue-71-route-authority-validation]
-    acceptance_refs: [SPR-AC-01, SPR-AC-02, SPR-AC-03]
+    statement: As ROOT, I can trust a lifecycle route only after every upstream authority
+      artifact and handoff has passed its declared validation contract.
+    issue_ids:
+    - 71
+    lane_ids:
+    - issue-71-route-authority-validation
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+    - SPR-AC-03
   - id: US-02
-    statement: As an operator, I can generate route views locally without stale committed snapshots contradicting live lifecycle authority.
-    issue_ids: [71]
-    lane_ids: [issue-71-route-authority-validation]
-    acceptance_refs: [SPR-AC-04, SPR-AC-05]
+    statement: As an operator, I can generate route views locally without stale committed
+      snapshots contradicting live lifecycle authority.
+    issue_ids:
+    - 71
+    lane_ids:
+    - issue-71-route-authority-validation
+    acceptance_refs:
+    - SPR-AC-04
+    - SPR-AC-05
   reporting_summary:
-    included: [fail-closed route artifact loading, legal handoff validation, ignored derived route cache, focused and full regressions]
-    deferred: [issue 73 evidence completeness, issues 75 and 74 evaluation floor, issues 43 and 70 bounded-loop policy, all cross-project work]
+    included:
+    - fail-closed route artifact loading
+    - legal handoff validation
+    - ignored derived route cache
+    - focused and full regressions
+    deferred:
+    - issue 73 evidence completeness
+    - issues 75 and 74 evaluation floor
+    - issues 43 and 70 bounded-loop policy
+    - all cross-project work
     ownership:
     - lane_id: issue-71-route-authority-validation
       owner: codex-issue71-worker
-      responsibility: Implement and prove the bounded route-authority validation and cache-authority repair.
-    next_review: One fresh critic at exact evidence head, then protected-dev integration and deterministic terminal receipt.
+      responsibility: Implement and prove the bounded route-authority validation and
+        cache-authority repair.
+    next_review: One fresh critic at exact evidence head, then protected-dev integration
+      and deterministic terminal receipt.
 approval:
   status: approved
   approver: Jason Vallery
