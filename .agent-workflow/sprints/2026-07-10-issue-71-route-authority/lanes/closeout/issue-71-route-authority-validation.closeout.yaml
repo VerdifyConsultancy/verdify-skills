@@ -5,7 +5,7 @@ sprint_id: 2026-07-10-issue-71-route-authority
 lane_id: issue-71-route-authority-validation
 status: ready_for_critic
 issue_ids: [71]
-pull_request: 222
+pull_request: 223
 baseline_sha: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
 implementation_head_sha: ea1769905f78483c4f6eef853c41868bd7f82dc1
 validated_head_sha: ea1769905f78483c4f6eef853c41868bd7f82dc1
@@ -125,10 +125,12 @@ residual_risks:
 worktree_clean: true
 worker_agent: codex-issue71-worker
 worker_session_id: codex-issue71-worker-20260710t2327z
-completed_at: "2026-07-11T00:18:50Z"
+completed_at: "2026-07-11T00:23:12Z"
 limitations:
   - Specialized sprint, critic, review, release, outcome, and terminal-receipt validators were intentionally preserved rather than rebuilt.
   - FIND-001 is addressed by producer-state transition validation and the declared lane-delivery/implementation adversarial regression; S1 remains byte-identical for independent re-review.
   - PR 221 merge cfaedfe60a1910b86725c2d5abea27aecbb9b5e3 is controller-owned incident evidence, not accepted lane completion; this worker did not revert or retroactively authorize it.
-  - LANE-AC-08 contains controller-owned post-worker evidence; this closeout proves D/I2 and hands E2 to a fresh critic without claiming S2, CI, integration, or receipt completion.
+  - PR 222 merge 8614eeaa082a3dce470752a5f7b42765ea18a18e at I2 is the second controller integration incident; it preceded E2/S2 and is not accepted lane completion.
+  - PR 223 is the draft evidence PR for the corrected closeout and fresh S2; it adds no implementation beyond protected dev and must remain draft until S2 exists.
+  - LANE-AC-08 contains controller-owned post-worker evidence; this closeout proves D/I2 and hands E3 to a fresh critic without claiming S2, CI, evidence integration, or receipt completion.
   - No schema, protected planning artifact, delivery workflow, branch protection, package version, runtime, credential, or permission was changed.
