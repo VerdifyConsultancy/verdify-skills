@@ -2,11 +2,11 @@
 schema_ref: state-of-union.schema.yaml
 kind: StateOfUnion
 schema_version: '1.0'
-strategy_id: four-project-autonomous-platform-post-215-2026-07-10
+strategy_id: four-project-autonomous-platform-post-71-2026-07-11
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: 0746cdc9468719dfddd31f485aefc323197c15a4
-assessed_at: '2026-07-10T23:12:26Z'
+baseline_sha: 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+assessed_at: '2026-07-11T00:57:06Z'
 inputs:
 - id: IN-001
   type: delegated_program_direction
@@ -25,8 +25,8 @@ inputs:
   evidence_status: verified
 - id: IN-004
   type: terminal_sprint_evidence
-  location: pull requests 213, 214, 217, and 218; .agent-workflow/sprints/2026-07-10-*/terminal-receipt.yaml
-  summary: Issues 135 and 215 are terminal, integrated_unterminated is zero, and protected dev contains every canonical receipt at the assessed baseline.
+  location: pull requests 213, 214, 217, 218, 223, and 224; .agent-workflow/sprints/2026-07-10-*/terminal-receipt.yaml
+  summary: Issues 135, 215, and 71 are terminal, integrated_unterminated is zero, and protected dev contains every canonical receipt at the assessed baseline.
   evidence_status: verified
 - id: IN-005
   type: live_github_reconciliation
@@ -34,31 +34,36 @@ inputs:
   summary: No requested implementation issue has an open linked pull request; the named Stage 0 Agent Platform security stops remain open P0 issues.
   evidence_status: verified
 - id: IN-006
-  type: completed_delivery_repair
-  location: Verdify Skills issue 215 and pull requests 217 and 218
-  summary: Authenticated, least-privilege receipt validation passed all exact-head checks and a normal terminal transaction without a second critic or human receipt approval.
+  type: completed_route_authority
+  location: Verdify Skills issue 71 and pull requests 221 through 224
+  summary: Fail-closed schema and semantic artifact loading, legal producer transitions, and untracked derived route cache passed fresh criticism, exact-head checks, protected-dev integration, and a normal terminal receipt.
+  evidence_status: verified
+- id: IN-007
+  type: delivery_authority_incidents
+  location: Verdify Skills issue 70, pull requests 221 through 223, and issue 71 closeout evidence
+  summary: Pull requests 221 and 222 merged before phase-appropriate critic evidence, and pull request 223 used a recorded non-author-review exception; these remain issue 70 authority incidents rather than compliant precedent.
   evidence_status: verified
 source_freshness:
 - surface: git
-  source_ref: Verdify Skills protected dev at 0746cdc9468719dfddd31f485aefc323197c15a4
+  source_ref: Verdify Skills protected dev at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
+  captured_at: '2026-07-11T00:57:06Z'
   limitation: This strategy refresh does not claim newer source authority in Agents, Gravity, or Orbit.
 - surface: github_issues
   source_ref: live issue API for Verdify Skills, jvallery/agents, VerdifyConsultancy/gravity, and jvallery/orbit
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
+  captured_at: '2026-07-11T00:57:06Z'
   limitation: Reconciliation is bounded to the user-authorized sequence and direct dependencies, not the full four-repository backlog.
 - surface: github_pull_requests
   source_ref: live pull request state for the sequenced issues
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
-  limitation: Issue 215 pull requests are merged and the remaining requested implementation issues have no open linked pull request at this cutoff.
+  captured_at: '2026-07-11T00:57:06Z'
+  limitation: Issue 71 pull requests are merged and the remaining requested implementation issues have no open linked pull request at this cutoff.
 - surface: github_checks
-  source_ref: exact-head checks for Verdify Skills pull requests 217 and 218
+  source_ref: exact-head checks for Verdify Skills pull requests 223 and 224
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
-  limitation: All implementation and normal-receipt required checks passed; the dev-push release gate still reports an absent promotion PR as failure and is assigned to issue 70 policy work.
+  captured_at: '2026-07-11T00:57:06Z'
+  limitation: Final implementation, evidence, and normal-receipt checks passed; issue 70 still owns typed merge authority and no-promotion push semantics.
 - surface: north_star
   source_ref: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and NORTHSTAR_ARCHITECTURE.md
   status: fresh
@@ -75,14 +80,14 @@ source_freshness:
   captured_at: '2026-07-10T21:15:06Z'
   limitation: Provider and external trust contracts are intentionally issue-backed future work.
 - surface: sprint_artifacts
-  source_ref: .agent-workflow/sprints and pull request 218 normal receipt
+  source_ref: .agent-workflow/sprints and pull request 224 normal receipt
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
+  captured_at: '2026-07-11T00:57:06Z'
   limitation: All existing sprint transactions are terminal; the next sprint has not yet been planned.
 - surface: review_artifacts
-  source_ref: issue 215 S3 fresh critic packet and exact-head critic check
+  source_ref: issue 71 S2 fresh critic packet and exact-head critic check
   status: fresh
-  captured_at: '2026-07-10T23:12:26Z'
+  captured_at: '2026-07-11T00:57:06Z'
   limitation: This planning-only approval uses Jason's explicit program authority and does not manufacture an additional implementation critic.
 - surface: deployment_runtime
   source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md runtime ledgers
@@ -128,8 +133,8 @@ planning_inventory:
 - artifact_type: state_of_union
   location: .agent-workflow/strategy/state-of-union.yaml
   status: current
-  finding: This refresh records terminal issue 215 delivery and advances the approved sequence without reopening protected intent.
-  action: Merge the planning-only refresh, then route directly to issue 71 sprint planning.
+  finding: This refresh records terminal issue 71 delivery and advances the approved sequence without reopening protected intent.
+  action: Merge the planning-only refresh, then route directly to issue 73 sprint planning.
 - artifact_type: github_backlog_sync
   location: .agent-workflow/strategy/github-backlog-sync.yaml
   status: current
@@ -139,7 +144,7 @@ planning_inventory:
   location: .agent-workflow/sprints
   status: current
   finding: Every existing transaction has terminal_at set and none remains globally active.
-  action: Create exactly one next sprint for issue 71.
+  action: Create exactly one next sprint for issue 73.
 - artifact_type: gate
   location: Agents issues 2884, 2887, and 2906
   status: blocked
@@ -158,7 +163,7 @@ north_star:
   - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
   - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
 current_state:
-  summary: Issues 135 and 215 are terminal and global routing is truthful. Issue 71 is the sole dependency-ready lane, while the four-project slice remains Stage 0 blocked.
+  summary: Issues 135, 215, and 71 are terminal and global routing is truthful. Issue 73 is the sole dependency-ready lane, while the four-project slice remains Stage 0 blocked.
   lifecycle_state: STATE_OF_UNION_APPROVED
   active_sprint: null
   open_gates:
@@ -166,18 +171,18 @@ current_state:
   - Agents #2887 tracked-archive credential containment and disposition
   - Agents #2906 credential-probe destination containment and live proof
   delivery_risks:
-  - Invalid approved lifecycle artifacts can still influence routing before fail-closed schema and semantic validation.
-  - Committed route cache files can drift from live router output while repository validation remains green.
+  - Approving critic evidence can remain empty, incomplete, duplicated, or disconnected from the lane contract.
+  - Free-text acceptance criteria cannot yet express which lifecycle phase owns their evidence; issue 225 owns the nonblocking schema versioning.
   - Issue 75 lacks executable fixture, oracle, and runner boundaries.
   - Cross-project runtime evidence is stale and cannot support a vertical-slice claim.
 delivery_health:
   status: degraded
   diagnostic_refs:
   - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
-  - https://github.com/VerdifyConsultancy/verdify-skills/issues/215
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
   deployment_refs: []
   log_refs:
-  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29123314875
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133631578
   telemetry_refs: []
   discovered_health_issues:
   - id: HEALTH-001
@@ -185,8 +190,16 @@ delivery_health:
     severity: medium
     evidence_refs:
     - Verdify Skills issue 70
-    - pull request 218 and Actions run 29129599364
-    action: Codify typed no-op promotion state and declared automatic receipt merge authority in issue 70 without weakening protected implementation gates.
+    - pull request 224 and Actions run 29133631578
+    action: Codify typed no-op promotion state, declared automatic receipt merge authority, and current-transition merge guards in issue 70 without weakening protected implementation gates.
+  - id: HEALTH-002
+    statement: Administrative merge authority can advance protected dev outside the declared evidence transition, and the final issue 71 evidence merge lacked the otherwise-required non-author GitHub approval.
+    severity: high
+    evidence_refs:
+    - Verdify Skills issue 70 comment 4940639026
+    - pull requests 221 and 222 premature merges
+    - pull request 223 recorded exception comment 4940829598
+    action: Make merge authorization a machine-verifiable typed transition in issue 70; keep these events as incidents, not precedent.
 issue_inventory:
 - issue: 135
   title: Reconcile completed sprints left active and unblock global routing
@@ -205,20 +218,28 @@ issue_inventory:
   action: Preserve as completed evidence; do not reopen.
 - issue: 71
   title: Route engine routes on unvalidated status strings
-  state: OPEN
-  classification: candidate
-  rationale: Read-only reconciliation narrowed the remaining defect to fail-closed lifecycle artifact loading and derived route-cache parity.
+  state: CLOSED
+  classification: done
+  rationale: Pull requests 223 and 224 integrated the independently reviewed route-authority fix and its normal terminal receipt; pull requests 221 and 222 remain recorded premature-merge incidents.
   dependencies:
   - issue 215 complete
-  action: Plan one bounded lane for validated artifact loading, producer routing, and route cache parity regressions.
+  action: Preserve as terminal evidence; issue 70 owns the typed merge-authority incidents.
 - issue: 73
   title: Empty evidence arrays can satisfy approval
   state: OPEN
   classification: candidate
-  rationale: Critic acceptance coverage remains incomplete even though release integration results already require evidence.
+  rationale: Fresh reproduction proves empty or fabricated approving assessments pass today, while verified release integration results already fail closed.
   dependencies:
-  - issue 71 reconciliation
-  action: Narrow to non-empty, criterion-complete critic evidence and implement one bounded lane.
+  - issue 71 terminal
+  action: Implement one bounded lane for exact critic-to-contract coverage and truthful closeout subsets; leave lifecycle-phase schema versioning to issue 225.
+- issue: 225
+  title: Add lifecycle phases to lane acceptance criteria
+  state: OPEN
+  classification: candidate
+  rationale: Structured phase ownership is required to prevent impossible closeout cycles, but it is separate from the immediate vacuous-critic defect.
+  dependencies:
+  - issue 73 trusted evidence floor
+  action: Preserve as discovered follow-up and reconcile before broad phase-specific contract authoring.
 - issue: 75
   title: Build an executable eval runner
   state: OPEN
@@ -304,14 +325,14 @@ issue_inventory:
 gaps:
 - id: GAP-001
   type: delivery
-  statement: Router authority artifacts are not uniformly loaded through fail-closed schema and semantic validation, and committed route cache parity is not enforced.
-  owner: Verdify Skills issue 71
+  statement: Deterministic merge authority and absent dev-to-main promotion remain represented through manual exceptions and red no-op workflow runs.
+  owner: Verdify Skills issue 70
   blocking: false
   apply_through: github_issue
 - id: GAP-002
   type: module_contract
-  statement: Trusted critic evidence is not yet demonstrably non-empty and criterion-complete across the lifecycle.
-  owner: Verdify Skills issues 71 and 73
+  statement: Trusted critic evidence is not yet demonstrably non-empty and criterion-complete, and acceptance phases are not yet structured.
+  owner: Verdify Skills issues 73 and 225
   blocking: false
   apply_through: github_issue
 - id: GAP-003
@@ -352,8 +373,8 @@ gaps:
   apply_through: release_verification
 recommended_sequence:
 - id: SEQ-001
-  outcome: Completed authenticated, deterministic terminal-receipt CI without weakening live evidence.
-  issue_ids: [215]
+  outcome: Completed terminal sprint authority, authenticated receipt CI, and fail-closed route authority.
+  issue_ids: [135, 215, 71]
   prerequisites:
   - issue 135 complete
   risks:
@@ -361,10 +382,9 @@ recommended_sequence:
   depends_on: []
 - id: SEQ-002
   outcome: Close the trusted transition and evaluation floor.
-  issue_ids: [71, 73, 75, 74]
+  issue_ids: [73, 75, 74]
   prerequisites:
-  - issue 215 complete
-  - reconcile issue 71 before adding code
+  - issue 71 terminal
   risks:
   - Redundant validation process
   - Vacuous evidence
@@ -437,27 +457,29 @@ recommended_sequence:
   - Expired authority, quota, duplicate wake, or restart failures
   depends_on: [SEQ-008]
 next_sprint_candidates:
-- outcome: Reconcile raw status trust before adding implementation.
-  issue_ids: [71]
+- outcome: Make approving critic evidence exact and non-vacuous.
+  issue_ids: [73]
   readiness: ready
-  rationale: Reconciliation proved two bounded remaining defects and recorded them on issue 71 without reopening already-correct critic, release, or outcome validation.
+  rationale: Fresh reproduction proved empty and fabricated approving assessments pass while existing verified-release evidence minimums already work.
   required_actions:
-  - Load route-authoritative lifecycle artifacts through schema and semantic validation and fail closed to their producing skill.
-  - Treat route-decision YAML and Markdown as derived cache and enforce parity with live route output.
+  - Require approving critic criterion IDs to equal the lane contract criteria exactly, with satisfied non-empty evidence.
+  - Require supplied non-approving and closeout criterion IDs to be unique, contract-valid, and truthful for their current phase.
+  - Pin the already-correct empty verified-release rejection and keep request-fixes empty assessment valid.
+  - Prove vacuous critic evidence cannot authorize review inbox, merge, or terminalization.
 actions:
 - id: ACT-001
   type: update_issue
-  target: Verdify Skills issue 215 terminal closeout
+  target: Verdify Skills issue 71 terminal closeout
   owner: ROOT controller
   status: applied
 - id: ACT-002
   type: update_issue
-  target: Verdify Skills issue 71 reconciliation note
+  target: Verdify Skills issue 73 bounded acceptance reconciliation
   owner: ROOT controller
   status: applied
 - id: ACT-003
   type: plan_sprint
-  target: Verdify Skills issue 71
+  target: Verdify Skills issue 73
   owner: sprint-planning
   status: proposed
 - id: ACT-004
@@ -475,13 +497,18 @@ actions:
   target: project-router after this strategy merges to protected dev
   owner: ROOT controller
   status: proposed
+- id: ACT-007
+  type: create_issue
+  target: Verdify Skills issue 225 lifecycle acceptance-phase schema
+  owner: ROOT controller
+  status: applied
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: Issues 135 and 215 are terminal, issue 71 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
+  reason: Issues 135, 215, and 71 are terminal, issue 73 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
   required_before_handoff:
   - Merge this strategy refresh to protected dev.
-  - Verify project-router selects sprint-planning for issue 71.
+  - Verify project-router selects sprint-planning for issue 73.
 approval:
   status: approved
   approver: Jason Vallery

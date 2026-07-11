@@ -1,12 +1,12 @@
-# State of Union: Post-#215 Autonomous Platform Program
+# State of Union: Post-#71 Autonomous Platform Program
 
 Canonical authority: `.agent-workflow/strategy/state-of-union.yaml`
-Assessed at protected `dev@0746cdc9468719dfddd31f485aefc323197c15a4`
-on 2026-07-10.
+Assessed at protected `dev@4fe6ff65338bb129cbfbeb2451cb5a5fa696533d`
+on 2026-07-11.
 
 ## Verdict
 
-Issues #135 and #215 are complete. All historical and current sprint
+Issues #135, #215, and #71 are complete. All historical and current sprint
 transactions have canonical terminal receipts, `integrated_unterminated` is
 zero, and the global router truthfully stops for this strategy refresh instead
 of selecting stale work.
@@ -24,19 +24,20 @@ The four-project vertical slice remains prohibited. Agents #2884, #2887, and
 
 ## Immediate Route
 
-Issue #71 is the sole ready next sprint candidate. Read-only reconciliation
-confirmed that critic, release, and outcome validation are substantially fixed,
-then narrowed the remaining defect to two authority gaps: malformed approved
-lifecycle artifacts can reach routing before fail-closed schema and semantic
-validation, and committed route cache files can disagree with live routing
-while repository validation remains green.
+Issue #73 is the sole ready next sprint candidate. Fresh reproduction confirmed
+that both an empty approving critic and an approving critic assessing only a
+fabricated criterion pass today. Verified release integration evidence already
+fails closed and will be pinned rather than rebuilt.
 
-The lane will fix only those demonstrated gaps. It will not add another review
-layer or duplicate validation already present elsewhere.
+The lane will require exact critic-to-contract coverage and truthful closeout
+subsets without adding another review layer. Structured lifecycle phase
+ownership is recorded separately on #225 because it requires a versioned
+contract model rather than inference from free-text criteria.
 
 ## Issue Sequence
 
-1. **Trusted transition and evaluation floor:** Verdify #71, #73, #75, #74.
+1. **Trusted transition and evaluation floor:** Verdify #73, #75, #74, with
+   #225 as a nonblocking schema follow-up.
 2. **Bounded autonomy and proportional process:** Verdify #43 and #70.
 3. **Agent Platform security and authority:** Agents #2884, #2887, #2906,
    #2890, #2905.
@@ -73,12 +74,13 @@ weaken review, evidence, or security requirements.
 
 | Risk | Durable owner |
 | --- | --- |
-| Invalid lifecycle artifacts and stale route cache can influence routing | Verdify #71 |
 | Critic evidence can remain non-exhaustive | Verdify #73 |
+| Acceptance criteria do not declare lifecycle phase ownership | Verdify #225 |
 | Eval packs lack a deterministic runner contract | Verdify #75 |
 | Consumer CI cannot enforce an undefined runner | Verdify #74 |
 | Shared bounded-loop and risk fast-path contracts are missing | Verdify #43/#70 |
 | No-promotion dev pushes are red and receipt auto-merge is undeclared | Verdify #70 |
+| PRs #221/#222 bypassed evidence sequencing and PR #223 used a non-author-review exception | Verdify #70 |
 | Stage 0 request, archive-secret, and probe-destination security stops | Agents #2884/#2887/#2906 |
 | Provider ownership and capability negotiation are unresolved | Verdify #12/#116; Agents #2497/#655 |
 | Citation, trust, lifecycle, and correlated runtime proof are missing | Gravity #184/#407; Orbit #193-#198/#43 |
@@ -87,4 +89,4 @@ weaken review, evidence, or security requirements.
 
 After this planning-only refresh merges to protected `dev`, run
 `project-router`. The expected handoff is `sprint-planning` in
-`lane-transaction` mode for Verdify #71. No broad fan-out is authorized.
+`lane-transaction` mode for Verdify #73. No broad fan-out is authorized.

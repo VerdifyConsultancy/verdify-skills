@@ -2,10 +2,10 @@
 schema_ref: github-backlog-sync.schema.yaml
 kind: GitHubBacklogSync
 schema_version: '1.0'
-sync_id: gbs-post-215-autonomous-platform-2026-07-10
+sync_id: gbs-post-71-autonomous-platform-2026-07-11
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: '2026-07-10T23:12:26Z'
+captured_at: '2026-07-11T00:57:06Z'
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -16,7 +16,7 @@ source_authority:
   - Runtime health was not re-probed because it does not affect selection of the next Verdify CI lane.
 snapshot:
   snapshot_ref: null
-  captured_at: '2026-07-10T23:12:26Z'
+  captured_at: '2026-07-11T00:57:06Z'
   freshness: live_only
   api_sources:
   - surface: issues
@@ -26,15 +26,15 @@ snapshot:
   - surface: pulls
     source_ref: live linked pull request searches for sequenced issues
     captured: true
-    limitation: Issue 215 pull requests are merged and no remaining requested implementation issue has an open linked pull request.
+    limitation: Issue 71 pull requests are merged and no remaining requested implementation issue has an open linked pull request.
   - surface: checks
-    source_ref: exact-head check runs for Verdify Skills pull requests 217 and 218
+    source_ref: exact-head check runs for Verdify Skills pull requests 223 and 224
     captured: true
     limitation: All implementation and normal-receipt required checks passed.
   - surface: workflow_runs
-    source_ref: Verdify Skills pull request 218 check runs and dev-push run 29129599364
+    source_ref: Verdify Skills pull request 224 check runs and dev-push run 29133631578
     captured: true
-    limitation: The normal receipt path is green; issue 70 owns the no-promotion push no-op and deterministic auto-merge policy.
+    limitation: The normal receipt path is green; issue 70 owns no-promotion semantics, deterministic merge authority, and the issue 71 premature-merge incidents.
   - surface: deployments
     source_ref: existing cross-project diagnostic ledgers
     captured: false
@@ -52,7 +52,7 @@ snapshot:
     captured: true
     limitation: Candidate strategy changes are not authoritative until merged to protected dev.
   - surface: git
-    source_ref: protected dev at 0746cdc9468719dfddd31f485aefc323197c15a4
+    source_ref: protected dev at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
     captured: true
     limitation: No source changes are included in this planning-only reconciliation.
 issue_findings:
@@ -82,7 +82,7 @@ issue_findings:
   assignees: []
   milestone: null
   dependencies:
-  - issues 71, 73, 75, and 74
+  - issues 73, 75, and 74
   sub_issues: []
   linked_prs: []
   project_refs: []
@@ -104,28 +104,34 @@ issue_findings:
   linked_prs: []
   project_refs: []
   evidence_refs:
-  - current issue body and 2026-07-10 authority-envelope comment
+  - current issue body and 2026-07-10 authority-envelope comments
+  - issue 71 premature-merge incidents and 2026-07-11 merge-authority comment
   github_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/70
   required_action: Compile the comment into a bounded risk-policy lane after issue 43.
 - issue: 71
   title: Route engine routes on unvalidated status strings
-  state: OPEN
-  classification: candidate
+  state: CLOSED
+  classification: done
   labels: []
   assignees: []
   milestone: null
   dependencies:
   - issue 215 complete
   sub_issues: []
-  linked_prs: []
+  linked_prs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/221
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/222
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/224
   project_refs: []
   evidence_refs:
-  - current route implementation and repository validator regressions
-  - 2026-07-10 issue reconciliation comment
+  - fresh S2 approval with zero findings
+  - protected dev merge 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  - terminal receipt merge 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
   github_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
-  required_action: Plan one bounded lane for fail-closed artifact loading, producer routing, and derived route-cache parity.
+  required_action: None; preserve terminal evidence and keep the merge incidents assigned to issue 70.
 - issue: 73
   title: Empty evidence arrays can satisfy approval
   state: OPEN
@@ -134,16 +140,35 @@ issue_findings:
   assignees: []
   milestone: null
   dependencies:
-  - issue 71 reconciliation
+  - issue 71 terminal
   sub_issues: []
   linked_prs: []
   project_refs: []
   evidence_refs:
-  - critic acceptance_assessment schema
-  - release integration_results schema
+  - direct reproduction of empty and fabricated approving assessments
+  - issue reconciliation comment 4940929833
+  - verified release integration_results schema already rejects an empty array
   github_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/73
-  required_action: Narrow to non-empty, criterion-complete critic evidence.
+  required_action: Implement exact critic-to-contract coverage and truthful closeout subsets in one bounded lane.
+- issue: 225
+  title: Add lifecycle phases to lane acceptance criteria
+  state: OPEN
+  classification: candidate
+  labels: ['type:problem', 'verdify:discovered-work']
+  assignees: []
+  milestone: null
+  dependencies:
+  - issue 73 trusted evidence floor
+  sub_issues: []
+  linked_prs: []
+  project_refs: []
+  evidence_refs:
+  - issue 73 acceptance-phase comment
+  - issue 71 closeout LANE-AC-08 phase boundary
+  github_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/225
+  required_action: Version structured lifecycle phases after the immediate issue 73 evidence fix.
 - issue: 74
   title: Semantic validator and eval runner are not merge-blocking in consumer CI
   state: OPEN
@@ -219,8 +244,8 @@ issue_findings:
   required_action: None; preserve terminal evidence.
 - issue: 211
   title: Publish evidence-backed four-project autonomous platform plan
-  state: CLOSED
-  classification: done
+  state: OPEN
+  classification: candidate
   labels: [documentation, enhancement]
   assignees: []
   milestone: null
@@ -234,7 +259,7 @@ issue_findings:
   - this state-of-union refresh
   github_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/211
-  required_action: None; preserve the approved strategy record.
+  required_action: Merge and verify this bounded three-artifact strategy refresh, then close again.
 - issue: 215
   title: Authenticate GitHub evidence reads in receipt CI
   state: CLOSED
@@ -368,6 +393,56 @@ pr_findings:
   finding: The one-parent, five-path normal receipt passed all policy checks without a second critic or human approval.
   evidence_refs:
   - merge commit 0746cdc9468719dfddd31f485aefc323197c15a4
+- pr: 221
+  branch: lane/71-route-authority-validation
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [71]
+  head_sha: 37d0c903b9d014d6643ed78f2071e8cafca99e01
+  checks_status: fail
+  deployment_status: not_applicable
+  finding: The initial implementation was merged before any critic report while critic-gate was failing; this is a non-authorizing merge incident owned by issue 70.
+  evidence_refs:
+  - merge commit cfaedfe60a1910b86725c2d5abea27aecbb9b5e3
+  - issue 70 comment 4940639026
+- pr: 222
+  branch: lane/71-route-authority-validation
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [71]
+  head_sha: ea1769905f78483c4f6eef853c41868bd7f82dc1
+  checks_status: fail
+  deployment_status: not_applicable
+  finding: The corrected implementation was merged before corrected closeout and fresh re-review; this is a second non-authorizing merge incident owned by issue 70.
+  evidence_refs:
+  - merge commit 8614eeaa082a3dce470752a5f7b42765ea18a18e
+- pr: 223
+  branch: lane/71-route-authority-validation
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [71]
+  head_sha: 3f2db1e608491f2157bcd363185758272e91a469
+  checks_status: pass
+  deployment_status: not_applicable
+  finding: Exact E3/S2 evidence passed every trusted check and integrated the independently reviewed implementation; the recorded non-author-review exception is not compliant precedent.
+  evidence_refs:
+  - merge commit 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223#issuecomment-4940829598
+- pr: 224
+  branch: receipt/2026-07-10-issue-71-route-authority/8487e66275bf
+  base_branch: dev
+  state: MERGED
+  draft: false
+  linked_issues: [71]
+  head_sha: 4eb47bb9f9641bcbda28b75f9f0ab74360432d19
+  checks_status: pass
+  deployment_status: not_applicable
+  finding: The one-parent, five-path normal receipt passed authenticated validation and every required check without a second critic or routine human approval.
+  evidence_refs:
+  - merge commit 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
 lane_findings:
 - lane_id: issue-135-terminal-authority
   contract_ref: .agent-workflow/sprints/2026-07-10-issue-135-terminal-authority/lanes/issue-135-terminal-authority/contract.yaml
@@ -390,59 +465,80 @@ lane_findings:
   findings:
   - D/I/E/S evidence, one fresh critic, and exact-head checks are integrated.
   - The normal terminal receipt is valid at protected dev and the issue is closed.
+- lane_id: issue-71-route-authority-validation
+  contract_ref: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml
+  issue_ids: [71]
+  branch: lane/71-route-authority-validation
+  pr_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/224
+  status: aligned
+  findings:
+  - D/I2/E3/S2 evidence, one fresh critic, and exact-head checks are integrated.
+  - The normal terminal receipt is valid at protected dev and issue 71 is closed.
+  - Pull requests 221 and 222 remain explicit controller incidents rather than retroactive approvals.
 delivery_findings:
 - ref: protected-dev
   type: branch_rule
   status: pass
   evidence_refs:
-  - live branch protection after pull requests 217 and 218
+  - live branch protection after pull requests 223 and 224
   finding: Required checks, CODEOWNERS review, admin enforcement, and force/deletion protections remain enforced.
 - ref: sprint-terminal-authority
   type: check
   status: pass
   evidence_refs:
-  - post-merge terminal_at and integrated_unterminated validation at 0746cdc9468719dfddd31f485aefc323197c15a4
-  finding: integrated_unterminated is zero and issue 215 plus all earlier sprint transactions are terminal.
+  - post-merge terminal_at and integrated_unterminated validation at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+  finding: integrated_unterminated is zero and all eight sprint transactions, including issue 71, are terminal.
 - ref: receipt-ci-authentication
   type: workflow_run
   status: pass
   evidence_refs:
   - pull request 218 exact-head required checks
+  - pull request 224 exact-head required checks
   - issue 215
   finding: A normal receipt completed authenticated policy, delivery, critic, compliance, and validation checks within the fail-closed request ceiling.
 - ref: dev-push-promotion-discovery
   type: workflow_run
   status: fail
   evidence_refs:
-  - Actions run 29129599364
+  - Actions run 29133631578
   - issue 70
   finding: An intentionally absent dev-to-main promotion PR is represented as failed delivery CI instead of a typed no-op.
-- ref: post-215-project-router
+- ref: issue-71-merge-authority-incidents
+  type: other
+  status: fail
+  evidence_refs:
+  - pull requests 221 and 222
+  - pull request 223 exception comment 4940829598
+  - issue 70 comment 4940639026
+  finding: Protected dev advanced twice before phase-appropriate critic evidence, and the final evidence merge used a recorded non-author-review exception; issue 70 must provide a typed machine-verifiable merge transition.
+- ref: post-71-project-router
   type: other
   status: pass
   evidence_refs:
   - .agent-workflow/router/route-decision.yaml
-  finding: The router truthfully selects state-of-union because this approved strategy baseline predates issue 215 delivery.
+  finding: The router truthfully selects state-of-union because this approved strategy baseline predates issue 71 delivery.
 actions:
 - id: GBSA-001
   type: update_issue
-  target: Verdify Skills issue 215 terminal closeout
+  target: Verdify Skills issue 71 terminal closeout
   owner: ROOT controller
   status: applied
   apply_through: github_issue
   evidence_refs:
-  - issue 215 closeout comment
+  - issue 71 closeout comment 4940916331
 - id: GBSA-002
   type: reconcile_lane
-  target: issue 71 bounded remaining defects
+  target: issue 73 bounded evidence acceptance
   owner: ROOT controller
   status: applied
   apply_through: github_issue
   evidence_refs:
-  - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/73#issuecomment-4940929833
 - id: GBSA-003
   type: route
-  target: sprint-planning for issue 71
+  target: sprint-planning for issue 73
   owner: ROOT controller
   status: proposed
   apply_through: state_of_union
@@ -450,12 +546,13 @@ actions:
   - .agent-workflow/strategy/state-of-union.yaml
 - id: GBSA-004
   type: update_issue
-  target: issue 70 proportional automation observations
+  target: issue 70 proportional automation and merge-authority observations
   owner: ROOT controller
   status: applied
   apply_through: github_issue
   evidence_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/70#issuecomment-4940254933
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/70#issuecomment-4940639026
 - id: GBSA-005
   type: set_dependency
   target: four-project slice blocked by Agents 2884, 2887, and 2906
@@ -464,7 +561,15 @@ actions:
   apply_through: state_of_union
   evidence_refs:
   - live Agents issue API
+- id: GBSA-006
+  type: create_issue
+  target: issue 225 lifecycle acceptance-phase schema
+  owner: ROOT controller
+  status: applied
+  apply_through: github_issue
+  evidence_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/225
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: Issue 71 is the sole ready candidate after terminal issues 135 and 215, and all broader fan-out remains explicitly sequenced or blocked.
+  reason: Issue 73 is the sole ready candidate after terminal issues 135, 215, and 71, and all broader fan-out remains explicitly sequenced or blocked.
