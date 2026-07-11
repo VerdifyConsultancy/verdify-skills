@@ -1,0 +1,164 @@
+kind: SprintHandoff
+schema_version: "0.1"
+sprint_boundary:
+  closed_sprint_id: 2026-07-10-issue-71-route-authority
+  next_sprint_id: null
+  next_candidate_issue: 73
+  prepared_at: "2026-07-11T01:05:48Z"
+  prepared_by: codex-root shutdown checkpoint
+program_goal:
+  goal_thread_id: 019f49ac-0732-7e11-a617-942ef35aaa17
+  objective: Continue the autonomous platform program from Verdify Skills PR 212 using one issue, lane, worktree, worker session, and pull request at a time, with truthful global routing, fresh implementation criticism, green CI, protected-dev integration, terminal receipts, and post-merge route verification.
+  operating_balance:
+    - Keep clear schema, accountability, and high-quality evidence without stacking routine reviews.
+    - One fresh independent critic is the default implementation assurance boundary.
+    - Deterministic planning, receipt, routing, and merge transitions should auto-advance when declared evidence is valid.
+    - Human gates are reserved for unresolved protected intent, irreversible data effects, credential or permission expansion, legal or compliance decisions, and out-of-envelope production operations.
+  authorized_sequence:
+    - "Verdify #73, #75, #74: trusted evidence and executable evaluation floor"
+    - "Verdify #43 and #70: bounded loop, risk classes, typed stops, and removal of avoidable human gates"
+    - "Agents #2884, #2887, #2906, #2890, #2905: Stage 0 security and authority"
+    - "Verdify #12/#116 and Agents #2497/#655: provider capability negotiation"
+    - "Gravity #184/#407: citation, API, and MCP readiness"
+    - "Orbit #193-#198 and #43: trust and lifecycle repair"
+    - Run one four-project transaction with one correlation ID.
+    - Run failure drills and seven unattended days before broader fleet autonomy.
+  hard_stop: Do not start the four-project vertical slice while Agents #2884, #2887, or #2906 is open.
+previous_sprint:
+  goal: Fix route authority so malformed or semantically illegal lifecycle artifacts fail closed to their producer, route caches are derived and untracked, and completed issue 71 becomes terminal through the normal receipt path.
+  outcome:
+    lanes_merged: 1
+    issues_closed: 1
+    board_delta:
+      before: not_captured
+      after_open_issue_count: 14
+    main_ci: Exact-head PR 223 and receipt PR 224 required checks passed; the latest dev-push delivery-gate run 29133631578 is red only because no dev-to-main promotion PR exists, which remains issue 70 work.
+  deploy_state: n/a repository-only
+  quality_record:
+    defects_caught_before_final_evidence_merge: 1
+    defects:
+      - Fresh critic found that REVIEW_STRATEGY could illegally hand off to lane-delivery/implementation despite schema-valid artifacts; I2 fixed the transition graph and added exhaustive legal-pair coverage.
+    fix_forwards:
+      - PR 221 merged before critic evidence and remains a non-authorizing incident.
+      - PR 222 merged the corrected implementation before corrected closeout and re-review and remains a second incident.
+      - PR 223 integrated exact E3/S2 after all checks, under a recorded non-author-review exception that is evidence rather than compliant precedent.
+  evidence_chain:
+    dispatch_sha: 5a44681f6bd840daefe829b9693365c67f693918
+    implementation_sha: ea1769905f78483c4f6eef853c41868bd7f82dc1
+    closeout_sha: 12d26d8988c25c9350c05ba6ff79395ad3d17793
+    critic_sha: 3f2db1e608491f2157bcd363185758272e91a469
+    evidence_merge_sha: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+    controller_packet_sha: 74567ec4a8b5cc7ce154218f5c45824772234215
+    controller_release_sha: 35e6c57bbf676c4a8fea6561f7802bced6a2eefd
+    controller_outcome_sha: a9bf6e436eb0d828e9ac368c968db5450422f4d2
+    receipt_sha: 4eb47bb9f9641bcbda28b75f9f0ab74360432d19
+    receipt_merge_sha: 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+  durable_claims:
+    - claim: Protected dev contains the issue 71 receipt merge.
+      probe: git ls-remote origin refs/heads/dev
+      expected: 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+      green_at: "2026-07-11T00:55:20Z"
+      reverified_at: "2026-07-11T01:05:48Z"
+    - claim: Issue 71 is terminal and no integrated sprint is unterminated.
+      probe: "ruby -Ilib -rverdify -e 'v=Verdify::SprintTerminalReceipt.new(repo: Dir.pwd); p terminal_at: v.terminal_at?(\"2026-07-10-issue-71-route-authority\", ref: \"HEAD\"), integrated_unterminated: v.integrated_unterminated_sprints(ref: \"HEAD\")'"
+      expected: "{terminal_at: true, integrated_unterminated: []}"
+      green_at: "2026-07-11T00:55:40Z"
+      reverified_at: "2026-07-11T01:05:48Z"
+    - claim: Global routing truthfully stops for a state-of-union refresh after issue 71.
+      probe: bin/verdify route
+      expected: STATE_OF_UNION_STALE -> state-of-union/strategy-refresh
+      green_at: "2026-07-11T00:55:46Z"
+      reverified_at: "2026-07-11T01:04:17Z"
+next_sprint:
+  status: candidate_not_planned_or_dispatched
+  goal: Fix issue 73 so approving critics are non-vacuous and exactly cover their lane contract, while closeouts may truthfully cover only unique contract-valid criteria available at E. Preserve already-correct verified-release evidence minimums and request-fixes behavior.
+  coverage:
+    open_issues: 2
+    covered: 2
+    included: [73]
+    deferred_follow_up: [225]
+    missing: []
+    duplicated: []
+  topology:
+    waves: 0
+    lanes: 0
+    gates: 0
+  delivery_split:
+    deploy: 0
+    build: 1
+    change_gate: 0
+  plan_artifacts:
+    - https://github.com/VerdifyConsultancy/verdify-skills/pull/226
+    - https://github.com/VerdifyConsultancy/verdify-skills/issues/73#issuecomment-4940929833
+    - https://github.com/VerdifyConsultancy/verdify-skills/issues/225
+  acceptance_floor:
+    - Approve and approve_with_risks require a non-empty assessment.
+    - Approving criterion IDs equal LaneContract criterion IDs exactly and without duplicates.
+    - Every approving assessment is satisfied and has non-empty evidence.
+    - Non-approving reports may be empty or partial, but supplied IDs are unique and contract-valid.
+    - Closeout IDs are a unique contract-valid subset; E does not claim future S, CI, integration, deployment, or outcome evidence.
+    - Empty verified release integration_results remains rejected.
+    - Request-fixes with an empty assessment remains valid.
+    - Vacuous critic evidence cannot authorize review inbox, merge, or terminal receipt.
+  top_risks:
+    - severity: high
+      statement: Current planning-only delivery policy requires implementation lane and critic metadata even for exactly three strategy artifacts.
+      mitigation: Re-probe PR 226 and use a recorded narrow exception only if the next agent elects to finish it; issue 70 owns the durable policy fix.
+    - severity: high
+      statement: Administrative merge actions can race evidence sequencing, as PRs 221 and 222 demonstrated.
+      mitigation: Do not treat those merges as precedent; issue 70 must add typed machine-verifiable merge authority.
+    - severity: medium
+      statement: Structured lifecycle phases cannot be inferred safely from free-text criteria.
+      mitigation: Issue 225 owns a versioned schema; do not expand issue 73 silently.
+agent_handoff:
+  baseline_sha: 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+  start_here: Read this packet, then inspect draft PR 226 and run project-router from a fresh protected-dev checkout.
+  open_prs:
+    - number: 226
+      title: "docs: checkpoint post-71 strategy handoff"
+      state: open_draft
+      head_sha: 46318545fd04930e8d3e711de2e1e1c974f9ab5f
+      branch: planning/post-71-state-of-union
+      checks: Compliance passed; validate was running at capture; policy, delivery-policy, and critic-gate failed on the known planning-only metadata mismatch.
+  in_flight_branches_worktrees:
+    - "origin/planning/post-71-state-of-union at 46318545fd04930e8d3e711de2e1e1c974f9ab5f; exactly three strategy artifacts; local worktree /Users/jason/repos/verdify-worktrees/2026-07-11-post-71-state-of-union"
+    - "origin/handoff/autonomous-platform-reset-2026-07-11; this shutdown packet"
+    - "origin/quarantine/issue71-root-artifact-misapply at aac1317918898e13a0c9bf6f3ed1a54eacca563d; never merge; preserved only because artifact commits were accidentally applied in the root checkout before recovery"
+    - "origin/controller/2026-07-10-issue-71-route-authority at a9bf6e436eb0d828e9ac368c968db5450422f4d2; authoritative P/R/O evidence"
+  open_gates:
+    - "Agents #2884: HTTP request desynchronization P0"
+    - "Agents #2887: tracked archive credential containment P0"
+    - "Agents #2906: fixed credential-probe destinations and live proof P0"
+    - "PR 226: planning-only policy mismatch; not an implementation critic defect"
+  github_state:
+    closed_program_issues: [135, 215, 71]
+    open_program_issues: [211, 73, 75, 74, 43, 70, 12, 116, 225]
+    strategy_owner_issue: 211
+    next_delivery_issue: 73
+  gotchas:
+    - GitHub Issues are the backlog authority; chat state is not.
+    - Issue 211 is reopened solely to own draft PR 226 and should close only when the refresh is actually merged and post-merge routing is verified.
+    - Do not dispatch issue 73 until the strategy refresh is merged or explicitly superseded and project-router selects it.
+    - Route-decision YAML and Markdown are ignored derived cache. Running route --write should not dirty tracked files.
+    - A normal terminal receipt is one direct child of the exact protected-dev base and changes exactly plan, status, release, outcome, and receipt paths.
+    - One fresh critic is enough by default. Additional review requires an unresolved finding, not ceremony.
+    - PRs 221 and 222 were premature administrative merges. PR 223 used a recorded exception and has zero GitHub reviews. Preserve this as issue 70 evidence.
+    - The latest dev-push delivery run is red only because no promotion PR exists. Issue 70 owns typed no-op semantics.
+    - Issue 225 is a discovered follow-up for phase schema; it does not block the immediate issue 73 evidence fix.
+    - Do not start Gravity, Orbit, provider, or four-project fan-out before the authorized sequence and Stage 0 stop clear.
+  shutdown_state:
+    root_worktree: clean at dev and origin/dev 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+    active_lane_leases: 0
+    active_worker_or_critic_sessions: 0
+    uncommitted_project_work: 0
+    unpushed_checkpoint_work: 0
+human_eyes_on: []
+restart_prompt_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/handoff/restart-prompt.md
+talking_points:
+  product:
+    - The program goal remains a high-quality autonomous platform, not a process-heavy review machine.
+    - Completed control-floor work is real, but the next instance should reassess the program from the durable evidence rather than continue conversational momentum.
+  architecture:
+    - Terminal receipts now separate merged work from globally terminal work.
+    - Route authority is fail-closed and cache output is derived.
+    - Evidence completeness, executable evals, bounded-loop policy, and Agent Platform Stage 0 security remain the critical path.
