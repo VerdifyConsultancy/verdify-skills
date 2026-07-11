@@ -87,17 +87,18 @@ write_strategy() {
   local repo="$1"
   local baseline="$2"
   local mode="$3"
+  local skill="${4:-sprint-planning}"
   mkdir -p "$repo/.agent-workflow/strategy"
   cp "$ROOT/examples/minimal-project/.agent-workflow/strategy/state-of-union.yaml" \
     "$repo/.agent-workflow/strategy/state-of-union.yaml"
   ruby -ryaml -e '
-    path, baseline, mode = ARGV
+    path, baseline, mode, skill = ARGV
     strategy = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
     strategy["baseline_sha"] = baseline
-    strategy["handoff"]["next_skill"] = "sprint-planning"
+    strategy["handoff"]["next_skill"] = skill
     strategy["handoff"]["next_mode"] = mode
     File.write(path, YAML.dump(strategy))
-  ' "$repo/.agent-workflow/strategy/state-of-union.yaml" "$baseline" "$mode"
+  ' "$repo/.agent-workflow/strategy/state-of-union.yaml" "$baseline" "$mode" "$skill"
 }
 
 # Every upstream authority caller uses a fixed expected schema and routes a
@@ -202,18 +203,30 @@ make_repo "$VALID_REPO"
 copy_foundations "$VALID_REPO"
 assert_route "$VALID_REPO" STATE_OF_UNION_MISSING state-of-union strategy-review "$TMP/valid.json"
 
-# A schema-valid but undeclared handoff mode routes to the producer rather than
-# raising from route_hash. The corresponding declared mode retains its route.
+# A schema-valid and globally declared pair that is unreachable from
+# REVIEW_STRATEGY routes back to its producer instead of entering implementation.
 HANDOFF_REPO="$TMP/handoff"
 make_repo "$HANDOFF_REPO"
 copy_foundations "$HANDOFF_REPO"
 git -C "$HANDOFF_REPO" add .agent-workflow
 git -C "$HANDOFF_REPO" commit -qm "seed approved foundations"
 HANDOFF_BASE="$(git -C "$HANDOFF_REPO" rev-parse HEAD)"
-write_strategy "$HANDOFF_REPO" "$HANDOFF_BASE" impossible-mode
+write_strategy "$HANDOFF_REPO" "$HANDOFF_BASE" implementation lane-delivery
 git -C "$HANDOFF_REPO" add .agent-workflow/strategy/state-of-union.yaml
 git -C "$HANDOFF_REPO" commit -qm "record invalid handoff"
 assert_route "$HANDOFF_REPO" STATE_OF_UNION_HANDOFF_INVALID state-of-union strategy-review "$TMP/handoff-invalid.json"
+
+# An allowed target skill still needs a declared mode.
+MODE_REPO="$TMP/invalid-handoff-mode"
+make_repo "$MODE_REPO"
+copy_foundations "$MODE_REPO"
+git -C "$MODE_REPO" add .agent-workflow
+git -C "$MODE_REPO" commit -qm "seed approved foundations"
+MODE_BASE="$(git -C "$MODE_REPO" rev-parse HEAD)"
+write_strategy "$MODE_REPO" "$MODE_BASE" impossible-mode
+git -C "$MODE_REPO" add .agent-workflow/strategy/state-of-union.yaml
+git -C "$MODE_REPO" commit -qm "record invalid handoff mode"
+assert_route "$MODE_REPO" STATE_OF_UNION_HANDOFF_INVALID state-of-union strategy-review "$TMP/handoff-invalid-mode.json"
 
 LEGAL_REPO="$TMP/legal-handoff"
 make_repo "$LEGAL_REPO"
@@ -225,6 +238,33 @@ write_strategy "$LEGAL_REPO" "$LEGAL_BASE" issue-readiness
 git -C "$LEGAL_REPO" add .agent-workflow/strategy/state-of-union.yaml
 git -C "$LEGAL_REPO" commit -qm "record legal handoff"
 assert_route "$LEGAL_REPO" REPO_HYGIENE_MISSING repo-hygiene assess "$TMP/handoff-valid.json"
+
+# REVIEW_STRATEGY's complete target-skill set comes from the workflow graph.
+# Every mode declared for those targets is legal; every other lifecycle skill
+# remains illegal even when its mode is globally valid.
+ruby -I"$ROOT/lib" -rverdify -ryaml -e '
+  cli = Verdify::CLI.new([])
+  producer = "REVIEW_STRATEGY"
+  expected = %w[
+    architecture-contracts gravity-readiness platform-readiness
+    project-definition project-router repo-hygiene sprint-planning
+  ].sort
+  actual = cli.send(:workflow_transition_target_skills, producer).sort
+  abort "workflow target mismatch: #{actual.inspect}" unless actual == expected
+
+  lifecycle = YAML.safe_load(File.read(File.join(ARGV.fetch(0), "config/lifecycle.yaml")), permitted_classes: [], aliases: false)
+  modes = Array(lifecycle["skills"]).to_h { |entry| [entry.fetch("name"), Array(entry.fetch("modes"))] }
+  expected.each do |skill|
+    modes.fetch(skill).each do |mode|
+      abort "expected legal #{skill}/#{mode}" unless cli.send(:legal_workflow_handoff?, producer, skill, mode)
+    end
+  end
+  (modes.keys - expected).each do |skill|
+    modes.fetch(skill).each do |mode|
+      abort "expected illegal #{skill}/#{mode}" if cli.send(:legal_workflow_handoff?, producer, skill, mode)
+    end
+  end
+' "$ROOT"
 
 # Route views are ignored derived cache. YAML and Markdown agree on every stable
 # authority field, while the volatile generation timestamp is YAML-only.

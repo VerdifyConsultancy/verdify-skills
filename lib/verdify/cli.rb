@@ -2195,12 +2195,12 @@ module Verdify
       if skill.empty? || mode.empty? || reason.empty?
         return route_hash(repo, "STATE_OF_UNION_HANDOFF_INCOMPLETE", "state-of-union", "strategy-review", "The approved strategy does not name a complete handoff.", evidence, missing, open_gates)
       end
-      unless declared_lifecycle_mode?(skill, mode)
+      unless legal_workflow_handoff?("REVIEW_STRATEGY", skill, mode)
         evidence << {
           "source" => strategy_path.relative_path_from(repo.root).to_s,
           "finding" => "route authority rejected (type=illegal_handoff; expected_schema=state-of-union.schema.yaml)"
         }
-        return route_hash(repo, "STATE_OF_UNION_HANDOFF_INVALID", "state-of-union", "strategy-review", "The approved strategy names a lifecycle handoff that is not declared by the canonical lifecycle model.", evidence, missing, open_gates)
+        return route_hash(repo, "STATE_OF_UNION_HANDOFF_INVALID", "state-of-union", "strategy-review", "The approved strategy names a lifecycle handoff that is not legal from the strategy producer state.", evidence, missing, open_gates)
       end
 
       hygiene_route = route_for_repo_hygiene(repo, root, evidence, missing, open_gates) if skill == "sprint-planning"
@@ -2456,6 +2456,25 @@ module Verdify
 
     def declared_lifecycle_mode?(skill, mode)
       lifecycle_modes[skill.to_s]&.include?(mode.to_s) == true
+    end
+
+    def legal_workflow_handoff?(producer_state, skill, mode)
+      declared_lifecycle_mode?(skill, mode) && workflow_transition_target_skills(producer_state).include?(skill.to_s)
+    end
+
+    def workflow_transition_target_skills(producer_state)
+      @workflow_transition_target_skills ||= {}
+      @workflow_transition_target_skills[producer_state.to_s] ||= begin
+        workflow = Verdify.safe_load_yaml(Verdify::ROOT.join("verdify.workflow.yaml"))
+        states = workflow.dig("state_machine", "states")
+        source = states.is_a?(Hash) ? states[producer_state.to_s] : nil
+        Array(source.is_a?(Hash) ? source["transitions"] : nil).filter_map do |target_state|
+          target = states[target_state]
+          target["skill"].to_s unless target["skill"].to_s.empty?
+        end.uniq.freeze
+      end
+    rescue Verdify::Error, NoMethodError
+      []
     end
 
     def lifecycle_modes
