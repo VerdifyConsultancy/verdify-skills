@@ -3,224 +3,194 @@ kind: CriticReport
 schema_version: "2.0"
 sprint_id: 2026-07-10-issue-71-route-authority
 lane_id: issue-71-route-authority-validation
-pull_request: 221
+pull_request: 223
 worker_agent: codex-issue71-worker
 worker_session_id: codex-issue71-worker-20260710t2327z
 critic_agent: codex-issue71-critic
-implementation_head_sha: "154e3bbd717f93b422343e97b98b7a24beda64d1"
-evidence_head_sha: "37d0c903b9d014d6643ed78f2071e8cafca99e01"
-reviewed_head_sha: "37d0c903b9d014d6643ed78f2071e8cafca99e01"
+implementation_head_sha: "ea1769905f78483c4f6eef853c41868bd7f82dc1"
+evidence_head_sha: "12d26d8988c25c9350c05ba6ff79395ad3d17793"
+reviewed_head_sha: "12d26d8988c25c9350c05ba6ff79395ad3d17793"
 closeout_path: .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/closeout/issue-71-route-authority-validation.closeout.yaml
-closeout_sha256: "8d35cec6bc53eb2f3f2d3a142a72e57f55f5d610f219cf36f42946cce794c6ff"
+closeout_sha256: "ac5ba0f2c2acbfc8fca7bb95299d249f8de97fcef2db04d088abd3a0aec5e9b2"
 critic_session_id: codex-issue71-critic-20260710t2355z
 review_worktree: /Users/jason/repos/verdify-worktrees/2026-07-10-issue-71-route-authority/critic
-outcome: request_fixes
-findings:
-  - id: FIND-001
-    severity: high
-    statement: >-
-      Dynamic handoff validation checks only whether a mode belongs to a named
-      lifecycle skill, so a schema- and semantic-valid State of Union can skip
-      the legal workflow graph and route directly into implementation.
-    evidence:
-      - >-
-        lib/verdify/cli.rb:2184-2209 accepts every pair for which
-        declared_lifecycle_mode? returns true. That helper at lines 2457-2464
-        reads only config/lifecycle.yaml skill-to-mode membership and never
-        checks the producer-specific transition graph.
-      - >-
-        verdify.workflow.yaml:116-121 limits REVIEW_STRATEGY transitions to its
-        strategy gate, project or architecture definition, repository hygiene,
-        platform or Gravity readiness, sprint planning, and routing. It does
-        not allow LANE_WORK or lane-delivery.
-      - >-
-        An independent temporary-repository fixture created approved
-        foundations and a schema-valid approved StateOfUnion whose handoff was
-        lane-delivery / implementation. Artifact validation passed, and
-        bin/verdify route returned STATE_OF_UNION_HANDOFF -> lane-delivery /
-        implementation instead of routing to state-of-union for repair.
-      - >-
-        tests/test_route_authority.sh:205-227 tests only an undeclared
-        impossible-mode and a declared sprint-planning mode. The candidate full
-        suite passes while the declared-but-illegal transition remains
-        accepted, so LANE-AC-03's globally impossible-state boundary is not
-        covered or enforced.
-    requested_action: >-
-      Enforce producer-specific legal workflow transitions in addition to
-      skill/mode membership, add a declared-but-illegal StateOfUnion handoff
-      regression such as lane-delivery / implementation, and rebuild the
-      implementation, closeout, and critic chain from the corrected dev state.
-  - id: FIND-002
-    severity: high
-    statement: >-
-      PR 221 merged to protected dev at evidence head E before any critic
-      report existed, while critic-gate was failing and no GitHub review was
-      present, so the required D/I/E/S authorization chain was bypassed.
-    evidence:
-      - >-
-        A live gh pr view after independent testing reported PR 221 MERGED at
-        2026-07-10T23:59:33Z with headRefOid
-        37d0c903b9d014d6643ed78f2071e8cafca99e01, merge commit
-        cfaedfe60a1910b86725c2d5abea27aecbb9b5e3, an empty reviews array, and
-        no reviewDecision.
-      - >-
-        The same live status rollup shows validate, compliance,
-        pull-request-policy, and delivery-policy successful, but all three
-        recorded critic-gate runs failed. The lane branch contained no
-        canonical critic report at merge time.
-      - >-
-        origin/dev now resolves to cfaedfe60a1910b86725c2d5abea27aecbb9b5e3,
-        while origin/lane/71-route-authority-validation still resolved to E
-        before this report. A report-only S pushed after merge cannot
-        retroactively become the merged exact head or authorize that merge.
-    requested_action: >-
-      Stop terminal-receipt and issue-closure processing for this sprint. Treat
-      the merge as unauthorized, apply a bounded revert or fix-forward on dev
-      that resolves FIND-001, and require a rebuilt exact-head critic chain and
-      passing trusted gates before any subsequent integration or promotion.
+outcome: approve_with_risks
+findings: []
 acceptance_assessment:
   - criterion_id: LANE-AC-01
     assessment: satisfied
     evidence:
       - >-
-        load_route_authority receives a code-selected schema name, parses with
-        YAML.safe_load through SchemaValidator.load_document, validates against
-        the expected schema, then applies SemanticValidator only after schema
-        success. Failures expose only a typed category, expected schema, capped
-        error count, and truncation marker.
+        The unchanged reusable loader receives a code-selected expected schema,
+        parses YAML safely, applies SchemaValidator followed by
+        SemanticValidator, and returns only a validated document or bounded
+        typed failure.
       - >-
-        The focused route-authority and schema-validator suites passed, and
-        wrong-schema, invalid-YAML, missing-field, semantic-failure, and bounded
-        diagnostic fixtures route to their typed producers without echoing
-        sentinel content.
+        Independent focused and full-suite runs passed wrong-schema,
+        invalid-YAML, missing-field, semantic-failure, and bounded diagnostic
+        fixtures without exposing sentinel artifact content.
   - criterion_id: LANE-AC-02
     assessment: satisfied
     evidence:
       - >-
-        Code inspection traced transcript replan, evidence registry, North Star
-        plan and artifacts, project definition, architecture, every discovered
-        module contract, State of Union, and repository hygiene through
-        route_authority_document before the relevant status, approval, or
-        handoff fields are read.
-      - >-
-        tests/test_route_authority.sh exercises all nine producer/schema routes,
-        and the independent full suite passed those fixtures.
+        Code inspection and the nine-producer matrix confirm transcript replan,
+        evidence registry, North Star plan and artifacts, project definition,
+        architecture, every module contract, State of Union, and repository
+        hygiene validate through route_authority_document before authority
+        fields are consumed.
   - criterion_id: LANE-AC-03
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
       - >-
-        Malformed YAML, schema substitution, missing fields, semantic invalidity,
-        and undeclared modes fail closed, but FIND-001 proves that a declared
-        skill/mode pair that is illegal from REVIEW_STRATEGY advances directly
-        into lane implementation.
+        I2 retains global skill/mode membership validation and additionally
+        derives reachable target skills from REVIEW_STRATEGY transitions in
+        verdify.workflow.yaml. Missing, malformed, or unresolvable graph state
+        yields no allowed target and therefore fails closed to the producer.
+      - >-
+        An independent schema-valid StateOfUnion reproduction using the globally
+        declared but producer-unreachable lane-delivery / implementation pair
+        now returns STATE_OF_UNION_HANDOFF_INVALID -> state-of-union /
+        strategy-review without exposing the supplied reason.
+      - >-
+        The complete REVIEW_STRATEGY matrix independently matched the seven
+        reachable target skills and every mode declared for them, while every
+        mode of every other lifecycle skill remained illegal. The committed
+        route-authority regression exercises the illegal pair, an undeclared
+        mode, and preserved legal routing.
   - criterion_id: LANE-AC-04
     assessment: satisfied
     evidence:
       - >-
-        Valid foundation and legal sprint-planning handoff fixtures preserve
-        their expected routes. The complete CLI, lane-review, delivery,
-        release, outcome, and terminal-receipt regression suites pass, and the
-        specialized validators were not modified by I.
+        Valid foundation, legal strategy, CLI, lane-review, delivery, release,
+        outcome, and terminal-receipt suites pass. I2 changes no specialized
+        sprint, critic, review, release, outcome, or terminal-receipt validator.
   - criterion_id: LANE-AC-05
     assessment: satisfied
     evidence:
       - >-
-        The two repository route-decision paths are absent from git ls-files,
-        both resolve through .agent-workflow/.gitignore, and repository
-        validation rejects a temporary-index attempt to re-track the YAML path.
-        Fresh repository and minimal-project ignore templates include both
-        derived cache paths.
+        Both repository route-decision paths remain absent from git ls-files,
+        resolve through the workflow ignore file, and are protected by the
+        existing temporary-index re-tracking regression.
   - criterion_id: LANE-AC-06
     assessment: satisfied
     evidence:
       - >-
-        A fresh route --write output validates against
-        route-decision.schema.yaml; the focused fixture compares current_state,
-        next_skill, next_mode, and reason across YAML and Markdown and proves
-        generated_at is absent from Markdown authority.
+        Fresh route --write output remains schema-valid, YAML and Markdown agree
+        on current_state, next_skill, next_mode, and reason, and generated_at
+        remains non-authoritative.
   - criterion_id: LANE-AC-07
     assessment: satisfied
     evidence:
       - >-
-        Worker evidence binds all required checks to I, and E adds only the
-        canonical closeout. Independent make test, npm install, repository,
-        manifest, route cache, diff, and redacted gitleaks checks passed on the
-        otherwise identical implementation tree at E.
+        Independent make test, installed-package, repository, manifest, route
+        cache, diff, and redacted gitleaks checks passed on E3. The I2 tree is
+        byte-identical to current protected dev merge 8614eeaa, and S1 remains
+        byte-identical with SHA-256
+        0c98134ddf09fde3bc55a800145764bee495cf69f8ad6e9cafa312fd325f410e.
   - criterion_id: LANE-AC-08
-    assessment: not_satisfied
+    assessment: satisfied
     evidence:
       - >-
-        D, I, and E are linear and correctly shaped, but this report requests
-        fixes, cannot yield an approving critic-gate, and FIND-002 proves the
-        protected-dev merge occurred without report head S or an exact-head
-        approving authorization.
+        D, I2, and E3 are present with immutable dispatch inputs, the corrected
+        implementation is independently accepted by this report-only S2, and
+        PR 223 provides a contained evidence-only path to protected dev. Exact
+        S2 checks, non-author approval, evidence integration, and the normal
+        terminal receipt remain mandatory integration gates rather than claims
+        of already completed approval.
 evidence_assessment:
   - >-
-    Independence is verified: critic codex-issue71-critic / session
-    codex-issue71-critic-20260710t2355z used the locked detached critic
-    worktree at E and differs from worker codex-issue71-worker / session
-    codex-issue71-worker-20260710t2327z.
+    Independence is preserved across both rounds: critic
+    codex-issue71-critic / codex-issue71-critic-20260710t2355z remains distinct
+    from worker codex-issue71-worker /
+    codex-issue71-worker-20260710t2327z and reviewed exact E3 in the locked
+    detached critic worktree.
   - >-
-    The history is linear from baseline
-    af3e6b7e7b23b600e62c1aedf042ab9a5d244deb to D
-    5a44681f6bd840daefe829b9693365c67f693918, I
-    154e3bbd717f93b422343e97b98b7a24beda64d1, and E
-    37d0c903b9d014d6643ed78f2071e8cafca99e01. D is the baseline's direct
-    child and adds only the sprint plan, wave release plan, and lane contract;
-    E adds only the canonical closeout.
+    D 5a44681f6bd840daefe829b9693365c67f693918 is the direct child of
+    baseline af3e6b7e7b23b600e62c1aedf042ab9a5d244deb and adds only the
+    sprint plan, wave release plan, and lane contract. Those three files are
+    byte-identical through E3; contract SHA-256 remains
+    712b88c45db87e0ce3c16561925c0bd4c3fd318bd6e1d9cd932d5c670a80d27a.
   - >-
-    Dispatch artifacts are byte-identical from D through E and match approved
-    planning transaction 8a296752b19b66da952002bf1519f5f92182ee11.
-    Contract SHA-256 is
-    712b88c45db87e0ce3c16561925c0bd4c3fd318bd6e1d9cd932d5c670a80d27a;
-    closeout SHA-256 is
-    8d35cec6bc53eb2f3f2d3a142a72e57f55f5d610f219cf36f42946cce794c6ff.
+    S1 dff8040731edeb68f61a582ca70ef8d30df8b437 remains byte-identical
+    through merge reconciliation 6294994709bdd7437d7f47117f34e41587134fb2,
+    I2, E3, and current dev. The 6294994 merge changes no tree content relative
+    to S1 and records origin/dev ancestry; it is integration evidence, not
+    retroactive approval of PR 221.
   - >-
-    I changes only contract-owned implementation, documentation, cache,
-    fixture, test, and manifest paths. No prohibited path changed, and the
-    closeout changed-path list matches the implementation commit.
+    I2 ea1769905f78483c4f6eef853c41868bd7f82dc1 changes exactly six
+    contract-owned implementation, documentation, test, and manifest paths.
+    The two linear I2-to-E3 commits change only the canonical closeout, whose
+    independently calculated SHA-256 is
+    ac5ba0f2c2acbfc8fca7bb95299d249f8de97fcef2db04d088abd3a0aec5e9b2.
   - >-
-    Trusted protected-base artifact validation passed for the sprint plan,
-    wave release plan, lane contract, and closeout. Candidate make test passed
-    with 122 schema runs/688 assertions, 52 lane-review runs/129 assertions,
-    and 29 terminal-receipt runs/147 assertions, all with zero failures,
-    errors, or skips; every shell policy, CLI, release, install, and packed
-    artifact suite also passed.
+    Current origin/dev merge 8614eeaa082a3dce470752a5f7b42765ea18a18e
+    has a tree byte-identical to I2 and contains the preserved S1 report. PR 223
+    is open, draft, targets dev, has exact head E3, and its base-to-head diff
+    changes only the canonical closeout.
+  - >-
+    The original adversarial fixture now fails closed. The exhaustive legal
+    target/mode check, bash tests/test_route_authority.sh, CLI suite, repository
+    validation, manifest check, route-cache checks, diff check, and redacted
+    three-commit gitleaks scan all passed independently.
+  - >-
+    make test passed with 122 schema runs/688 assertions, 52 lane-review
+    runs/129 assertions, and 29 terminal-receipt runs/147 assertions, all with
+    zero failures, errors, or skips; every shell policy, release, installation,
+    and packed-artifact suite also passed.
   - >-
     A separate bash tests/test_npm_install.sh run passed against the exact
-    candidate package, including the pinned published 1.2.1 upgrade path.
-    Manifest regeneration matched, the route cache index/ignore checks passed,
-    and gitleaks scanned all three lane commits with no leaks.
+    candidate package, including the pinned published 1.2.1 forced-upgrade
+    path. Trusted protected-base artifact validation passed for the sprint
+    plan, wave plan, lane contract, and E3 closeout.
   - >-
-    The committed test matrix is credible for malformed artifacts, bounded
-    diagnostics, cache generation, package compatibility, and preserved
-    specialized validators. It is insufficient for globally legal handoffs,
-    as the independent declared-but-impossible transition fixture demonstrates.
+    E3 pull-request-policy, delivery-policy, and critic-gate failures are
+    attributable to the intentionally preserved S1 report still binding PR
+    221/I1/E1 and to the absent S2 report head. They are expected pre-S2
+    containment failures, not accepted evidence or green authorization.
 integration_risks:
   - >-
-    The unreviewed implementation is already present on protected dev at merge
-    commit cfaedfe60a1910b86725c2d5abea27aecbb9b5e3. A crafted approved State of
-    Union can currently bypass sprint planning and route directly to a worker.
+    PR 221 merge cfaedfe60a1910b86725c2d5abea27aecbb9b5e3 and PR 222
+    merge 8614eeaa082a3dce470752a5f7b42765ea18a18e both occurred before
+    their phase-appropriate critic evidence. They are controller incidents and
+    ancestry evidence only; neither is retroactively approved by this report.
   - >-
-    This report-only S is durable request-fixes evidence on the lane branch; it
-    is not an approval, cannot retroactively authorize merge commit cfaedfe,
-    and must not be used to generate a normal terminal receipt.
+    PR 223 must remain draft until the controller updates its current-head
+    metadata to exact S2 and validate, pull-request-policy, delivery-policy,
+    compliance, and critic-gate all succeed at that exact report head. This
+    critic did not mark it ready.
   - >-
-    Main, npm publication, GitHub release, runtime deployment, and credential or
-    permission changes remain outside this lane and must not advance from the
-    unauthorized dev merge.
+    PR 223 is currently behind dev by the 8614eeaa merge commit even though its
+    implementation tree matches dev. If policy requires a new synchronization
+    commit after S2, that commit invalidates this review and requires a new
+    evidence head and re-review; it must not be silently added after S2.
+  - >-
+    Because the corrected implementation changed CODEOWNERS-protected route
+    authority code and the earlier integrations lacked an approving critic,
+    a current non-author repository owner approval bound to exact S2 remains a
+    mandatory compensating integration gate.
+  - >-
+    A successful evidence-only PR 223 merge still does not complete the sprint.
+    The controller must verify the integrated report/closeout on protected dev
+    and complete the normal terminal-receipt transaction before issue closure or
+    downstream route advancement.
 residual_risks:
   - >-
-    Existing initialized repositories do not receive the two new ignore entries
-    from a non-forced init. They may need an explicit .gitignore update and git
-    index cleanup before generated route views are purely local cache; fresh
-    initialization and the tested forced upgrade install the entries.
+    Existing initialized repositories do not receive the two route-cache ignore
+    entries from a non-forced init. They may require an explicit ignore update
+    and git-index cleanup; fresh initialization and the tested forced upgrade
+    install the entries.
   - >-
-    The candidate tests validate skill/mode membership but do not derive or
-    assert producer-specific workflow transitions. Any fix must cover other
-    dynamic producer handoffs, not only the reproduced StateOfUnion pair.
+    REVIEW_STRATEGY legality intentionally combines producer-reachable target
+    skills from verdify.workflow.yaml with all modes declared for those skills
+    in config/lifecycle.yaml. Future workflow or mode changes require the
+    exhaustive package regression to remain synchronized.
   - >-
-    Any implementation commit after this report requires a new closeout and
-    independent exact-head review; the current merged E and later request-fixes
-    S are not an approving chain.
-reviewed_at: "2026-07-11T00:05:13Z"
+    The two integration races show that branch controls can be administratively
+    bypassed. Exact-S2 checks, the non-author approval, draft containment, and
+    the terminal receipt are therefore required controls, not ceremonial
+    follow-up.
+  - >-
+    No main promotion, npm publication, GitHub release, runtime deployment,
+    credential expansion, or permission change was performed or authorized by
+    this review.
+reviewed_at: "2026-07-11T00:33:40Z"
