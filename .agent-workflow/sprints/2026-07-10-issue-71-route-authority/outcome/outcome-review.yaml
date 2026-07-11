@@ -1,0 +1,41 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-71-route-authority
+decision: accepted_with_risks
+reviewed_at: '2026-07-11T00:49:06Z'
+reviewer: codex-root under Jason Vallery delegated outcome authority
+intended_outcome: Make global project routing derive lifecycle state only from schema-valid, semantically legal authority artifacts while keeping route output deterministic, bounded, and non-authoritative.
+delivered_outcomes:
+- Every upstream routing authority now has an explicit expected artifact kind and trusted schema selected by code rather than artifact-supplied schema_ref.
+- Malformed authority artifacts fail closed to the responsible producer skill with bounded diagnostics rather than routing from unchecked status strings.
+- Producer-state handoffs are checked against the complete declared target and mode graph; illegal transitions such as REVIEW_STRATEGY to lane-delivery/implementation are rejected.
+- Route-decision YAML and Markdown are untracked ignored derived cache, while route --write still emits an agreeing pair without changing project authority.
+- Route, gate, CLI, schema, full-repository, installed-package, manifest, secret-scan, and diff regressions pass.
+- Fresh criticism found the illegal-transition gap, drove the I2 fix-forward, and approved exact S2 with zero unresolved findings.
+- PR 223 merged exact S2 to protected dev as 8487e66275bfc19b63f3d36872741f8f86d6cb6d with trusted checks green and protections restored.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/221
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/222
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/223#issuecomment-4940829598
+- git:ea1769905f78483c4f6eef853c41868bd7f82dc1
+- git:3f2db1e608491f2157bcd363185758272e91a469
+- git:8487e66275bfc19b63f3d36872741f8f86d6cb6d
+- git:74567ec4a8b5cc7ce154218f5c45824772234215
+- git:35e6c57bbf676c4a8fea6561f7802bced6a2eefd
+incomplete_items: []
+residual_risks:
+- PRs 221 and 222 were merged before approving critic evidence; they cannot be retroactively authorized and remain recorded integration incidents even though the resulting tree was independently reviewed and corrected.
+- Existing initialized repositories may retain tracked or unignored route cache files until updated; fresh and forced initialization install both ignore rules.
+- The deterministic terminal receipt remains to prove that this accepted protected-dev state closes the sprint without relying on mutable controller status.
+follow_up_issues:
+- 70
+lessons_learned:
+- A schema-valid status is not sufficient authority; routing also needs a producer-owned legal transition graph.
+- Derived route output must remain observable but untracked so cache generation cannot become global lifecycle authority.
+- One independent critic with fix-forward re-review exposed the semantic gap without requiring repeated approval layers.
+- Merge authority needs a typed automated guard because administrative UI actions can race controller-owned evidence sequencing.
+rationale: The bounded issue met its route-authority contract, the sole critic finding was fixed and independently re-reviewed, exact-head CI and protected-dev integration are verified, and the remaining receipt is a deterministic terminal transition rather than unresolved implementation work.

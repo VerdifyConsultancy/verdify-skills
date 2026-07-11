@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-71-route-authority
+mode: normal
+recovery_bundle:
+receipt_base_sha: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+integration_branch: dev
+controller:
+  ref: controller/2026-07-10-issue-71-route-authority
+  head_sha: a9bf6e436eb0d828e9ac368c968db5450422f4d2
+  packet_commit_sha: 74567ec4a8b5cc7ce154218f5c45824772234215
+  release_commit_sha: 35e6c57bbf676c4a8fea6561f7802bced6a2eefd
+  outcome_commit_sha: a9bf6e436eb0d828e9ac368c968db5450422f4d2
+  packet_path: ".agent-workflow/sprints/2026-07-10-issue-71-route-authority/review/review-inbox-packet.yaml"
+  packet_sha256: f87c94ac61741bd2cb1b5a591d54b8bfffb173854f0a25c91ca040693b01bd5e
+  release_sha256: e53e711f7ea03379017274db17d1ae3bdc7bd68daf37cd2bb4389693faf83074
+  outcome_sha256: 042d4e8ecacd3dc59fdb8628b5cc75c3f00253c2a220d2f155c241baf4a82dcc
+lanes:
+- lane_id: issue-71-route-authority-validation
+  issue_ids:
+  - 71
+  branch: lane/71-route-authority-validation
+  pull_request: 223
+  dispatch_head_sha: 5a44681f6bd840daefe829b9693365c67f693918
+  implementation_head_sha: ea1769905f78483c4f6eef853c41868bd7f82dc1
+  evidence_head_sha: 12d26d8988c25c9350c05ba6ff79395ad3d17793
+  critic_report_head_sha: 3f2db1e608491f2157bcd363185758272e91a469
+  merge_commit_sha: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+artifacts:
+  plan_sha256: af88a2055bc04eb1a5bfa94506660f6e21633ce89e0509a58d1e41e5c28f674f
+  status_sha256: 586aa4c02951efde5a0b273d9781a5bf90d1f4505d78466cf02c4c7bd4d86405
+  release_sha256: e53e711f7ea03379017274db17d1ae3bdc7bd68daf37cd2bb4389693faf83074
+  outcome_sha256: 042d4e8ecacd3dc59fdb8628b5cc75c3f00253c2a220d2f155c241baf4a82dcc
+terminal:
+  integrated_sha: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-11T00:50:28Z'
+generator: codex-root-issue71-controller

@@ -1,0 +1,87 @@
+---
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: '1.0'
+sprint_id: 2026-07-10-issue-71-route-authority
+status: verified
+integrated_sha: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+release:
+  tag: null
+  url: null
+artifact_identity:
+- type: git-commit
+  identifier: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+- type: github-pull-request
+  identifier: https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+- type: critic-report-head
+  identifier: 3f2db1e608491f2157bcd363185758272e91a469
+integration_results:
+- name: D/I2/E3/S2 evidence chain
+  result: passed
+  evidence: Dispatch 5a44681f6bd840daefe829b9693365c67f693918, implementation ea1769905f78483c4f6eef853c41868bd7f82dc1, corrected closeout 12d26d8988c25c9350c05ba6ff79395ad3d17793, and approving critic 3f2db1e608491f2157bcd363185758272e91a469 validate.
+- name: validate
+  result: passed
+  evidence: Trusted pull_request check 86491949618 from run 29133022050 passed at exact S2.
+- name: pull-request-policy
+  result: passed
+  evidence: Trusted pull_request check 86492314100 from run 29133148616 passed at exact S2.
+- name: compliance / compliance
+  result: passed
+  evidence: Trusted pull_request check 86491949917 from run 29133022171 passed at exact S2.
+- name: delivery-policy
+  result: passed
+  evidence: Trusted pull_request check 86492314237 from run 29133148608 passed at exact S2.
+- name: critic-gate
+  result: passed
+  evidence: Trusted pull_request check 86492314258 from run 29133148608 passed at exact S2.
+- name: protected-dev merge
+  result: passed
+  evidence: PR 223 merged exact S2 as 8487e66275bfc19b63f3d36872741f8f86d6cb6d and branch protections were restored.
+- name: integration incident containment
+  result: passed
+  evidence: PRs 221 and 222 remain explicit non-authorizing incidents; draft PR 223 carried exact E3/S2 and stayed unmerged until the fresh critic and trusted checks completed.
+deployment:
+  environment: protected-dev
+  deployment_id: 223
+  deployed_at: '2026-07-11T00:41:43Z'
+  observed_revision: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  deployer: github-merge
+  approval:
+    required: true
+    approved_by: Jason Vallery delegated repository authority
+    approved_at: '2026-07-11T00:41:43Z'
+    evidence: Exact-head protected-path exception recorded at https://github.com/VerdifyConsultancy/verdify-skills/pull/223#issuecomment-4940829598.
+runtime_checks:
+- name: protected dev exactness and ancestry
+  result: passed
+  observed_at: '2026-07-11T00:47:39Z'
+  evidence: origin/dev and local dev equal 8487e66275bfc19b63f3d36872741f8f86d6cb6d, whose second parent is exact S2.
+- name: branch protection restoration
+  result: passed
+  observed_at: '2026-07-11T00:47:39Z'
+  evidence: Admin enforcement, strict required contexts, CODEOWNERS, stale-review dismissal, conversation resolution, and force/deletion prohibitions match the protected state.
+- name: repository validation
+  result: passed
+  observed_at: '2026-07-11T00:47:39Z'
+  evidence: ruby scripts/validate-repo.rb passed with 28 skills and 49 schemas on merged dev.
+- name: route cache authority
+  result: passed
+  observed_at: '2026-07-11T00:47:39Z'
+  evidence: Route-decision YAML and Markdown are untracked ignored derived cache; route --write remains available without mutating tracked project authority.
+- name: terminal authority set
+  result: passed
+  observed_at: '2026-07-11T00:47:39Z'
+  evidence: All prior transactions remain terminal and issue 71 is the sole integrated unterminated sprint.
+migrations:
+- name: repository-only
+  result: not_applicable
+  evidence: No data, schema, package, or runtime migration exists.
+rollback:
+  ready: true
+  known_good_revision: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
+  procedure: Revert evidence merge 8487e66275bfc19b63f3d36872741f8f86d6cb6d, fix merge 8614eeaa082a3dce470752a5f7b42765ea18a18e, and initial merge cfaedfe60a1910b86725c2d5abea27aecbb9b5e3 in reverse order; restore prior route behavior and rerun the full route and installed-package matrix.
+incidents:
+- PR 221 merged as cfaedfe60a1910b86725c2d5abea27aecbb9b5e3 before critic evidence and is not retroactive approval.
+- PR 222 merged as 8614eeaa082a3dce470752a5f7b42765ea18a18e before corrected closeout and critic evidence and is not retroactive approval.
+verified_at: '2026-07-11T00:47:39Z'
+verifier: codex-root-issue71-release-verifier
