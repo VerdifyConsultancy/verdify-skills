@@ -1,0 +1,66 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260711-agentic-sdlc-state-of-art-kiss
+reference: northstar://evidence/NSE-20260711-agentic-sdlc-state-of-art-kiss
+title: Agentic SDLC state of the art and KISS direction
+evidence_type: research_report
+evidence_status: observed
+ingested_at: '2026-07-11T17:28:02Z'
+source:
+  uri: repo://.agent-workflow/northstar/research-inbox/2026-07-11-agentic-sdlc-state-of-art-kiss.md
+  original_path: "/tmp/verdify-skills-state-of-art/.agent-workflow/northstar/research-inbox/2026-07-11-agentic-sdlc-state-of-art-kiss.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260711-agentic-sdlc-state-of-art-kiss-2026-07-11-agentic-sdlc-state-of-art-kiss-md"
+  sha256: e5f54bdf3cf4a209b71dc26e69080c58f54ea0bbaeae4edcc61871c9d00775ed
+summary: Primary-source, repository, and local evidence comparing the Verdify lifecycle
+  and platform vision with July 2026 agentic delivery systems, skill ecosystems, protocols,
+  durable execution, evaluation, security, and production practice; separates proof
+  levels and proposes a minimal evidence-gated direction.
+tags:
+- agentic-sdlc
+- brave-search
+- evaluation
+- kiss
+- orchestration
+- platform
+- security
+- skills
+claims:
+- High-volume vendor reports from Stripe and Spotify describe a small deterministic
+  controller around isolated replaceable coding agents, narrow tool sets, deterministic
+  verification, bounded repair, existing Git and CI delivery infrastructure, and human
+  review.
+- The Agent Skills specification supports progressive-disclosure playbooks, while
+  its official evaluation guidance begins with realistic clean-context with-skill
+  and without-skill cases; experimental allowed-tools metadata is not an authorization
+  boundary.
+- ACP standardizes worker-session capabilities, MCP standardizes tools and resources,
+  Kubernetes reconciles process state, and durable workflow systems still require
+  idempotency for at-least-once external effects; none replaces delivery authority
+  and outcome policy.
+- DORA and METR evidence does not support a universal agent productivity claim and
+  instead supports measuring accepted outcomes, stability, intervention, cost, and
+  defects against a local baseline.
+- At dev revision 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d, Verdify repository validation
+  and the full test suite pass for 28 skills and 49 schemas, and published release
+  1.3.0 is bound to source revision 416caf3ff005cdb78b58b7c991351edd627fd00b.
+- Local inspection found unproven or fail-open areas in consumer host-path preservation,
+  critic criterion coverage, diff-to-contract enforcement, executable skill evaluation,
+  resume behavior, provider-neutral dispatch, and crash or duplicate-effect recovery.
+planning_relevance:
+- 'Supports Verdify Skills #116 and the next state-of-union strategy refresh with
+  a build, reuse, and stop-doing boundary.'
+- 'Proposes a smaller proof sequence before the approved four-project target: security
+  and truth floor, behavior evaluation, one single-repo lane, one runtime-changing
+  lane, one narrow cross-project dependency, then the correlated slice.'
+- Preserves GitHub authority, one-lane identity, exact-head independent review, distinct
+  deploy and outcome proof, and four co-equal project ownership while challenging
+  hardcoded dispatch and unmeasured artifact growth.
+limitations:
+- Vendor reports, specifications, stars, downloads, and benchmarks are not operational
+  proof for Verdify; claims are labeled by evidence level.
+- An initial GitHub GraphQL quota exhaustion recovered; the 2026-07-11 open-issue
+  snapshot is point-in-time and must still be re-queried before execution.
+- The report contains architecture proposals that require normal North Star and authority
+  review; ingestion does not approve them.
