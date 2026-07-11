@@ -14,6 +14,7 @@ git fetch --all --prune
 git status --short --branch
 git ls-remote origin refs/heads/dev
 git show origin/handoff/autonomous-platform-reset-2026-07-11:.agent-workflow/sprints/2026-07-10-issue-71-route-authority/handoff/sprint-handoff.yaml
+gh pr view 227 --repo VerdifyConsultancy/verdify-skills --json state,isDraft,headRefOid,baseRefOid,statusCheckRollup,files,body
 gh pr list --repo VerdifyConsultancy/verdify-skills --state open --limit 100
 gh pr view 226 --repo VerdifyConsultancy/verdify-skills --json state,isDraft,headRefOid,baseRefOid,mergeStateStatus,statusCheckRollup,files,body
 gh issue view 211 --repo VerdifyConsultancy/verdify-skills --json state,comments,url
@@ -44,7 +45,7 @@ Checkpointed planning:
 - It changes exactly `.agent-workflow/strategy/state-of-union.yaml`, `.agent-workflow/strategy/state-of-union.md`, and `.agent-workflow/strategy/github-backlog-sync.yaml`.
 - Both YAML artifacts and repository validation passed locally.
 - Its intent is to record #71 terminal, make #73 the sole next candidate, preserve the full sequence, preserve Agents #2884/#2887/#2906 as Stage 0 stops, and track issue #225 as a nonblocking schema follow-up.
-- PR #226 was draft and blocked at capture. Compliance passed; validate was still running; policy, delivery-policy, and critic-gate failed on the known planning-only evidence mismatch. Re-probe. Do not blindly merge.
+- PR #226 was draft and blocked at capture. Compliance and validate passed; policy, delivery-policy, and critic-gate failed on the known planning-only evidence mismatch. Re-probe. Do not blindly merge.
 - Issue #211 is open only as the strategy-refresh owner and should close only after the strategy actually merges and post-merge route verification passes.
 
 Immediate decision for the new agent:

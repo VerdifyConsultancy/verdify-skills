@@ -4,6 +4,8 @@ Prepared 2026-07-11T01:05:48Z from protected `dev@4fe6ff65338bb129cbfbeb2451cb5a
 
 Canonical record: `sprint-handoff.yaml`
 
+Remote retrieval: draft PR #227 or `origin/handoff/autonomous-platform-reset-2026-07-11`.
+
 ## Human Eyes On
 
 None required to restart. The next ROOT agent has delegated authority to re-probe, finish or supersede draft planning work, manage PRs, and continue issue-backed execution. The three Agent Platform P0 issues remain machine-enforced program stops, not requests to begin the four-project slice.
@@ -31,7 +33,7 @@ Draft PR #226 is the post-#71 strategy checkpoint:
 - Diff: exactly the three canonical strategy artifacts
 - Local validation: both YAML schemas, repository validation, and diff check pass
 - Intended route: issue #73 as the sole next candidate
-- Known CI state at capture: compliance passed, validate running, and policy/delivery/critic failed on the known planning-only metadata mismatch
+- Known CI state at capture: compliance and validate passed; policy/delivery/critic failed on the known planning-only metadata mismatch
 
 Issue #211 is open only to own that refresh. The next agent must re-probe PR #226 and either finish it or supersede it explicitly. Do not begin issue #73 implementation on the strategy branch.
 

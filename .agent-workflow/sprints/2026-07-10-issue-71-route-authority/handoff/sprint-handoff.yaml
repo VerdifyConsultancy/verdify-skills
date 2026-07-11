@@ -6,6 +6,7 @@ sprint_boundary:
   next_candidate_issue: 73
   prepared_at: "2026-07-11T01:05:48Z"
   prepared_by: codex-root shutdown checkpoint
+  handoff_pull_request: 227
 program_goal:
   goal_thread_id: 019f49ac-0732-7e11-a617-942ef35aaa17
   objective: Continue the autonomous platform program from Verdify Skills PR 212 using one issue, lane, worktree, worker session, and pull request at a time, with truthful global routing, fresh implementation criticism, green CI, protected-dev integration, terminal receipts, and post-merge route verification.
@@ -119,7 +120,13 @@ agent_handoff:
       state: open_draft
       head_sha: 46318545fd04930e8d3e711de2e1e1c974f9ab5f
       branch: planning/post-71-state-of-union
-      checks: Compliance passed; validate was running at capture; policy, delivery-policy, and critic-gate failed on the known planning-only metadata mismatch.
+      checks: Compliance and validate passed; policy, delivery-policy, and critic-gate failed on the known planning-only metadata mismatch.
+    - number: 227
+      title: "docs: autonomous platform shutdown handoff"
+      state: open_draft
+      head_sha: 2067147bfa3b273467bbb0e736068fe03415fca9 before this metadata update
+      branch: handoff/autonomous-platform-reset-2026-07-11
+      checks: Draft handoff checks were pending at initial capture; re-probe if merge is considered.
   in_flight_branches_worktrees:
     - "origin/planning/post-71-state-of-union at 46318545fd04930e8d3e711de2e1e1c974f9ab5f; exactly three strategy artifacts; local worktree /Users/jason/repos/verdify-worktrees/2026-07-11-post-71-state-of-union"
     - "origin/handoff/autonomous-platform-reset-2026-07-11; this shutdown packet"
