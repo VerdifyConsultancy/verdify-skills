@@ -1,0 +1,178 @@
+---
+schema_ref: review-inbox-packet.schema.yaml
+kind: ReviewInboxPacket
+schema_version: '2.0'
+packet_id: review-2026-07-10-issue-71-route-authority
+status: approved
+scope:
+  review_unit: lane
+  sprint_id: 2026-07-10-issue-71-route-authority
+  lane_ids: [issue-71-route-authority-validation]
+  issue_ids: [71]
+  northstar_ids: []
+  summary: Post-merge packet for the exact reviewed route-authority lane, its bounded fix-forward, and contained evidence integration.
+traceability:
+  repository: VerdifyConsultancy/verdify-skills
+  base_ref: dev
+  head_ref: controller/2026-07-10-issue-71-route-authority
+  review_submissions:
+  - pull_request: 223
+    review_submission_head_sha: 3f2db1e608491f2157bcd363185758272e91a469
+    reviewer_login: github-actions
+    reviewer_id: 15368
+  artifact_paths:
+  - .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/contracts/issue-71-route-authority-validation.contract.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-71-route-authority/lanes/closeout/issue-71-route-authority-validation.closeout.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-71-route-authority/critic/issue-71-route-authority-validation.critic.yaml
+  - .agent-workflow/sprints/2026-07-10-issue-71-route-authority/release/wave-release-plan.yaml
+  source_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/221
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/222
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+pull_requests:
+- provider: github
+  identifier: '#223'
+  url: https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+  state: merged
+  author: jvallery
+  requested_reviewers: []
+  latest_review_state: not_applicable
+checks:
+- name: validate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133022050/job/86491949618
+  observed_at: '2026-07-11T00:40:37Z'
+- name: pull-request-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148616/job/86492314100
+  observed_at: '2026-07-11T00:41:51Z'
+- name: compliance / compliance
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133022171/job/86491949917
+  observed_at: '2026-07-11T00:38:10Z'
+- name: delivery-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148608/job/86492314237
+  observed_at: '2026-07-11T00:41:50Z'
+- name: critic-gate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148608/job/86492314258
+  observed_at: '2026-07-11T00:41:54Z'
+deployments:
+- environment: repository-only
+  environment_type: none
+  required: false
+  state: not_applicable
+  url: null
+  deployment_id: null
+  observed_revision: 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  desired_state_ref: dev
+  reconciliation_evidence:
+  - PR 223 merged exact S2 to protected dev as 8487e66275bfc19b63f3d36872741f8f86d6cb6d.
+  - Admin enforcement and every required branch protection were restored immediately after the exact-head evidence merge.
+  - Protected dev contains the tree independently reviewed at I2 plus the canonical E3/S2 evidence.
+  log_url: null
+  observed_at: '2026-07-11T00:41:43Z'
+reviewer_guidance:
+  human_test_steps:
+  - Confirm D/I2/E3/S2, PR 223 merge identity, and exact-S2 trusted checks.
+  - Confirm malformed upstream artifacts route to their producer with bounded diagnostics.
+  - Confirm lane-delivery/implementation is rejected from REVIEW_STRATEGY while every declared legal target and mode remains accepted.
+  - Confirm route-decision YAML and Markdown are untracked ignored derived cache and route --write still emits an agreeing pair.
+  review_urls:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223/files
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223/checks
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/222/files
+  route_maps: []
+telemetry:
+  dashboards: []
+  logs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133022050/job/86491949618
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148616/job/86492314100
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133022171/job/86491949917
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148608/job/86492314237
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133148608/job/86492314258
+  metrics:
+  - nine route-authority producer/schema mappings exercised
+  - complete REVIEW_STRATEGY legal target/mode matrix exercised
+  - zero tracked route-decision cache files
+  traces:
+  - D 5a44681f6bd840daefe829b9693365c67f693918
+  - I2 ea1769905f78483c4f6eef853c41868bd7f82dc1
+  - E3 12d26d8988c25c9350c05ba6ff79395ad3d17793
+  - S2 3f2db1e608491f2157bcd363185758272e91a469
+  - premature merge cfaedfe60a1910b86725c2d5abea27aecbb9b5e3
+  - premature merge 8614eeaa082a3dce470752a5f7b42765ea18a18e
+  - evidence merge 8487e66275bfc19b63f3d36872741f8f86d6cb6d
+  runtime_checks:
+  - name: exact-head protected delivery checks
+    result: passed
+    evidence: All five trusted checks succeeded at exact S2 with expected GitHub Actions identity.
+  - name: reviewed implementation tree
+    result: passed
+    evidence: Fresh critic verified protected dev at 8614eeaa was tree-identical to exact I2 before S2 evidence integration.
+  - name: branch protection restoration
+    result: passed
+    evidence: Admin enforcement, CODEOWNERS, strict checks, force-push prohibition, and deletion prohibition were verified after merge 8487e662.
+  - name: controller incident containment
+    result: passed
+    evidence: PR 223 remained draft through S2 and exact-head checks, then merged in one trapped operation; PRs 221 and 222 remain explicit non-authorizing incident evidence.
+  missing_telemetry:
+  - The normal post-merge terminal receipt has not yet exercised the completed issue 71 transaction.
+security:
+  privileged_access_required: true
+  secret_exposure_reviewed: true
+  preview_generator_controls:
+  - Expected schemas are selected by trusted code rather than artifact-supplied schema_ref values.
+  - Validation diagnostics are bounded and do not expose arbitrary artifact content or stack traces.
+  - Route cache files are ignored local output and repository validation rejects re-tracking them.
+  - The exact-S2 evidence merge exception was recorded before the admin action and protections were restored immediately.
+  unresolved_findings: []
+rollback:
+  ready: true
+  known_good_revision: af3e6b7e7b23b600e62c1aedf042ab9a5d244deb
+  procedure: Revert evidence merge 8487e662, fix merge 8614eeaa, and initial merge cfaedfe in reverse order; restore the prior tracked route files only as a temporary rollback and rerun the full route/package matrix.
+  evidence:
+  - Exact merge commits, the protected-dev baseline, changed paths, and complete tests are recorded.
+risks:
+- id: RISK-01
+  severity: high
+  statement: PRs 221 and 222 were merged before approving critic evidence and cannot be retroactively authorized.
+  disposition: The code was subsequently independently reviewed and fixed, PR 223 integrated exact E3/S2 after green checks, the incidents remain durable on issue 71 and PRs, and issue 70 owns a typed merge-authority guard.
+- id: RISK-02
+  severity: medium
+  statement: Existing initialized repositories may retain tracked or unignored route cache files until updated.
+  disposition: Fresh and forced initialization installs both ignore rules; package and upgrade regressions pass; this repository has zero tracked cache files.
+- id: RISK-03
+  severity: medium
+  statement: Merge and check evidence is point-in-time until the normal receipt completes.
+  disposition: Revalidate the live PR, exact checks, controller bytes, branch protection, and receipt ancestry during terminalization.
+questions: []
+evidence_completeness:
+  verdict: complete
+  satisfied_required:
+  - Exact D/I2/E3/S2, merged evidence PR, trusted checks, critic finding disposition, protected-dev ancestry, incident containment, and rollback are verified.
+  missing_required: []
+  blockers: []
+recommendation:
+  outcome: approve
+  rationale: The bounded route-authority contract is satisfied, FIND-001 is fixed, S2 has zero findings, exact-head CI is green, and protected dev contains the reviewed code plus canonical evidence while the premature merges remain explicit risks.
+feedback_route:
+  route: release_verification
+  instructions: Commit verified release evidence and accepted-with-risks outcome on this controller branch, then generate the normal terminal receipt.
+  target_refs:
+  - controller/2026-07-10-issue-71-route-authority
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/223
+prepared_at: '2026-07-11T00:44:13Z'
+preparer: codex-root-issue71-controller
