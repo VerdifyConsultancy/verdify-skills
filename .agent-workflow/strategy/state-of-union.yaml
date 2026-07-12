@@ -2,11 +2,11 @@
 schema_ref: state-of-union.schema.yaml
 kind: StateOfUnion
 schema_version: '1.0'
-strategy_id: four-project-autonomous-platform-post-71-2026-07-11
+strategy_id: four-project-autonomous-platform-post-sota-2026-07-12
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
-assessed_at: '2026-07-11T00:57:06Z'
+baseline_sha: bfc304748e7b06ff767f360291dc8a7734e3db8a
+assessed_at: '2026-07-12T17:22:00Z'
 inputs:
 - id: IN-001
   type: delegated_program_direction
@@ -43,26 +43,31 @@ inputs:
   location: Verdify Skills issue 70, pull requests 221 through 223, and issue 71 closeout evidence
   summary: Pull requests 221 and 222 merged before phase-appropriate critic evidence, and pull request 223 used a recorded non-author-review exception; these remain issue 70 authority incidents rather than compliant precedent.
   evidence_status: verified
+- id: IN-008
+  type: approved_strategic_direction
+  location: northstar://evidence/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs and recorded comments on issues 211, 70, 76, 12, and 43
+  summary: Jason approved the 2026-07 SOTA benchmark keep/kill/simplify direction on 2026-07-12; issue 70 is elevated above 74 and 75, issue 76 is pulled forward and expanded with the kill list, issue 12 is re-scoped to platform-native dispatch, and issue 43 becomes four loop guardrails.
+  evidence_status: verified
 source_freshness:
 - surface: git
   source_ref: Verdify Skills protected dev at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: This strategy refresh does not claim newer source authority in Agents, Gravity, or Orbit.
 - surface: github_issues
   source_ref: live issue API for Verdify Skills, jvallery/agents, VerdifyConsultancy/gravity, and jvallery/orbit
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: Reconciliation is bounded to the user-authorized sequence and direct dependencies, not the full four-repository backlog.
 - surface: github_pull_requests
   source_ref: live pull request state for the sequenced issues
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: Issue 71 pull requests are merged and the remaining requested implementation issues have no open linked pull request at this cutoff.
 - surface: github_checks
   source_ref: exact-head checks for Verdify Skills pull requests 223 and 224
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: Final implementation, evidence, and normal-receipt checks passed; issue 70 still owns typed merge authority and no-promotion push semantics.
 - surface: north_star
   source_ref: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and NORTHSTAR_ARCHITECTURE.md
@@ -82,12 +87,12 @@ source_freshness:
 - surface: sprint_artifacts
   source_ref: .agent-workflow/sprints and pull request 224 normal receipt
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: All existing sprint transactions are terminal; the next sprint has not yet been planned.
 - surface: review_artifacts
   source_ref: issue 71 S2 fresh critic packet and exact-head critic check
   status: fresh
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   limitation: This planning-only approval uses Jason's explicit program authority and does not manufacture an additional implementation critic.
 - surface: deployment_runtime
   source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md runtime ledgers
@@ -381,8 +386,8 @@ recommended_sequence:
   - Preserve least-privilege token scope and exact check identity in later changes
   depends_on: []
 - id: SEQ-002
-  outcome: Close the trusted transition and evaluation floor.
-  issue_ids: [73, 75, 74]
+  outcome: Close the trusted evidence floor with exact non-vacuous critic evidence.
+  issue_ids: [73]
   prerequisites:
   - issue 71 terminal
   risks:
@@ -391,15 +396,24 @@ recommended_sequence:
   - Nondeterministic or expensive evals
   depends_on: [SEQ-001]
 - id: SEQ-003
-  outcome: Implement one bounded-loop contract and evidence-proportionate risk policy.
-  issue_ids: [43, 70]
+  outcome: Implement evidence-proportionate change classes, replace the loop contract with four guardrails, and execute the expanded simplification pass.
+  issue_ids: [70, 43, 76]
   prerequisites:
-  - trusted transition and evaluation floor complete
+  - trusted evidence floor complete
   risks:
   - Overly broad scope across every skill
   - Fast paths that bypass protected decisions
   depends_on: [SEQ-002]
 - id: SEQ-004
+  outcome: Make semantic validation and executable evals merge-blocking for the slimmed core.
+  issue_ids: [75, 74]
+  prerequisites:
+  - simplification pass scoped the surviving skill and schema set
+  risks:
+  - Nondeterministic or expensive evals
+  - Enforcement against a still-moving skill surface
+  depends_on: [SEQ-003]
+- id: SEQ-005
   outcome: Resolve Agent Platform Stage 0 security and execution authority.
   issue_ids: [2884, 2887, 2906, 2890, 2905]
   prerequisites:
@@ -407,9 +421,9 @@ recommended_sequence:
   risks:
   - Security stop cannot be cleared from repository evidence alone
   - Credential history work may require an attended protected operation
-  depends_on: [SEQ-003]
-- id: SEQ-005
-  outcome: Establish versioned provider capability negotiation and supported dispatch.
+  depends_on: [SEQ-004]
+- id: SEQ-006
+  outcome: Adopt platform-native GitHub dispatch as the default worker adapter; retain Verdify evidence gates around it.
   issue_ids: [12, 116, 2497, 655]
   prerequisites:
   - Agents 2884, 2887, and 2906 closed
@@ -417,8 +431,8 @@ recommended_sequence:
   risks:
   - Contract split across repositories
   - Issue 116 is an umbrella rather than one lane
-  depends_on: [SEQ-004]
-- id: SEQ-006
+  depends_on: [SEQ-005]
+- id: SEQ-007
   outcome: Make Gravity citations resolve with API/MCP parity and live authorized proof.
   issue_ids: [407, 184]
   prerequisites:
@@ -426,8 +440,8 @@ recommended_sequence:
   risks:
   - Query versus projection hydration decision
   - Durability interval remains unspecified
-  depends_on: [SEQ-005]
-- id: SEQ-007
+  depends_on: [SEQ-006]
+- id: SEQ-008
   outcome: Repair Orbit authority, trust, connector, and lifecycle boundaries.
   issue_ids: [197, 193, 194, 195, 196, 198, 43]
   prerequisites:
@@ -436,8 +450,8 @@ recommended_sequence:
   risks:
   - Principal and broker architecture undecided
   - Retention and history disposition require owner authority
-  depends_on: [SEQ-006]
-- id: SEQ-008
+  depends_on: [SEQ-007]
+- id: SEQ-009
   outcome: Run one complete four-project transaction with one correlation ID.
   issue_ids: [116]
   prerequisites:
@@ -446,8 +460,8 @@ recommended_sequence:
   risks:
   - Merged state may diverge from runtime state
   - Missing end-to-end provenance
-  depends_on: [SEQ-007]
-- id: SEQ-009
+  depends_on: [SEQ-008]
+- id: SEQ-010
   outcome: Pass failure drills and seven unattended days before broader autonomy.
   issue_ids: [116]
   prerequisites:
@@ -455,7 +469,7 @@ recommended_sequence:
   risks:
   - Silent stalled loops
   - Expired authority, quota, duplicate wake, or restart failures
-  depends_on: [SEQ-008]
+  depends_on: [SEQ-009]
 next_sprint_candidates:
 - outcome: Make approving critic evidence exact and non-vacuous.
   issue_ids: [73]
@@ -505,11 +519,11 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: Issues 135, 215, and 71 are terminal, issue 73 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
+  reason: Issues 135, 215, and 71 are terminal, the 2026-07-12 SOTA re-sequencing is approved and recorded, issue 73 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
   required_before_handoff:
   - Merge this strategy refresh to protected dev.
   - Verify project-router selects sprint-planning for issue 73.
 approval:
   status: approved
   approver: Jason Vallery
-  approved_at: '2026-07-10T21:15:06Z'
+  approved_at: '2026-07-12T17:22:00Z'

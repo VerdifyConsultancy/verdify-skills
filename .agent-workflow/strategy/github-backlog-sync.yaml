@@ -2,10 +2,10 @@
 schema_ref: github-backlog-sync.schema.yaml
 kind: GitHubBacklogSync
 schema_version: '1.0'
-sync_id: gbs-post-71-autonomous-platform-2026-07-11
+sync_id: gbs-post-sota-2026-07-12
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: '2026-07-11T00:57:06Z'
+captured_at: '2026-07-12T17:22:00Z'
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -16,7 +16,7 @@ source_authority:
   - Runtime health was not re-probed because it does not affect selection of the next Verdify CI lane.
 snapshot:
   snapshot_ref: null
-  captured_at: '2026-07-11T00:57:06Z'
+  captured_at: '2026-07-12T17:22:00Z'
   freshness: live_only
   api_sources:
   - surface: issues
