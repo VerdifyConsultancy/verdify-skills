@@ -1,0 +1,234 @@
+---
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-70-change-classes
+status: approved
+goal: Make change risk classes typed and authoritative across pr-policy, delivery-gate,
+  and the router so planning-only and lightweight changes advance with proportional
+  evidence, protected paths always traverse the full chain, no-op promotion and merge
+  authority become typed machine-verifiable states, and ceremony drops without weakening
+  implementation criticism.
+baseline_sha: 'd226b7f244fd4612ab44739fd275b8158e1d9159'
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone:
+  project:
+issue_ids:
+- 70
+scope:
+- Add an optional change_class enum [lightweight, standard] to schemas/lane-contract.schema.yaml,
+  additive, with standard as the resolved default when the field is absent.
+- Teach scripts/pr-policy.rb a deterministic planning-only PR class recognized purely
+  by changed paths (only .agent-workflow/strategy/**, .agent-workflow/northstar/**,
+  .agent-workflow/intake/**, docs/**, and *.md) that skips lane and critic metadata
+  requirements, plus a lightweight class that requires an issue link and a critic
+  finding while skipping sprint, wave, and closeout sections.
+- Teach scripts/delivery-gate.rb to honor both classes (planning-only by path check
+  with no lane metadata demanded; lightweight requiring only the critic report artifact),
+  to return a typed "no promotion expected" success for dev pushes whose package
+  version is already published, and to enforce a typed merge-authority table (implementation
+  PR requires the exact approving critic report S at head; receipt PR requires a
+  valid receipt; planning-only passes by path check).
+- Add a lightweight-lane transaction to the lib/verdify/cli.rb router that produces
+  a contract and critic report only, with no wave plan and no separate receipt PR,
+  and a protected-path override that forces the standard chain whenever the diff
+  touches the protected list regardless of declared class.
+- Publish a single protected_paths source in config/github-primitives.yaml mirroring
+  CODEOWNERS plus .github/**, schemas/**, config/**, lib/**, and the four policy
+  scripts, consumed by pr-policy, delivery-gate, and the router.
+- Reconcile authority documentation with a change-class section in docs/authority-model.md
+  and COMMON_OPERATING_CONTRACT.md, record the weekly human sampling sweep (at least
+  three machine-merged lane PRs sampled per week; any incident touching a machine-approved
+  PR auto-flags), and fix AGENTS.md line 54 to match contract rule 15.
+non_goals:
+- Version the lane-contract schema or add structured lifecycle phases; issue 225
+  owns that follow-up.
+- Implement issue 75 eval execution or issue 74 consumer enforcement.
+- Implement issue 43 or issue 76 route-simplification scope beyond what change classes
+  themselves require.
+- Change .github/workflows/**, VERSION, package.json, CHANGELOG.md, or the npm release
+  path.
+- Weaken implementation criticism, exact-head checks, Stage 0 security stops, or
+  protected-path non-author review authority.
+- Build sweep scheduling infrastructure; the weekly sampling sweep is recorded as
+  a standing operator duty and scheduling lives in fleet cron.
+acceptance_criteria:
+- id: SPR-AC-01
+  statement: Change classes are schema-backed and deterministic; the lane-contract
+    schema gains an optional change_class enum defaulting to standard, planning-only
+    PRs are recognized identically by changed paths in both pr-policy and delivery-gate,
+    and risk classification derives from findings and touched paths, never line count.
+  lane_ids:
+  - issue-70-change-classes
+  evidence_expected:
+  - schema additive-change regression
+  - planning-only fixture passing without lane metadata in both entrypoints
+- id: SPR-AC-02
+  statement: A lightweight lane delivers issue plus diff plus critic finding in one
+    PR with approximately three artifacts, no wave plan, and no separate receipt
+    PR, honored consistently by pr-policy, delivery-gate, and the router.
+  lane_ids:
+  - issue-70-change-classes
+  evidence_expected:
+  - lightweight lane end-to-end fixture
+  - router lightweight transaction test
+- id: SPR-AC-03
+  statement: Protected paths have a single source in config/github-primitives.yaml
+    consumed by all three policy entrypoints, and any diff touching them is forced
+    through the standard full chain regardless of declared class.
+  lane_ids:
+  - issue-70-change-classes
+  evidence_expected:
+  - protected-path override fixture
+  - single-source consumption tests
+- id: SPR-AC-04
+  statement: Ambient failure and unguarded success become typed states; a dev push
+    with an intentionally absent promotion returns a typed "no promotion expected"
+    success, and merge authority is a typed table requiring machine-verifiable transition
+    state per PR kind.
+  lane_ids:
+  - issue-70-change-classes
+  evidence_expected:
+  - dev-push no-promotion typed-success fixture
+  - merge-authority table tests
+- id: SPR-AC-05
+  statement: Authority docs are reconciled (AGENTS.md line 54 matches contract rule
+    15; change-class sections exist in docs/authority-model.md and COMMON_OPERATING_CONTRACT.md;
+    the weekly human sampling sweep is recorded), the historical corpus and full
+    suite stay green, and worker closeout, one fresh critic, exact-head CI, protected-dev
+    integration, and a normal terminal receipt all pass.
+  lane_ids:
+  - issue-70-change-classes
+  evidence_expected:
+  - docs reconciliation diff
+  - full suite and historical-corpus logs
+  - D/I/E/S chain
+  - fresh critic report
+  - GitHub checks
+  - terminal receipt
+risks:
+- id: RISK-01
+  severity: high
+  statement: Class recognition drift could misroute an implementation or control-plane
+    diff onto a reduced evidence chain.
+  mitigation: Keep one protected_paths source, classify deterministically by changed
+    paths, force the standard chain on any protected-path touch, and pin a fixture
+    where a protected-path diff declared lightweight is forced to standard.
+- id: RISK-02
+  severity: medium
+  statement: Typed no-op promotion could mask a genuinely missed release.
+  mitigation: Return typed success only on positive evidence that the exact package
+    version at the pushed head is already published; a genuinely absent promotion
+    still fails, with regression fixtures in both directions.
+- id: RISK-03
+  severity: medium
+  statement: Relaxing the AGENTS.md universal non-author approval could weaken protected-surface
+    authority.
+  mitigation: CODEOWNERS non-author code-owner review is retained for control-plane
+    paths per contract rule 15; only ordinary non-control-plane lanes use the zero-review
+    critic-status path, and docs state the boundary explicitly.
+- id: RISK-04
+  severity: medium
+  statement: Machine-merge autonomy could degrade silently once routine human checkpoints
+    are removed.
+  mitigation: Record the weekly human sampling sweep of at least three machine-merged
+    lane PRs and auto-flag any incident touching a machine-approved PR as a standing
+    companion control.
+lanes:
+- lane_id: issue-70-change-classes
+  issue_ids:
+  - 70
+  contract_path: ".agent-workflow/sprints/2026-07-12-issue-70-change-classes/lanes/contracts/issue-70-change-classes.contract.yaml"
+  branch: lane/70-change-classes
+  owner: claude-issue70-worker
+  reviewer: fresh-independent-critic
+  summary: Implement typed change classes, the protected-path single source and override,
+    typed no-op promotion, the typed merge-authority table, the router lightweight
+    transaction, and the reconciled authority docs with complete class fixtures.
+dependency_order:
+- - issue-70-change-classes
+deployment_expectations:
+- The lane changes policy engines, the router, one schema, configuration, docs, and
+  tests only; it has no application runtime deployment.
+- Exact-head CI must exercise source and installed-package validation plus the new
+  change-class fixture matrix.
+- After integration, the controller completes the deterministic normal terminal receipt
+  and verifies global routing advances to the issue 43/76 sequence.
+review_plan:
+  qa_milestones:
+  - id: QA-01
+    name: Change-class fixture matrix
+    due: before worker closeout
+    evidence_expected:
+    - planning-only PR fixture passes without lane metadata
+    - lightweight lane fixture merges with three artifacts
+    - protected-path diff declared lightweight is forced to standard
+    - dev-push no-promotion returns typed success
+  - id: QA-02
+    name: Full regression and historical-corpus proof
+    due: at implementation head
+    evidence_expected:
+    - make test
+    - historical corpus validation via validate-repo
+    - manifest check
+  human_review_milestones:
+  - id: HR-01
+    name: One independent implementation criticism
+    owner: Fresh critic
+    trigger: Exact implementation and closeout heads pass every required local validation.
+    review_packet_path: ".agent-workflow/sprints/2026-07-12-issue-70-change-classes/review/review-inbox-packet.yaml"
+  user_stories_for_review:
+  - id: US-01
+    statement: As the controller, I can advance planning-only and lightweight changes
+      with proportional typed evidence instead of fabricating implementation lanes
+      or recording policy exceptions.
+    issue_ids:
+    - 70
+    lane_ids:
+    - issue-70-change-classes
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+  - id: US-02
+    statement: As the controller, I can trust that any diff touching protected paths
+      always traverses the full standard chain regardless of its declared class.
+    issue_ids:
+    - 70
+    lane_ids:
+    - issue-70-change-classes
+    acceptance_refs:
+    - SPR-AC-03
+  - id: US-03
+    statement: As the operator, I can rely on typed no-op promotion and typed merge
+      authority instead of chronic red pushes and unguarded admin merges, and I audit
+      machine-merged lanes through the weekly sampling sweep.
+    issue_ids:
+    - 70
+    lane_ids:
+    - issue-70-change-classes
+    acceptance_refs:
+    - SPR-AC-04
+    - SPR-AC-05
+  reporting_summary:
+    included:
+    - typed change classes across both policy entrypoints and the router
+    - protected-path single source with force-standard override
+    - typed no-op promotion and typed merge-authority table
+    - reconciled authority docs and the weekly human sampling sweep
+    deferred:
+    - issue 225 lifecycle-phase schema
+    - issues 75 and 74 evaluation floor
+    - issues 43 and 76 route simplification
+    ownership:
+    - lane_id: issue-70-change-classes
+      owner: claude-issue70-worker
+      responsibility: Implement and prove typed change classes and typed merge authority
+        end to end.
+    next_review: One fresh critic at the exact evidence head, then protected-dev integration
+      with the recorded non-author code-owner review and the deterministic terminal
+      receipt.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T19:00:00Z'

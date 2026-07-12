@@ -1,0 +1,12 @@
+---
+schema_ref: status.schema.yaml
+kind: SprintStatus
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-70-change-classes
+state: READY
+updated_at: '2026-07-12T19:00:00Z'
+active_lanes:
+- issue-70-change-classes
+blockers: []
+next_action: Dispatch the issue-70 worker through bin/verdify lane create after the
+  controller swaps the baseline placeholder for the dev head at the issue-73 receipt.
