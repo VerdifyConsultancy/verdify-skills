@@ -1,15 +1,17 @@
-# State of Union: Post-SOTA-Approval Autonomous Platform Program
+# State of Union: Post-73 Autonomous Platform Program
 
 Canonical authority: `.agent-workflow/strategy/state-of-union.yaml`
-Assessed at protected `dev@bfc304748e7b06ff767f360291dc8a7734e3db8a`
+Assessed at protected `dev@ad2d39926a37a89875ce6b062614d21b6862047b`
 on 2026-07-12.
 
 ## Verdict
 
-Issues #135, #215, and #71 are complete with canonical terminal receipts. The
-parked planning checkpoints merged to protected dev under recorded narrow
-admin exceptions (PRs #226, #227, #228 — the planning-only policy gap remains
-issue #70 evidence, not precedent).
+Issues #135, #215, #71, and #73 are complete with canonical terminal receipts.
+Issue #73 shipped exact non-vacuous critic and closeout evidence: PR #230
+merged with all five required checks green at the exact fresh-critic head —
+the first lane to pass the full policy chain legitimately — and receipt PR
+#231 terminalized the sprint. The planning-only policy gap and the
+code-owner-review exception remain issue #70 evidence, not precedent.
 
 Jason approved the 2026-07 SOTA benchmark keep/kill/simplify direction on
 2026-07-12 (evidence `NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs`;
@@ -24,20 +26,20 @@ The four-project vertical slice remains prohibited. Agents #2884, #2887, and
 
 ## Immediate Route
 
-Issue #73 is the sole ready next sprint candidate. Fresh reproduction confirmed
-that both an empty approving critic and an approving critic assessing only a
-fabricated criterion pass today. Verified release integration evidence already
-fails closed and will be pinned rather than rebuilt.
+Issue #70 is the sole ready next sprint candidate: evidence-proportionate
+change classes (lightweight = issue + diff + critic finding, ~3 artifacts, one
+PR), a planning-only class, typed no-op promotion, typed merge authority, a
+protected-path override, and the weekly human sampling sweep. The validated
+draft sprint transaction is staged.
 
-The lane will require exact critic-to-contract coverage and truthful closeout
-subsets without adding another review layer. Structured lifecycle phase
-ownership is recorded separately on #225 because it requires a versioned
-contract model rather than inference from free-text criteria.
+Structured lifecycle phase ownership remains recorded separately on #225; the
+issue-73 residual risks (denylist-evasion tripwire, evidence-content
+non-resolution) are owned by #70 and #225.
 
 ## Issue Sequence (re-approved 2026-07-12)
 
-1. **Trusted evidence floor:** Verdify #73, with #225 as a nonblocking schema
-   follow-up.
+1. **Trusted evidence floor (DONE 2026-07-12):** Verdify #73 terminal; #225
+   remains the nonblocking schema follow-up.
 2. **Proportional process and simplification:** Verdify #70 (change classes:
    lightweight = issue + diff + critic finding, ~3 artifacts, one PR; risk
    from findings/paths, never line count; protected paths always full-chain;
@@ -84,7 +86,7 @@ not silently weaken review, evidence, or security requirements.
 
 | Risk | Durable owner |
 | --- | --- |
-| Critic evidence can remain non-exhaustive | Verdify #73 |
+| Critic evidence exactness shipped; residual tripwire/allowlist follow-up | Verdify #70/#225 |
 | Acceptance criteria do not declare lifecycle phase ownership | Verdify #225 |
 | Planning-only PRs still require recorded admin exceptions | Verdify #70 |
 | Unexercised skill/schema surface keeps accruing maintenance and doc drift | Verdify #76 |
@@ -100,4 +102,4 @@ not silently weaken review, evidence, or security requirements.
 
 After this planning-only refresh merges to protected `dev`, run
 `project-router`. The expected handoff is `sprint-planning` in
-`lane-transaction` mode for Verdify #73. No broad fan-out is authorized.
+`lane-transaction` mode for Verdify #70. No broad fan-out is authorized.
