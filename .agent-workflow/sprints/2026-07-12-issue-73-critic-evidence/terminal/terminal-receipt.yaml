@@ -1,0 +1,43 @@
+---
+schema_ref: sprint-terminal-receipt.schema.yaml
+kind: SprintTerminalReceipt
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+mode: normal
+recovery_bundle:
+receipt_base_sha: f86512099f1623be1c50e453fc78763716d2c971
+integration_branch: dev
+controller:
+  ref: controller/2026-07-12-issue-73-critic-evidence
+  head_sha: ef4d699cdf587119fb30b75c06c5f094e49b806e
+  packet_commit_sha: aeff959d86c91574123b1f6baf35238cb8b5e286
+  release_commit_sha: fcbac4f02de2e89c0e1aafa668517f170092025a
+  outcome_commit_sha: ef4d699cdf587119fb30b75c06c5f094e49b806e
+  packet_path: ".agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/review/review-inbox-packet.yaml"
+  packet_sha256: 1c8be8aa1c9d3561cfb4085ae1426e96e21b7d3c701438e67d222a6f73ff466f
+  release_sha256: 142ce08a635e029160d68e6c52509dcab32c6a5c74592eb996bc2243592095fd
+  outcome_sha256: d7a83dfb5516f20e641f6424d2d530e7f1563a7c5368258b8165a6827b1ead56
+lanes:
+- lane_id: issue-73-critic-evidence
+  issue_ids:
+  - 73
+  branch: lane/73-critic-evidence
+  pull_request: 230
+  dispatch_head_sha: 70d521d8f31679f40ada17c7faf7572d06809c30
+  implementation_head_sha: 98f44562fa6f5982e353533439d4b1b9cfc890b3
+  evidence_head_sha: '089f9b99e2d1f0911f8293f4aff4f19aa63cfe53'
+  critic_report_head_sha: 4947c387a1070423e73f780cc980ae3a16012623
+  merge_commit_sha: f86512099f1623be1c50e453fc78763716d2c971
+artifacts:
+  plan_sha256: a114182019d0ec4fcefdb2d9cb149c05705bc1d991f50e3357da3a8d6d94ec0a
+  status_sha256: 685c1f3e45b329e72ee54d86a19dc780d1f3c8c48b5b227a6f7d7a30fc2dddc1
+  release_sha256: 142ce08a635e029160d68e6c52509dcab32c6a5c74592eb996bc2243592095fd
+  outcome_sha256: d7a83dfb5516f20e641f6424d2d530e7f1563a7c5368258b8165a6827b1ead56
+terminal:
+  integrated_sha: f86512099f1623be1c50e453fc78763716d2c971
+  plan_status: complete
+  status_state: COMPLETE
+  release_status: verified
+  outcome_decision: accepted_with_risks
+generated_at: '2026-07-12T18:44:22Z'
+generator: claude-issue73-controller

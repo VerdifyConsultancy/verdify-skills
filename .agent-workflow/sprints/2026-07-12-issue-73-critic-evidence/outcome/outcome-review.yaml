@@ -1,0 +1,40 @@
+---
+schema_ref: outcome-review.schema.yaml
+kind: OutcomeReview
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+decision: accepted_with_risks
+reviewed_at: '2026-07-12T18:45:00Z'
+reviewer: claude-issue73-controller under Jason Vallery delegated outcome authority
+intended_outcome: Make approving critic and closeout evidence exact and non-vacuous so no empty or fabricated assessment can authorize review inbox, merge, or terminalization.
+delivered_outcomes:
+- Approving critic reports now require a non-empty acceptance assessment whose criterion IDs exactly equal the lane contract criterion set, order-independent, with duplicates, unknown IDs, and omissions each rejected with a distinct bounded error naming the offending IDs.
+- Every assessment in an approving report must be satisfied with non-empty evidence; whitespace-only evidence and enum-casing tricks fail both the schema and semantic layers.
+- Non-approving reports remain partial-friendly while supplied criterion IDs must stay unique and contract-valid, pinned by explicit request_fixes regressions.
+- Closeout claims are enforced as a unique contract-valid subset that cannot claim naturally named critic, CI, integration, deployment, or outcome evidence that does not yet exist.
+- The empty verified-release integration_results rejection and the empty request_fixes validity are pinned by explicit regressions without touching schemas.
+- End-to-end fixtures prove vacuous or fabricated approving evidence cannot authorize route handoff, delivery-gate success, or terminal-receipt lane bindings.
+- Fresh criticism ran a 21-probe hostile matrix against the candidate validator, approved with recorded risks and zero unresolved findings, and PR 230 merged exact S to protected dev as f86512099f1623be1c50e453fc78763716d2c971 with all five trusted checks green.
+evidence_links:
+- https://github.com/VerdifyConsultancy/verdify-skills/issues/73
+- https://github.com/VerdifyConsultancy/verdify-skills/pull/230
+- git:70d521d8f31679f40ada17c7faf7572d06809c30
+- git:98f44562fa6f5982e353533439d4b1b9cfc890b3
+- git:089f9b99e2d1f0911f8293f4aff4f19aa63cfe53
+- git:4947c387a1070423e73f780cc980ae3a16012623
+- git:f86512099f1623be1c50e453fc78763716d2c971
+- git:aeff959d86c91574123b1f6baf35238cb8b5e286
+- git:fcbac4f02de2e89c0e1aafa668517f170092025a
+incomplete_items: []
+residual_risks:
+- The closeout future-phase evidence check is a word-boundary name denylist (FIND-001, low) evadable by deliberately concatenated, homoglyph, or empty-string evidence IDs; it is a truthfulness tripwire rather than an authorization gate, and every fabrication probe was still rejected by the independent exactness, gate, route, and receipt layers.
+- Approving-report evidence strings are checked for non-emptiness but are not resolved against repository content (FIND-002, note); evidence-content truthfulness remains with the fresh critic and independent human approval.
+- The critic-report schema acceptance_assessment description is stale now that empty approving assessments are always rejected (FIND-003, note); schemas/** was a prohibited path for this lane and the description-only fix belongs to a schema-owning follow-up.
+- LANE-AC-08's downstream components (exact-head CI, protected-dev integration, terminal receipt) are controller-owned evidence completed by this closeout rather than claims inside the critic report; the deterministic terminal receipt remains to prove the accepted protected-dev state closes the sprint.
+- make test requires an explicit UTF-8 locale (LANG=C.UTF-8) on pods without a default locale, a pre-existing baseline limitation of scripts/verify-npm-tarball.rb rather than a lane defect.
+follow_up_issues:
+- 70
+- 225
+lessons_learned:
+- Exactness enforcement shipped without breaking the historical corpus by splitting document-local vs contract-aware rules; future-phase denylist should become an allowlist (#70/#225).
+rationale: The bounded issue met its critic-evidence exactness contract with all eight acceptance criteria assessed satisfied, the fresh critic approved with recorded risks and zero unresolved findings, exact-head CI and protected-dev integration are verified, and the remaining receipt is a deterministic terminal transition whose residual risks are owned by issues 70 and 225.
