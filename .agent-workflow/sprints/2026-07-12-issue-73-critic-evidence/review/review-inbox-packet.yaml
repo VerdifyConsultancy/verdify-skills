@@ -1,0 +1,182 @@
+---
+schema_ref: review-inbox-packet.schema.yaml
+kind: ReviewInboxPacket
+schema_version: '2.0'
+packet_id: review-2026-07-12-issue-73-critic-evidence
+status: approved
+scope:
+  review_unit: lane
+  sprint_id: 2026-07-12-issue-73-critic-evidence
+  lane_ids: [issue-73-critic-evidence]
+  issue_ids: [73]
+  northstar_ids: []
+  summary: Post-merge packet for the exact reviewed critic-evidence exactness lane, its approve-with-risks fresh criticism, and the contained protected-dev integration.
+traceability:
+  repository: VerdifyConsultancy/verdify-skills
+  base_ref: dev
+  head_ref: controller/2026-07-12-issue-73-critic-evidence
+  review_submissions:
+  - pull_request: 230
+    review_submission_head_sha: 4947c387a1070423e73f780cc980ae3a16012623
+    reviewer_login: github-actions
+    reviewer_id: 15368
+  artifact_paths:
+  - .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/lanes/contracts/issue-73-critic-evidence.contract.yaml
+  - .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/lanes/closeout/issue-73-critic-evidence.closeout.yaml
+  - .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/critic/issue-73-critic-evidence.critic.yaml
+  - .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/release/wave-release-plan.yaml
+  source_refs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/73
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/230
+pull_requests:
+- provider: github
+  identifier: '#230'
+  url: https://github.com/VerdifyConsultancy/verdify-skills/pull/230
+  state: merged
+  author: jvallery
+  requested_reviewers: []
+  latest_review_state: not_applicable
+checks:
+- name: validate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203804291/job/86679576350
+  observed_at: '2026-07-12T18:26:52Z'
+- name: pull-request-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839592/job/86679671974
+  observed_at: '2026-07-12T18:25:25Z'
+- name: compliance / compliance
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203804430/job/86679576963
+  observed_at: '2026-07-12T18:24:16Z'
+- name: delivery-policy
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839562/job/86679671845
+  observed_at: '2026-07-12T18:25:25Z'
+- name: critic-gate
+  provider: github_actions
+  status: completed
+  conclusion: success
+  url: https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839562/job/86679671822
+  observed_at: '2026-07-12T18:25:27Z'
+deployments:
+- environment: repository-only
+  environment_type: none
+  required: false
+  state: not_applicable
+  url: null
+  deployment_id: null
+  observed_revision: f86512099f1623be1c50e453fc78763716d2c971
+  desired_state_ref: dev
+  reconciliation_evidence:
+  - PR 230 merged exact S to protected dev as f86512099f1623be1c50e453fc78763716d2c971 at 2026-07-12T18:28:29Z.
+  - Protected dev merge parents are exactly baseline f72244d2ef93602647e02c92d9eaab601fe8637a and exact S 4947c387a1070423e73f780cc980ae3a16012623.
+  - The lane is validators, tests, and documentation only; no runtime deployment exists or is required.
+  log_url: null
+  observed_at: '2026-07-12T18:28:29Z'
+reviewer_guidance:
+  human_test_steps:
+  - Confirm D/I/E/S, PR 230 merge identity, and the five exact-S trusted checks.
+  - Confirm an approving critic report with an empty, duplicate, unknown-ID, omitted, unsatisfied, or empty-evidence acceptance assessment fails validation with a bounded typed error.
+  - Confirm closeout claims are a unique contract-valid subset and naturally named future-phase evidence claims are rejected.
+  - Confirm vacuous or fabricated approving evidence cannot authorize route handoff, delivery-gate success, or terminal-receipt lane bindings end to end.
+  - Confirm empty and partial request_fixes reports remain valid while duplicate and unknown criterion IDs are still rejected.
+  review_urls:
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/230/files
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/230/checks
+  route_maps: []
+telemetry:
+  dashboards: []
+  logs:
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203804291/job/86679576350
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839592/job/86679671974
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203804430/job/86679576963
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839562/job/86679671845
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29203839562/job/86679671822
+  metrics:
+  - 21-probe hostile critic fixture matrix rejected every authorization-bearing probe fail-closed
+  - critic-evidence suite 20 runs / 52 assertions, lane-review suite 54 runs / 135 assertions, schema-validator suite 148 runs / 749 assertions
+  - repository validation green with 28 skills and 49 schemas on merged dev
+  traces:
+  - D 70d521d8f31679f40ada17c7faf7572d06809c30
+  - I 98f44562fa6f5982e353533439d4b1b9cfc890b3
+  - E 089f9b99e2d1f0911f8293f4aff4f19aa63cfe53
+  - S 4947c387a1070423e73f780cc980ae3a16012623
+  - closeout sha256 1dad1b770beadaad888b9c6882918fbfafb848dbde18c75d68b017a12f34af18
+  - merge f86512099f1623be1c50e453fc78763716d2c971
+  runtime_checks:
+  - name: exact-head protected delivery checks
+    result: passed
+    evidence: The latest validate, pull-request-policy, compliance, delivery-policy, and critic-gate check runs all succeeded at exact S with the github-actions app identity.
+  - name: reviewed lane chain integrity
+    result: passed
+    evidence: Fresh critic reconstructed baseline f72244d2 -> dispatch-only D 70d521d8 -> implementation I 98f44562 (owned paths only) -> evidence E 089f9b99 (canonical closeout only) from raw Git, with dispatch artifacts byte-identical D through E and closeout SHA-256 1dad1b770beadaad888b9c6882918fbfafb848dbde18c75d68b017a12f34af18 computed independently.
+  - name: protected-baseline validation authority
+    result: passed
+    evidence: The lane chain was validated with the protected-baseline policy tree extracted from f72244d2; the candidate validator was exercised only as the review subject.
+  - name: merged-dev repository validation
+    result: passed
+    evidence: ruby scripts/validate-repo.rb, ruby tests/test_critic_evidence.rb, and LANG=C.UTF-8 make test all passed on protected dev at f86512099f16 on 2026-07-12T18:36:05Z.
+  missing_telemetry:
+  - The normal post-merge terminal receipt has not yet exercised the completed issue 73 transaction.
+security:
+  privileged_access_required: true
+  secret_exposure_reviewed: true
+  preview_generator_controls:
+  - Validation diagnostics are bounded typed errors that name offending IDs without dumping artifact content or stack traces.
+  - Exactness rules live in document-local semantic validation plus contract-aware lane-review validation, so the committed historical corpus still validates.
+  - A redacted gitleaks 8.24.3 scan of the three lane commits reported no leaks.
+  unresolved_findings: []
+rollback:
+  ready: true
+  known_good_revision: f72244d2ef93602647e02c92d9eaab601fe8637a
+  procedure: Revert merge f86512099f1623be1c50e453fc78763716d2c971 to restore the baseline validators, then rerun the critic-evidence, lane-review, schema-validator, and full-repository suites.
+  evidence:
+  - The exact merge commit, protected-dev baseline, changed paths, and complete green test matrix are recorded.
+risks:
+- id: RISK-01
+  severity: low
+  statement: The closeout future-phase evidence check is a word-boundary name denylist evadable by deliberately concatenated, homoglyph, or empty-string evidence IDs (FIND-001).
+  disposition: It is a truthfulness tripwire, not an authorization gate; the approving-critic exactness rules, delivery-gate exit, route state, and terminal-receipt lane bindings each rejected every fabrication probe independently. A future-phase allowlist formulation is owned by issues 70 and 225.
+- id: RISK-02
+  severity: low
+  statement: Approving-report evidence strings are checked for non-emptiness but are not resolved against repository content (FIND-002).
+  disposition: Evidence-content truthfulness remains with the fresh critic and independent human approval by contract scope; a future evidence-resolution lane may bind evidence strings to checkable artifacts.
+- id: RISK-03
+  severity: low
+  statement: The critic-report schema acceptance_assessment description is stale now that empty approving assessments are always rejected (FIND-003).
+  disposition: schemas/** was a prohibited path for this lane; the description-only correction belongs to the issue 225 schema-owning follow-up. No behavior change is required.
+- id: RISK-04
+  severity: medium
+  statement: LANE-AC-08's exact-head CI, protected-dev integration, and terminal-receipt components are controller-owned downstream evidence, and merge and check evidence is point-in-time until the normal receipt completes.
+  disposition: Exact-S checks and the protected-dev merge are now verified in this packet; the deterministic terminal receipt revalidates the live PR, exact checks, controller bytes, and receipt ancestry during terminalization.
+- id: RISK-05
+  severity: low
+  statement: make test requires an explicit UTF-8 locale (LANG=C.UTF-8) on pods without a default locale.
+  disposition: Pre-existing baseline limitation of scripts/verify-npm-tarball.rb, not a lane defect; reproduced identically by the worker, the critic, and this controller.
+questions: []
+evidence_completeness:
+  verdict: complete
+  satisfied_required:
+  - Exact D/I/E/S, merged PR 230, five trusted exact-S checks, critic finding disposition, closeout digest, protected-dev ancestry, and rollback are verified.
+  missing_required: []
+  blockers: []
+recommendation:
+  outcome: approve
+  rationale: The bounded critic-evidence exactness contract is satisfied with LANE-AC-01 through LANE-AC-08 assessed satisfied, the fresh critic approved with recorded risks and zero unresolved findings, all five trusted checks passed at exact S, and protected dev contains exactly the reviewed tree via merge f86512099f16.
+feedback_route:
+  route: release_verification
+  instructions: Commit verified release evidence and the accepted-with-risks outcome on this controller branch, then generate the normal terminal receipt.
+  target_refs:
+  - controller/2026-07-12-issue-73-critic-evidence
+  - https://github.com/VerdifyConsultancy/verdify-skills/pull/230
+prepared_at: '2026-07-12T18:38:30Z'
+preparer: claude-issue73-controller
