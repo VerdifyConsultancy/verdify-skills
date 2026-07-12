@@ -2,11 +2,11 @@
 schema_ref: state-of-union.schema.yaml
 kind: StateOfUnion
 schema_version: '1.0'
-strategy_id: four-project-autonomous-platform-post-sota-2026-07-12
+strategy_id: four-project-autonomous-platform-post-73-2026-07-12
 status: approved
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: bfc304748e7b06ff767f360291dc8a7734e3db8a
-assessed_at: '2026-07-12T17:22:00Z'
+baseline_sha: ad2d39926a37a89875ce6b062614d21b6862047b
+assessed_at: '2026-07-12T18:55:00Z'
 inputs:
 - id: IN-001
   type: delegated_program_direction
@@ -48,26 +48,31 @@ inputs:
   location: northstar://evidence/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs and recorded comments on issues 211, 70, 76, 12, and 43
   summary: Jason approved the 2026-07 SOTA benchmark keep/kill/simplify direction on 2026-07-12; issue 70 is elevated above 74 and 75, issue 76 is pulled forward and expanded with the kill list, issue 12 is re-scoped to platform-native dispatch, and issue 43 becomes four loop guardrails.
   evidence_status: verified
+- id: IN-009
+  type: terminal_sprint_evidence
+  location: pull requests 230 and 231; .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/terminal/terminal-receipt.yaml
+  summary: Issue 73 is terminal on protected dev with all five checks green at exact critic head S, fresh-critic approve_with_risks, merge f8651209, and receipt merge ad2d3992; vacuous approving evidence can no longer authorize review inbox, merge, or terminalization.
+  evidence_status: verified
 source_freshness:
 - surface: git
   source_ref: Verdify Skills protected dev at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: This strategy refresh does not claim newer source authority in Agents, Gravity, or Orbit.
 - surface: github_issues
   source_ref: live issue API for Verdify Skills, jvallery/agents, VerdifyConsultancy/gravity, and jvallery/orbit
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: Reconciliation is bounded to the user-authorized sequence and direct dependencies, not the full four-repository backlog.
 - surface: github_pull_requests
   source_ref: live pull request state for the sequenced issues
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: Issue 71 pull requests are merged and the remaining requested implementation issues have no open linked pull request at this cutoff.
 - surface: github_checks
   source_ref: exact-head checks for Verdify Skills pull requests 223 and 224
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: Final implementation, evidence, and normal-receipt checks passed; issue 70 still owns typed merge authority and no-promotion push semantics.
 - surface: north_star
   source_ref: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and NORTHSTAR_ARCHITECTURE.md
@@ -87,12 +92,12 @@ source_freshness:
 - surface: sprint_artifacts
   source_ref: .agent-workflow/sprints and pull request 224 normal receipt
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: All existing sprint transactions are terminal; the next sprint has not yet been planned.
 - surface: review_artifacts
   source_ref: issue 71 S2 fresh critic packet and exact-head critic check
   status: fresh
-  captured_at: '2026-07-12T17:22:00Z'
+  captured_at: '2026-07-12T18:55:00Z'
   limitation: This planning-only approval uses Jason's explicit program authority and does not manufacture an additional implementation critic.
 - surface: deployment_runtime
   source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md runtime ledgers
@@ -231,12 +236,12 @@ issue_inventory:
   action: Preserve as terminal evidence; issue 70 owns the typed merge-authority incidents.
 - issue: 73
   title: Empty evidence arrays can satisfy approval
-  state: OPEN
-  classification: candidate
-  rationale: Fresh reproduction proves empty or fabricated approving assessments pass today, while verified release integration results already fail closed.
+  state: CLOSED
+  classification: done
+  rationale: Lane issue-73-critic-evidence is terminal; exact critic-to-contract coverage and truthful closeout subsets are enforced fail-closed with a 21-probe hostile matrix; residual denylist-evasion tripwire and schema-description staleness are owned by issues 70 and 225.
   dependencies:
   - issue 71 terminal
-  action: Implement one bounded lane for exact critic-to-contract coverage and truthful closeout subsets; leave lifecycle-phase schema versioning to issue 225.
+  action: Preserve terminal evidence; no further work.
 - issue: 225
   title: Add lifecycle phases to lane acceptance criteria
   state: OPEN
@@ -274,10 +279,10 @@ issue_inventory:
   title: Risk-sensitive fast path and change classes
   state: OPEN
   classification: candidate
-  rationale: The current issue comment supplies the needed authority envelope, typed stops, and human-gate policy.
+  rationale: The 2026-07-12 elevation comment supplies the approved design parameters; the drafted lane contract compiles them into six bounded surfaces.
   dependencies:
-  - issue 43 common bounded-loop contract
-  action: Compile the comment into a bounded lane contract and implement evidence-proportionate routing.
+  - issue 73 terminal
+  action: Dispatch the issue-70 change-classes lane as the sole ready candidate.
 - issue: 12
   title: Negotiate Agent Platform capabilities through supported worker adapters
   state: OPEN
@@ -471,15 +476,16 @@ recommended_sequence:
   - Expired authority, quota, duplicate wake, or restart failures
   depends_on: [SEQ-009]
 next_sprint_candidates:
-- outcome: Make approving critic evidence exact and non-vacuous.
-  issue_ids: [73]
+- outcome: Implement evidence-proportionate change classes and typed merge authority.
+  issue_ids: [70]
   readiness: ready
-  rationale: Fresh reproduction proved empty and fabricated approving assessments pass while existing verified-release evidence minimums already work.
+  rationale: Issue 73 is terminal; the approved 2026-07-12 parameters and a validated draft sprint transaction make issue 70 the sole ready candidate.
   required_actions:
-  - Require approving critic criterion IDs to equal the lane contract criteria exactly, with satisfied non-empty evidence.
-  - Require supplied non-approving and closeout criterion IDs to be unique, contract-valid, and truthful for their current phase.
-  - Pin the already-correct empty verified-release rejection and keep request-fixes empty assessment valid.
-  - Prove vacuous critic evidence cannot authorize review inbox, merge, or terminalization.
+  - Add an additive change_class to lane contracts with lightweight and standard classes.
+  - Recognize planning-only and lightweight PR classes deterministically in pr-policy and delivery-gate.
+  - Return a typed no-op promotion success on dev pushes with no expected release PR.
+  - Encode a typed merge-authority table and a protected-path override forcing the full chain.
+  - Record the weekly human sampling sweep and reconcile AGENTS.md with the operating contract.
 actions:
 - id: ACT-001
   type: update_issue
@@ -519,11 +525,11 @@ actions:
 handoff:
   next_skill: sprint-planning
   next_mode: lane-transaction
-  reason: Issues 135, 215, and 71 are terminal, the 2026-07-12 SOTA re-sequencing is approved and recorded, issue 73 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
+  reason: Issues 135, 215, 71, and 73 are terminal, the 2026-07-12 SOTA re-sequencing is approved and recorded, issue 70 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
   required_before_handoff:
   - Merge this strategy refresh to protected dev.
   - Verify project-router selects sprint-planning for issue 73.
 approval:
   status: approved
   approver: Jason Vallery
-  approved_at: '2026-07-12T17:22:00Z'
+  approved_at: '2026-07-12T18:55:00Z'
