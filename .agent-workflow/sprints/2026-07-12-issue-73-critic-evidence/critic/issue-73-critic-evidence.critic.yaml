@@ -1,0 +1,298 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-07-12-issue-73-critic-evidence
+lane_id: issue-73-critic-evidence
+pull_request: 230
+worker_agent: claude-issue73-worker
+worker_session_id: issue73-worker-2026-07-12a
+critic_agent: claude-issue73-critic
+implementation_head_sha: "98f44562fa6f5982e353533439d4b1b9cfc890b3"
+evidence_head_sha: "089f9b99e2d1f0911f8293f4aff4f19aa63cfe53"
+reviewed_head_sha: "089f9b99e2d1f0911f8293f4aff4f19aa63cfe53"
+closeout_path: .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/lanes/closeout/issue-73-critic-evidence.closeout.yaml
+closeout_sha256: "1dad1b770beadaad888b9c6882918fbfafb848dbde18c75d68b017a12f34af18"
+critic_session_id: issue73-critic-2026-07-12a
+review_worktree: /tmp/claude-1001/-workspace-verdify-skills-repo/a0f98778-e422-498e-b98a-8aa55479b0f7/scratchpad/.reviews/dev-wt/issue-73-critic-evidence-issue73-critic-2026-07-1
+outcome: approve_with_risks
+findings:
+  - id: FIND-001
+    severity: low
+    statement: >-
+      The closeout future-phase evidence tripwire
+      (LaneReviewValidator::FUTURE_PHASE_EVIDENCE_PATTERN) is a word-boundary
+      name denylist and is evadable by deliberate naming: unrecorded closeout
+      evidence IDs such as "criticreview", "postintegration", "ghchecks", a
+      homoglyph "critic" spelled with Cyrillic i, and the empty string all
+      pass validate_closeout_claims without error. LANE-AC-05's natural
+      reading ("cannot claim critic, CI, integration, deployment, or outcome
+      evidence") is enforced only for naturally named claims.
+    evidence:
+      - >-
+        Independent hostile-fixture probes L6, L6b, and L8 against the
+        candidate validator at evidence head 089f9b99 returned zero errors for
+        closeout claims with evidence_ids ["criticreview", "postintegration",
+        "ghchecks"], a Cyrillic-i "critic-approval" variant, and [""], while
+        the naturally named probe from tests/test_critic_evidence.rb
+        (fresh-critic-approval, github-checks-at-head, terminal-receipt) was
+        rejected with the bounded future-phase error.
+      - >-
+        Impact is bounded: closeout evidence_ids carry no standalone merge or
+        receipt authority; the approving critic exactness rules, delivery-gate
+        process exit, route state, and terminal-receipt lane bindings all
+        rejected every fabrication probe independently of this tripwire, and
+        the worker closeout and docs/authority-model.md both record the
+        category-name design explicitly.
+    requested_action: >-
+      Accept as recorded risk for this lane; in a follow-up evidence-truth
+      iteration consider an allowlist rule (unrecorded closeout evidence IDs
+      restricted to committed artifact paths or recorded validation_results
+      IDs) instead of a name denylist.
+  - id: FIND-002
+    severity: note
+    statement: >-
+      Approving-report evidence strings are checked for non-emptiness but are
+      not resolved against repository content: an approving report whose
+      acceptance_assessment lists the exact contract criterion IDs, all
+      satisfied, with evidence naming nonexistent files validates on every
+      layer. Evidence-content truthfulness remains the fresh critic's and the
+      human reviewer's responsibility by design; the contract scoped this lane
+      to exactness, uniqueness, satisfaction, and non-emptiness only.
+    evidence:
+      - >-
+        Hostile probe L4 (exact IDs, satisfied, evidence "tests/
+        does_not_exist_9999.rb passes" and "see artifacts/imaginary-log.txt")
+        validated cleanly through LaneReviewValidator.validate_critic at the
+        candidate evidence head; LANE-AC-01..07 fixtures and the contract's
+        desired_outcome confirm this is outside the approved lane scope.
+    requested_action: >-
+      No change for this lane; record as residual risk so a future
+      evidence-resolution lane can bind evidence strings to checkable
+      artifacts.
+  - id: FIND-003
+    severity: note
+    statement: >-
+      The critic-report schema's acceptance_assessment description ("Empty
+      only when the reviewed lane contract has no enumerated acceptance
+      criteria") is now stale: the new document-local semantic rule rejects an
+      empty acceptance_assessment for every approving report, and the
+      lane-contract schema requires at least one acceptance criterion, so the
+      described empty case is unreachable. schemas/** was a prohibited path
+      for this lane, so the worker could not correct the description text.
+    evidence:
+      - >-
+        schemas/critic-report.schema.yaml acceptance_assessment description
+        versus SemanticValidator#validate_critic_report empty-assessment
+        rejection at evidence head 089f9b99, and
+        schemas/lane-contract.schema.yaml acceptance_criteria minItems 1.
+    requested_action: >-
+      Update the description string in a schema-owning lane (issue #225
+      vicinity); no behavior change required.
+  - id: FIND-004
+    severity: low
+    statement: >-
+      The worker-authored PR 230 body retained the pull-request template's
+      leading HTML comment, so the required pull-request-policy check fails at
+      evidence head E for template hygiene ("pull request template still
+      contains unresolved HTML placeholders"), independent of lane code
+      quality. delivery-policy and critic-gate failures at E are
+      phase-expected ("current head does not contain the canonical critic
+      report") and resolve at report head S.
+    evidence:
+      - >-
+        Independent local reproduction with the protected-baseline policy
+        engine at E: scripts/pr-policy.rb (f72244d2 tree) against the live PR
+        230 body reported exactly the unresolved-HTML-placeholder error;
+        scripts/delivery-gate.rb (same tree) reported exactly the
+        missing-canonical-critic-report error.
+    requested_action: >-
+      Remove the template HTML comment and refresh Current head SHA to the
+      exact report head S in the PR body before the gates re-evaluate; no
+      branch content change is involved.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        SemanticValidator#validate_critic_report rejects an empty
+        acceptance_assessment for both approve and approve_with_risks with the
+        bounded typed error "$.acceptance_assessment: <outcome> requires an
+        acceptance assessment for every lane contract criterion"; independent
+        re-run of ruby tests/test_critic_evidence.rb (20 runs, 52 assertions,
+        0 failures) and hostile probe S6 confirmed the rejection, and probes
+        against route, delivery-gate, and terminal-receipt confirmed the empty
+        approving report authorizes nothing end to end.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        LaneReviewValidator#validate_critic_assessment plus the document-local
+        duplicate rule enforce exact order-independent equality with the
+        contract criterion set: independent probes confirmed duplicates
+        ("criterion IDs must be unique: LANE-AC-01"), unknown IDs ("assesses
+        criteria missing from the lane contract: LANE-AC-99"), and omissions
+        ("does not assess lane contract criteria: LANE-AC-02") each fail with
+        a distinct bounded error naming the offending IDs, while the exact set
+        in reversed order validates. Case-variant, trailing-whitespace, and
+        Cyrillic-homoglyph criterion IDs were all rejected fail-closed (probes
+        L1-L3), and the lane-contract schema's ^LANE-AC-[0-9]{2,}$ ID pattern
+        prevents homoglyph IDs from ever existing in a valid contract.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        Approving reports require every assessment "satisfied" (schema enum
+        plus semantic check, so casing tricks like "Satisfied" fail both
+        layers) with evidence non-empty after strip: probes S1-S3 rejected
+        whitespace-only and tab/newline evidence strings with "approval
+        requires non-empty evidence (<id>)", the unsatisfied fixture fails
+        with "approval requires satisfied criteria (<id>)", and the schema
+        minItems pin for empty evidence arrays was independently re-run green
+        in tests/test_critic_evidence.rb.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - >-
+        Empty and partial request_fixes reports validate (re-run
+        test_request_fixes_report_remains_valid_when_empty/_partial), while
+        duplicate and unknown criterion IDs in non-approving reports are still
+        rejected (probe S7 and the re-run
+        test_request_fixes_report_rejects_duplicate_and_unknown_ids); outcome
+        casing "Approve" fails the schema enum and is never treated as
+        approving by any authorization path (probe S4).
+  - criterion_id: LANE-AC-05
+    assessment: satisfied
+    evidence:
+      - >-
+        Closeout claims are enforced as a unique contract-valid subset on the
+        lane review path: fabricated criterion IDs fail ("closeout claims
+        criteria missing from the lane contract: LANE-AC-99"), duplicates fail
+        with the offending ID, omission of criteria is allowed (truthful
+        subset probe passed), naturally named future-phase evidence claims
+        fail with the bounded error naming each offending evidence ID, and a
+        claim pointing at a recorded-but-failed validation result is rejected
+        because ready_for_critic requires every validation result passed
+        (probe L5). The name-denylist evasion limit is recorded as FIND-001
+        and as a residual risk.
+  - criterion_id: LANE-AC-06
+    assessment: satisfied
+    evidence:
+      - >-
+        The verified-release empty integration_results rejection is pinned by
+        the new regression test_verified_release_still_rejects_empty_integration_results
+        (independently re-run green in tests/test_schema_validator.rb, 148
+        runs, 749 assertions) without any change to
+        schemas/release-verification.schema.yaml or the release validator:
+        the I-to-D diff touches no schemas/** or release-validation path.
+  - criterion_id: LANE-AC-07
+    assessment: satisfied
+    evidence:
+      - >-
+        End-to-end rejection was independently reproduced on all three
+        authorization surfaces: route returns LANE_REVIEW_EVIDENCE_INVALID and
+        never hands off to release-verification for vacuous or fabricated
+        approving reports (re-run lane-review suite, 54 runs, 135 assertions),
+        scripts/delivery-gate.rb exits 1 with bounded stderr (186 bytes, no
+        artifact dump or stack trace) for vacuous, fabricated, and
+        homoglyph approving reports (probes L9/L9b), and
+        SprintTerminalReceipt#validate_local rejects the lane binding whose
+        critic report is vacuous (re-run critic-evidence suite).
+  - criterion_id: LANE-AC-08
+    assessment: satisfied
+    evidence:
+      - >-
+        Every component verifiable at report time S is independently verified:
+        D 70d521d8 is baseline-parented and dispatch-only, dispatch artifacts
+        are byte-identical D through E, I 98f44562 changes exactly the seven
+        contract-owned paths, E 089f9b99 adds only the canonical closeout
+        (worker-recorded contract hash f6d7cddf... matches the contract at I),
+        and the protected-baseline (f72244d2) LaneReviewValidator accepts the
+        closeout chain at exact E. All seven contract validation commands were
+        re-run by this critic in the detached review worktree at E and passed:
+        critic-evidence suite 20/52, lane-review suite 54/135,
+        schema-validator suite 148/749, validate-repo (28 skills, 49 schemas),
+        manifest-check (459 entries), LANG=C.UTF-8 make test exit 0, and a
+        redacted gitleaks 8.24.3 scan of the three lane commits with no leaks.
+        This report's existence on a distinct critic agent/session satisfies
+        the fresh-critic component. Exact-head CI at S, protected-dev
+        integration, and the normal terminal receipt are downstream
+        controller-owned gates recorded as residual risk, not claimed here.
+evidence_assessment:
+  - >-
+    Independence holds: critic claude-issue73-critic /
+    issue73-critic-2026-07-12a differs from worker claude-issue73-worker /
+    issue73-worker-2026-07-12a on both axes; the review ran in a freshly
+    leased detached worktree at exact E with no worker context.
+  - >-
+    Chain integrity was reconstructed from raw Git, not from worker claims:
+    baseline f72244d2 -> dispatch-only D 70d521d8 (sprint plan, wave release
+    plan, lane contract; 523 insertions) -> implementation I 98f44562 (owned
+    paths only) -> evidence E 089f9b99 (closeout only), with dispatch
+    artifacts byte-identical D through E and closeout SHA-256
+    1dad1b770beadaad888b9c6882918fbfafb848dbde18c75d68b017a12f34af18
+    computed independently at E.
+  - >-
+    Rule-13 authority separation was respected: the lane chain was validated
+    with the protected-baseline policy tree extracted from f72244d2, and the
+    candidate validator was exercised only as the review subject via a
+    21-probe hostile matrix (whitespace evidence, enum casing, duplicate and
+    homoglyph IDs, fabricated files, failed-result claims, denylist evasion,
+    end-to-end gate exits) with every authorization-bearing probe rejected
+    fail-closed and the two accepted probes matching documented design scope.
+  - >-
+    The worker closeout is truthful: it claims only LANE-AC-01..07 with
+    evidence IDs that all reference its own recorded validation_results,
+    omits LANE-AC-08 rather than overclaiming controller-owned evidence, and
+    its limitations record the locale requirement, the scratchpad-fetched
+    gitleaks binary, and the RISK-01 validation-time binding accurately.
+  - >-
+    RISK-01 handling is coherent and verified: document-local rules live in
+    SemanticValidator, contract reconciliation binds only on the live lane
+    review path (route, pr-policy, delivery-gate, terminal-receipt lane
+    bindings, all confirmed as LaneReviewValidator call sites), the committed
+    historical corpus still validates (validate-repo green at E), and
+    docs/authority-model.md describes exactly the shipped rule set including
+    the validation-results exemption.
+  - >-
+    PR 230 is open, draft, targets dev, and its head equals exact E. The
+    validate and compliance checks passed at E; pull-request-policy fails at E
+    only for the template HTML comment (FIND-004) and delivery-policy and
+    critic-gate fail only because no critic report exists at E yet - both
+    were reproduced locally with the protected-baseline engines and are
+    containment behavior, not accepted evidence.
+integration_risks:
+  - >-
+    This approval authorizes nothing by itself: integration requires the
+    critic-gate and required checks to succeed at the exact report-only head
+    S, and any commit after S invalidates this review and requires a new
+    evidence head and re-review.
+  - >-
+    The PR body must have its Current head SHA refreshed to exact S and the
+    template HTML comment removed (FIND-004) before pull-request-policy can
+    pass; until then the PR remains draft and unmergeable.
+  - >-
+    The new exactness rules bind as trusted policy only after this lane
+    merges to protected dev; until then they exist in candidate code and in
+    the candidate-engine gate run only.
+residual_risks:
+  - >-
+    LANE-AC-08's merge, exact-head CI, protected-dev integration, and normal
+    terminal-receipt components are controller-owned downstream evidence that
+    cannot exist at report time; they remain mandatory gates under issue
+    #225's structured phase-ownership follow-up rather than claims satisfied
+    by this report.
+  - >-
+    The closeout future-phase evidence check is a name denylist evadable by
+    deliberate concatenated, homoglyph, or empty-string evidence IDs
+    (FIND-001); it is a truthfulness tripwire, not an authorization gate, and
+    a stronger allowlist formulation is deferred to a follow-up lane.
+  - >-
+    Approving-report evidence strings are not resolved against repository
+    content (FIND-002); content truthfulness continues to rely on the fresh
+    critic and the independent human approval.
+  - >-
+    make test requires an explicit UTF-8 locale (LANG=C.UTF-8) on pods with
+    no default locale; this is a pre-existing baseline limitation of
+    scripts/verify-npm-tarball.rb, not a lane defect, and was reproduced
+    identically by this critic.
+reviewed_at: "2026-07-12T18:24:00Z"
