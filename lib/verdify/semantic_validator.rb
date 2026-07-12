@@ -196,6 +196,8 @@ module Verdify
       Array(document["acceptance_evidence"]).each_with_index do |assessment, index|
         errors << "$.acceptance_evidence[#{index}]: ready_for_critic requires satisfied criteria" unless assessment["assessment"] == "satisfied"
       end
+      duplicates = duplicate_values(Array(document["acceptance_evidence"]).map { |assessment| assessment["criterion_id"] })
+      errors << "$.acceptance_evidence: criterion IDs must be unique: #{duplicates.join(', ')}" unless duplicates.empty?
     end
 
     def validate_critic_report(document, errors)
@@ -211,10 +213,20 @@ module Verdify
       unless document["reviewed_head_sha"] == document["evidence_head_sha"]
         errors << "$.reviewed_head_sha: must equal evidence_head_sha"
       end
+      assessments = Array(document["acceptance_assessment"])
+      duplicates = duplicate_values(assessments.map { |assessment| assessment["criterion_id"] })
+      errors << "$.acceptance_assessment: criterion IDs must be unique: #{duplicates.join(', ')}" unless duplicates.empty?
       return unless %w[approve approve_with_risks].include?(document["outcome"])
 
-      Array(document["acceptance_assessment"]).each_with_index do |assessment, index|
-        errors << "$.acceptance_assessment[#{index}]: approval requires satisfied criteria" unless assessment["assessment"] == "satisfied"
+      if assessments.empty?
+        errors << "$.acceptance_assessment: #{document['outcome']} requires an acceptance assessment for every lane contract criterion"
+      end
+      assessments.each_with_index do |assessment, index|
+        unless assessment["assessment"] == "satisfied"
+          errors << "$.acceptance_assessment[#{index}]: approval requires satisfied criteria (#{assessment['criterion_id']})"
+        end
+        evidence = Array(assessment["evidence"]).map { |item| item.to_s.strip }.reject(&:empty?)
+        errors << "$.acceptance_assessment[#{index}]: approval requires non-empty evidence (#{assessment['criterion_id']})" if evidence.empty?
       end
       blocking = Array(document["findings"]).select { |finding| %w[critical high].include?(finding["severity"]) }
       errors << "$.findings: approval cannot contain critical/high findings" unless blocking.empty?
@@ -365,6 +377,10 @@ module Verdify
 
     def validate_sha(value, path, errors)
       errors << "#{path}: expected a full 40-character commit SHA" unless value.to_s.match?(SHA_PATTERN)
+    end
+
+    def duplicate_values(values)
+      values.select { |value| values.count(value) > 1 }.uniq
     end
   end
 end
