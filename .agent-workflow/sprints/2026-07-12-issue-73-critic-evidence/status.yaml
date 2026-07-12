@@ -1,0 +1,10 @@
+---
+schema_ref: status.schema.yaml
+kind: SprintStatus
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+state: COMPLETE
+updated_at: '2026-07-12T18:43:30Z'
+active_lanes: []
+blockers: []
+next_action: Terminal receipt, then dispatch issue 70.
