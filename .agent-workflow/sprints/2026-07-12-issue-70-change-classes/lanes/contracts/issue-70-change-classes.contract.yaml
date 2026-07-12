@@ -1,0 +1,257 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-70-change-classes
+lane_id: issue-70-change-classes
+title: Typed change classes and typed merge authority
+status: approved
+issue_ids: [70]
+coupling_justification: null
+objective: Make change classes authoritative across pr-policy, delivery-gate, and
+  the router with deterministic planning-only recognition, a lightweight one-PR lane
+  class, a single protected-path source with a force-standard override, typed no-op
+  promotion for dev pushes, and a typed merge-authority table, so proportional process
+  replaces ceremony without weakening implementation criticism or protected-path
+  authority.
+desired_outcome: A planning-only PR passes policy in both entrypoints without lane
+  or critic metadata; a lightweight lane merges with an issue, diff, and critic finding
+  in one PR with no wave plan or separate receipt; any protected-path diff is forced
+  through the standard chain regardless of declared class; an intentionally absent
+  promotion is a typed "no promotion expected" success; merges are authorized only
+  by machine-verifiable transition state; and AGENTS.md, COMMON_OPERATING_CONTRACT.md,
+  and docs/authority-model.md state one consistent authority model.
+non_goals:
+- Version the lane-contract schema or add structured lifecycle phases (issue 225).
+- Implement issue 75 eval execution, issue 74 consumer enforcement, or issue 43/76
+  route-simplification scope beyond what change classes require.
+- Change .github/workflows/**, VERSION, package.json, CHANGELOG.md, or the npm release
+  path.
+- Weaken implementation criticism, exact-head checks, Stage 0 security stops, verified-release
+  validation, or protected-path non-author review authority.
+- Build sweep scheduling infrastructure; the weekly sampling sweep is a recorded
+  standing operator duty scheduled in fleet cron.
+baseline_sha: 'd226b7f244fd4612ab44739fd275b8158e1d9159'
+branch: lane/70-change-classes
+module_contracts: [governance-routing, execution-control, lane-assurance, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [change-class-policy, merge-authority-typing, promotion-typing, authority-documentation]
+  owned_paths:
+  - schemas/lane-contract.schema.yaml
+  - scripts/pr-policy.rb
+  - scripts/delivery-gate.rb
+  - lib/verdify/cli.rb
+  - config/github-primitives.yaml
+  - docs/authority-model.md
+  - COMMON_OPERATING_CONTRACT.md
+  - AGENTS.md
+  - .github/pull_request_template.md
+  - tests/test_pr_policy.sh
+  - tests/test_delivery_gate.sh
+  - tests/test_cli.sh
+  - tests/test_change_classes.sh
+  - MANIFEST.sha256
+  prohibited_paths:
+  - .github/workflows/**
+  - VERSION
+  - package.json
+  - CHANGELOG.md
+  - lib/verdify/semantic_validator.rb
+  - lib/verdify/lane_review_validator.rb
+  - lib/verdify/sprint_terminal_receipt.rb
+  - .agent-workflow/northstar/**
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/strategy/**
+  - skills/**
+  coordination_required_paths: []
+  owned_interfaces:
+  - Optional change_class declaration in lane contracts (enum lightweight or standard;
+    absent resolves to standard) with additive schema compatibility.
+  - Deterministic planning-only PR classification by changed paths (only .agent-workflow/strategy/**,
+    .agent-workflow/northstar/**, .agent-workflow/intake/**, docs/**, and *.md) shared
+    by pr-policy and delivery-gate.
+  - Lightweight PR class requiring an issue link and a critic finding while skipping
+    sprint, wave, and closeout sections.
+  - protected_paths single source in config/github-primitives.yaml consumed by pr-policy,
+    delivery-gate, and the router, with a force-standard override on any touch.
+  - Typed "no promotion expected" success for dev-push release checks when the package
+    version at head is already published.
+  - Typed merge-authority table; implementation PR requires the exact approving critic
+    report S at head, receipt PR requires a valid receipt, planning-only passes by
+    path check, and protected-dev changes outside those states emit a typed incident
+    or fix-forward stop.
+  - Router lightweight-lane transaction producing a contract and critic report only,
+    with no wave plan and no separate receipt PR.
+dependencies:
+  hard:
+  - lane_id: issue-73-critic-evidence
+    required_output: Issue 73 is terminal on protected dev; exact non-vacuous critic
+      and closeout evidence validation is in the baseline so lightweight critic findings
+      cannot be vacuous.
+  soft:
+  - lane_id: issue-225-lifecycle-phases
+    coordination: Issue 225 owns structured phase ownership and lane-contract versioning;
+      this lane adds only the optional change_class field and must not add phase
+      fields to any schema.
+  - lane_id: issue-43-76-route-simplification
+    coordination: Issues 43 and 76 consume change classes for route simplification;
+      this lane must not pre-implement their scope.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: schemas/lane-contract.schema.yaml gains an optional change_class enum
+    [lightweight, standard]; the change is additive, contracts without the field
+    still validate and resolve to standard, and the committed historical contract
+    corpus remains green.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [schema diff, absent-field default fixture, historical contract
+      corpus regression]
+- id: LANE-AC-02
+  statement: pr-policy.rb recognizes a planning-only PR class deterministically by
+    changed paths (only .agent-workflow/strategy/**, .agent-workflow/northstar/**,
+    .agent-workflow/intake/**, docs/**, and *.md) and skips lane and critic metadata
+    requirements for it; a diff containing any other path does not qualify.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [planning-only positive fixture without lane metadata, non-qualifying
+      path negative fixture]
+- id: LANE-AC-03
+  statement: pr-policy.rb enforces a lightweight PR class that requires an issue
+    link and a critic finding while skipping sprint, wave, and closeout sections;
+    standard PR requirements are unchanged.
+  sprint_acceptance_ids: [SPR-AC-02]
+  evidence_required: [lightweight positive fixture, missing-critic-finding negative
+      fixture, standard-mode regression]
+- id: LANE-AC-04
+  statement: delivery-gate.rb honors both classes; planning-only PRs pass by path
+    check with no lane or critic metadata demanded, lightweight PRs require only
+    the critic report artifact with no closeout chain or receipt, and the standard
+    critic-gate chain is unchanged.
+  sprint_acceptance_ids: [SPR-AC-01, SPR-AC-02]
+  evidence_required: [delivery-gate planning-only fixture, delivery-gate lightweight
+      fixture, standard chain regression]
+- id: LANE-AC-05
+  statement: The dev-push release check returns a typed "no promotion expected" success
+    when the package version at the pushed head is already published, and still fails
+    when a promotion is genuinely expected and absent.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [no-promotion typed-success fixture, genuine-missing-promotion
+      failure regression]
+- id: LANE-AC-06
+  statement: Merge authority is a typed table; an implementation PR is mergeable
+    only with the exact approving critic report S at the current head, a receipt
+    PR only with a valid receipt, planning-only by path check, and a protected-dev
+    change outside those states emits a typed incident or fix-forward stop.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [merge-authority table tests per PR kind, out-of-state typed-stop
+      fixture]
+- id: LANE-AC-07
+  statement: The cli.rb router supports a lightweight-lane transaction that produces
+    a contract and critic report only (no wave plan, no separate receipt PR), and
+    a protected-path override backed by the new protected_paths key in config/github-primitives.yaml
+    forces the standard chain when the diff touches the protected list; pr-policy,
+    delivery-gate, and the router all consume the same single source.
+  sprint_acceptance_ids: [SPR-AC-02, SPR-AC-03]
+  evidence_required: [router lightweight transaction test, protected-path diff declared
+      lightweight forced to standard fixture, single-source consumption tests in
+      all three entrypoints]
+- id: LANE-AC-08
+  statement: docs/authority-model.md and COMMON_OPERATING_CONTRACT.md gain a change-class
+    section including the weekly human sampling sweep (at least three machine-merged
+    lane PRs sampled per week; incidents touching machine-approved PRs auto-flag),
+    AGENTS.md line 54 is fixed to match contract rule 15, the historical corpus
+    and full suite stay green, and worker closeout, one fresh critic, exact-head
+    CI, protected-dev integration, and a normal terminal receipt all pass.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [docs reconciliation diff, full suite and historical-corpus logs,
+      D/I/E/S chain, critic report, GitHub checks, terminal receipt]
+validation_commands:
+- id: change-class-suite
+  command: bash tests/test_change_classes.sh
+  purpose: Prove the end-to-end class fixtures; a planning-only PR passes without
+    lane metadata, a lightweight lane merges with three artifacts, a protected-path
+    diff declared lightweight is forced to standard, and a dev-push no-promotion
+    state returns typed success.
+  required: true
+- id: pr-policy-suite
+  command: bash tests/test_pr_policy.sh
+  purpose: Preserve and extend pull-request policy behavior across planning-only,
+    lightweight, standard, receipt, and release modes.
+  required: true
+- id: delivery-gate-suite
+  command: bash tests/test_delivery_gate.sh
+  purpose: Preserve and extend delivery-gate behavior including typed no-op promotion
+    and the typed merge-authority table.
+  required: true
+- id: cli-suite
+  command: bash tests/test_cli.sh
+  purpose: Prove the router lightweight-lane transaction and the protected-path override.
+  required: true
+- id: historical-corpus-regression
+  command: ruby scripts/validate-repo.rb
+  purpose: Prove the committed historical sprint and contract corpus still validates
+    under the additive schema and policy changes.
+  required: true
+- id: manifest-check
+  command: make manifest-check
+  purpose: Prove package integrity.
+  required: true
+- id: full-suite
+  command: make test
+  purpose: Run the complete regression suite including schema, route-authority, receipt,
+    and release tests.
+  required: true
+- id: changed-commit-secret-scan
+  command: gitleaks git --no-banner --redact --log-opts="d226b7f244fd4612ab44739fd275b8158e1d9159..HEAD"
+  purpose: Scan every lane commit without exposing detected match values.
+  required: true
+required_evidence:
+- Class fixture matrix; planning-only positive and negative, lightweight positive
+  and negative, protected-path override, and dev-push typed no-op promotion with
+  a genuine-failure regression.
+- Single-source protected_paths consumption proof in pr-policy, delivery-gate, and
+  the router.
+- Historical corpus and full regression suite green at the exact implementation head.
+- Docs reconciliation diff showing AGENTS.md line 54 aligned with contract rule 15
+  and the change-class plus weekly-sampling-sweep sections.
+- Focused, full-suite, manifest, worker closeout, fresh critic, exact-head CI, protected-dev
+  integration with the recorded non-author code-owner review, and terminal receipt
+  evidence.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Deterministic class recognition cannot be implemented without weakening implementation
+  criticism, exact-head checks, or Stage 0 security stops.
+- The protected_paths single source cannot be consumed by all three entrypoints without
+  changing .github/workflows/**.
+- Typed no-op promotion cannot positively distinguish an already-published version
+  from a genuinely missed release.
+- The committed historical corpus or existing lifecycle fixtures start failing under
+  the new classes.
+- Correct behavior would require changing a prohibited validator, receipt, or workflow
+  file.
+- Work outside the owned paths or issue 70 acceptance becomes necessary.
+definition_of_done:
+- Every lane and sprint acceptance criterion has committed deterministic evidence.
+- The approved dispatch inputs remain byte-identical to dispatch commit D.
+- Focused tests, validate-repo, manifest-check, make test, and the redacted secret
+  scan pass at the exact implementation head.
+- Worker closeout records exact D/I/E and a different fresh critic approves the exact
+  evidence head with no unresolved high or critical finding.
+- The implementation merges to protected dev with the recorded non-author code-owner
+  review required for its CODEOWNERS-protected paths, and a normal terminal receipt
+  validates, merges, and leaves global routing truthful.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T19:00:00Z'

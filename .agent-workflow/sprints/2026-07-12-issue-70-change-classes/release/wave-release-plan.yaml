@@ -1,0 +1,222 @@
+---
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: '1.0'
+wave_id: wave-2026-07-12-issue-70-change-classes
+status: approved
+scope:
+  sprint_id: 2026-07-12-issue-70-change-classes
+  issue_ids: [70]
+  lane_ids: [issue-70-change-classes]
+  northstar_ids: [NSM-007, NSM-008, NSM-009]
+  summary: Integrate typed change classes, the protected-path single source and override,
+    typed no-op promotion, the typed merge-authority table, the router lightweight
+    transaction, and the reconciled authority docs into protected dev.
+  non_goals: [main or npm release, application runtime deployment, workflow file changes,
+    issue 225 schema versioning, issues 43/76 route simplification]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-70
+  decision_notes: One policy-and-router lane targets dev; the lane touches CODEOWNERS-protected
+    control-plane paths, so its merge carries a recorded non-author code-owner review
+    after critic-gate is green, and its post-merge receipt is deterministic with
+    no second critic cycle.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+  - name: validate
+    required: true
+    event_triggers: [pull_request, push]
+    timeout_minutes: 30
+    evidence_expected: [full repository tests, manifest verification, change-class
+        fixture matrix, historical-corpus regression]
+  - name: policy
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [standard lane identity and protected-base policy, planning-only
+        and lightweight class recognition]
+  - name: delivery-gate
+    required: true
+    event_triggers: [pull_request, push, other]
+    timeout_minutes: 15
+    evidence_expected: [exact-head critic report, typed merge-authority table, typed
+        no-op promotion on dev pushes, terminal receipt validation]
+  - name: compliance-selftest
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [fleet-standard repository compliance]
+  artifacts: [change-class fixture matrix, protected-path override fixture, typed
+      no-op promotion fixture, D/I/E/S evidence, terminal receipt]
+  required_events: [pull_request, push]
+environments:
+- name: repository-control-plane
+  environment_type: review
+  required: true
+  namespace: null
+  url: https://github.com/VerdifyConsultancy/verdify-skills
+  quota_policy: Routine source and package validation must remain local and deterministic;
+    terminal evidence uses the existing bounded GitHub read policy.
+  limit_policy: No new credential or write authority is introduced; typed merge authority
+    narrows, never widens, existing merge paths.
+  network_policy: Class and route artifact validation performs no network access;
+    the typed no-op promotion check uses the existing registry read already performed
+    by the release path.
+  ttl: null
+  secrets_scope: Existing ephemeral GitHub Actions token only; no new secret, personal
+    token, persistence, or output.
+  protection_rules: [one fresh implementation critic, exact-head checks, non-author
+      code-owner review for the CODEOWNERS-protected paths this lane touches]
+  expected_revision_source: merged issue 70 dev SHA followed by merged normal terminal
+    receipt dev SHA
+gitops:
+  controller: none
+  desired_state_refs: [scripts/pr-policy.rb, scripts/delivery-gate.rb, lib/verdify/cli.rb,
+    config/github-primitives.yaml, schemas/lane-contract.schema.yaml, tests/test_change_classes.sh]
+  sync_order:
+  - phase: validation
+    wave: 1
+    resource: issue 70 implementation pull request
+    purpose: Exercise the class fixture matrix, protected-path override, typed no-op
+      promotion, merge-authority table, packaging, and exact-head checks.
+  - phase: integration
+    wave: 2
+    resource: protected dev
+    purpose: Merge only the exact fresh-critic-approved head after required checks
+      and the recorded non-author code-owner review for protected paths.
+  - phase: closeout
+    wave: 3
+    resource: normal terminal receipt pull request
+    purpose: Make completion authoritative and verify the global router advances
+      to the issue 43/76 sequence.
+  reconciliation_checks: [origin/dev exactness, class fixture matrix, protected-path
+      single-source consumption, historical corpus validation, terminal receipt ancestry]
+  remediation_policy: Stop and fix forward on any class misrouting, protected-path
+    bypass, promotion mistyping, historical-corpus rejection, test, CI, or receipt
+    mismatch.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+  - id: STEP-01
+    action: Run the change-class fixture matrix, protected-path override and single-source
+      tests, typed no-op promotion fixtures, package and full tests, one fresh critic,
+      and exact-head pull-request checks.
+    success_criteria: Every class routes to its exact evidence chain, protected-path
+      diffs are always forced to standard, no-promotion pushes are typed successes,
+      the historical corpus validates, and all required evidence is green.
+    rollback_trigger: Any class misrouting, protected-path bypass, promotion mistyping,
+      historical-corpus rejection, failed test, or critic blocker.
+  - id: STEP-02
+    action: Merge the exact approved head to protected dev with the recorded non-author
+      code-owner review required for the CODEOWNERS-protected paths in the diff.
+    success_criteria: The intended commit is integrated and all branch protections
+      are verified restored.
+    rollback_trigger: Head changes, required check drift, or protection restoration
+      failure.
+  - id: STEP-03
+    action: Generate and merge the normal deterministic terminal receipt, then rerun
+      the global router.
+    success_criteria: Receipt policy checks pass, issue 70 is terminal, and routing
+      advances to the issue 43/76 sequence.
+    rollback_trigger: Any evidence mismatch, receipt failure, integrated unterminated
+      sprint, or stale route.
+observability:
+  dashboards: [GitHub pull requests, checks, workflow runs, and branch protection]
+  logs: [focused test output, redacted validation output, Actions logs, terminal
+      receipt validation]
+  metrics: [class fixtures passing per class, protected-path overrides enforced,
+    dev pushes returning typed no-promotion success instead of red, historical artifacts
+      still valid]
+  traces: [sprint ID, D/I/E/S SHAs, pull request, workflow run IDs, dev merge, terminal
+      receipt]
+  runtime_checks: [change-class suite, pr-policy suite, delivery-gate suite, cli
+      suite, validate-repo, project-router]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the single implementation merge if class routing, promotion typing,
+    or merge authority misbehaves on dev; rejected candidates are fixed forward before
+    merge.
+  known_good_ref: 'd226b7f244fd4612ab44739fd275b8158e1d9159'
+  procedure: Stop receipt generation, preserve bounded evidence, revert only the
+    issue 70 merge if necessary, and rerun the policy, router, and package matrix.
+  validation_steps: [validate repository, run change-class tests, run full suite,
+    verify branch protection, rerun project-router]
+release_health:
+  stabilization_window: through implementation merge, normal receipt merge, and post-merge
+    route verification
+  signals:
+  - name: class routing integrity
+    source: change-class fixture matrix
+    threshold: Every planning-only, lightweight, and standard fixture routes to exactly
+      its class evidence chain; no reduced chain accepts an implementation diff.
+    blocking: true
+  - name: protected-path enforcement
+    source: protected-path override and single-source tests
+    threshold: Any diff touching protected_paths is forced through the standard chain
+      regardless of declared class in all three entrypoints.
+    blocking: true
+  - name: typed promotion and merge authority
+    source: delivery-gate no-promotion and merge-authority fixtures
+    threshold: No-promotion dev pushes are typed successes, genuine missing promotions
+      still fail, and merges outside the typed authority table emit typed stops.
+    blocking: true
+  - name: valid lifecycle preservation
+    source: full regression suite and historical sprint corpus
+    threshold: Every committed historical artifact and valid fixture still validates.
+    blocking: true
+  - name: terminal convergence
+    source: normal terminal receipt and project-router
+    threshold: Receipt checks are green, integrated_unterminated is zero, and routing
+      advances to the issue 43/76 sequence.
+    blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-12-issue-70-change-classes/review/review-inbox-packet.yaml
+  human_test_steps:
+  - Inspect the class fixture matrix; planning-only without lane metadata, lightweight
+    with three artifacts, and the protected-path diff forced to standard.
+  - Inspect the typed no-op promotion fixture and the genuine-missing-promotion regression.
+  - Confirm AGENTS.md line 54 now matches contract rule 15 and the change-class and
+    weekly-sampling-sweep sections read as one authority model.
+  - Confirm the historical sprint corpus still validates unchanged.
+  approval_gate: One fresh implementation critic plus the non-author code-owner review
+    required for the CODEOWNERS-protected paths this lane touches.
+risks:
+- id: RISK-01
+  severity: high
+  statement: Class recognition drift could misroute an implementation or control-plane
+    diff onto a reduced evidence chain.
+  mitigation: Single protected_paths source, deterministic path classification, force-standard
+    override, and a pinned fixture where a protected-path diff declared lightweight
+    is forced to standard.
+- id: RISK-02
+  severity: medium
+  statement: Typed no-op promotion could mask a genuinely missed release.
+  mitigation: Typed success requires positive already-published evidence for the
+    exact version; genuine absent promotions still fail, with regressions in both
+    directions.
+- id: RISK-03
+  severity: medium
+  statement: Machine-merge autonomy could degrade silently after routine human checkpoints
+    are removed.
+  mitigation: Weekly human sampling sweep of at least three machine-merged lane PRs
+    and automatic flagging of any incident touching a machine-approved PR.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T19:00:00Z'
+prepared_at: '2026-07-12T19:00:00Z'
+planner: root-issue70-change-classes
