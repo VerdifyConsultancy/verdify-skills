@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-07-10T14:12:32Z'
+updated_at: '2026-07-12T17:02:36Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1820,3 +1820,45 @@ evidence:
   - Verdify proposes one integrated four-project vertical slice before broader rollout;
     the cited sources support incremental, measured expansion but do not identify
     Verdify's projects or sequence.
+- id: NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs
+  reference: northstar://evidence/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs
+  title: 'SOTA benchmark 2026-07: verdify-skills vs industry autonomous-SDLC practice'
+  evidence_type: research_note
+  evidence_status: observed
+  ingested_at: '2026-07-12T17:02:36Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs-sota-benchmark-2026-07-md"
+  source_uri:
+  source_sha256: b1d47df0a6220ed14d0cd36eb93f931113a1331ba2edf76607d8935519430ae5
+  summary: 'Exhaustive July-2026 benchmark of the verdify operating model against
+    shipped industry practice (coding agents, spec-driven tooling, blocking AI review
+    gates, orchestration, release/supply-chain, harness doctrine). Core control theory
+    validated; ceremony diverges from all proven practice. Jason approved keep/kill/simplify
+    direction 2026-07-12: risk-tiered lanes first (#70), expanded simplification (#76),
+    platform-native dispatch re-scope (#12).'
+  tags:
+  - 2026-07
+  - industry-comparison
+  - risk-tiering
+  - simplification
+  - sota-benchmark
+  claims:
+  - Every production system that lets an AI verdict satisfy a merge gate (Cloudflare,
+    Rewind, Intercom, Customer.io) pairs it with risk tiering and deterministic policy
+    code; none runs always-on uniform heavyweight ceremony.
+  - The artifact-ceremony ceiling with demonstrated retention is 3-4 artifacts per
+    feature (Kiro, Spec Kit, BMAD Quick Flow); verdify's measured internal overhead
+    is ~5:1 ceremony-to-code commits, 3 PRs and 9 artifacts per lane.
+  - 'The fresh-session independent critic is the single best-evidenced multi-agent
+    pattern for code (Cognition: ~2 bugs/PR, 58% severe; LLM self-preference-bias
+    and self-correction research), while deliberative consensus committees underperform
+    their best member by up to 37.6%.'
+  - npm staged publishing (GA 2026-05) plus GitHub immutable releases and Rekor-logged
+    provenance natively provide exact-tarball retention, inspection, and gated atomic
+    go-live, superseding verdify's bespoke release-transaction ledger.
+  - 'GitHub runs Claude and Codex coding agents natively (Agent HQ), commoditizing
+    the dispatch layer issue #12 planned to negotiate bespoke adapters for.'
+  - Capability scaffolding depreciates on METR's ~89-day task-horizon doubling; trust
+    scaffolding (dispatch immutability, critic-before-merge, release gates, protected-base
+    policy) endures.
+  planning_relevance: []
