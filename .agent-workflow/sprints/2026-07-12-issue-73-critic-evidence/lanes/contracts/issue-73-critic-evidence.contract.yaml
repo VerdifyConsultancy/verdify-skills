@@ -1,0 +1,191 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+lane_id: issue-73-critic-evidence
+title: Exact non-vacuous critic and closeout evidence
+status: approved
+issue_ids: [73]
+coupling_justification: null
+objective: Reject empty or fabricated approving critic evidence and untruthful closeout
+  claims in the semantic and lane-review validators so vacuous evidence can never
+  authorize review inbox, merge, or terminalization.
+desired_outcome: An approving critic report is valid only when its acceptance assessment
+  exactly covers the lane contract criteria with satisfied non-empty evidence; closeout
+  criterion IDs are a truthful contract-valid subset; non-approving partial reports
+  and the existing empty verified-release rejection keep working.
+non_goals:
+- Version the lane-contract schema or add structured lifecycle phases (issue 225).
+- Change any file under schemas/.
+- Rebuild verified-release integration validation, terminal receipts, or delivery
+  controls.
+- Implement issue 75, 74, 70, 43, or 76 scope.
+baseline_sha: f72244d2ef93602647e02c92d9eaab601fe8637a
+branch: lane/73-critic-evidence
+module_contracts: [lane-assurance, quality-enablement]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [critic-evidence-validation, closeout-evidence-validation, lifecycle-regression-tests]
+  owned_paths:
+  - lib/verdify/semantic_validator.rb
+  - lib/verdify/lane_review_validator.rb
+  - tests/test_schema_validator.rb
+  - tests/test_lane_review_validator.rb
+  - tests/test_critic_evidence.rb
+  - docs/authority-model.md
+  - MANIFEST.sha256
+  prohibited_paths:
+  - .github/**
+  - config/**
+  - schemas/**
+  - VERSION
+  - package.json
+  - CHANGELOG.md
+  - bin/**
+  - lib/verdify/cli.rb
+  - lib/verdify/sprint_terminal_receipt.rb
+  - lib/verdify/git_repository.rb
+  - scripts/**
+  - skills/**
+  - .agent-workflow/northstar/**
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/strategy/**
+  coordination_required_paths: []
+  owned_interfaces:
+  - Approving critic acceptance-assessment exactness (coverage, uniqueness, satisfaction,
+    non-empty evidence).
+  - Closeout criterion-subset truthfulness.
+  - Bounded typed validation errors for vacuous or fabricated evidence.
+dependencies:
+  hard:
+  - lane_id: issue-71-route-authority-validation
+    required_output: Issue 71 is terminal on protected dev; fail-closed route authority
+      loading is in place.
+  soft:
+  - lane_id: issue-225-lifecycle-phases
+    coordination: Issue 225 owns structured phase ownership; this lane must not add
+      phase fields to any schema.
+  - lane_id: issue-70-change-classes
+    coordination: Issue 70 owns risk classes and planning-only policy; this lane changes
+      evidence truth only.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: An approve or approve_with_risks critic report with an empty acceptance
+    assessment fails semantic validation with a bounded typed error.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [empty approving fixture, validator test]
+- id: LANE-AC-02
+  statement: Approving criterion IDs must equal the lane contract criterion IDs exactly,
+    order-independent; duplicates, unknown IDs, and missing criteria each fail with
+    a distinct bounded error naming the offending IDs.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [duplicate fixture, unknown-ID fixture, missing-criterion fixture,
+    exact-match fixture]
+- id: LANE-AC-03
+  statement: Every assessment in an approving report must be satisfied with non-empty
+    evidence; an unsatisfied or evidence-empty assessment fails.
+  sprint_acceptance_ids: [SPR-AC-01]
+  evidence_required: [unsatisfied fixture, empty-evidence fixture]
+- id: LANE-AC-04
+  statement: Non-approving reports remain valid when partial or empty, and supplied
+    criterion IDs must be unique and contract-valid; the existing empty request_fixes
+    regression is pinned.
+  sprint_acceptance_ids: [SPR-AC-02]
+  evidence_required: [request_fixes fixtures, partial report fixtures]
+- id: LANE-AC-05
+  statement: Closeout criterion IDs are a unique contract-valid subset and cannot
+    claim critic, CI, integration, deployment, or outcome evidence; violations fail
+    with bounded errors.
+  sprint_acceptance_ids: [SPR-AC-03]
+  evidence_required: [truthful subset fixture, fabricated-ID fixture, future-evidence
+    fixture]
+- id: LANE-AC-06
+  statement: The existing empty verified-release integration_results rejection is
+    pinned with an explicit regression and is not weakened or rebuilt.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [verified-release regression test]
+- id: LANE-AC-07
+  statement: End-to-end fixtures prove a vacuous or fabricated approving report cannot
+    authorize review-inbox packet validation, delivery-gate critic evaluation, or
+    terminal-receipt validation.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [review-inbox fixture, delivery-gate fixture, terminal-receipt
+    fixture]
+- id: LANE-AC-08
+  statement: Focused and full tests, manifest and repository validation, worker closeout,
+    one fresh critic, exact-head CI, protected-dev integration, and a normal terminal
+    receipt all pass.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [test logs, D/I/E/S chain, critic report, GitHub checks, terminal
+    receipt]
+validation_commands:
+- id: critic-evidence-suite
+  command: ruby tests/test_critic_evidence.rb
+  purpose: Prove the exact non-vacuous evidence rules and bounded errors.
+  required: true
+- id: lane-review-suite
+  command: ruby tests/test_lane_review_validator.rb
+  purpose: Preserve and extend lane review validation behavior.
+  required: true
+- id: schema-validator-suite
+  command: ruby tests/test_schema_validator.rb
+  purpose: Preserve semantic validator behavior for all other artifact kinds.
+  required: true
+- id: repository-validation
+  command: ruby scripts/validate-repo.rb
+  purpose: Prove the historical sprint corpus still validates.
+  required: true
+- id: manifest-check
+  command: make manifest-check
+  purpose: Prove package integrity.
+  required: true
+- id: full-suite
+  command: make test
+  purpose: Run the complete regression suite including delivery-gate and receipt tests.
+  required: true
+- id: changed-commit-secret-scan
+  command: gitleaks git --no-banner --redact --log-opts="f72244d2ef93602647e02c92d9eaab601fe8637a..HEAD"
+  purpose: Scan every lane commit without exposing detected match values.
+  required: true
+required_evidence:
+- Negative fixtures for empty approving assessment, duplicate IDs, unknown IDs, missing
+  criteria, unsatisfied assessments, and empty evidence.
+- Positive fixtures for exact-match approval, partial request_fixes, and truthful
+  closeout subsets.
+- End-to-end proof that vacuous evidence cannot authorize review inbox, merge, or
+  terminal receipt.
+- Focused, full-suite, manifest, fresh critic, exact-head CI, merge, and terminal
+  receipt evidence.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- Exact criterion reconciliation cannot be enforced without rejecting the committed
+  historical sprint corpus.
+- Correct behavior would require changing a schema file or weakening verified-release,
+  receipt, or delivery-gate validation.
+- Work outside the owned paths or issue 73 acceptance becomes necessary.
+definition_of_done:
+- Every lane and sprint acceptance criterion has committed deterministic evidence.
+- The approved dispatch inputs remain byte-identical to dispatch commit D.
+- Focused tests, validate-repo, manifest-check, make test, and the redacted secret
+  scan pass at the exact implementation head.
+- Worker closeout records exact D/I/E and a different fresh critic approves the exact
+  evidence head with no unresolved high or critical finding.
+- The implementation merges to protected dev and a normal terminal receipt validates,
+  merges, and leaves global routing truthful.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T17:40:00Z'

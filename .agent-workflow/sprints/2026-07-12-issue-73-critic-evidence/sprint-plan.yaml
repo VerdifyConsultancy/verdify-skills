@@ -1,0 +1,178 @@
+---
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+status: approved
+goal: Make approving critic and closeout evidence exact and non-vacuous so no empty
+  or fabricated assessment can authorize review inbox, merge, or terminalization.
+baseline_sha: f72244d2ef93602647e02c92d9eaab601fe8637a
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone:
+  project:
+issue_ids:
+- 73
+scope:
+- Require approve and approve_with_risks critic reports to carry a non-empty acceptance
+  assessment whose criterion IDs exactly equal the lane contract criterion IDs, order-independent,
+  with no duplicates, no unknown IDs, and no omissions.
+- Require every assessment in an approving report to be satisfied with non-empty evidence.
+- Allow non-approving reports to remain partial while requiring supplied criterion
+  IDs to be unique and contract-valid.
+- Require closeout criterion IDs to be a truthful contract-valid subset that cannot
+  claim critic, CI, integration, deployment, or outcome evidence that does not yet
+  exist.
+- Pin the existing empty verified-release integration_results rejection and the validity
+  of an empty request_fixes assessment with explicit regressions.
+- Prove through end-to-end fixtures that vacuous evidence cannot authorize review-inbox
+  packet assembly, merge advancement, or terminal-receipt generation.
+non_goals:
+- Version the lane-contract schema or add structured lifecycle phases to acceptance
+  criteria; issue 225 owns that follow-up.
+- Change critic-report, lane-closeout, or any other schema file; enforcement lands
+  in semantic and lane-review validation.
+- Rebuild verified-release integration validation, terminal receipts, or GitHub delivery
+  controls.
+- Implement issue 75 eval execution, issue 74 consumer enforcement, or issue 70 change
+  classes.
+acceptance_criteria:
+- id: SPR-AC-01
+  statement: An approving critic report with an empty acceptance assessment, a duplicated
+    criterion ID, an unknown criterion ID, a missing contract criterion, an unsatisfied
+    assessment, or empty evidence fails validation with bounded typed errors.
+  lane_ids:
+  - issue-73-critic-evidence
+  evidence_expected:
+  - negative fixture matrix
+  - validator unit tests
+- id: SPR-AC-02
+  statement: Non-approving reports remain valid when partial or empty, and supplied
+    criterion IDs must be unique and contract-valid.
+  lane_ids:
+  - issue-73-critic-evidence
+  evidence_expected:
+  - request_fixes fixtures
+  - partial assessment regressions
+- id: SPR-AC-03
+  statement: Closeout criterion IDs are validated as a truthful contract-valid subset
+    and cannot assert future-phase evidence.
+  lane_ids:
+  - issue-73-critic-evidence
+  evidence_expected:
+  - closeout subset fixtures
+  - future-evidence rejection tests
+- id: SPR-AC-04
+  statement: Existing valid lifecycle fixtures, the empty verified-release rejection,
+    and the full regression suite remain green, and vacuous evidence cannot reach
+    review inbox, merge, or terminal receipt.
+  lane_ids:
+  - issue-73-critic-evidence
+  evidence_expected:
+  - full suite logs
+  - end-to-end vacuous-authorization fixtures
+- id: SPR-AC-05
+  statement: Focused and full tests, manifest and repository validation, one fresh
+    critic, exact-head CI, protected-dev integration, and a normal terminal receipt
+    all pass.
+  lane_ids:
+  - issue-73-critic-evidence
+  evidence_expected:
+  - D/I/E/S chain
+  - fresh critic report
+  - GitHub checks
+  - terminal receipt
+risks:
+- id: RISK-01
+  severity: high
+  statement: Exact criterion reconciliation could reject historical sprint artifacts
+    that predate the rule and break repository validation.
+  mitigation: Enforce at validation time for new reports through the lane-review path
+    while keeping historical committed artifacts out of scope; prove with the existing
+    sprint corpus in make test.
+- id: RISK-02
+  severity: medium
+  statement: Overly strict closeout subset rules could block legitimate fix-forward
+    lanes.
+  mitigation: Closeout subsets may omit criteria; only fabricated or future-phase
+    claims fail, with fixtures for both directions.
+lanes:
+- lane_id: issue-73-critic-evidence
+  issue_ids:
+  - 73
+  contract_path: ".agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/lanes/contracts/issue-73-critic-evidence.contract.yaml"
+  branch: lane/73-critic-evidence
+  owner: claude-issue73-worker
+  reviewer: fresh-independent-critic
+  summary: Enforce exact non-vacuous critic and closeout evidence in the semantic
+    and lane-review validators with complete negative and end-to-end fixtures.
+dependency_order:
+- - issue-73-critic-evidence
+deployment_expectations:
+- The lane changes validators, tests, and docs only; it has no application runtime
+  deployment.
+- Exact-head CI must exercise source and installed-package validation.
+- After integration, the controller completes the deterministic normal terminal receipt
+  and verifies global routing selects the issue 70/43/76 sequence.
+review_plan:
+  qa_milestones:
+  - id: QA-01
+    name: Vacuous and fabricated evidence negative matrix
+    due: before worker closeout
+    evidence_expected:
+    - empty approving report rejection
+    - fabricated criterion rejection
+    - duplicate and unknown ID rejection
+  - id: QA-02
+    name: Full regression and end-to-end authorization proof
+    due: at implementation head
+    evidence_expected:
+    - make test
+    - manifest check
+    - vacuous evidence cannot authorize review inbox, merge, or receipt
+  human_review_milestones:
+  - id: HR-01
+    name: One independent implementation criticism
+    owner: Fresh critic
+    trigger: Exact implementation and closeout heads pass every required local validation.
+    review_packet_path: ".agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/review/review-inbox-packet.yaml"
+  user_stories_for_review:
+  - id: US-01
+    statement: As the controller, I can trust an approving critic report only when
+      it proves every contract criterion with non-empty evidence.
+    issue_ids:
+    - 73
+    lane_ids:
+    - issue-73-critic-evidence
+    acceptance_refs:
+    - SPR-AC-01
+    - SPR-AC-02
+  - id: US-02
+    statement: As the controller, I can trust closeout evidence to claim only what
+      its lifecycle phase can truthfully know.
+    issue_ids:
+    - 73
+    lane_ids:
+    - issue-73-critic-evidence
+    acceptance_refs:
+    - SPR-AC-03
+    - SPR-AC-04
+  reporting_summary:
+    included:
+    - exact criterion reconciliation for approving reports
+    - truthful closeout subsets
+    - vacuous-authorization end-to-end proof
+    deferred:
+    - issue 225 lifecycle-phase schema
+    - issues 75 and 74 evaluation floor
+    - issues 70, 43, and 76 proportional process and simplification
+    ownership:
+    - lane_id: issue-73-critic-evidence
+      owner: claude-issue73-worker
+      responsibility: Implement and prove exact non-vacuous evidence validation.
+    next_review: One fresh critic at exact evidence head, then protected-dev integration
+      and deterministic terminal receipt.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T17:40:00Z'

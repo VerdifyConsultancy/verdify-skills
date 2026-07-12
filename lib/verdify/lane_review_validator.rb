@@ -2,6 +2,15 @@
 
 module Verdify
   class LaneReviewValidator
+    APPROVING_OUTCOMES = %w[approve approve_with_risks].freeze
+    # Evidence categories that cannot exist while the worker closeout is being
+    # written: critic review, CI checks, integration/merge, deployment, outcome
+    # acceptance, and terminal receipts all happen in later lifecycle phases.
+    # Evidence IDs recorded in the closeout's own validation_results are exempt
+    # because they identify commands the worker itself executed and recorded.
+    FUTURE_PHASE_EVIDENCE_PATTERN =
+      /\b(critic|ci|check|checks|integration|integrated|merge|merged|deploy|deployment|deployed|outcome|receipt|github)\b/i
+
     Result = Struct.new(
       :errors,
       :contract,
@@ -42,6 +51,7 @@ module Verdify
         compare_identity(contract, closeout, errors)
         errors << "closeout issue_ids must match lane contract" unless closeout["issue_ids"] == contract["issue_ids"]
         errors << "closeout baseline_sha must match lane contract" unless closeout["baseline_sha"] == contract["baseline_sha"]
+        validate_closeout_claims(contract, closeout, errors)
       end
 
       implementation_head = closeout && closeout["implementation_head_sha"]
@@ -98,6 +108,7 @@ module Verdify
         expected = relative_path(@contract_path, errors)&.dirname&.parent&.parent&.join("critic/#{contract['lane_id']}.critic.yaml")
         errors << "critic path must be #{expected}" if expected && critic_rel != expected
         compare_identity(contract, critic, errors)
+        validate_critic_assessment(contract, critic, errors)
       end
 
       if closeout && critic
@@ -205,7 +216,7 @@ module Verdify
       report_head = result.critic_report_head_sha.to_s
       errors << "live pull request head must be a full 40-character commit SHA" unless full_sha?(pull_head)
       errors << "live pull request head must equal the critic report head" unless pull_head == report_head
-      unless result.critic && %w[approve approve_with_risks].include?(result.critic["outcome"])
+      unless result.critic && APPROVING_OUTCOMES.include?(result.critic["outcome"])
         errors << "critic outcome must approve integration"
       end
 
@@ -263,6 +274,47 @@ module Verdify
     def compare_identity(contract, artifact, errors)
       errors << "artifact sprint_id must match lane contract" unless artifact["sprint_id"] == contract["sprint_id"]
       errors << "artifact lane_id must match lane contract" unless artifact["lane_id"] == contract["lane_id"]
+    end
+
+    def contract_criterion_ids(contract)
+      Array(contract["acceptance_criteria"]).map { |criterion| criterion["id"].to_s }
+    end
+
+    # Closeout claims must be a truthful subset of the lane contract: every
+    # claimed criterion ID must exist in the contract (omissions are allowed),
+    # and evidence that is not recorded in the closeout's own validation
+    # results may not name critic, CI, integration, deployment, or outcome
+    # evidence, because none of that exists at worker closeout time.
+    def validate_closeout_claims(contract, closeout, errors)
+      contract_ids = contract_criterion_ids(contract)
+      claims = Array(closeout["acceptance_evidence"])
+      unknown = (claims.map { |claim| claim["criterion_id"].to_s } - contract_ids).uniq
+      errors << "closeout claims criteria missing from the lane contract: #{unknown.join(', ')}" unless unknown.empty?
+
+      recorded = Array(closeout["validation_results"]).map { |result| result["id"].to_s }
+      claims.each do |claim|
+        unrecorded = Array(claim["evidence_ids"]).map(&:to_s) - recorded
+        future = unrecorded.grep(FUTURE_PHASE_EVIDENCE_PATTERN).uniq
+        next if future.empty?
+
+        errors << "closeout claims future-phase evidence for #{claim['criterion_id']}: #{future.join(', ')} " \
+                  "(a worker closeout cannot claim critic, CI, integration, deployment, or outcome evidence)"
+      end
+    end
+
+    # An approving critic report must assess exactly the lane contract's
+    # criterion set (order-independent): unknown and missing criterion IDs are
+    # distinct bounded failures. Non-approving reports may be partial or empty
+    # but may not assess criteria the contract does not define.
+    def validate_critic_assessment(contract, critic, errors)
+      contract_ids = contract_criterion_ids(contract)
+      assessed = Array(critic["acceptance_assessment"]).map { |assessment| assessment["criterion_id"].to_s }
+      unknown = (assessed - contract_ids).uniq
+      errors << "critic report assesses criteria missing from the lane contract: #{unknown.join(', ')}" unless unknown.empty?
+      return unless APPROVING_OUTCOMES.include?(critic["outcome"])
+
+      missing = (contract_ids - assessed).uniq
+      errors << "approving critic report does not assess lane contract criteria: #{missing.join(', ')}" unless missing.empty?
     end
 
     def full_sha?(value)

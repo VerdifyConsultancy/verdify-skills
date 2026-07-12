@@ -1,0 +1,154 @@
+---
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: '1.0'
+wave_id: wave-2026-07-12-issue-73-critic-evidence
+status: approved
+scope:
+  sprint_id: 2026-07-12-issue-73-critic-evidence
+  issue_ids: [73]
+  lane_ids: [issue-73-critic-evidence]
+  northstar_ids: [NSM-007, NSM-008, NSM-009]
+  summary: Integrate exact non-vacuous critic and closeout evidence validation into protected dev.
+  non_goals: [main or npm release, application runtime deployment, schema or North Star change, later platform lanes]
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-issue-73
+  decision_notes: One validator lane targets dev; its post-merge receipt is deterministic and receives no second critic cycle.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+  - name: validate
+    required: true
+    event_triggers: [pull_request, push]
+    timeout_minutes: 30
+    evidence_expected: [full repository tests, manifest verification, critic-evidence and lane-review regressions]
+  - name: policy
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [standard lane identity and protected-base policy]
+  - name: delivery-gate
+    required: true
+    event_triggers: [pull_request, push, other]
+    timeout_minutes: 15
+    evidence_expected: [exact-head critic report, delivery policy, terminal receipt validation]
+  - name: compliance-selftest
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [fleet-standard repository compliance]
+  artifacts: [vacuous-evidence negative matrix, end-to-end authorization fixtures, D/I/E/S evidence, terminal receipt]
+  required_events: [pull_request, push]
+environments:
+- name: repository-control-plane
+  environment_type: review
+  required: true
+  namespace: null
+  url: https://github.com/VerdifyConsultancy/verdify-skills
+  quota_policy: Routine source and package validation must remain local and deterministic; terminal evidence uses the existing bounded GitHub read policy.
+  limit_policy: No new credential or write authority is introduced.
+  network_policy: Route artifact validation performs no network access; existing GitHub delivery and receipt evidence paths remain unchanged.
+  ttl: null
+  secrets_scope: Existing ephemeral GitHub Actions token only; no new secret, personal token, persistence, or output.
+  protection_rules: [one fresh implementation critic, exact-head checks, CODEOWNERS or narrow recorded admin exception]
+  expected_revision_source: merged issue 73 dev SHA followed by merged normal terminal receipt dev SHA
+gitops:
+  controller: none
+  desired_state_refs: [lib/verdify/semantic_validator.rb, lib/verdify/lane_review_validator.rb, tests/test_critic_evidence.rb]
+  sync_order:
+  - phase: validation
+    wave: 1
+    resource: issue 73 implementation pull request
+    purpose: Exercise vacuous-evidence rejection, truthful closeout subsets, packaging, and exact-head checks.
+  - phase: integration
+    wave: 2
+    resource: protected dev
+    purpose: Merge only the exact fresh-critic-approved head after required checks and protected-path decision evidence.
+  - phase: closeout
+    wave: 3
+    resource: normal terminal receipt pull request
+    purpose: Make completion authoritative and verify the global router advances to the issue 70/43/76 sequence.
+  reconciliation_checks: [origin/dev exactness, criterion reconciliation matrix, historical corpus validation, terminal receipt ancestry]
+  remediation_policy: Stop and fix forward on any vacuous-evidence bypass, historical-corpus rejection, unbounded error, test, CI, or receipt mismatch.
+deployment_strategy:
+  type: manual
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+  - id: STEP-01
+    action: Run the vacuous-evidence negative matrix, package and full tests, one fresh critic, and exact-head pull-request checks.
+    success_criteria: Every vacuous or fabricated evidence shape fails, valid shapes pass, the historical corpus validates, and all required evidence is green.
+    rollback_trigger: Any vacuous-evidence bypass, historical-corpus rejection, unbounded diagnostic, failed test, or critic blocker.
+  - id: STEP-02
+    action: Merge the exact approved head to protected dev under CODEOWNERS or the preauthorized narrow exception.
+    success_criteria: The intended commit is integrated and all branch protections are verified restored.
+    rollback_trigger: Head changes, required check drift, or protection restoration failure.
+  - id: STEP-03
+    action: Generate and merge the normal deterministic terminal receipt, then rerun the global router.
+    success_criteria: Receipt policy checks pass, issue 73 is terminal, and routing selects the issue 70/43/76 sequence.
+    rollback_trigger: Any evidence mismatch, receipt failure, integrated unterminated sprint, or stale route.
+observability:
+  dashboards: [GitHub pull requests, checks, workflow runs, and branch protection]
+  logs: [focused test output, redacted validation output, Actions logs, terminal receipt validation]
+  metrics: [negative fixtures rejected, approving reports requiring exact coverage, historical artifacts still valid]
+  traces: [sprint ID, D/I/E/S SHAs, pull request, workflow run IDs, dev merge, terminal receipt]
+  runtime_checks: [critic evidence suite, lane review suite, validate-repo, project-router]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the single implementation merge if valid lifecycle artifacts start failing on dev; rejected candidates are fixed forward before merge.
+  known_good_ref: f72244d2ef93602647e02c92d9eaab601fe8637a
+  procedure: Stop receipt generation, preserve bounded evidence, revert only the issue 73 merge if necessary, and rerun the validator and package matrix.
+  validation_steps: [validate repository, run critic evidence tests, run full suite, verify branch protection, rerun project-router]
+release_health:
+  stabilization_window: through implementation merge, normal receipt merge, and post-merge route verification
+  signals:
+  - name: vacuous evidence rejection
+    source: critic evidence negative matrix
+    threshold: Every empty, duplicated, unknown, missing, unsatisfied, or evidence-empty approving shape fails with a bounded error.
+    blocking: true
+  - name: valid lifecycle preservation
+    source: full regression suite and historical sprint corpus
+    threshold: Every committed historical artifact and valid fixture still validates.
+    blocking: true
+  - name: authorization integrity
+    source: end-to-end review-inbox, delivery-gate, and terminal-receipt fixtures
+    threshold: Vacuous or fabricated approving evidence cannot authorize any downstream transition.
+    blocking: true
+  - name: terminal convergence
+    source: normal terminal receipt and project-router
+    threshold: Receipt checks are green, integrated_unterminated is zero, and routing advances to the issue 70/43/76 sequence.
+    blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/review/review-inbox-packet.yaml
+  human_test_steps:
+  - Inspect the negative matrix for empty, duplicated, unknown, missing, unsatisfied, and evidence-empty approving shapes.
+  - Inspect the truthful closeout subset and future-evidence rejection fixtures.
+  - Confirm the historical sprint corpus still validates unchanged.
+  approval_gate: One fresh implementation critic plus the preauthorized protected-path exception only if CODEOWNERS cannot be satisfied by an available non-author identity.
+risks:
+- id: RISK-01
+  severity: high
+  statement: Exact reconciliation could reject the committed historical sprint corpus.
+  mitigation: Scope enforcement to lane-review validation of new reports and prove the corpus green in make test.
+- id: RISK-02
+  severity: medium
+  statement: Strict closeout subset rules could block legitimate fix-forward lanes.
+  mitigation: Allow omissions; fail only fabricated or future-phase claims, with fixtures both ways.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: '2026-07-12T17:40:00Z'
+prepared_at: '2026-07-12T17:40:00Z'
+planner: root-issue73-critic-evidence

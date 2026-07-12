@@ -137,6 +137,64 @@ class SchemaValidatorTest < Minitest::Test
     assert errors.any? { |error| error.include?("critic session must differ from worker session") }
   end
 
+  def test_semantic_rejects_vacuous_approving_critic_assessments
+    critic = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/critic/issue-123-api.critic.yaml")
+    )
+    critic["outcome"] = "approve"
+    critic["acceptance_assessment"] = []
+    empty_errors = Verdify::SemanticValidator.validate(critic)
+    assert empty_errors.any? { |error| error.include?("$.acceptance_assessment: approve requires an acceptance assessment") }
+
+    critic["acceptance_assessment"] = [
+      { "criterion_id" => "LANE-AC-01", "assessment" => "satisfied", "evidence" => ["test"] },
+      { "criterion_id" => "LANE-AC-01", "assessment" => "uncertain", "evidence" => ["  "] }
+    ]
+    vacuous_errors = Verdify::SemanticValidator.validate(critic)
+    assert vacuous_errors.any? { |error| error.include?("criterion IDs must be unique: LANE-AC-01") }
+    assert vacuous_errors.any? { |error| error.include?("approval requires satisfied criteria (LANE-AC-01)") }
+    assert vacuous_errors.any? { |error| error.include?("approval requires non-empty evidence (LANE-AC-01)") }
+  end
+
+  def test_semantic_keeps_empty_request_fixes_assessment_valid
+    critic = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/critic/issue-123-api.critic.yaml")
+    )
+    critic["outcome"] = "request_fixes"
+    critic["acceptance_assessment"] = []
+
+    assert_empty Verdify::SemanticValidator.validate(critic)
+  end
+
+  def test_semantic_rejects_duplicate_closeout_acceptance_evidence
+    closeout = Verdify::SchemaValidator.load_document(
+      Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/lanes/closeout/issue-123-api.closeout.yaml")
+    )
+    closeout["acceptance_evidence"] = [
+      { "criterion_id" => "LANE-AC-01", "evidence_ids" => ["EV-001"], "assessment" => "satisfied" },
+      { "criterion_id" => "LANE-AC-01", "evidence_ids" => ["EV-002"], "assessment" => "satisfied" }
+    ]
+
+    errors = Verdify::SemanticValidator.validate(closeout)
+
+    assert errors.any? { |error| error.include?("$.acceptance_evidence: criterion IDs must be unique: LANE-AC-01") }
+  end
+
+  def test_verified_release_still_rejects_empty_integration_results
+    # Regression pin for issue #73 / LANE-AC-06: the existing schema-level
+    # rejection of an empty verified-release integration_results array must
+    # stay in force; this pins it without rebuilding the validator.
+    path = Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/release/release-verification.yaml")
+    document = Verdify::SchemaValidator.load_document(path)
+    document["integration_results"] = []
+    schema = Verdify::SchemaValidator.load_document(Verdify::ROOT.join("schemas/release-verification.schema.yaml"))
+
+    errors = validator.validate(document, schema)
+
+    assert errors.any? { |error| error.include?("$.integration_results") && error.include?("at least 1") },
+           "expected the empty integration_results rejection to hold, got: #{errors.inspect}"
+  end
+
   def test_review_packet_v2_rejects_deprecated_reviewed_head_field
     packet = Verdify::SchemaValidator.load_document(
       Verdify::ROOT.join("examples/minimal-project/.agent-workflow/sprints/2026-06-22-a/review/review-inbox-packet.yaml")

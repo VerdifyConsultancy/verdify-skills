@@ -551,6 +551,39 @@ class LaneReviewValidatorTest < Minitest::Test
     FileUtils.rm_rf(chain[:root]) if chain
   end
 
+  def test_route_does_not_authorize_review_inbox_for_vacuous_approving_report
+    chain = build_chain(route_ready: true, critic_acceptance_assessment: [])
+    status = nil
+    stdout, stderr = capture_io do
+      status = Verdify::CLI.run(["route", "--repo", chain[:root], "--json"])
+    end
+
+    assert_equal 0, status, stderr
+    decision = JSON.parse(stdout)
+    assert_equal "LANE_REVIEW_EVIDENCE_INVALID", decision["current_state"]
+    refute_equal "release-verification", decision["next_skill"]
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
+  def test_route_does_not_authorize_review_inbox_for_fabricated_assessment
+    chain = build_chain(route_ready: true, critic_acceptance_assessment: [
+                          { "criterion_id" => "LANE-AC-01", "assessment" => "satisfied", "evidence" => ["test"] },
+                          { "criterion_id" => "LANE-AC-99", "assessment" => "satisfied", "evidence" => ["fabricated"] }
+                        ])
+    status = nil
+    stdout, stderr = capture_io do
+      status = Verdify::CLI.run(["route", "--repo", chain[:root], "--json"])
+    end
+
+    assert_equal 0, status, stderr
+    decision = JSON.parse(stdout)
+    assert_equal "LANE_REVIEW_EVIDENCE_INVALID", decision["current_state"]
+    refute_equal "release-verification", decision["next_skill"]
+  ensure
+    FileUtils.rm_rf(chain[:root]) if chain
+  end
+
   def test_route_does_not_advance_on_approve_outcome_with_invalid_evidence_chain
     chain = build_chain(closeout_sha256: "0" * 64, route_ready: true)
     status = nil
@@ -1150,7 +1183,7 @@ class LaneReviewValidatorTest < Minitest::Test
     }
   end
 
-  def build_chain(critic_session_id: "critic-session", critic_agent: "critic-agent", critic_outcome: "approve", closeout_status: "ready_for_critic", extra_worker_evidence_path: false, extra_critic_evidence_path: false, worker_evidence_merge: false, closeout_sha256: nil, post_review_change: false, route_ready: false, lane_branch: "main", integration_base: "main", mutate_dispatch_during_implementation: false)
+  def build_chain(critic_session_id: "critic-session", critic_agent: "critic-agent", critic_outcome: "approve", critic_acceptance_assessment: nil, closeout_status: "ready_for_critic", extra_worker_evidence_path: false, extra_critic_evidence_path: false, worker_evidence_merge: false, closeout_sha256: nil, post_review_change: false, route_ready: false, lane_branch: "main", integration_base: "main", mutate_dispatch_during_implementation: false)
     root = Dir.mktmpdir("verdify-lane-review-")
     git(root, "init", "-q", "-b", "main")
     git(root, "config", "user.name", "Verdify Test")
@@ -1277,7 +1310,7 @@ class LaneReviewValidatorTest < Minitest::Test
       "review_worktree" => root,
       "outcome" => critic_outcome,
       "findings" => [],
-      "acceptance_assessment" => [
+      "acceptance_assessment" => critic_acceptance_assessment || [
         { "criterion_id" => "LANE-AC-01", "assessment" => "satisfied", "evidence" => ["test"] }
       ],
       "evidence_assessment" => ["Implementation and evidence heads are distinct and traceable."],

@@ -1,0 +1,123 @@
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-07-12-issue-73-critic-evidence
+lane_id: issue-73-critic-evidence
+status: ready_for_critic
+issue_ids: [73]
+pull_request: 230
+baseline_sha: f72244d2ef93602647e02c92d9eaab601fe8637a
+implementation_head_sha: 98f44562fa6f5982e353533439d4b1b9cfc890b3
+validated_head_sha: 98f44562fa6f5982e353533439d4b1b9cfc890b3
+contract_hash: f6d7cddfe3ce98f657dd9bc6f80d189116ef0a34a97ac476fe24fa540d386c1d
+changed_paths:
+  - MANIFEST.sha256
+  - docs/authority-model.md
+  - lib/verdify/lane_review_validator.rb
+  - lib/verdify/semantic_validator.rb
+  - tests/test_critic_evidence.rb
+  - tests/test_lane_review_validator.rb
+  - tests/test_schema_validator.rb
+validation_results:
+  - id: critic-evidence-suite
+    command: ruby tests/test_critic_evidence.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:01:15Z"
+    artifact: tests/test_critic_evidence.rb
+  - id: lane-review-suite
+    command: ruby tests/test_lane_review_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:01:18Z"
+    artifact: tests/test_lane_review_validator.rb
+  - id: schema-validator-suite
+    command: ruby tests/test_schema_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:01:37Z"
+    artifact: tests/test_schema_validator.rb
+  - id: repository-validation
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:02:10Z"
+    artifact: scripts/validate-repo.rb
+  - id: manifest-check
+    command: make manifest-check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:02:11Z"
+    artifact: MANIFEST.sha256
+  - id: full-suite
+    command: make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:04:24Z"
+    artifact: Makefile
+  - id: changed-commit-secret-scan
+    command: gitleaks git --no-banner --redact --log-opts="f72244d2ef93602647e02c92d9eaab601fe8637a..HEAD"
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:02:12Z"
+    artifact: null
+  - id: diff-check
+    command: git diff --check f72244d2ef93602647e02c92d9eaab601fe8637a..HEAD
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T18:02:12Z"
+    artifact: null
+  - id: dispatch-integrity
+    command: verify dispatch commit D 70d521d8f31679f40ada17c7faf7572d06809c30 is baseline-parented, changes only the three canonical dispatch paths, and that all dispatch artifacts stay byte-identical through I
+    exit_status: 0
+    result: passed
+    executed_at: "2026-07-12T17:58:23Z"
+    artifact: .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/lanes/contracts/issue-73-critic-evidence.contract.yaml
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [critic-evidence-suite, schema-validator-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [critic-evidence-suite, lane-review-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [critic-evidence-suite, schema-validator-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [critic-evidence-suite, schema-validator-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [critic-evidence-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-06
+    evidence_ids: [schema-validator-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-07
+    evidence_ids: [critic-evidence-suite, lane-review-suite, full-suite]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - Future-phase closeout detection is category-name based and applies only to evidence IDs
+    not recorded in the closeout's own validation_results; recorded worker-run validation
+    results are exempt by design.
+  - Fresh critic evidence, exact final-head checks, protected-dev integration, and a normal
+    terminal receipt remain downstream requirements before issue closure.
+worktree_clean: true
+worker_agent: claude-issue73-worker
+worker_session_id: issue73-worker-2026-07-12a
+completed_at: "2026-07-12T18:06:00Z"
+limitations:
+  - LANE-AC-08 contains controller-owned post-worker evidence (fresh critic, exact-head CI,
+    protected-dev integration, normal terminal receipt); this closeout proves D/I and claims
+    only worker-observable validation without asserting critic, CI, integration, or receipt
+    completion.
+  - Exact criterion reconciliation binds at validation time on the live lane review path;
+    committed historical sprint artifacts are intentionally out of scope (sprint RISK-01
+    mitigation), proven by repository-validation and full-suite at I.
+  - make test requires a UTF-8 locale; with LANG/LC_ALL unset, Ruby's US-ASCII default
+    encoding breaks scripts/verify-npm-tarball.rb while reading UTF-8 SKILL.md content that
+    predates this lane and is untouched by it. The recorded full-suite run used LANG=C.UTF-8.
+  - The redacted secret scan ran with gitleaks 8.24.3 fetched into the session scratchpad
+    because no system gitleaks was installed; it scanned the two lane commits after baseline
+    and found no leaks.
+  - No schema, script, workflow, config, VERSION, package, or skill file was changed.

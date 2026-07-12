@@ -56,4 +56,35 @@ and the target skill must be reachable from the artifact producer's state in
 the artifact producer and never becomes a router exception or downstream
 transition.
 
+## Exact non-vacuous review evidence
+
+Approving evidence is authoritative only when it is exact and non-vacuous
+(issue #73). Semantic validation enforces the document-local rules for every
+consumer, and the lane review path (`route`, `pr-policy`, `delivery-gate`,
+terminal-receipt lane bindings) reconciles reports against the approved lane
+contract before any review inbox, integration, or terminalization decision:
+
+- An `approve`/`approve_with_risks` critic report must carry a non-empty
+  acceptance assessment whose criterion IDs equal the lane contract criterion
+  IDs exactly, order-independent. Duplicate, unknown, and missing criterion
+  IDs each fail with a distinct bounded error naming the offending IDs.
+- Every assessment in an approving report must be `satisfied` with non-empty
+  evidence.
+- Non-approving reports (for example `request_fixes`) may stay partial or
+  empty, but supplied criterion IDs must be unique and contract-valid.
+- Worker closeout acceptance evidence must be a truthful contract-valid
+  subset: claimed criterion IDs must be unique and exist in the lane
+  contract, omissions are allowed, and evidence not recorded in the
+  closeout's own `validation_results` may not claim critic, CI, integration,
+  deployment, or outcome evidence — none of that exists at worker closeout
+  time.
+- A verified release still rejects empty `integration_results`
+  (schema-enforced and pinned by regression).
+
+Historical committed sprint artifacts predate the reconciliation rule and are
+out of scope; enforcement binds at validation time on the live lane review
+path, so no new vacuous or fabricated approving evidence can authorize
+review-inbox packet validation, delivery-gate critic evaluation, or
+terminal-receipt validation.
+
 When authoritative records disagree, stop the transition, reconstruct current state, and use a decision or scope-change gate. Do not edit intent retroactively merely to make an implementation appear compliant.
