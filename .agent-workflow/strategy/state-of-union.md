@@ -1,23 +1,23 @@
-# State of Union: Post-#71 Autonomous Platform Program
+# State of Union: Post-SOTA-Approval Autonomous Platform Program
 
 Canonical authority: `.agent-workflow/strategy/state-of-union.yaml`
-Assessed at protected `dev@4fe6ff65338bb129cbfbeb2451cb5a5fa696533d`
-on 2026-07-11.
+Assessed at protected `dev@bfc304748e7b06ff767f360291dc8a7734e3db8a`
+on 2026-07-12.
 
 ## Verdict
 
-Issues #135, #215, and #71 are complete. All historical and current sprint
-transactions have canonical terminal receipts, `integrated_unterminated` is
-zero, and the global router truthfully stops for this strategy refresh instead
-of selecting stale work.
+Issues #135, #215, and #71 are complete with canonical terminal receipts. The
+parked planning checkpoints merged to protected dev under recorded narrow
+admin exceptions (PRs #226, #227, #228 — the planning-only policy gap remains
+issue #70 evidence, not precedent).
 
-Jason has delegated approval for the issue-backed autonomous sequence and asked
-that the skills optimize for clear authority and high-quality evidence without
-turning every deterministic transition into another review. This strategy is
-therefore approved without an additional human gate. Fresh independent
-criticism remains mandatory for implementation output; deterministic planning,
-receipt, routing, and merge transitions consume existing authority and evidence
-instead of manufacturing more approvals.
+Jason approved the 2026-07 SOTA benchmark keep/kill/simplify direction on
+2026-07-12 (evidence `NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs`;
+recorded on issues #211, #70, #76, #12, and #43) and directed autonomous
+execution of the backlog through validation, packaging, and release readiness.
+Fresh independent criticism remains mandatory for implementation output;
+deterministic planning, receipt, routing, and merge transitions consume
+existing authority and evidence instead of manufacturing more approvals.
 
 The four-project vertical slice remains prohibited. Agents #2884, #2887, and
 #2906 are all still open P0 Stage 0 security stops.
@@ -34,21 +34,31 @@ subsets without adding another review layer. Structured lifecycle phase
 ownership is recorded separately on #225 because it requires a versioned
 contract model rather than inference from free-text criteria.
 
-## Issue Sequence
+## Issue Sequence (re-approved 2026-07-12)
 
-1. **Trusted transition and evaluation floor:** Verdify #73, #75, #74, with
-   #225 as a nonblocking schema follow-up.
-2. **Bounded autonomy and proportional process:** Verdify #43 and #70.
-3. **Agent Platform security and authority:** Agents #2884, #2887, #2906,
+1. **Trusted evidence floor:** Verdify #73, with #225 as a nonblocking schema
+   follow-up.
+2. **Proportional process and simplification:** Verdify #70 (change classes:
+   lightweight = issue + diff + critic finding, ~3 artifacts, one PR; risk
+   from findings/paths, never line count; protected paths always full-chain;
+   planning-only class; weekly human sampling sweep), #43 (loop contract
+   replaced by four guardrails: budget caps, max-iterations, watchdog,
+   markdown resume note), and #76 pulled forward and expanded (kill list:
+   consensus/adversarial-audit machinery, controller-loop and
+   sprint-orchestrator prose machines, bespoke release ledger, crm-email,
+   timeline-historian; consolidation: skills 28→~12–15, schemas 49→~10–12,
+   artifacts per lane →3–4, receipt/strategy PRs folded into the lane PR).
+3. **Merge-blocking evaluation floor for the slimmed core:** Verdify #75, #74.
+4. **Agent Platform security and authority:** Agents #2884, #2887, #2906,
    #2890, #2905.
-4. **Provider capability negotiation:** Verdify #12/#116 and Agents
-   #2497/#655.
-5. **Gravity citation/API/MCP readiness:** Gravity #407, then #184 acceptance.
-6. **Orbit trust and lifecycle repair:** Orbit #197, #193-#196, #198, then #43.
-7. **One correlated transaction:** one correlation ID across all four projects,
-   only after every Stage 0 stop is closed with live proof.
-8. **Durability:** failure drills and seven unattended days before broader
-   fleet autonomy.
+5. **Platform-native dispatch (re-scoped #12):** GitHub-native Claude/Codex
+   workers as the default adapter; Verdify keeps dispatch commits, contracts,
+   the critic gate, and protected-base policy; Verdify #116 and Agents
+   #2497/#655 for what remains.
+6. **Gravity citation/API/MCP readiness:** Gravity #407, then #184 acceptance.
+7. **Orbit trust and lifecycle repair:** Orbit #197, #193-#196, #198, then #43.
+8. **One correlated transaction, then durability drills** — only after every
+   Stage 0 stop is closed with live proof.
 
 ## Process Balance
 
@@ -66,9 +76,9 @@ The target operating model is evidence-proportionate:
 - runtime-changing work still requires proof from the runtime, separately from
   merge success.
 
-Issues #43 and #70 own codifying this common bounded-loop contract, risk classes,
-typed stops, and fast paths in the skills package. The strategy does not silently
-weaken review, evidence, or security requirements.
+Issues #70, #43, and #76 own codifying change classes, the four loop
+guardrails, and the slimmed surface in the skills package. The strategy does
+not silently weaken review, evidence, or security requirements.
 
 ## Current Risks
 
@@ -76,13 +86,14 @@ weaken review, evidence, or security requirements.
 | --- | --- |
 | Critic evidence can remain non-exhaustive | Verdify #73 |
 | Acceptance criteria do not declare lifecycle phase ownership | Verdify #225 |
+| Planning-only PRs still require recorded admin exceptions | Verdify #70 |
+| Unexercised skill/schema surface keeps accruing maintenance and doc drift | Verdify #76 |
 | Eval packs lack a deterministic runner contract | Verdify #75 |
 | Consumer CI cannot enforce an undefined runner | Verdify #74 |
-| Shared bounded-loop and risk fast-path contracts are missing | Verdify #43/#70 |
 | No-promotion dev pushes are red and receipt auto-merge is undeclared | Verdify #70 |
 | PRs #221/#222 bypassed evidence sequencing and PR #223 used a non-author-review exception | Verdify #70 |
 | Stage 0 request, archive-secret, and probe-destination security stops | Agents #2884/#2887/#2906 |
-| Provider ownership and capability negotiation are unresolved | Verdify #12/#116; Agents #2497/#655 |
+| Provider ownership beyond platform-native dispatch | Verdify #12/#116; Agents #2497/#655 |
 | Citation, trust, lifecycle, and correlated runtime proof are missing | Gravity #184/#407; Orbit #193-#198/#43 |
 
 ## Handoff
