@@ -3,7 +3,7 @@ schema_ref: sprint-plan.schema.yaml
 kind: SprintPlan
 schema_version: '1.0'
 sprint_id: 2026-07-12-issue-73-critic-evidence
-status: approved
+status: complete
 goal: Make approving critic and closeout evidence exact and non-vacuous so no empty
   or fabricated assessment can authorize review inbox, merge, or terminalization.
 baseline_sha: f72244d2ef93602647e02c92d9eaab601fe8637a

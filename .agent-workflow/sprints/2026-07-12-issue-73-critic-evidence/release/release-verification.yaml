@@ -1,0 +1,82 @@
+---
+schema_ref: release-verification.schema.yaml
+kind: ReleaseVerification
+schema_version: '1.0'
+sprint_id: 2026-07-12-issue-73-critic-evidence
+status: verified
+integrated_sha: f86512099f1623be1c50e453fc78763716d2c971
+release:
+  tag: null
+  url: null
+artifact_identity:
+- type: git-commit
+  identifier: f86512099f1623be1c50e453fc78763716d2c971
+- type: github-pull-request
+  identifier: https://github.com/VerdifyConsultancy/verdify-skills/pull/230
+- type: critic-report-head
+  identifier: 4947c387a1070423e73f780cc980ae3a16012623
+integration_results:
+- name: D/I/E/S evidence chain
+  result: passed
+  evidence: Dispatch 70d521d8f31679f40ada17c7faf7572d06809c30, implementation 98f44562fa6f5982e353533439d4b1b9cfc890b3, closeout evidence 089f9b99e2d1f0911f8293f4aff4f19aa63cfe53, and approving critic 4947c387a1070423e73f780cc980ae3a16012623 validate from baseline f72244d2ef93602647e02c92d9eaab601fe8637a.
+- name: validate
+  result: passed
+  evidence: Trusted pull_request check 86679576350 from run 29203804291 passed at exact S.
+- name: pull-request-policy
+  result: passed
+  evidence: Trusted pull_request check 86679671974 from run 29203839592 passed at exact S.
+- name: compliance / compliance
+  result: passed
+  evidence: Trusted pull_request check 86679576963 from run 29203804430 passed at exact S.
+- name: delivery-policy
+  result: passed
+  evidence: Trusted pull_request check 86679671845 from run 29203839562 passed at exact S.
+- name: critic-gate
+  result: passed
+  evidence: Trusted pull_request check 86679671822 from run 29203839562 passed at exact S.
+- name: protected-dev merge
+  result: passed
+  evidence: PR 230 merged exact S as f86512099f1623be1c50e453fc78763716d2c971 at 2026-07-12T18:28:29Z with merge parents baseline f72244d2 and exact S 4947c387.
+deployment:
+  environment: protected-dev
+  deployment_id: 230
+  deployed_at: '2026-07-12T18:28:29Z'
+  observed_revision: f86512099f1623be1c50e453fc78763716d2c971
+  deployer: github-merge
+  approval:
+    required: true
+    approved_by: Jason Vallery (jvallery) repository authority
+    approved_at: '2026-07-12T18:28:29Z'
+    evidence: PR 230 was merged to protected dev by repository authority jvallery after the approving fresh critic report and all five required checks succeeded at exact S.
+runtime_checks:
+- name: protected dev exactness and ancestry
+  result: passed
+  observed_at: '2026-07-12T18:42:05Z'
+  evidence: origin/dev equals f86512099f1623be1c50e453fc78763716d2c971, whose parents are exactly baseline f72244d2ef93602647e02c92d9eaab601fe8637a and exact S 4947c387a1070423e73f780cc980ae3a16012623.
+- name: repository validation
+  result: passed
+  observed_at: '2026-07-12T18:36:05Z'
+  evidence: ruby scripts/validate-repo.rb passed with 28 skills and 49 schemas on merged dev at f86512099f16.
+- name: critic-evidence exactness validators
+  result: passed
+  observed_at: '2026-07-12T18:36:05Z'
+  evidence: ruby tests/test_critic_evidence.rb passed with 20 runs, 52 assertions, 0 failures on merged dev; vacuous, duplicate, unknown-ID, omitted, unsatisfied, and empty-evidence approving reports are rejected with bounded typed errors.
+- name: full test suite
+  result: passed
+  observed_at: '2026-07-12T18:37:30Z'
+  evidence: LANG=C.UTF-8 make test exited 0 on merged dev, including release-transaction and packed-artifact suites.
+- name: terminal authority set
+  result: passed
+  observed_at: '2026-07-12T18:38:00Z'
+  evidence: All prior transactions remain terminal and 2026-07-12-issue-73-critic-evidence is the sole integrated unterminated sprint at f86512099f16.
+migrations:
+- name: repository-only
+  result: not_applicable
+  evidence: The lane changed validators, tests, and documentation only; no data, schema-file, package, runtime, or deployment migration exists.
+rollback:
+  ready: true
+  known_good_revision: f72244d2ef93602647e02c92d9eaab601fe8637a
+  procedure: Revert merge f86512099f1623be1c50e453fc78763716d2c971 to restore the baseline validation behavior, then rerun the critic-evidence, lane-review, schema-validator, and full-repository suites.
+incidents: []
+verified_at: '2026-07-12T18:42:05Z'
+verifier: claude-issue73-release-verifier
