@@ -6,7 +6,7 @@ strategy_id: verdify-skills-local-ci-migration-2026-07-27
 status: blocked
 repository: VerdifyConsultancy/verdify-skills
 baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
-assessed_at: '2026-07-27T21:00:36Z'
+assessed_at: '2026-07-27T21:36:05Z'
 inputs:
 - id: IN-001
   type: user_directive
@@ -57,17 +57,17 @@ source_freshness:
 - surface: github_issues
   source_ref: "live jvallery/agents#3044 and VerdifyConsultancy/verdify-skills issue API"
   status: fresh
-  captured_at: '2026-07-27T18:01:48Z'
+  captured_at: '2026-07-27T21:36:05Z'
   limitation: "The fleet work board is authoritative for this migration; existing Verdify repository issues remain relevant delivery history."
 - surface: github_pull_requests
   source_ref: "live VerdifyConsultancy/verdify-skills pull request API and jvallery/agents#3060"
   status: fresh
-  captured_at: '2026-07-27T21:00:36Z'
+  captured_at: '2026-07-27T21:36:05Z'
   limitation: "No Verdify Skills pull request is open; jvallery/agents#3060 is a draft platform North Star proposal with failing exact-head checks."
 - surface: github_checks
   source_ref: "latest 20 Verdify Skills Actions runs and exact-head checks for jvallery/agents#3060"
   status: fresh
-  captured_at: '2026-07-27T21:00:36Z'
+  captured_at: '2026-07-27T21:36:05Z'
   limitation: "The latest Verdify runs are from 2026-07-12; validate and compliance-selftest passed while delivery-gate failed on the dev push. Draft platform PR #3060 also has failing exact-head checks."
 - surface: github_deployments
   source_ref: "live Verdify Skills deployment and environment API"
@@ -144,7 +144,7 @@ planning_inventory:
   location: .agent-workflow/northstar
   status: incomplete
   finding: "Iteration 26 now proposes Forgejo primary authority, Argo event-driven CI, immutable Zot package subjects, GitOps consumer acceptance, local immutable dependencies, coexistence, rollback, and attended cutover; iteration 25 remains protected until Jason locks the revision."
-  action: "Route to northstar-planning/review-feedback for fresh cross-functional re-review and owner dispositions; only then resolve NSQ-015 through NSQ-020 plus the separate final-lock decision before downstream definition work."
+  action: "Route to northstar-planning/review-feedback for fresh cross-functional re-review, immutable owner assignments, and both NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers. Missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open; only after none remain may Jason resolve NSQ-015 through NSQ-020 plus the separate final-lock decision before downstream definition work."
 - artifact_type: project_definition
   location: .agent-workflow/project/project-definition.yaml
   status: stale
@@ -223,7 +223,7 @@ delivery_health:
   status: degraded
   diagnostic_refs:
   - "ruby scripts/validate-repo.rb passed on main and dev"
-  - "live GitHub Actions run inventory at 2026-07-27T18:01:48Z"
+  - "live GitHub Actions run inventory at 2026-07-27T21:36:05Z"
   - "jvallery/agents local CI source at 4bbd5c973c8038f4f28843529cffcfc8d89d9cd9"
   - "authorized Kubernetes/Argo/Zot probe window 2026-07-27T17:56:03Z through 18:01:33Z"
   deployment_refs:
@@ -260,8 +260,8 @@ delivery_health:
     statement: "Main and dev branch protections require only contexts produced by GitHub Actions app 15368, and all observed latest jobs ran on GitHub-hosted ubuntu-latest runners."
     severity: critical
     evidence_refs:
-    - "live branch protection API at 2026-07-27T18:01:21Z"
-    - "live Actions jobs API at 2026-07-27T18:01:21Z"
+    - "live branch protection API at 2026-07-27T21:36:05Z"
+    - "live Actions jobs API at 2026-07-27T21:36:05Z"
     action: "Reproduce stable contexts under tested internal authority and change requirements only through the attended reversible cutover."
   - id: HEALTH-005
     statement: "Authorized RBAC cannot read live Argo resources or Zot metadata; the named repo pod is healthy but labeled prod and is not migration acceptance evidence."
@@ -504,10 +504,10 @@ actions:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: "After the separate exact-final-candidate evidence binds the packet and gate to three no_changes_required verdicts, assign every required OWN-* role by immutable subject and durable authority evidence, then collect every applicable OWN-*/OE-* disposition without unresolved conflict before Jason resolves NSQ-015 through NSQ-020 and the separate final-lock decision."
+  reason: "After the separate exact-final-candidate evidence binds the packet and gate to three no_changes_required verdicts, assign every required OWN-* role by immutable subject and durable authority evidence and complete both identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers as mapped in NORTHSTAR_INTERVIEW.md. Missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open. Only after none remain may Jason resolve NSQ-015 through NSQ-020 and the separate final-lock decision."
   required_before_handoff:
   - "Preserve existing GitHub Actions, npm, GitHub Release, branch/ruleset, credentials, runners, webhooks, and production state."
-  - "Review NSQ-015 through NSQ-020 and the separate final-lock question in NORTHSTAR_INTERVIEW.md only after fresh cross-functional review, owner assignments, and row-level dispositions close."
+  - "Review NSQ-015 through NSQ-020 and the separate final-lock question in NORTHSTAR_INTERVIEW.md only after fresh cross-functional review, owner assignments, and both row-level disposition ledgers close under the missing-row, rejection, conflict, and no-generic-approval rules."
   - "Keep internal-forge and cold-cache claims blocked until direct proof exists."
 approval:
   status: pending

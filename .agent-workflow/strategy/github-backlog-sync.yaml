@@ -5,7 +5,7 @@ schema_version: '1.0'
 sync_id: gbs-verdify-skills-local-ci-2026-07-27
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: '2026-07-27T21:00:36Z'
+captured_at: '2026-07-27T21:36:05Z'
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -18,7 +18,7 @@ source_authority:
   - "Kubernetes, Argo, Zot, forge, runner, secret, and webhook visibility is bounded by current API and RBAC access."
 snapshot:
   snapshot_ref: null
-  captured_at: '2026-07-27T21:00:36Z'
+  captured_at: '2026-07-27T21:36:05Z'
   freshness: live_only
   api_sources:
   - surface: issues
@@ -214,7 +214,7 @@ issue_findings:
   milestone: null
   dependencies:
   - "Agent Platform North Star and architecture authority"
-  - "named platform, source-control, security, SRE, recovery, and finance owner dispositions"
+  - "immutable platform, source-control, security, SRE, recovery, finance, release, governance, and legal/IP assignments plus all applicable NSQ-*/OWN-* and OWN-*/OE-* dispositions"
   sub_issues: []
   linked_prs:
   - "jvallery/agents#3060"
@@ -233,13 +233,13 @@ pr_findings:
   state: OPEN
   draft: true
   linked_issues: [3047]
-  head_sha: 933fac33a7dacbc2bbf170d0e4e1a4dcdf773174
+  head_sha: 0b1c8ceb88b144ff8a90f9c064f1f85991364195
   checks_status: fail
   deployment_status: not_applicable
   finding: "Draft North Star proposal for #3047 has failing exact-head checks; it is neither merge-ready, approved platform authority, nor implementation evidence."
   evidence_refs:
   - https://github.com/jvallery/agents/pull/3060
-  - "live gh pr checks at 2026-07-27T21:00:36Z"
+  - "live gh pr checks at 2026-07-27T21:36:05Z"
   - "NSE-20260727-shared-local-delivery-authority-live-state"
 lane_findings: []
 delivery_findings:
@@ -247,13 +247,13 @@ delivery_findings:
   type: branch_rule
   status: pass
   evidence_refs:
-  - "live dev branch protection API at 2026-07-27T18:01:21Z"
+  - "live dev branch protection API at 2026-07-27T21:36:05Z"
   finding: "Strict protection, admin enforcement, conversation resolution, code-owner policy, push restrictions, and four required contexts remain intact; every required context is bound to GitHub Actions app 15368."
 - ref: "origin/main"
   type: branch_rule
   status: pass
   evidence_refs:
-  - "live main branch protection API at 2026-07-27T18:01:21Z"
+  - "live main branch protection API at 2026-07-27T21:36:05Z"
   finding: "Main additionally requires one approval and five Actions-bound contexts; force pushes and deletion remain disabled."
 - ref: "Actions run 29204807032"
   type: workflow_run
@@ -368,4 +368,4 @@ actions:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: "Only after separate exact-final-candidate evidence binds this reconciled packet to three no_changes_required verdicts may stable row-level named-owner dispositions be collected before Jason resolves NSQ-015 through NSQ-020 and the separate final-lock decision."
+  reason: "Only after separate exact-final-candidate evidence binds this reconciled packet to three no_changes_required verdicts may immutable owner assignments and both identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers be collected as mapped in NORTHSTAR_INTERVIEW.md. Missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open. Only after none remain may Jason resolve NSQ-015 through NSQ-020 and the separate final-lock decision."

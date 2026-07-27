@@ -6,7 +6,7 @@ project_id: verdify-skills
 status: review_requested
 iteration: 26
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-07-27T21:09:51Z'
+updated_at: '2026-07-27T21:44:33Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   status: review_requested
@@ -765,7 +765,7 @@ open_questions:
 - id: NSQ-015
   artifact: both
   question: Approve a capability-qualified supported Forgejo release (v16 is the current candidate) as internal repository authority, with GitHub retained as an output mirror through coexistence and the observation window?
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
@@ -775,11 +775,11 @@ open_questions:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-shared-local-delivery-authority-live-state
   - NSE-20260727-local-delivery-native-dependency-reconciliation
-  proposed_resolution: Approve only after the exact version passes capability, internal-IdP identity, repository/governance-history import, review/status/protection/audit, upgrade, coordinated-restore, public-mirror, and attended GitHub-unavailable contract tests.
+  proposed_resolution: Require one identity-bound accept, revise, or reject row for every applicable NSQ-015/OWN-* pair before Jason decides; approve only after the exact version passes capability, internal-IdP identity, repository/governance-history import, review/status/protection/audit, upgrade, coordinated-restore, public-mirror, and attended GitHub-unavailable contract tests.
 - id: NSQ-016
   artifact: both
   question: Approve a package-specific Zot OCI subject, one signed immutable release envelope, and a stable-harness/fresh-volume GitOps consumer as the authoritative Verdify release and deployed-acceptance model?
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-004, OWN-005, OWN-006, OWN-008, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
@@ -789,11 +789,11 @@ open_questions:
   - NSE-20260727-verdify-skills-local-delivery-inventory
   - NSE-20260727-local-delivery-control-plane-primary-sources
   - NSE-20260727-local-delivery-adversarial-audit
-  proposed_resolution: Approve. Treat the consumer as an acceptance workload; promote only the signed envelope digest, use a digest-pinned harness whose init path verifies into a fresh volume and whose main path performs a real install, and require Argo CD sole ownership, rollback, and delayed durability proof.
+  proposed_resolution: Require one identity-bound accept, revise, or reject row for every applicable NSQ-016/OWN-* pair before Jason decides. Treat the consumer as an acceptance workload; promote only the signed envelope digest, use a digest-pinned harness whose init path verifies into a fresh volume and whose main path performs a real install, and require Argo CD sole ownership, rollback, and delayed durability proof.
 - id: NSQ-017
   artifact: both
   question: Keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub's in-Service public-repository rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use unless separately approved, accept issue/security reports but reject external code until approved CLA or copyright-assignment terms exist, declare freshness/outage/verification/support, and defer licensing, intake, or retirement changes to separate gates?
-  owner: Jason, Skills governance owner, and legal/IP owner
+  owner: OWN-001, OWN-009, and OWN-010 advise; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
@@ -801,22 +801,22 @@ open_questions:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-verdify-skills-public-visibility-license
   - NSE-20260727-github-public-repository-license-terms
-  proposed_resolution: Approve subject to legal/IP confirmation of the exact GitHub-Terms and additional-project-license statement; issue/security input remains non-authoritative, external code remains disabled pending approved contributor-rights terms, and internal recovery, licensing, distribution, and destructive retirement remain separate decisions.
+  proposed_resolution: Require one identity-bound accept, revise, or reject row for every applicable NSQ-017/OWN-* pair, including OWN-010 legal/IP, before Jason decides. The exact GitHub-Terms and additional-project-license statement needs legal/IP confirmation; issue/security input remains non-authoritative, external code remains disabled pending approved contributor-rights terms, and internal recovery, licensing, distribution, and destructive retirement remain separate decisions.
 - id: NSQ-018
   artifact: both
   question: Approve migration of repository and portfolio-work authority through provider-neutral work/change IDs, portfolio metadata, imported-history markers, and cross-system links while retaining jvallery/agents#3044 as the GitHub-side migration record until cutover reconciliation?
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-shared-local-delivery-authority-live-state
   - NSE-20260727-local-delivery-native-dependency-reconciliation
-  proposed_resolution: "Approve because Git push mirroring cannot migrate governance authority; preserve the native #3044 blocked_by #3047 boundary and perform the switch only after isolated contract proof, dual-run reconciliation, and attended APPLY."
+  proposed_resolution: "Require one identity-bound accept, revise, or reject row for every applicable NSQ-018/OWN-* pair before Jason decides. Git push mirroring cannot migrate governance authority; preserve the native #3044 blocked_by #3047 boundary and perform the switch only after isolated contract proof, dual-run reconciliation, and attended APPLY."
 - id: NSQ-019
   artifact: both
   question: "Approve the complete proposed pilot envelope represented by stable thresholds OE-001 through OE-034 and the applicable-owner mapping in NORTHSTAR_INTERVIEW.md?"
-  owner: OWN-001 through OWN-009
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, OWN-007, OWN-008, and OWN-009 advise per threshold row; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
@@ -826,13 +826,13 @@ open_questions:
 - id: NSQ-020
   artifact: both
   question: Approve internal IdP immutable subjects, raw-body event admission plus a durable transaction/effect ledger, minimally scoped trusted status reporting, and separate candidate, trusted validator, critic, integrator, publisher, signer, mirror, GitOps, verifier, approver, and recovery principals as mandatory trust boundaries?
-  owner: Jason, security owner, and Agent Platform owner
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, OWN-008, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   status: open
   source_ids:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-shared-local-delivery-authority-live-state
-  proposed_resolution: Approve and reject any provider or implementation that cannot prove these boundaries without granting candidate code a self-certification path.
+  proposed_resolution: Require one identity-bound accept, revise, or reject row for every applicable NSQ-020/OWN-* pair before Jason decides; reject any provider or implementation that cannot prove these boundaries without granting candidate code a self-certification path.
 learning_capture:
   status: staged
   proposal_paths:
@@ -840,7 +840,7 @@ learning_capture:
   - .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
   open_proposal_ids: [NLP-001, NLP-002, NLP-003, NLP-004, NLP-005, NLP-006, NLP-007]
 review:
-  requested_at: '2026-07-27T21:09:51Z'
+  requested_at: '2026-07-27T21:44:33Z'
   reviewers: [Jason, James, Skills governance owner, Skills release owner, legal/IP owner, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner]
   status: requested
   approvals: []
@@ -848,4 +848,4 @@ review:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign every required OWN-* role by immutable subject and authority evidence, record every applicable OWN-*/OE-* disposition without unresolved conflict, resolve NSQ-015 through NSQ-020, and request Jason's separate explicit final-lock phrase. If that evidence is absent or any hash changes, return to adversarial-review; no human approval is inferred."
+  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign every required OWN-* role by immutable subject and authority evidence and complete both identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers as mapped there. Missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open. Only after none remain may Jason resolve NSQ-015 through NSQ-020 and provide the separate explicit final-lock phrase. If that evidence is absent or any hash changes, return to adversarial-review; no human approval is inferred."

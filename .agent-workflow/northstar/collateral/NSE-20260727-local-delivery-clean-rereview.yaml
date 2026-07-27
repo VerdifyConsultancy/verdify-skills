@@ -32,5 +32,6 @@ limitations:
 - This evidence is machine review only and records no human owner disposition, North
   Star lock, release approval, implementation authority, change-gate APPLY, or destructive-action
   authority.
-- Five listed artifacts changed after this review. A later exact-hash review record is
-  required before the current packet can return to human review.
+- The current candidate differs from every artifact in the earlier hash-bound packet.
+  A later exact-hash review record is required before the current packet can return
+  to human review.

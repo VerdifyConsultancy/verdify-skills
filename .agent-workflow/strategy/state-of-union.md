@@ -20,8 +20,11 @@ The next handoff remains blocked inside `northstar-planning`. A separate
 hash-bound record must first prove that fresh product/business,
 architecture/delivery, and security/SRE reviewers returned
 `no_changes_required` for the exact final candidate. Only then may the named
-service owners record row-level dispositions before Jason is asked to resolve
-`NSQ-015` through `NSQ-020` and the separate final-lock decision.
+service owners record every applicable `NSQ-*`/`OWN-*` decision disposition
+and `OWN-*`/`OE-*` operating-envelope disposition. Missing assignments or rows,
+any rejection, unresolved conflicting revisions, or generic approvals keep the
+affected question and gate open before Jason is asked to resolve `NSQ-015`
+through `NSQ-020` and the separate final-lock decision.
 
 ## Current truth
 
@@ -58,9 +61,12 @@ service owners record row-level dispositions before Jason is asked to resolve
 
 ## Strategic sequence
 
-1. Complete fresh cross-functional review and owner dispositions, resolve
-   `NSQ-015` through `NSQ-020`, and explicitly lock the replacement authority
-   and product outcome.
+1. Complete fresh cross-functional review, immutable owner assignments, and
+   both question/owner and owner/threshold disposition ledgers. Missing
+   assignments or rows, any rejection, unresolved conflicting revisions, or
+   generic approvals keep the affected question and gate open. Only after none
+   remain may Jason resolve `NSQ-015` through `NSQ-020` and explicitly lock the
+   replacement authority and product outcome.
 2. Refresh project definition, architecture ADRs, module contracts, package
    representation, ownership, rollback, and staged migration rules.
 3. Preserve `#3047` as the single shared platform and offline-supply owner.
@@ -80,7 +86,8 @@ service owners record row-level dispositions before Jason is asked to resolve
 ## Blocking gaps
 
 - Exact final-candidate re-review evidence, stable named-owner assignments,
-  row-level operating-envelope dispositions, and final lock remain open;
+  question/owner dispositions, row-level operating-envelope dispositions, and
+  final lock remain open;
   project definition, architecture, and module contracts remain stale for the
   proposal.
 - The local package form is undecided; the fleet CI schema currently requires

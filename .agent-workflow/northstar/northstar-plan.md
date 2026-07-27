@@ -66,22 +66,29 @@ distinct; duplicate/reordered/replayed events and controller loss cannot repeat
 effects; no load-bearing exception remains at cutover.
 
 The proposed pilot maximum is two concurrent workflows, one release/day,
-200 GiB incremental storage, four operator-hours/week, and at most 30
-consecutive dual-run days before an explicit extension decision. Cutover also
-requires at least twenty consecutive distinct successful end-to-end change
-transactions and at least three consecutive distinct successful
-release-and-rollback transaction pairs, p95 queue under two minutes,
-validation under fifteen minutes, consumer health and rollback under ten
-minutes, Forgejo RPO at most five minutes/RTO at most two hours, four
-GitHub-unavailable hours, and fourteen healthy observation days.
+200 GiB incremental storage, at most four attended operator-hours per rolling
+seven days including incident response, and at most 30 consecutive dual-run
+days before an explicit extension decision. Any operator-hour exceedance
+requires a threshold revision or extension record. Cutover also requires at
+least twenty consecutive distinct successful end-to-end change transactions
+and at least three consecutive distinct successful release-and-rollback
+transaction pairs, p95 queue under two minutes, validation under fifteen
+minutes, consumer health and rollback under ten minutes, Forgejo RPO at most
+five minutes/RTO at most two hours, four GitHub-unavailable hours, and fourteen
+healthy observation days. Raw admitted events and transaction, effect, status,
+audit, and acceptance evidence remain for at least 365 days; each supported
+package subject, signed release envelope, and immutable graph remains through
+the later of support end or retirement plus at least 365 days.
 
 ## Sequence
 
 1. Verify the exact final-candidate cross-functional review record; assign
    every `OWN-*` role to one immutable human subject with durable authority
-   evidence; collect every required `OWN-*`/`OE-*` row disposition; resolve
-   conflicts and `NSQ-015` through `NSQ-020`; then explicitly lock iteration
-   26.
+   evidence; collect every required `NSQ-*`/`OWN-*` decision row and
+   `OWN-*`/`OE-*` operating-envelope row. Missing assignments or rows, any
+   rejection, unresolved conflicting revisions, or generic approvals keep the
+   affected question and gate open. Only after none remain may Jason resolve
+   `NSQ-015` through `NSQ-020` and explicitly lock iteration 26.
 2. Produce approved project definition and architecture/module contracts.
 3. Record closed issues #120/#121 as completed absorbed predecessor contracts
    without redispatch; retain `#3047` as the single shared Agent Platform and
@@ -130,18 +137,21 @@ Proposed defaults:
    contract; retirement is a later destructive gate.
 4. Repository and portfolio-work authority migrate through provider-neutral
    IDs and history markers.
-5. Approve or revise every named value in the bounded operating envelope:
+5. Record one identity-bound `accept`, `revise`, or `reject` row for every
+   question/owner pair applicable to `NSQ-015` through `NSQ-018` and `NSQ-020`.
+6. Approve or revise every named value in the bounded operating envelope:
    repository/event scale and age, compute/storage/spend/operator limits,
    availability/support, latency, recovery/backup/retention, parity,
    transaction/outage evidence, delayed re-probe, and observation. The exact
    `OWN-001` through `OWN-009` and `OE-001` through `OE-034` matrices in
    `NORTHSTAR_INTERVIEW.md` are the required disposition surface; generic
    approval is invalid.
-6. Require IdP identity, raw-body admission, durable effect ledger, trusted
+7. Require IdP identity, raw-body admission, durable effect ledger, trusted
    status issuer, and separated privileged principals.
 
 The earlier hash-bound review covered a candidate that later changed. This
-packet is ready for named-owner dispositions and human decisions only when
+packet is ready for immutable owner assignments, both identity-bound
+disposition ledgers, and human decisions only when
 `NSE-20260727-local-delivery-final-candidate-rereview` binds these exact bytes
 and the North Star gate to three fresh `no_changes_required` verdicts. The
 separate review record does not mutate the reviewed packet, and no approval is
@@ -150,9 +160,12 @@ inferred.
 ## Handoff
 
 Next route after exact-review evidence: `northstar-planning / human-review`,
-using `NORTHSTAR_INTERVIEW.md` as the ready question pack. Captured answers
-return through `northstar-planning / review-feedback` before any explicit final
-lock.
+using `NORTHSTAR_INTERVIEW.md` as the ready question pack. Every applicable
+`NSQ-*`/`OWN-*` decision row and `OWN-*`/`OE-*` operating-envelope row must be
+captured. Missing assignments or rows, any rejection, unresolved conflicting
+revisions, or generic approvals keep the affected question and gate open.
+Answers return through `northstar-planning / review-feedback` before any
+explicit final lock.
 
 No implementation, protection change, credential change, cluster mutation,
 cutover, public-package removal, release deletion, or destructive retirement is

@@ -6,7 +6,7 @@ sprint_id: null
 lane_id: null
 type: northstar
 status: open
-question: With the exact final-candidate hash-bound cross-functional re-review registered, after every required OWN-* role has an immutable human subject and authority reference and every applicable OWN-*/OE-* disposition is recorded without unresolved conflict, resolve NSQ-015 through NSQ-020 and explicitly approve and lock Verdify Skills North Star iteration 26 for the local-delivery independence milestone?
+question: With the exact final-candidate hash-bound cross-functional re-review registered, after every required OWN-* role has an immutable human subject and authority reference and both identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers are complete as mapped in NORTHSTAR_INTERVIEW.md—with no missing assignment or row, rejection, unresolved conflicting revision, or generic approval remaining—resolve NSQ-015 through NSQ-020 and explicitly approve and lock Verdify Skills North Star iteration 26 for the local-delivery independence milestone?
 owner: Jason
 evidence_required:
   - .agent-workflow/northstar/REVIEW_PLAN.md

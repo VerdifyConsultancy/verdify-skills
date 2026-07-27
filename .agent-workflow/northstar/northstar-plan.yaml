@@ -865,11 +865,11 @@ requirements:
   statement: Platform, source-control, security, SRE, backup, finance, and release owners must accept a measurable operating envelope before final lock and exact implementation SLOs before dual-run.
   source_ids: [SRC-043, SRC-044, SRC-047, SRC-050]
   acceptance_signals:
-  - The review assigns stable `OWN-001` through `OWN-009` roles to accountable humans by immutable subject and versioned authority reference, then records one `accept`, `revise`, or `reject` entry for every applicable owner/threshold pair in `OE-001` through `OE-034`; missing rows, rejections, or conflicting revisions keep the gate open.
+  - The review assigns stable `OWN-001` through `OWN-010` roles to accountable humans by immutable subject and versioned authority reference, then records one `accept`, `revise`, or `reject` entry for every applicable `NSQ-*`/`OWN-*` decision pair and every applicable `OWN-*`/`OE-*` threshold pair in `OE-001` through `OE-034`; missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open.
   - Initial proposed scope is one isolated rehearsal repository plus the live Verdify Skills repository, at most 500 admitted events per day and 20 per minute burst, and a ten-minute maximum ordinary event age unless an authorized replay record exists.
-  - Resource and cost bounds are two concurrent workflows, one release per day, 16 vCPU, 32 GiB memory, 200 GiB incremental retained storage, USD 250 per month incremental infrastructure spend, four steady-state operator hours per week, and at most 30 consecutive dual-run days before an explicit extension decision.
+  - Resource and cost bounds are two concurrent workflows, one release per day, 16 vCPU, 32 GiB memory, 200 GiB incremental retained storage, USD 250 per month incremental infrastructure spend, at most four attended operator-hours per rolling seven days including incident response with any exceedance requiring an explicit threshold revision or extension record, and at most 30 consecutive dual-run days before an explicit extension decision.
   - Availability and support bounds are 99.5 percent monthly internal-path availability excluding approved maintenance, 24x7 automated alerting, and required human attendance for release and cutover windows.
-  - Recovery and retention bounds are forge RPO at most 5 minutes and RTO at most 2 hours, Git mirror freshness at most 15 minutes, package mirror freshness at most 4 hours, coordinated encrypted snapshot age at most 24 hours, restore-rehearsal age at most 30 days, raw-event and transaction/effect/status/audit evidence retention at least 365 days, and supported package subjects and signed envelopes retained through support plus 365 days after retirement.
+  - Recovery and retention bounds are forge RPO at most 5 minutes and RTO at most 2 hours, Git mirror freshness at most 15 minutes, package mirror freshness at most 4 hours, coordinated encrypted snapshot age at most 24 hours, restore-rehearsal age at most 30 days, raw admitted events and transaction/effect/status/audit/acceptance evidence retained at least 365 days, and each supported package subject, signed release envelope, and immutable graph retained through the later of support end or retirement plus at least 365 days.
   - Cutover thresholds include 100 percent logical-check and failure-fixture parity, zero false acceptance, at least 20 consecutive distinct successful end-to-end change transactions, at least 3 consecutive distinct successful release-and-rollback transaction pairs, p95 queue under 2 minutes, p95 validation under 15 minutes, promotion health under 10 minutes, rollback under 10 minutes, a 4-hour cold GitHub-unavailable window, a UTC durability re-probe 30 minutes after the initial green result, and 14 healthy observation days.
 - id: NSR-049
   kind: constraint
@@ -1836,32 +1836,32 @@ open_questions:
   source_ids: [SRC-034, SRC-031]
 - id: NSQ-015
   question: 'Final-lock decision: approve a capability-qualified supported Forgejo release (v16 is the current review candidate) as the internal primary source, repository issue, pull-request, review, required-status, and protected-branch authority, with GitHub retained as an output mirror through coexistence and the observation window?'
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-046, SRC-050, SRC-051]
 - id: NSQ-016
   question: 'Final-lock decision: approve a package-specific Zot OCI subject, a signed immutable envelope for the complete pre-promotion graph, durable later-effect receipts, and a stable-harness/fresh-volume GitOps consumer as the authoritative Verdify release and deployed-acceptance model?'
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-004, OWN-005, OWN-006, OWN-008, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-007, SRC-031, SRC-037, SRC-043, SRC-044, SRC-045, SRC-047]
 - id: NSQ-017
   question: 'Final-lock decision: keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub users in-Service public-repository rights, make no additional project grant beyond GitHub Terms and applicable law for off-platform/package use unless separately approved, accept issue/security reports but reject external code until approved CLA or copyright-assignment terms exist, declare freshness/outage/verification/support, and defer licensing, intake, or retirement changes to separate gates?'
-  owner: Jason, Skills governance owner, and legal/IP owner
+  owner: OWN-001, OWN-009, and OWN-010 advise; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-038, SRC-043, SRC-044, SRC-046, SRC-047, SRC-048, SRC-049]
 - id: NSQ-018
   question: 'Final-lock decision: approve migration of the load-bearing repository and portfolio work authority—including provider-neutral issue and change IDs, portfolio metadata, historical-import markers, and cross-system links—while retaining jvallery/agents#3044 as the GitHub-side global migration record, natively blocked by shared platform issue #3047, until cutover reconciliation?'
-  owner: Jason
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-043, SRC-044, SRC-047, SRC-050, SRC-051]
 - id: NSQ-019
   question: 'Final-lock decision: after every required role has an immutable human subject and durable authority assignment, approve the complete pilot envelope represented by exact thresholds OE-001 through OE-034 and their applicable-owner mapping in NORTHSTAR_INTERVIEW.md?'
-  owner: OWN-001 through OWN-009
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, OWN-007, OWN-008, and OWN-009 advise per threshold row; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-043, SRC-047, SRC-050]
 - id: NSQ-020
   question: 'Final-lock decision: approve internal IdP-backed immutable identities, a dedicated raw-body event admission service plus durable transaction ledger, minimally scoped trusted status reporter, and separate candidate, trusted validator, critic, integrator, publisher, signer, mirror, GitOps, verifier, approver, and recovery principals as non-negotiable trust boundaries?'
-  owner: Jason, security owner, and Agent Platform owner
+  owner: OWN-001, OWN-002, OWN-003, OWN-004, OWN-005, OWN-006, OWN-008, and OWN-009 advise; Jason makes the separate final decision
   blocking: true
   source_ids: [SRC-044, SRC-047, SRC-050]
 conflicts:
@@ -2961,7 +2961,7 @@ gate_recommendations:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign each required OWN-* role by immutable subject and durable authority evidence, record every applicable OWN-*/OE-* disposition without unresolved conflict, resolve NSQ-015 through NSQ-020, and request Jason's separate explicit final-lock phrase. Until that evidence exists or if any hash changes, return to adversarial-review; no approval is inferred."
+  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign each required OWN-* role by immutable subject and durable authority evidence and complete both identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers as mapped there. Missing assignments or rows, any rejection, unresolved conflicting revisions, or generic approvals keep the affected question and gate open. Only after none remain may Jason resolve NSQ-015 through NSQ-020 and provide the separate explicit final-lock phrase. Until that evidence exists or if any hash changes, return to adversarial-review; no approval is inferred."
 approval:
   status: pending
   approver:

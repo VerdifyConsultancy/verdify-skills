@@ -37,7 +37,8 @@ package deletion, or authority cutover is authorized by this packet.
 The historical clean-review evidence binds an earlier candidate and cannot
 certify these bytes. This interview is ready for Agent Platform,
 source-control, security, SRE, backup/recovery, finance, Skills release,
-governance, and legal/IP owner dispositions plus Jason's decisions only when
+governance, and legal/IP owner assignments plus both identity-bound disposition
+ledgers, followed by Jason's decisions, only when
 `NSE-20260727-local-delivery-final-candidate-rereview` records three fresh
 `no_changes_required` verdicts against the exact final-candidate hash manifest.
 That separate evidence record must not mutate the reviewed packet; no approval
@@ -48,7 +49,7 @@ is inferred.
 | Priority | Decision or work | Classification |
 | --- | --- | --- |
 | P0 | Select the internal authority, signed release-envelope/consumer model, public-mirror posture, repository plus portfolio-work migration scope, bounded operating envelope, and mandatory trust boundaries. | must-decide |
-| P0 | Require Agent Platform, source-control, security, SRE, backup/recovery, finance, Skills release/governance, legal/IP, and fresh product/architecture/security reviewers to return no required changes before asking Jason for final lock. | review gate |
+| P0 | Require Agent Platform, source-control, security, SRE, backup/recovery, finance, Skills release/governance, and legal/IP owners to complete every applicable identity-bound disposition without unresolved rejection or revision, and require fresh product/architecture/security reviewers to return no required changes, before asking Jason for final lock. | review gate |
 | P1 | After lock, approve module contracts for identity, governance-history migration, raw event admission, ledger/status, package/envelope, stable consumer, immutable dependencies, coordinated recovery, public support, and attended cutover before implementation dispatch. | should-decide before sprint planning |
 | P1 | Keep organization-level GitHub controls, live Argo/Zot state, IdP and status scope, backup/restore, signing custody, full-boundary cold-node proof, and service measurements in the exception ledger until owner-scoped evidence closes them. | research-needed |
 
@@ -123,28 +124,32 @@ is inferred.
 - **Proposed: bounded pilot.** One rehearsal and one live repository; 500
   admitted events/day and 20/minute burst; ten-minute ordinary event age; two
   concurrent workflows; one release/day; 16 vCPU, 32 GiB, 200 GiB, USD
-  250/month, four operator-hours/week, and at most 30 consecutive dual-run days
-  before extension; 99.5% monthly availability excluding approved maintenance;
-  24x7 automated alerting with attended release/cutover windows; 24-hour
-  snapshot, 30-day restore rehearsal, 365-day evidence,
-  support-plus-365-day release retention, at least twenty consecutive distinct
-  successful end-to-end change transactions, at least three consecutive
-  distinct successful release-and-rollback transaction pairs, and the exact
-  latency, RPO/RTO, mirror, outage, 30-minute re-probe, and fourteen-day
-  observation thresholds.
+  250/month, at most four attended operator-hours per rolling seven days
+  including incident response, and at most 30 consecutive dual-run days before
+  extension; 99.5% monthly availability excluding approved maintenance; 24x7
+  automated alerting with attended release/cutover windows; 24-hour snapshot,
+  30-day restore rehearsal; raw admitted events and transaction, effect,
+  status, audit, and acceptance evidence retained at least 365 days; supported
+  package subjects, signed release envelopes, and immutable graphs retained
+  through the later of support end or retirement plus at least 365 days; at
+  least twenty consecutive distinct successful end-to-end change transactions;
+  at least three consecutive distinct successful release-and-rollback
+  transaction pairs; and the exact latency, RPO/RTO, mirror, outage, 30-minute
+  re-probe, and fourteen-day observation thresholds.
 - Unbounded rollout. Faster nominal expansion but no objective finance,
   capacity, reliability, or “ready to cut over” verdict.
 
 ### Decision owner assignments
 
 The stable owner-role IDs below are the only role names accepted by the
-iteration-26 decision records; `OWN-001` through `OWN-009` participate in the
-`NSQ-019` disposition ledger. A role is not assigned merely because a person
-has a display name, authored a proposal, controls a GitHub service account, or
-responds in chat. Before human review, every row must name one accountable
-human by immutable IdP subject and cite a durable, versioned authority
-assignment. `pending` therefore remains a blocking state, not an inferred
-assignment.
+iteration-26 decision records. `OWN-001` through `OWN-010` participate in the
+question-specific disposition matrix, and `OWN-001` through `OWN-009`
+participate in the `NSQ-019` threshold ledger. A role is not assigned merely
+because a person has a display name, authored a proposal, controls a GitHub
+service account, or responds in chat. Before Jason's final-lock question, every
+required row must name one accountable human by immutable IdP subject and cite
+a durable, versioned authority assignment. `pending` therefore remains a
+blocking state, not an inferred assignment.
 
 | Owner ID | Accountable role | Current human / immutable subject | Durable authority-assignment reference | Assignment state |
 | --- | --- | --- | --- | --- |
@@ -158,6 +163,33 @@ assignment.
 | `OWN-008` | Verdify Skills release owner | pending | pending review-feedback evidence | pending |
 | `OWN-009` | Verdify Skills governance owner | pending | pending review-feedback evidence | pending |
 | `OWN-010` | Legal/IP owner for `NSQ-017` only | pending | pending review-feedback evidence | pending |
+
+### Decision applicability and dispositions
+
+Every P0 decision has explicit applicable owner roles. Except for `NSQ-019`,
+the decision ledger must contain one row for every question/owner pair below.
+Each row contains question ID, owner ID, immutable human subject, versioned
+authority-assignment reference, `accept`, `revise`, or `reject`, exact
+alternative or constraints for `revise`, rationale, UTC timestamp, and
+immutable review-feedback evidence reference. `NSQ-019` uses the more granular
+owner/threshold ledger in the next section; its complete applicable-pair set is
+the decision disposition for that question.
+
+| Question ID | Applicable owner IDs | Current disposition | Completion rule |
+| --- | --- | --- | --- |
+| `NSQ-015` | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-009` | pending | every listed question/owner pair resolves |
+| `NSQ-016` | `OWN-001`, `OWN-002`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-008`, `OWN-009` | pending | every listed question/owner pair resolves |
+| `NSQ-017` | `OWN-001`, `OWN-009`, `OWN-010` | pending | every listed question/owner pair resolves, including legal/IP |
+| `NSQ-018` | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-009` | pending | every listed question/owner pair resolves |
+| `NSQ-019` | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-007`, `OWN-008`, `OWN-009`, as mapped per `OE-*` row | pending | every applicable owner/threshold pair resolves |
+| `NSQ-020` | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-008`, `OWN-009` | pending | every listed question/owner pair resolves |
+
+A missing assignment or required ledger row keeps the question open. Any
+`reject` keeps it open. Conflicting revisions are not averaged and cannot be
+overridden by a generic approval or by `OWN-001`: affected owners must converge
+on one exact proposal in a new evidence record and submit superseding
+dispositions before Jason may decide. This ledger records prerequisite owner
+advice; Jason retains the separate final decision and iteration-lock authority.
 
 ### NSQ-019 threshold dispositions
 
@@ -180,14 +212,14 @@ no approval.
 | `OE-009` | Memory allocation | at most 32 GiB requested by the pilot control and execution plane | `OWN-001`, `OWN-002`, `OWN-005`, `OWN-007` | pending |
 | `OE-010` | Retained storage | at most 200 GiB across pilot forge, ledger, workflow, mirror, evidence, and recovery stores | `OWN-001`, `OWN-002`, `OWN-005`, `OWN-006`, `OWN-007` | pending |
 | `OE-011` | Incremental spend | at most USD 250 per calendar month | `OWN-001`, `OWN-002`, `OWN-007`, `OWN-009` | pending |
-| `OE-012` | Operator effort | at most 4 attended operator-hours per rolling 7 days, excluding declared incidents | `OWN-001`, `OWN-002`, `OWN-005`, `OWN-007`, `OWN-009` | pending |
+| `OE-012` | Operator effort | at most 4 attended operator-hours per rolling 7 days, including incident response; any exceedance requires an explicit threshold revision or extension record | `OWN-001`, `OWN-002`, `OWN-005`, `OWN-007`, `OWN-009` | pending |
 | `OE-013` | Dual-run duration limit | at most 30 consecutive days before an explicit extension decision is required | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-005`, `OWN-007`, `OWN-008`, `OWN-009` | pending |
 | `OE-014` | Service availability | at least 99.5% per calendar month, excluding approved maintenance windows | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-005`, `OWN-007`, `OWN-008`, `OWN-009` | pending |
 | `OE-015` | Alert and support coverage | automated alerting 24x7; human attendance required for every release and cutover window | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-007`, `OWN-008`, `OWN-009` | pending |
 | `OE-016` | Snapshot age | latest restorable coordinated snapshot at most 24 hours old | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006` | pending |
 | `OE-017` | Restore-rehearsal age | latest successful coordinated restore rehearsal at most 30 days old | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006` | pending |
-| `OE-018` | Evidence retention | retain protected transaction and acceptance evidence for at least 365 days | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-008`, `OWN-009` | pending |
-| `OE-019` | Release retention | retain each supported release and its immutable graph through support end plus at least 365 days | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-007`, `OWN-008`, `OWN-009` | pending |
+| `OE-018` | Evidence retention | retain raw admitted events and transaction, effect, status, audit, and acceptance evidence for at least 365 days | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-008`, `OWN-009` | pending |
+| `OE-019` | Release retention | retain each supported package subject, signed release envelope, and immutable graph through the later of support end or retirement, plus at least 365 days | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-006`, `OWN-007`, `OWN-008`, `OWN-009` | pending |
 | `OE-020` | Logical and failure parity | 100% of approved legacy-path logical and injected-failure cases pass on the candidate path | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-008`, `OWN-009` | pending |
 | `OE-021` | False accepts | exactly 0 candidate-path false accepts across the approved parity corpus | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-008`, `OWN-009` | pending |
 | `OE-022` | Change transactions | at least 20 consecutive distinct successful end-to-end change transactions | `OWN-001`, `OWN-002`, `OWN-003`, `OWN-004`, `OWN-005`, `OWN-008`, `OWN-009` | pending |
@@ -219,23 +251,25 @@ owner must converge on one exact value in a new evidence record, after which
 
 | ID | Priority | Question | Proposed default | Options / tradeoffs | Affected IDs | Evidence | Answer shape |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NSQ-015 | P0 | Approve a capability-qualified supported Forgejo release (v16 is the current candidate) as internal repository authority with GitHub as an output mirror? | Approve D012 only after exact-version capability, IdP, migration, policy, audit, upgrade, coordinated-restore, GitHub-unavailable, and attended-cutover proofs. | Approve; choose another internal forge and require the same contracts; keep GitHub primary, which does not satisfy independence. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `ARQ-035`, `CON-011`, `CON-015`, `OWN-001` | all applicable 2026-07-27 migration evidence items, including `NSE-20260727-shared-local-delivery-authority-live-state` and `NSE-20260727-local-delivery-native-dependency-reconciliation` | `approve default`, `choose alternative`, or `freeform constraint` |
-| NSQ-016 | P0 | Approve the Zot package subject, signed immutable complete pre-promotion envelope, later-effect ledger receipts, and stable-harness/fresh-volume Argo CD consumer as authoritative release and non-production acceptance? | Approve D013; treat the consumer as an acceptance fixture and promote the fixed envelope digest while later effects remain ledger receipts. | Approve; select another internal package authority only with equivalent atomic signed-graph and GitOps proof; image-only does not prove the package. | `PRODUCT-015`, `ARCH-022`, `PRQ-041`, `PRQ-042`, `CON-012`, `OWN-001` | `NSE-20260709-verdify-skills-adversarial-review`, `NSE-20260727-verdify-skills-local-delivery-inventory`, `NSE-20260727-local-delivery-control-plane-primary-sources`, `NSE-20260727-local-delivery-adversarial-audit` | `approve default`, `choose alternative`, or `freeform constraint` |
-| NSQ-017 | P0 | Keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub's in-Service rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use, allow issue/security intake but no external code pending approved CLA/assignment terms, and use later separate licensing/intake/retirement gates? | Approve D014 subject to legal/IP confirmation of the exact rights statement. | Approve the GitHub-Terms-plus-no-additional-project-grant/non-acceptance default; choose and legally approve another license plus contributor-IP process; retire later through a separate attended gate. | `PRODUCT-015`, `ARCH-022`, `PRQ-047`, `ARQ-044`, `OWN-001`, `OWN-009`, `OWN-010` | `NSE-20260727-verdify-skills-local-delivery-inventory`, `NSE-20260727-local-delivery-adversarial-audit`, `NSE-20260727-verdify-skills-public-visibility-license`, `NSE-20260727-github-public-repository-license-terms` | `approve default`, `state approved license/IP terms`, or `state retirement rule` |
-| NSQ-018 | P0 | Approve migration of repository and portfolio-work authority through provider-neutral IDs, portfolio metadata, imported-history markers, and cross-system links while retaining `jvallery/agents#3044` as the GitHub-side migration record, natively blocked by shared platform issue `#3047`, until reconciliation? | Approve D015. | Approve; keep the global portfolio on GitHub, which leaves GitHub load-bearing; choose a different internal portfolio authority and define the bridge. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `CON-014`, `CON-015`, `OWN-001` | `NSE-20260727-local-delivery-adversarial-audit`, `NSE-20260727-shared-local-delivery-authority-live-state`, `NSE-20260727-local-delivery-native-dependency-reconciliation` | `approve default`, `choose alternative`, or `freeform constraint` |
+| NSQ-015 | P0 | Approve a capability-qualified supported Forgejo release (v16 is the current candidate) as internal repository authority with GitHub as an output mirror? | Approve D012 only after exact-version capability, IdP, migration, policy, audit, upgrade, coordinated-restore, GitHub-unavailable, and attended-cutover proofs. | Approve; choose another internal forge and require the same contracts; keep GitHub primary, which does not satisfy independence. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `ARQ-035`, `CON-011`, `CON-015`; applicable roles above | all applicable 2026-07-27 migration evidence items, including `NSE-20260727-shared-local-delivery-authority-live-state` and `NSE-20260727-local-delivery-native-dependency-reconciliation` | one identity-bound ledger entry per applicable question/owner pair; no generic response |
+| NSQ-016 | P0 | Approve the Zot package subject, signed immutable complete pre-promotion envelope, later-effect ledger receipts, and stable-harness/fresh-volume Argo CD consumer as authoritative release and non-production acceptance? | Approve D013; treat the consumer as an acceptance fixture and promote the fixed envelope digest while later effects remain ledger receipts. | Approve; select another internal package authority only with equivalent atomic signed-graph and GitOps proof; image-only does not prove the package. | `PRODUCT-015`, `ARCH-022`, `PRQ-041`, `PRQ-042`, `CON-012`; applicable roles above | `NSE-20260709-verdify-skills-adversarial-review`, `NSE-20260727-verdify-skills-local-delivery-inventory`, `NSE-20260727-local-delivery-control-plane-primary-sources`, `NSE-20260727-local-delivery-adversarial-audit` | one identity-bound ledger entry per applicable question/owner pair; no generic response |
+| NSQ-017 | P0 | Keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub's in-Service rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use, allow issue/security intake but no external code pending approved CLA/assignment terms, and use later separate licensing/intake/retirement gates? | Approve D014 subject to legal/IP confirmation of the exact rights statement. | Approve the GitHub-Terms-plus-no-additional-project-grant/non-acceptance default; choose and legally approve another license plus contributor-IP process; retire later through a separate attended gate. | `PRODUCT-015`, `ARCH-022`, `PRQ-047`, `ARQ-044`; applicable roles above | `NSE-20260727-verdify-skills-local-delivery-inventory`, `NSE-20260727-local-delivery-adversarial-audit`, `NSE-20260727-verdify-skills-public-visibility-license`, `NSE-20260727-github-public-repository-license-terms` | one identity-bound ledger entry per applicable question/owner pair; no generic response |
+| NSQ-018 | P0 | Approve migration of repository and portfolio-work authority through provider-neutral IDs, portfolio metadata, imported-history markers, and cross-system links while retaining `jvallery/agents#3044` as the GitHub-side migration record, natively blocked by shared platform issue `#3047`, until reconciliation? | Approve D015. | Approve; keep the global portfolio on GitHub, which leaves GitHub load-bearing; choose a different internal portfolio authority and define the bridge. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `CON-014`, `CON-015`; applicable roles above | `NSE-20260727-local-delivery-adversarial-audit`, `NSE-20260727-shared-local-delivery-authority-live-state`, `NSE-20260727-local-delivery-native-dependency-reconciliation` | one identity-bound ledger entry per applicable question/owner pair; no generic response |
 | NSQ-019 | P0 | Approve the complete proposed pilot envelope for repository/event scale and age, compute/storage/spend/operator limits, availability/support, latency, recovery/backup/retention, parity, transaction/outage evidence, 30-minute delayed re-probe, and fourteen-day observation? | Approve D016 exactly as `OE-001` through `OE-034`. | Approve every applicable row; revise a named row with exact replacement value/unit and rationale; reject a named row; omit a row or identity, which keeps the gate open. | `PRODUCT-015`, `PRQ-048`, `ARCH-022`, `ARQ-045`, `IFACE-031`, `OWN-001`–`OWN-009`, `OE-001`–`OE-034` | `NSE-20260727-local-delivery-adversarial-audit`; the completed immutable disposition ledger | one ledger entry per applicable owner/threshold pair using the required fields above; no generic approval |
-| NSQ-020 | P0 | Approve immutable IdP subjects, raw-body event admission plus durable effect ledger, scoped trusted status reporting, and separated privileged principals as mandatory? | Approve D017 and reject any provider/design that cannot prove the boundary. | Approve; propose an equivalent mechanism with the same adversarial tests; waive, which leaves candidate self-certification/replay risk and is not recommended. | `PRODUCT-015`, `ARCH-022`, `PRQ-040`, `PRQ-044`, `ARQ-036`, `ARQ-040`, `ARQ-041`, `OWN-001`, `OWN-002`, `OWN-004` | `NSE-20260727-local-delivery-adversarial-audit` | `approve default` or `state equivalent controls` |
-| NQI-Q021 | P0 | After the fresh independent re-review returns no required changes, required `OWN-*` roles have immutable identity/authority evidence, all applicable `OWN-*`/`OE-*` rows are resolved without conflict, and NSQ-015 through NSQ-020 are resolved, do you explicitly approve and lock North Star iteration 26? | Approve D018 only after every prior condition is met. | Approve and lock; request named changes; reject. | all iteration-26 IDs; `northstar-artifacts.yaml`; North Star gate | complete iteration-26 review packet, assignments, and row-level dispositions | exact phrase: `approve and lock iteration 26`, `changes requested: ...`, or `reject: ...` |
+| NSQ-020 | P0 | Approve immutable IdP subjects, raw-body event admission plus durable effect ledger, scoped trusted status reporting, and separated privileged principals as mandatory? | Approve D017 and reject any provider/design that cannot prove the boundary. | Approve; propose an equivalent mechanism with the same adversarial tests; waive, which leaves candidate self-certification/replay risk and is not recommended. | `PRODUCT-015`, `ARCH-022`, `PRQ-040`, `PRQ-044`, `ARQ-036`, `ARQ-040`, `ARQ-041`; applicable roles above | `NSE-20260727-local-delivery-adversarial-audit` | one identity-bound ledger entry per applicable question/owner pair; no generic response |
+| NQI-Q021 | P0 | After the fresh independent re-review returns no required changes, required `OWN-*` roles have immutable identity/authority evidence, both identity-bound ledgers are complete as mapped above with no missing assignment or row, rejection, unresolved conflicting revision, or generic approval remaining, and NSQ-015 through NSQ-020 are resolved, do you explicitly approve and lock North Star iteration 26? | Approve D018 only after every prior condition is met. | Approve and lock; request named changes; reject. | all iteration-26 IDs; `northstar-artifacts.yaml`; North Star gate | complete iteration-26 review packet, assignments, and both row-level disposition ledgers | exact phrase: `approve and lock iteration 26`, `changes requested: ...`, or `reject: ...` |
 
 ## Answer Capture Rules
 
 - Preserve answers as new review-feedback evidence and route them through
   `northstar-planning / review-feedback`.
 - Owner assignments and threshold dispositions must preserve the stable
-  `OWN-*`/`OE-*` IDs and every required field defined above; prose summaries do
-  not replace the row-level evidence.
+  `OWN-*`/`OE-*` IDs and every required field defined above. Decision
+  dispositions must preserve the stable `NSQ-*`/`OWN-*` pairs. Prose summaries
+  do not replace either row-level evidence set.
 - Interview answers do not themselves record final lock. Only the explicit
-  NQI-Q021 decision, after a clean re-review and owner dispositions, may update `northstar-artifacts.yaml`,
+  NQI-Q021 decision, after a clean re-review and complete `NSQ-*`/`OWN-*` and
+  `OWN-*`/`OE-*` disposition ledgers, may update `northstar-artifacts.yaml`,
   `northstar-plan.yaml`, `.agent-workflow/gates/northstar.yaml`, product and
   architecture status, and downstream handoff.
 - A lock authorizes downstream project definition and architecture contracts;

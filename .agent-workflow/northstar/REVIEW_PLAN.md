@@ -11,16 +11,19 @@ Reviewers: Jason, James, Skills governance/release owner, legal/IP owner, Agent 
 
 The first product/business, architecture/delivery, and security/SRE review
 returned required changes. An earlier hash-bound candidate then received three
-`no_changes_required` verdicts, but five reviewed artifacts changed afterward;
-that historical result is not proof for the current bytes. The final candidate
-may advance only when a separate evidence record binds these exact files and
-the North Star gate to three fresh `no_changes_required` verdicts without
-mutating the reviewed packet. Once that record exists, the remaining decision
-path is:
+`no_changes_required` verdicts, but the current candidate differs from every
+artifact in that earlier hash-bound packet; that historical result is not
+proof for the current bytes. The final candidate may advance only when a
+separate evidence record binds these exact files and the North Star gate to
+three fresh `no_changes_required` verdicts without mutating the reviewed
+packet. Once that record exists, the remaining decision path is:
 
 1. inspect the exact final-candidate re-review evidence;
 2. record Agent Platform, source-control, security, SRE, backup/recovery,
-   finance, Skills release, governance, and legal/IP dispositions;
+   finance, Skills release, governance, and legal/IP assignments and every
+   applicable `NSQ-*`/`OWN-*` and `OWN-*`/`OE-*` disposition; missing
+   assignments or rows, any rejection, unresolved conflicting revisions, or
+   generic approvals keep the affected question and gate open;
 3. then ask Jason to resolve `NSQ-015` through `NSQ-020`; and
 4. only if satisfied, explicitly say `approve and lock iteration 26`.
 
@@ -119,9 +122,10 @@ cluster mutation, cutover, production deployment, or destructive retirement.
   proposals are retired, and neither issue's unapproved proposal is treated as
   authority.
 - [x] `NORTHSTAR_INTERVIEW.md` defines stable `OWN-001` through `OWN-010`
-  role-assignment slots and exact `OE-001` through `OE-034` threshold rows with
+  role-assignment slots, an explicit applicable-owner matrix for `NSQ-015`
+  through `NSQ-020`, and exact `OE-001` through `OE-034` threshold rows with
   units, applicable owners, required row-level fields, and conflict handling.
-  Pending identities and dispositions remain blockers.
+  Pending identities and both disposition ledgers remain blockers.
 - [x] Iteration 25 remains the protected authority and this packet records no
   inferred approval.
 - Exact-review completion is not self-asserted by this mutable checklist.
@@ -133,10 +137,14 @@ cluster mutation, cutover, production deployment, or destructive retirement.
 - [ ] Every `OWN-001` through `OWN-010` role needed by `NSQ-015` through
   `NSQ-020` names one accountable human by immutable IdP subject and cites a
   versioned durable authority assignment before Jason's final-lock question.
-- [ ] The disposition ledger contains one identity-bound `accept`, `revise`, or
-  `reject` record for every applicable `OWN-*`/`OE-*` pair. Missing rows,
-  rejections, or unresolved conflicting revisions keep `NSQ-019` open; a
-  generic approval does not satisfy the operating-envelope gate.
+- [ ] The decision ledger contains one identity-bound `accept`, `revise`, or
+  `reject` record for every applicable `NSQ-*`/`OWN-*` pair outside
+  `NSQ-019`. Missing rows, rejections, or unresolved conflicting revisions keep
+  the affected question open; a generic approval does not satisfy it.
+- [ ] The operating-envelope ledger contains one identity-bound `accept`,
+  `revise`, or `reject` record for every applicable `OWN-*`/`OE-*` pair.
+  Missing rows, rejections, or unresolved conflicting revisions keep
+  `NSQ-019` open; a generic approval does not satisfy it.
 
 ## Adversarial Review Lenses
 
@@ -205,8 +213,10 @@ Current route remains `northstar-planning / review-feedback` until
 to all three required `no_changes_required` verdicts. Then route once to
 `northstar-planning / human-review` using `NORTHSTAR_INTERVIEW.md`: assign every
 required `OWN-*` role by immutable subject and durable authority evidence,
-record every applicable `OWN-*`/`OE-*` disposition without unresolved
-conflict, and resolve `NSQ-015` through `NSQ-020`. Captured answers return
-through `northstar-planning / review-feedback`. Only after Jason separately
-locks iteration 26 may the canonical artifacts route to
+complete both identity-bound disposition ledgers as mapped in the interview;
+missing assignments or rows, any rejection, unresolved conflicting revisions,
+or generic approvals keep the affected question and gate open. Only after those
+conditions close may Jason resolve `NSQ-015` through `NSQ-020`. Captured answers
+return through `northstar-planning / review-feedback`. Only after Jason
+separately locks iteration 26 may the canonical artifacts route to
 `project-definition / discovery`.
