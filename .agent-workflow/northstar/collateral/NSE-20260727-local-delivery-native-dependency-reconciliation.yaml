@@ -1,0 +1,33 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-local-delivery-native-dependency-reconciliation
+reference: northstar://evidence/NSE-20260727-local-delivery-native-dependency-reconciliation
+title: Verdify Skills local-delivery native dependency reconciliation
+evidence_type: observation
+evidence_status: verified
+ingested_at: '2026-07-27T20:40:38Z'
+source:
+  uri: https://github.com/jvallery/agents/issues/3044
+  original_path: "/tmp/verdify-skills-native-dependency-reconciliation-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-native-dependency-reconciliation-verdify-skills-native-dependency-reconciliation"
+  sha256: e9d462f235cfacbd79e05563e3a8d629352fc4e76fbd6a65b4d7851a9bdca318
+summary: 'Verified native GitHub dependency linking repository migration #3044 to
+  shared platform blocker #3047 and retiring duplicate issue-creation proposals.'
+tags:
+- backlog
+- governance
+- local-delivery
+- platform
+claims:
+- jvallery/agents#3044 is natively blocked by open jvallery/agents#3047.
+- 'jvallery/agents#3047 natively reports that it blocks #3044.'
+- The relationship replaces stale proposals for duplicate internal-authority and immutable-mirror
+  issues but grants no design or implementation approval.
+planning_relevance:
+- Reconciles the canonical strategy and backlog artifacts to one shared platform dependency
+  and one repository consumer record.
+limitations:
+- The dependency edge does not resolve North Star questions, owner dispositions, runtime
+  acceptance, or human gates.

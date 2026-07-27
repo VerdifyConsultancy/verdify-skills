@@ -23,6 +23,11 @@ dependency:
   candidate) and internal IdP become repository, portfolio-work, issue,
   pull-request, review, trusted-status, protection, identity, and audit
   authority.
+- Shared Agent Platform issue `jvallery/agents#3047` owns the reusable internal
+  Git/event/status authority and offline dependency supply. Repository issue
+  `#3044` owns Verdify Skills adoption and acceptance. The native GitHub edge
+  records `#3044 blocked_by #3047`; it prevents duplicate platform issues but
+  neither open proposal is treated as approved authority for the other.
 - Raw-body webhook admission and a durable transaction/effect ledger establish
   canonical identity, idempotency, exact-head currentness, immutable effects,
   archives, and authorized replay before Argo Events and repository-owned Argo
@@ -61,21 +66,27 @@ distinct; duplicate/reordered/replayed events and controller loss cannot repeat
 effects; no load-bearing exception remains at cutover.
 
 The proposed pilot maximum is two concurrent workflows, one release/day,
-200 GiB incremental storage, four operator-hours/week, and thirty dual-run
-days. Cutover also requires twenty change and three release/rollback
-transactions, p95 queue under two minutes, validation under fifteen minutes,
-consumer health and rollback under ten minutes, Forgejo RPO at most five
-minutes/RTO at most two hours, four GitHub-unavailable hours, and fourteen
-healthy observation days.
+200 GiB incremental storage, four operator-hours/week, and at most 30
+consecutive dual-run days before an explicit extension decision. Cutover also
+requires at least twenty consecutive distinct successful end-to-end change
+transactions and at least three consecutive distinct successful
+release-and-rollback transaction pairs, p95 queue under two minutes,
+validation under fifteen minutes, consumer health and rollback under ten
+minutes, Forgejo RPO at most five minutes/RTO at most two hours, four
+GitHub-unavailable hours, and fourteen healthy observation days.
 
 ## Sequence
 
-1. Complete the fresh cross-functional audit; resolve `NSQ-015` through
-   `NSQ-020`; explicitly lock iteration 26.
+1. Verify the exact final-candidate cross-functional review record; assign
+   every `OWN-*` role to one immutable human subject with durable authority
+   evidence; collect every required `OWN-*`/`OE-*` row disposition; resolve
+   conflicts and `NSQ-015` through `NSQ-020`; then explicitly lock iteration
+   26.
 2. Produce approved project definition and architecture/module contracts.
 3. Record closed issues #120/#121 as completed absorbed predecessor contracts
-   without redispatch; create owning Agent Platform and Verdify Skills issues
-   and non-overlapping one-lane implementation transactions.
+   without redispatch; retain `#3047` as the single shared Agent Platform and
+   offline-supply issue, then create only non-overlapping Verdify Skills
+   implementation transactions under `#3044`.
 4. In isolation, establish qualified Forgejo, IdP, portfolio migration,
    admission/ledger/status, immutable dependencies, Zot/signing, GitOps,
    coordinated backup/restore, audit, public-support, and service-objective
@@ -97,6 +108,8 @@ healthy observation days.
   trusted status issuer, coordinated recovery set, or public-support owner was
   observable.
 - Current generic local workflows still clone GitHub and use public inputs.
+- Shared platform issue `jvallery/agents#3047` remains open; its component
+  choices and acceptance criteria are proposed rather than approved or proven.
 - Verdify Skills has no package-aware Agent Fleet CI contract or dedicated
   acceptance workload.
 - Live Argo ownership/health and Zot contents are unreadable with the repository
@@ -120,19 +133,26 @@ Proposed defaults:
 5. Approve or revise every named value in the bounded operating envelope:
    repository/event scale and age, compute/storage/spend/operator limits,
    availability/support, latency, recovery/backup/retention, parity,
-   transaction/outage evidence, delayed re-probe, and observation.
+   transaction/outage evidence, delayed re-probe, and observation. The exact
+   `OWN-001` through `OWN-009` and `OE-001` through `OE-034` matrices in
+   `NORTHSTAR_INTERVIEW.md` are the required disposition surface; generic
+   approval is invalid.
 6. Require IdP identity, raw-body admission, durable effect ledger, trusted
    status issuer, and separated privileged principals.
 
-The hash-bound fresh independent re-review found no required changes. The
-packet is ready for named owner dispositions and human decisions; no approval
-is inferred.
+The earlier hash-bound review covered a candidate that later changed. This
+packet is ready for named-owner dispositions and human decisions only when
+`NSE-20260727-local-delivery-final-candidate-rereview` binds these exact bytes
+and the North Star gate to three fresh `no_changes_required` verdicts. The
+separate review record does not mutate the reviewed packet, and no approval is
+inferred.
 
 ## Handoff
 
-Next route: `northstar-planning / human-review`, using
-`NORTHSTAR_INTERVIEW.md` as the ready question pack. Captured answers return
-through `northstar-planning / review-feedback` before any explicit final lock.
+Next route after exact-review evidence: `northstar-planning / human-review`,
+using `NORTHSTAR_INTERVIEW.md` as the ready question pack. Captured answers
+return through `northstar-planning / review-feedback` before any explicit final
+lock.
 
 No implementation, protection change, credential change, cluster mutation,
 cutover, public-package removal, release deletion, or destructive retirement is

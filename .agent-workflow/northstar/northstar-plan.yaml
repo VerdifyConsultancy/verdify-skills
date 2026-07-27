@@ -251,6 +251,16 @@ sources:
   location: .agent-workflow/northstar/collateral/NSE-20260727-github-public-repository-license-terms.yaml
   summary: Official GitHub Terms evidence that public repositories grant users in-Service view, use, display, perform, reproduce, and fork rights, constraining how UNLICENSED and any separate project grant are described.
   evidence_status: verified
+- id: SRC-050
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260727-shared-local-delivery-authority-live-state.yaml
+  summary: "Read-only live evidence that shared platform issue #3047 remains open, generic local Workflows retain GitHub and public-image dependencies, and no Verdify Skills-specific internal authority, Workflow, or package acceptance path is bound."
+  evidence_status: observed
+- id: SRC-051
+  type: northstar_evidence
+  location: .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-native-dependency-reconciliation.yaml
+  summary: "Verified native GitHub dependency that records Verdify Skills migration #3044 as blocked by shared platform issue #3047 and retires duplicate platform-issue proposals without granting approval."
+  evidence_status: verified
 goals:
 - id: NSG-001
   statement: Turn registered research, ideation, transcript input, feedback, and requirements into durable North Star planning artifacts before implementation planning.
@@ -462,7 +472,7 @@ goals:
   success_signals:
   - Every July 9 adversarial-review recommendation is the planning default unless new evidence and explicit authority approve an exception.
   - Pre-lock safety work stays narrow while exact-artifact publication and installation use trusted staging, integrity and conflict checks, atomic promotion, and rollback.
-  - Verdify Skills remains proprietary and internal-first; its already-public repository preserves GitHub users' in-Service rights under GitHub's Terms, while `UNLICENSED` makes no additional project grant beyond those Terms and applicable law for off-platform use, modification, redistribution, derivatives, or package use unless legal/IP approves separate terms.
+  - Verdify Skills remains proprietary and internal-first; possible future open source or reference use creates no current community-growth objective. The exact public-rights, off-platform/package-use, and contributor-intake contract is a proposed iteration-26 delta under NSR-047 and NSQ-017, not part of the locked July 9 decision set.
   - No backwards compatibility is promised; deprecated or redundant capability is deleted after atomic consumer convergence.
   - Verdify Skills, Agent Platform, Orbit, and Gravity operate as four co-equal active pilots under the root planning outer loop while retaining project-local authority.
   - Jason records North Star lock; Jason or James may approve a release; James is the npm publisher; independent PR review remains separately evidenced.
@@ -473,7 +483,7 @@ goals:
 - id: NSG-031
   statement: Make Verdify Skills build, validation, review, promotion, package distribution, non-production acceptance, rollback, and recovery reproducible on the local k3s platform without any load-bearing GitHub Actions, GitHub-hosted runner, public package registry, public release asset, or GitHub-only authority.
   priority: must
-  source_ids: [SRC-043, SRC-044, SRC-045, SRC-046]
+  source_ids: [SRC-043, SRC-044, SRC-045, SRC-046, SRC-050, SRC-051]
   success_signals:
   - An internal Git/review/status authority can receive source and events, enforce equivalent protected-branch and independent-review policy, and remain usable while GitHub is unavailable.
   - Argo Events and Argo Workflows execute repository-owned validation, policy, build, package, provenance, promotion, rollback, and recovery contracts from immutable local dependencies.
@@ -758,7 +768,7 @@ requirements:
 - id: NSR-038
   kind: functional
   statement: A capability-qualified, digest-pinned supported Forgejo release must become the internal source, backlog, pull-request, review, required-status, protected-branch, identity, and audit authority for Verdify Skills and its load-bearing portfolio work before GitHub can become an output-only mirror.
-  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-047]
+  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-047, SRC-050, SRC-051]
   acceptance_signals:
   - The provider contract proves supported-release and upgrade policy, topology, internal IdP/MFA, immutable subjects, service identities, CODEOWNERS translation, stale-review invalidation, conversation resolution, trusted statuses, protection, audit, backup, restore, RPO/RTO, and operator ownership.
   - Metadata migration covers issues, pull requests, comments, reviews, statuses, relationships, audit refs, and the `jvallery/agents` portfolio work record; imported decisions remain historical and open changes are re-reviewed and rechecked internally.
@@ -767,7 +777,7 @@ requirements:
 - id: NSR-039
   kind: functional
   statement: A trusted Forgejo event-admission service must verify and normalize raw webhooks, persist a delivery transaction and effect ledger, and then drive a persistent Argo Events bus and repository-owned Argo Workflows for validation, policy, packaging, promotion proposals, recovery, and evidence.
-  source_ids: [SRC-028, SRC-043, SRC-044, SRC-045, SRC-047]
+  source_ids: [SRC-028, SRC-043, SRC-044, SRC-045, SRC-047, SRC-050]
   acceptance_signals:
   - Admission verifies the raw-body signature, key version, provider/repository/event/ref allowlist, delivery ID, payload hash and size, rotation overlap, and authoritative re-fetch before every protected effect.
   - A PostgreSQL-backed or separately approved equivalent ledger owns atomic uniqueness, payload hash, monotonic attempts, compare-and-set states, Workflow/status/publish/promote/rollback/mirror receipts, replay authorization, retention, and recovery.
@@ -796,7 +806,7 @@ requirements:
 - id: NSR-042
   kind: non_functional
   statement: Every build-time and runtime dependency required for local validation, packaging, promotion, recovery, and acceptance must resolve from an internal mirror or Zot by immutable digest or checksum.
-  source_ids: [SRC-043, SRC-044, SRC-047]
+  source_ids: [SRC-043, SRC-044, SRC-047, SRC-050]
   acceptance_signals:
   - The inventory includes Git remotes, controller/worker/base/tool/harness images, Forgejo/Argo charts, OS/Ruby/Node packages, Kaniko/build tools, ORAS/signing tools, release downloads, generated assets, bootstrap and recovery inputs, origin, internal mirror, immutable identity, refresh owner, and exception status.
   - A dedicated acceptance node starts with empty CRI and task caches; node/gateway and participating controller/repo-server/worker/consumer egress deny public Git, registries, package endpoints, and release assets while internal DNS/forge/Zot/telemetry allowlists remain auditable.
@@ -816,7 +826,7 @@ requirements:
 - id: NSR-044
   kind: constraint
   statement: Migration must use staged coexistence and an attended cutover; no GitHub Action, required check, runner, credential, npm publication, GitHub Release, or GitHub authority may be disabled or removed until local parity and rollback are independently proven.
-  source_ids: [SRC-043, SRC-044, SRC-046, SRC-047]
+  source_ids: [SRC-043, SRC-044, SRC-046, SRC-047, SRC-050, SRC-051]
   acceptance_signals:
   - An isolated imported repository first completes a cold, credential-denied GitHub-unavailable rehearsal before live dual-run; live parity then reaches every approved threshold with zero false acceptance.
   - A coordinated snapshot covers forge Git and collaboration metadata, IdP/team/protection/webhook state, delivery ledger and Workflow archive, Zot subjects/referrers, GitOps source, signing trust, evidence, and mirrors; restore is the post-cutover rollback path because Git push mirroring is not metadata failback.
@@ -833,7 +843,7 @@ requirements:
 - id: NSR-046
   kind: constraint
   statement: A versioned exception ledger must classify load-bearing and cutover-blocking dependencies; no exception or human waiver may satisfy completion while internal source, backlog, review, status, package, signing, GitOps, cold-node, recovery, or required observed-state independence remains external or unreadable.
-  source_ids: [SRC-043, SRC-044, SRC-046, SRC-047]
+  source_ids: [SRC-043, SRC-044, SRC-046, SRC-047, SRC-050]
   acceptance_signals:
   - Every record includes dependency class, `load_bearing`, `cutover_blocking`, owner, reason, scope, risk, expiry, immutable replacement, detection probe, fallback, remediation issue, and closure evidence.
   - The initial ledger includes unknown organization-level GitHub controls, portfolio backlog authority, public source/mirrors, npm/GitHub Releases, public chart/image origins, mutable tool dependencies, and unreadable live identity/Argo/Zot/GitOps state.
@@ -853,18 +863,18 @@ requirements:
 - id: NSR-048
   kind: non_functional
   statement: Platform, source-control, security, SRE, backup, finance, and release owners must accept a measurable operating envelope before final lock and exact implementation SLOs before dual-run.
-  source_ids: [SRC-043, SRC-044, SRC-047]
+  source_ids: [SRC-043, SRC-044, SRC-047, SRC-050]
   acceptance_signals:
-  - The review records accountable service, on-call, source-control, security, SRE, backup/recovery, finance, Skills release, and governance owners plus their explicit acceptance or revision of every bound.
+  - The review assigns stable `OWN-001` through `OWN-009` roles to accountable humans by immutable subject and versioned authority reference, then records one `accept`, `revise`, or `reject` entry for every applicable owner/threshold pair in `OE-001` through `OE-034`; missing rows, rejections, or conflicting revisions keep the gate open.
   - Initial proposed scope is one isolated rehearsal repository plus the live Verdify Skills repository, at most 500 admitted events per day and 20 per minute burst, and a ten-minute maximum ordinary event age unless an authorized replay record exists.
-  - Resource and cost bounds are two concurrent workflows, one release per day, 16 vCPU, 32 GiB memory, 200 GiB incremental retained storage, USD 250 per month incremental infrastructure spend, four steady-state operator hours per week, and a 30-day maximum dual-run without extension.
+  - Resource and cost bounds are two concurrent workflows, one release per day, 16 vCPU, 32 GiB memory, 200 GiB incremental retained storage, USD 250 per month incremental infrastructure spend, four steady-state operator hours per week, and at most 30 consecutive dual-run days before an explicit extension decision.
   - Availability and support bounds are 99.5 percent monthly internal-path availability excluding approved maintenance, 24x7 automated alerting, and required human attendance for release and cutover windows.
   - Recovery and retention bounds are forge RPO at most 5 minutes and RTO at most 2 hours, Git mirror freshness at most 15 minutes, package mirror freshness at most 4 hours, coordinated encrypted snapshot age at most 24 hours, restore-rehearsal age at most 30 days, raw-event and transaction/effect/status/audit evidence retention at least 365 days, and supported package subjects and signed envelopes retained through support plus 365 days after retirement.
-  - Cutover thresholds include 100 percent logical-check and failure-fixture parity, zero false acceptance, 20 consecutive change transactions, three release/rollback transactions, p95 queue under 2 minutes, p95 validation under 15 minutes, promotion health under 10 minutes, rollback under 10 minutes, a 4-hour cold GitHub-unavailable window, a UTC durability re-probe 30 minutes after the initial green result, and 14 healthy observation days.
+  - Cutover thresholds include 100 percent logical-check and failure-fixture parity, zero false acceptance, at least 20 consecutive distinct successful end-to-end change transactions, at least 3 consecutive distinct successful release-and-rollback transaction pairs, p95 queue under 2 minutes, p95 validation under 15 minutes, promotion health under 10 minutes, rollback under 10 minutes, a 4-hour cold GitHub-unavailable window, a UTC durability re-probe 30 minutes after the initial green result, and 14 healthy observation days.
 - id: NSR-049
   kind: constraint
   statement: "The migration must record closed issues #120 and #121 as completed absorbed predecessor contracts, preserve their safety outcomes and current four-project waves, and execute one bounded vertical slice before broader platform or customer expansion."
-  source_ids: [SRC-037, SRC-038, SRC-043, SRC-044, SRC-046, SRC-047]
+  source_ids: [SRC-037, SRC-038, SRC-043, SRC-044, SRC-046, SRC-047, SRC-051]
   acceptance_signals:
   - "Closed issue #120 exact-package/atomic-install trust and closed issue #121 protected-development/release-only-main outcomes remain completed prerequisites, are absorbed into local parity and lane contracts, and are not redispatched or duplicated; protected `dev` and release-only `main` controls remain coexistence gates until authority cutover."
   - The first slice is one non-destructive Forgejo event -> trusted five-check state -> package subject/envelope -> internal desired-state PR -> consumer health -> rollback transaction on an isolated imported repository.
@@ -1272,7 +1282,7 @@ architecture_principles:
   purpose: Prevents a cosmetic workflow migration from leaving source, reviews, required statuses, or promotion stranded on GitHub.
   linked_goal_ids: [NSG-031]
   linked_requirement_ids: [NSR-038, NSR-044]
-  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045]
+  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-050, SRC-051]
 - id: NSP-033
   statement: The repository owns validation and release behavior; the platform owns reusable event, workflow, registry, identity, GitOps, and observability mechanisms.
   purpose: Keeps policy reviewable with the code while avoiding one-off cluster automation and duplicated controllers.
@@ -1427,7 +1437,7 @@ milestones:
   exit_criteria:
   - All five protected checks and deliberately failing fixtures have 100% logical and failure parity, zero false accepts, exact-head currentness, and trusted-issuer evidence on both paths.
   - The exact tested OCI subject and one signed immutable release envelope enumerate the complete pre-promotion package, provenance, SBOM, signing, attestation, source, protected-policy, test, and critic digests; the ledger records later approval, consumer, rollback, release, and mirror receipts.
-  - Twenty change transactions and three release/rollback transactions satisfy the approved queue, validation, health, and rollback objectives.
+  - At least twenty consecutive distinct successful end-to-end change transactions and at least three consecutive distinct successful release-and-rollback transaction pairs satisfy the approved queue, validation, health, and rollback objectives.
   requirement_ids: [NSR-039, NSR-040, NSR-043, NSR-045, NSR-048]
 - id: NSM-013
   name: GitOps non-production and offline acceptance
@@ -1828,7 +1838,7 @@ open_questions:
   question: 'Final-lock decision: approve a capability-qualified supported Forgejo release (v16 is the current review candidate) as the internal primary source, repository issue, pull-request, review, required-status, and protected-branch authority, with GitHub retained as an output mirror through coexistence and the observation window?'
   owner: Jason
   blocking: true
-  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-046]
+  source_ids: [SRC-017, SRC-043, SRC-044, SRC-045, SRC-046, SRC-050, SRC-051]
 - id: NSQ-016
   question: 'Final-lock decision: approve a package-specific Zot OCI subject, a signed immutable envelope for the complete pre-promotion graph, durable later-effect receipts, and a stable-harness/fresh-volume GitOps consumer as the authoritative Verdify release and deployed-acceptance model?'
   owner: Jason
@@ -1840,20 +1850,20 @@ open_questions:
   blocking: true
   source_ids: [SRC-038, SRC-043, SRC-044, SRC-046, SRC-047, SRC-048, SRC-049]
 - id: NSQ-018
-  question: 'Final-lock decision: approve migration of the load-bearing repository and portfolio work authority—including provider-neutral issue and change IDs, portfolio metadata, historical-import markers, and cross-system links—while retaining jvallery/agents#3044 as the GitHub-side global migration record until cutover reconciliation?'
+  question: 'Final-lock decision: approve migration of the load-bearing repository and portfolio work authority—including provider-neutral issue and change IDs, portfolio metadata, historical-import markers, and cross-system links—while retaining jvallery/agents#3044 as the GitHub-side global migration record, natively blocked by shared platform issue #3047, until cutover reconciliation?'
   owner: Jason
   blocking: true
-  source_ids: [SRC-043, SRC-044, SRC-047]
+  source_ids: [SRC-043, SRC-044, SRC-047, SRC-050, SRC-051]
 - id: NSQ-019
-  question: 'Final-lock decision: approve the complete proposed envelope of one rehearsal and one live repository; 500 admitted events per day and 20 per minute burst; ten-minute maximum ordinary event age except authorized replay; two workflows; one release per day; 16 vCPU, 32 GiB memory, 200 GiB retained storage, USD 250 per month, four operator-hours per week, and thirty dual-run days; 99.5 percent monthly availability excluding approved maintenance; 24x7 automated alerting with attended release/cutover windows; 24-hour snapshot and 30-day restore-rehearsal age; 365-day evidence and support-plus-365-day release retention; 100 percent logical/failure parity, zero false accepts, twenty change and three release/rollback transactions, p95 queue under two minutes, validation under fifteen minutes, health and rollback under ten minutes, Forgejo RPO at most five minutes/RTO at most two hours, Git mirror freshness at most fifteen minutes, package mirror freshness at most four hours, four GitHub-unavailable hours, a 30-minute delayed re-probe, and fourteen healthy observation days?'
-  owner: Jason, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner, Skills release owner, and Skills governance owner
+  question: 'Final-lock decision: after every required role has an immutable human subject and durable authority assignment, approve the complete pilot envelope represented by exact thresholds OE-001 through OE-034 and their applicable-owner mapping in NORTHSTAR_INTERVIEW.md?'
+  owner: OWN-001 through OWN-009
   blocking: true
-  source_ids: [SRC-043, SRC-047]
+  source_ids: [SRC-043, SRC-047, SRC-050]
 - id: NSQ-020
   question: 'Final-lock decision: approve internal IdP-backed immutable identities, a dedicated raw-body event admission service plus durable transaction ledger, minimally scoped trusted status reporter, and separate candidate, trusted validator, critic, integrator, publisher, signer, mirror, GitOps, verifier, approver, and recovery principals as non-negotiable trust boundaries?'
   owner: Jason, security owner, and Agent Platform owner
   blocking: true
-  source_ids: [SRC-044, SRC-047]
+  source_ids: [SRC-044, SRC-047, SRC-050]
 conflicts:
 - id: CON-001
   statement: Wave branch proposals conflict with current one issue/lane/branch/worktree/session/PR policy.
@@ -2371,6 +2381,24 @@ traceability:
 - from: SRC-047
   to: NSR-049
   relationship: sequences the first bounded slice and existing release-security work before broader cutover
+- from: SRC-050
+  to: NSR-038
+  relationship: "proves shared platform issue #3047 is still an open dependency rather than an approved internal authority"
+- from: SRC-050
+  to: NSR-042
+  relationship: proves generic local templates still retain public and GitHub-dependent supply inputs
+- from: SRC-050
+  to: NSR-046
+  relationship: preserves RBAC-denied and unreadable authority, Argo, and Zot state as explicit cutover-blocking exceptions
+- from: SRC-051
+  to: NSR-038
+  relationship: "records #3044 blocked_by #3047 as the native repository-to-platform authority dependency"
+- from: SRC-051
+  to: NSR-044
+  relationship: prevents coexistence planning from dispatching duplicate shared authority or mirror work
+- from: SRC-051
+  to: NSR-049
+  relationship: "keeps shared #3047 scope separate from Verdify Skills-owned #3044 implementation slices"
 proposed_artifact_changes:
 - path: skills/northstar-research-ingest
   change_type: create
@@ -2736,6 +2764,18 @@ proposed_artifact_changes:
   change_type: create
   summary: Register current Forgejo, Argo Events, and OCI artifact primary-source capabilities and limitations.
   approval_required: false
+- path: .agent-workflow/northstar/collateral/NSE-20260727-shared-local-delivery-authority-live-state.yaml
+  change_type: create
+  summary: "Register live #3047, required-check, Argo Workflow, public-input, registry, and access-limit evidence for the shared platform dependency."
+  approval_required: false
+- path: .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-native-dependency-reconciliation.yaml
+  change_type: create
+  summary: "Register the verified #3044 blocked_by #3047 native dependency and retirement of duplicate platform-issue proposals."
+  approval_required: false
+- path: .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  change_type: create
+  summary: Bind the exact final-candidate packet and North Star gate hashes to fresh product/business, architecture/delivery/scalability, and security/SRE/audit verdicts without mutating reviewed files.
+  approval_required: false
 - path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   change_type: update
   summary: Propose iteration 26 local-delivery independence outcomes, personas, acceptance criteria, coexistence, and cutover boundaries.
@@ -2853,21 +2893,17 @@ issue_recommendations:
   repository: VerdifyConsultancy/gravity
   body_summary: "Created as VerdifyConsultancy/gravity#406 and #407; reconcile current authority and hydrate resolvable citations across HTTP and MCP."
   labels: [northstar, retrieval, integration]
-- title: Establish the internal Forgejo delivery authority and GitHub mirror
+- title: Establish internal delivery authority, GitHub mirroring, and offline dependency supply
   repository: jvallery/agents
-  body_summary: Deploy and operate a capability-qualified supported Forgejo release with internal IdP, repository and portfolio-work migration, raw-body admission, durable transaction ledger, trusted statuses, reviews, protection, audit, coordinated backup/restore, observability, and GitHub output mirroring; prove the contract under GitHub unavailability before authority cutover.
-  labels: [platform, source-control, migration, security]
-- title: Make Agent Fleet CI, package publication, and dependencies local and immutable
+  body_summary: "Tracked by open jvallery/agents#3047; qualify and operate the internal forge/IdP/event/status/review/promotion authority plus immutable OCI, chart, package, release-asset, and vendor mirrors, then prove cold-worker public denial and GitHub-unavailable delivery before any consumer cutover. Do not create a duplicate platform issue."
+  labels: [platform, source-control, migration, security, argo, zot, supply-chain, gitops]
+- title: Implement transport-neutral Verdify validation, release, and authority contracts for the Verdify Skills consumer
   repository: jvallery/agents
-  body_summary: Extend the repository CI contract and Argo templates for package artifacts, ORAS/Zot publication, signing and provenance, internal image/chart/package mirrors, cold-node public-egress denial, event replay, recovery, and versioned exception-ledger enforcement.
-  labels: [argo, zot, supply-chain, gitops]
-- title: Implement transport-neutral Verdify validation, release, and authority contracts
-  repository: VerdifyConsultancy/verdify-skills
-  body_summary: Replace GitHub-specific checks, receipts, backlog/review/release interfaces, and package publication assumptions with provider-neutral contracts; retain compatibility adapters during coexistence and preserve protected-base validation and independent exact-head criticism.
+  body_summary: "Decompose only as issue-backed Verdify Skills work under consumer record #3044 after protected planning locks; #3044 owns repository adapters and acceptance while shared authority and offline supply remain blocked by #3047. Do not duplicate #3047."
   labels: [delivery, governance, packaging, migration]
 - title: Prove Verdify non-production promotion, rollback, and attended cutover
   repository: jvallery/agents
-  body_summary: Add the sole-owner Argo CD package-consumer Application, functional and failure-injection probes, rollback and delayed durability evidence, parity matrix, attended GitHub-unavailable runbook, dead-man behavior, and post-cutover observation and retirement gates.
+  body_summary: "Decompose only under consumer record #3044 after protected planning locks: prove the sole-owner Argo CD package consumer, failures, rollback, delayed durability, parity, attended GitHub-unavailable operation, dead-man behavior, observation, and retirement gates while consuming—not duplicating—the shared #3047 dependency."
   labels: [gitops, acceptance, rollback, change-gate]
 gate_recommendations:
 - type: northstar
@@ -2880,23 +2916,23 @@ gate_recommendations:
   blocking: false
 - type: platform_security_authority
   owner: Jason, platform owner, and security owner
-  reason: Broad domain-agent access, credential validation, and self-service storage mount changes require an owning implementation gate before those actions; this recommendation is nonblocking for the approved North Star and project-definition discovery.
+  reason: Broad domain-agent access, credential validation, and self-service storage mount changes require an owning implementation gate before those actions; this recommendation is nonblocking for iteration-26 final lock and, after lock, project-definition discovery.
   blocking: false
 - type: fleet_bootstrap_readiness
   owner: Jason and platform owner
-  reason: Running bootstrap across 30+ repo controllers requires an owning readiness gate after namespace naming, inventory shape, safe credential probes, and controller recovery behavior are specified; this recommendation is nonblocking for the approved North Star and project-definition discovery.
+  reason: Running bootstrap across 30+ repo controllers requires an owning readiness gate after namespace naming, inventory shape, safe credential probes, and controller recovery behavior are specified; this recommendation is nonblocking for iteration-26 final lock and, after lock, project-definition discovery.
   blocking: false
 - type: package_publication_trust
   owner: Jason or James
-  reason: Publication and installation require a separate owning release gate proving exact packed-artifact tests, trusted validation, atomic promotion, rollback, and no preexisting-target execution; this recommendation is nonblocking for the approved North Star and project-definition discovery.
+  reason: Publication and installation require a separate owning release gate proving exact packed-artifact tests, trusted validation, atomic promotion, rollback, and no preexisting-target execution; this recommendation is nonblocking for iteration-26 final lock and, after lock, project-definition discovery.
   blocking: false
 - type: orbit_connector_security
   owner: Jason, Orbit owner, and security/privacy owner
-  reason: Broad personal and enterprise connectors require a separate owning security gate before fleet-actuation trust, proving principal separation or policy mediation, approved encrypted data storage, source-aware governance, and negative authorization tests; this recommendation is nonblocking for the approved North Star and project-definition discovery.
+  reason: Broad personal and enterprise connectors require a separate owning security gate before fleet-actuation trust, proving principal separation or policy mediation, approved encrypted data storage, source-aware governance, and negative authorization tests; this recommendation is nonblocking for iteration-26 final lock and, after lock, project-definition discovery.
   blocking: false
 - type: cross_project_contract
   owner: Root planner and four pilot owners
-  reason: The first integrated self-building slice requires a separate owning contract gate for the PilotProject contract and supported provider capabilities; this recommendation is nonblocking for project-definition discovery and project-local development under each owning backlog.
+  reason: The first integrated self-building slice requires a separate owning contract gate for the PilotProject contract and supported provider capabilities; this recommendation is nonblocking for iteration-26 final lock and, after lock, project-definition discovery and project-local development under each owning backlog.
   blocking: false
 - type: source_control_authority
   owner: Jason, Agent Platform owner, source-control service owner, and security owner
@@ -2924,8 +2960,8 @@ gate_recommendations:
   blocking: true
 handoff:
   next_skill: northstar-planning
-  next_mode: review-feedback
-  reason: "Iteration 26 is incorporating the registered independent audit. A fresh product, architecture, security, and SRE re-review must return no required changes before the packet returns to northstar-interview for NSQ-015 through NSQ-020 and final lock."
+  next_mode: human-review
+  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign each required OWN-* role by immutable subject and durable authority evidence, record every applicable OWN-*/OE-* disposition without unresolved conflict, resolve NSQ-015 through NSQ-020, and request Jason's separate explicit final-lock phrase. Until that evidence exists or if any hash changes, return to adversarial-review; no approval is inferred."
 approval:
   status: pending
   approver:

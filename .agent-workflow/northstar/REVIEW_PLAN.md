@@ -10,11 +10,15 @@ Reviewers: Jason, James, Skills governance/release owner, legal/IP owner, Agent 
 ## Decision Requested
 
 The first product/business, architecture/delivery, and security/SRE review
-returned required changes. Those changes were incorporated, and a fresh
-hash-bound re-review across all three lenses returned
-`no_changes_required`. The remaining decision path is:
+returned required changes. An earlier hash-bound candidate then received three
+`no_changes_required` verdicts, but five reviewed artifacts changed afterward;
+that historical result is not proof for the current bytes. The final candidate
+may advance only when a separate evidence record binds these exact files and
+the North Star gate to three fresh `no_changes_required` verdicts without
+mutating the reviewed packet. Once that record exists, the remaining decision
+path is:
 
-1. inspect the clean re-review evidence;
+1. inspect the exact final-candidate re-review evidence;
 2. record Agent Platform, source-control, security, SRE, backup/recovery,
    finance, Skills release, governance, and legal/IP dispositions;
 3. then ask Jason to resolve `NSQ-015` through `NSQ-020`; and
@@ -39,7 +43,10 @@ cluster mutation, cutover, production deployment, or destructive retirement.
 - `northstar://evidence/NSE-20260727-local-delivery-adversarial-audit`
 - `northstar://evidence/NSE-20260727-verdify-skills-public-visibility-license`
 - `northstar://evidence/NSE-20260727-github-public-repository-license-terms`
-- `northstar://evidence/NSE-20260727-local-delivery-clean-rereview`
+- `northstar://evidence/NSE-20260727-shared-local-delivery-authority-live-state`
+- `northstar://evidence/NSE-20260727-local-delivery-native-dependency-reconciliation`
+- `northstar://evidence/NSE-20260727-local-delivery-clean-rereview` (historical candidate only)
+- `northstar://evidence/NSE-20260727-local-delivery-final-candidate-rereview`
 - `northstar://evidence/NSE-20260623-source-control-migration-local-forges`
 - `northstar://evidence/NSE-20260623-kubernetes-gitops-cicd-cardinality`
 - `northstar://evidence/NSE-20260623-environment-gitops-implementation-best-p`
@@ -50,6 +57,7 @@ cluster mutation, cutover, production deployment, or destructive retirement.
 - `.agent-workflow/strategy/state-of-union.md`
 - `.agent-workflow/strategy/github-backlog-sync.yaml`
 - `jvallery/agents#3044`
+- `jvallery/agents#3047`
 
 ## Content Review Checks
 
@@ -105,18 +113,30 @@ cluster mutation, cutover, production deployment, or destructive retirement.
   re-probe, and observation thresholds.
 - [x] Closed issues #120 and #121 are completed absorbed predecessor contracts,
   carried into #3044/WAVE-011 without redispatch or parallel duplicate work.
+- [x] Shared platform issue #3047 owns internal Git/event/status authority and
+  offline dependency supply; #3044 remains the Verdify Skills consumer record,
+  the native `#3044 blocked_by #3047` edge is recorded, duplicate issue
+  proposals are retired, and neither issue's unapproved proposal is treated as
+  authority.
+- [x] `NORTHSTAR_INTERVIEW.md` defines stable `OWN-001` through `OWN-010`
+  role-assignment slots and exact `OE-001` through `OE-034` threshold rows with
+  units, applicable owners, required row-level fields, and conflict handling.
+  Pending identities and dispositions remain blockers.
 - [x] Iteration 25 remains the protected authority and this packet records no
   inferred approval.
-- [x] Fresh product/business re-review returns no required changes.
-- [x] Fresh architecture/delivery/scalability re-review returns no required
-  changes.
-- [x] Fresh security/SRE/audit re-review returns no required changes.
-- [ ] Agent Platform, source-control, security, SRE, backup/recovery, finance,
-  Skills release, governance, and legal/IP owner dispositions are recorded
-  before Jason's final-lock question.
-- [ ] Each named owner disposition explicitly accepts or revises every
-  applicable `NSQ-019` value; a generic approval does not satisfy the operating
-  envelope gate.
+- Exact-review completion is not self-asserted by this mutable checklist.
+  `NSE-20260727-local-delivery-final-candidate-rereview` is the sole completion
+  record: it must bind this exact packet and gate manifest to separate
+  product/business, architecture/delivery/scalability, and security/SRE/audit
+  `no_changes_required` verdicts. A missing record, missing lens, different
+  verdict, or hash mismatch returns the packet to adversarial review.
+- [ ] Every `OWN-001` through `OWN-010` role needed by `NSQ-015` through
+  `NSQ-020` names one accountable human by immutable IdP subject and cites a
+  versioned durable authority assignment before Jason's final-lock question.
+- [ ] The disposition ledger contains one identity-bound `accept`, `revise`, or
+  `reject` record for every applicable `OWN-*`/`OE-*` pair. Missing rows,
+  rejections, or unresolved conflicting revisions keep `NSQ-019` open; a
+  generic approval does not satisfy the operating-envelope gate.
 
 ## Adversarial Review Lenses
 
@@ -145,8 +165,10 @@ findings; it may not infer approval.
    Forgejo/IdP/portfolio migration,
    admission/ledger/status, immutable-dependency, signing, GitOps, public
    support, and coordinated-restore contract tests without changing authority.
-5. Twenty change and three release/rollback transactions with 100% logical and
-   failure parity, zero false accepts, trusted issuers, and objective latency.
+5. At least twenty consecutive distinct successful end-to-end change
+   transactions and at least three consecutive distinct successful
+   release-and-rollback transaction pairs with 100% logical and failure parity,
+   zero false accepts, trusted issuers, and objective latency.
 6. Exact package subject, signed complete envelope, separated publisher/signer,
    Zot ACL/retention/GC/backup, and public-mirror verification.
 7. Empty-node/CRI-cache full-boundary denied-egress, stable-harness fresh-volume
@@ -178,9 +200,13 @@ North Star lock or guessing protected authority.
 
 ## Handoff
 
-Current route is `northstar-planning / review-feedback`. After the four fresh
-review/owner-disposition checkboxes close, route to
-`northstar-interview / question-pack`. If Jason then explicitly resolves the
-six questions and locks iteration 26, update
-the canonical product, architecture, structured plan, loop record, interview,
-gate, and review packet, then route to `project-definition / discovery`.
+Current route remains `northstar-planning / review-feedback` until
+`NSE-20260727-local-delivery-final-candidate-rereview` binds the exact packet
+to all three required `no_changes_required` verdicts. Then route once to
+`northstar-planning / human-review` using `NORTHSTAR_INTERVIEW.md`: assign every
+required `OWN-*` role by immutable subject and durable authority evidence,
+record every applicable `OWN-*`/`OE-*` disposition without unresolved
+conflict, and resolve `NSQ-015` through `NSQ-020`. Captured answers return
+through `northstar-planning / review-feedback`. Only after Jason separately
+locks iteration 26 may the canonical artifacts route to
+`project-definition / discovery`.

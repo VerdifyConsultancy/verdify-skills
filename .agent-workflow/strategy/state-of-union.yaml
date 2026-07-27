@@ -6,7 +6,7 @@ strategy_id: verdify-skills-local-ci-migration-2026-07-27
 status: blocked
 repository: VerdifyConsultancy/verdify-skills
 baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
-assessed_at: '2026-07-27T18:01:48Z'
+assessed_at: '2026-07-27T21:00:36Z'
 inputs:
 - id: IN-001
   type: user_directive
@@ -43,6 +43,11 @@ inputs:
   location: "npm @verdify-cli/cli and GitHub release v1.3.0"
   summary: "Version 1.3.0 is currently published to npm and GitHub Releases with immutable checksums and provenance assets; no equivalent locally authoritative package release was found."
   evidence_status: verified
+- id: IN-008
+  type: github_dependency
+  location: "jvallery/agents#3044 blocked_by jvallery/agents#3047; draft PR jvallery/agents#3060"
+  summary: "The shared internal Git/event/status and offline-supply work is tracked once in open #3047, with proposed North Star changes in draft PR #3060; #3044 is natively blocked by #3047, and the draft PR's exact-head checks are failing."
+  evidence_status: verified
 source_freshness:
 - surface: git
   source_ref: origin/dev
@@ -55,15 +60,15 @@ source_freshness:
   captured_at: '2026-07-27T18:01:48Z'
   limitation: "The fleet work board is authoritative for this migration; existing Verdify repository issues remain relevant delivery history."
 - surface: github_pull_requests
-  source_ref: "live VerdifyConsultancy/verdify-skills pull request API"
+  source_ref: "live VerdifyConsultancy/verdify-skills pull request API and jvallery/agents#3060"
   status: fresh
-  captured_at: '2026-07-27T18:01:48Z'
-  limitation: "No pull request is open."
+  captured_at: '2026-07-27T21:00:36Z'
+  limitation: "No Verdify Skills pull request is open; jvallery/agents#3060 is a draft platform North Star proposal with failing exact-head checks."
 - surface: github_checks
-  source_ref: "latest 20 Verdify Skills Actions runs"
+  source_ref: "latest 20 Verdify Skills Actions runs and exact-head checks for jvallery/agents#3060"
   status: fresh
-  captured_at: '2026-07-27T18:01:48Z'
-  limitation: "The latest runs are from 2026-07-12; validate and compliance-selftest passed while delivery-gate failed on the dev push."
+  captured_at: '2026-07-27T21:00:36Z'
+  limitation: "The latest Verdify runs are from 2026-07-12; validate and compliance-selftest passed while delivery-gate failed on the dev push. Draft platform PR #3060 also has failing exact-head checks."
 - surface: github_deployments
   source_ref: "live Verdify Skills deployment and environment API"
   status: fresh
@@ -274,7 +279,7 @@ issue_inventory:
   - "North Star migration lock"
   - "project-definition refresh"
   - "architecture and module-contract refresh"
-  - "internal forge/authority decision or explicit hard-blocker disposition"
+  - "native blocker jvallery/agents#3047 for shared internal authority and offline dependency supply"
   action: "Keep as the umbrella and durable handoff; update it after every lifecycle boundary."
 - issue: 70
   title: "Route engine has no change_class; trivial changes traverse the full lifecycle"
@@ -290,7 +295,7 @@ issue_inventory:
   rationale: "Its check-enforcement intent overlaps the replacement path but depends on issue 75 and the new local authority contract."
   dependencies:
   - "Verdify Skills issue 75"
-  - "local check/status authority from #3044"
+  - "repo-local check/status adoption under #3044, blocked by shared authority #3047"
   action: "Reconcile as a dependency or child during issue decomposition; do not duplicate its acceptance boundary."
 - issue: 75
   title: "Build an executable eval runner"
@@ -322,22 +327,16 @@ issue_inventory:
   dependencies:
   - "completed issue #120 contract"
   action: "Absorb the completed outcomes into #3044/WAVE-011 protected-development and promotion contracts; do not redispatch issue #121."
-- issue: null
-  title: "Internal Git, event, status, approval, and promotion authority"
-  state: MISSING
-  classification: missing
-  rationale: "Source and live searches found generic local CI but no verified internal forge/mirror and no GitHub-unavailable end-to-end authority."
+- issue: 3047
+  title: "[ACP][Platform] Internal Git/event/status authority and offline dependency mirrors for Actions-free repo cells"
+  state: OPEN
+  classification: blocked
+  rationale: "This existing shared platform issue owns both internal Git/event/status/approval/promotion authority and immutable offline dependency supply. Draft PR #3060 proposes its North Star but has failing exact-head checks; neither design nor runtime acceptance is approved."
   dependencies:
-  - "platform architecture owner"
-  action: "Create a platform issue after North Star defines the required authority and acceptance interface."
-- issue: null
-  title: "Cold-node immutable dependency and chart mirror proof"
-  state: MISSING
-  classification: missing
-  rationale: "Current templates and Argo Applications retain public canonical image and Helm sources; a warm cache is insufficient."
-  dependencies:
-  - "platform supply-chain owner"
-  action: "Create a platform issue with denied-egress cold-cache acceptance after architecture fixes the mirror contract."
+  - "approved Agent Platform authority and supply-chain North Star"
+  - "named platform, source-control, security, SRE, backup/recovery, and finance owners"
+  - "cold-worker and GitHub-unavailable acceptance"
+  action: "Retain #3044 blocked_by #3047, reconcile draft PR #3060 through its own authority path, and create no duplicate authority or mirror issue."
 gaps:
 - id: GAP-001
   type: product_definition
@@ -359,14 +358,14 @@ gaps:
   apply_through: architecture_contracts
 - id: GAP-004
   type: external_dependency
-  statement: "No verified internal forge/mirror can supply Git fetch, events, status/approval, and promotion while GitHub is unavailable."
-  owner: "Agent Fleet platform"
+  statement: "Open shared issue #3047 and failing-check draft PR #3060 propose the internal authority, but no verified forge/mirror can yet supply Git fetch, events, status/approval, and promotion while GitHub is unavailable."
+  owner: "Agent Fleet platform through jvallery/agents#3047"
   blocking: true
   apply_through: github_dependency
 - id: GAP-005
   type: external_dependency
-  statement: "Fleet templates and Argo Applications retain public image and Helm sources and GitHub-hosted desired state."
-  owner: "Agent Fleet platform"
+  statement: "Open shared issue #3047 owns offline supply, while current fleet templates and Argo Applications still retain public image/Helm sources and GitHub-hosted desired state."
+  owner: "Agent Fleet platform through jvallery/agents#3047"
   blocking: true
   apply_through: github_dependency
 - id: GAP-006
@@ -390,7 +389,7 @@ gaps:
 recommended_sequence:
 - id: SEQ-001
   outcome: "Lock a product and architecture North Star that replaces GitHub/npm load-bearing authority without weakening typed backlog, review, or release invariants."
-  issue_ids: [3044]
+  issue_ids: [3044, 3047]
   prerequisites:
   - "Issue #3044 remains the durable user directive."
   risks:
@@ -398,15 +397,15 @@ recommended_sequence:
   depends_on: []
 - id: SEQ-002
   outcome: "Refresh project definition, architecture ADRs, module contracts, ownership boundaries, local package form, and staged rollback model."
-  issue_ids: [3044]
+  issue_ids: [3044, 3047]
   prerequisites:
   - "SEQ-001 locked North Star"
   risks:
   - "Cross-repository platform changes can be hidden inside a Verdify Skills lane."
   depends_on: [SEQ-001]
 - id: SEQ-003
-  outcome: "Reconcile completed #120/#121 outcomes as absorbed predecessor contracts, then decompose #3044 into issue-backed repo, platform, supply-chain, non-production verification, internal-authority, and attended-cutover slices."
-  issue_ids: [3044, 120, 121]
+  outcome: "Reconcile completed #120/#121 outcomes as absorbed predecessor contracts, retain #3047 as the single shared platform/supply-chain dependency, and decompose only Verdify Skills-owned #3044 adoption, package, parity, non-production verification, and attended-cutover slices."
+  issue_ids: [3044, 3047, 120, 121]
   prerequisites:
   - "SEQ-002 approved contracts"
   - "Issue #120 exact-package trust and issue #121 protected-development outcomes are mapped once into lane contracts."
@@ -425,7 +424,7 @@ recommended_sequence:
   depends_on: [SEQ-003]
 - id: SEQ-005
   outcome: "Prove GitOps-only non-production reconciliation, sole desired-state ownership, rollback, delayed health, denied-public cold-cache operation, and GitHub-unavailable authority."
-  issue_ids: [3044]
+  issue_ids: [3044, 3047]
   prerequisites:
   - "SEQ-004 immutable artifacts"
   - "platform dependencies deployed through their own change gates"
@@ -478,15 +477,15 @@ actions:
   owner: architecture-contracts
   status: proposed
 - id: ACT-006
-  type: create_issue
-  target: "Agent Fleet internal Git/event/status/approval/promotion authority"
-  owner: "Agent Fleet controller"
-  status: proposed
+  type: set_dependency
+  target: "jvallery/agents#3044 blocked_by jvallery/agents#3047"
+  owner: ROOT controller
+  status: applied
 - id: ACT-007
-  type: create_issue
-  target: "Agent Fleet immutable local dependency/chart mirrors and denied-public cold-cache proof"
+  type: no_op
+  target: "Do not create duplicate internal-authority or immutable-mirror issues; jvallery/agents#3047 owns both shared scopes."
   owner: "Agent Fleet controller"
-  status: proposed
+  status: applied
 - id: ACT-008
   type: open_gate
   target: "attended branch/ruleset and legacy-retirement cutover"
@@ -504,11 +503,11 @@ actions:
   status: applied
 handoff:
   next_skill: northstar-planning
-  next_mode: review-feedback
-  reason: "The iteration-26 product, architecture, structured plan, loop, review, interview, evidence, and gate artifacts are incorporating the registered audit; fresh product, architecture, security, SRE, and owner dispositions must close before NSQ-015 through NSQ-020 and final lock."
+  next_mode: human-review
+  reason: "After the separate exact-final-candidate evidence binds the packet and gate to three no_changes_required verdicts, assign every required OWN-* role by immutable subject and durable authority evidence, then collect every applicable OWN-*/OE-* disposition without unresolved conflict before Jason resolves NSQ-015 through NSQ-020 and the separate final-lock decision."
   required_before_handoff:
   - "Preserve existing GitHub Actions, npm, GitHub Release, branch/ruleset, credentials, runners, webhooks, and production state."
-  - "Review NSQ-015 through NSQ-020 and the separate final-lock question in NORTHSTAR_INTERVIEW.md after fresh cross-functional review and owner dispositions close."
+  - "Review NSQ-015 through NSQ-020 and the separate final-lock question in NORTHSTAR_INTERVIEW.md only after fresh cross-functional review, owner assignments, and row-level dispositions close."
   - "Keep internal-forge and cold-cache claims blocked until direct proof exists."
 approval:
   status: pending

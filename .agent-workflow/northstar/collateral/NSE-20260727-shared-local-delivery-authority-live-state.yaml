@@ -1,0 +1,39 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-shared-local-delivery-authority-live-state
+reference: northstar://evidence/NSE-20260727-shared-local-delivery-authority-live-state
+title: Shared Agent Platform local-delivery authority live state
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-27T20:21:45Z'
+source:
+  uri: https://github.com/jvallery/agents/issues/3047
+  original_path: "/tmp/verdify-skills-platform-authority-live-state-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-shared-local-delivery-authority-live-state-verdify-skills-platform-authority-live-state-202"
+  sha256: a3994d0bb21988c1464520facfa1bb0129aac3d8d1fb1f91e694f1221cb48e4e
+summary: 'Read-only GitHub, repository, Argo Workflow, registry, and endpoint evidence
+  showing that shared platform issue #3047 remains open and Verdify Skills has no
+  bound internal delivery authority.'
+tags:
+- argo
+- github-unavailable
+- local-delivery
+- platform
+- zot
+claims:
+- jvallery/agents#3047 remains open with its internal-authority and offline-supply-chain
+  acceptance criteria unchecked.
+- Verdify Skills still has eight active Actions workflows and protected branches require
+  GitHub Actions app-issued checks.
+- Visible generic Argo WorkflowTemplates still depend on GitHub credentials and public
+  canonical image sources, and no exact Verdify Skills Workflow was found.
+- No readable evidence proved a Verdify Skills internal Git/status/approval authority
+  or immutable Zot package acceptance path.
+planning_relevance:
+- 'Makes #3047 an explicit shared platform dependency for #3044 and preserves the
+  implementation block until capability and owner approvals exist.'
+limitations:
+- Available RBAC denied Argo CD, Sensor, EventSource, EventBus, forge namespace, registry
+  namespace, and Zot catalog reads; platform-wide absence cannot be inferred.

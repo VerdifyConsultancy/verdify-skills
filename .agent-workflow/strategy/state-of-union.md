@@ -3,6 +3,7 @@
 Status: blocked
 Baseline: `d226b7f244fd4612ab44739fd275b8158e1d9159`
 Owning work item: `jvallery/agents#3044`
+Shared platform dependency: `jvallery/agents#3047`
 
 ## Outcome
 
@@ -15,10 +16,12 @@ dependencies, coordinated recovery, measurable coexistence, and attended
 cutover. Iteration 25 remains protected because the audit revision is still
 iterating, not locked.
 
-The single next handoff is `northstar-planning / review-feedback`. Fresh
-product/business, architecture/delivery, and security/SRE reviewers plus the
-named service owners must close their dispositions before Jason is asked to
-resolve `NSQ-015` through `NSQ-020` and the separate final-lock decision.
+The next handoff remains blocked inside `northstar-planning`. A separate
+hash-bound record must first prove that fresh product/business,
+architecture/delivery, and security/SRE reviewers returned
+`no_changes_required` for the exact final candidate. Only then may the named
+service owners record row-level dispositions before Jason is asked to resolve
+`NSQ-015` through `NSQ-020` and the separate final-lock decision.
 
 ## Current truth
 
@@ -34,6 +37,12 @@ resolve `NSQ-015` through `NSQ-020` and the separate final-lock decision.
   locally authoritative package release exists.
 - The fleet has generic `repo-validate` and `repo-build` WorkflowTemplates,
   Argo Events objects, Argo Workflows, and Zot publication.
+- Open shared platform issue `jvallery/agents#3047` owns the reusable internal
+  Git/event/status authority and offline dependency supply; draft PR `#3060`
+  proposes its North Star changes but currently has failing exact-head checks.
+  The native GitHub dependency records `#3044 blocked_by #3047`. Neither the
+  issue, dependency edge, nor draft PR grants design, implementation, or
+  cutover authority.
 - Verdify Skills has no `.agent-fleet/ci.yaml`, Dockerfile, Sensor binding,
   local package path, Argo Application, or immutable desired-state pin.
 - The generic fleet path still clones `github.com` with
@@ -54,9 +63,10 @@ resolve `NSQ-015` through `NSQ-020` and the separate final-lock decision.
    and product outcome.
 2. Refresh project definition, architecture ADRs, module contracts, package
    representation, ownership, rollback, and staged migration rules.
-3. Split `#3044` into issue-backed repo, platform, supply-chain,
-   non-production verification, internal-authority, and attended-cutover
-   slices.
+3. Preserve `#3047` as the single shared platform and offline-supply owner.
+   Split only `#3044`'s Verdify Skills adoption, package, parity,
+   non-production verification, and attended-cutover work into issue-backed
+   slices; create no duplicate shared platform issue.
 4. Map closed #120/#121 as completed absorbed predecessors without redispatch,
    then implement isolated identity, admission/ledger, trusted-status, stable
    local validation, and immutable Zot package/envelope publication while
@@ -69,13 +79,16 @@ resolve `NSQ-015` through `NSQ-020` and the separate final-lock decision.
 
 ## Blocking gaps
 
-- The North Star audit revision has not passed fresh re-review or final lock;
-  project definition, architecture, and module contracts remain stale for it.
+- Exact final-candidate re-review evidence, stable named-owner assignments,
+  row-level operating-envelope dispositions, and final lock remain open;
+  project definition, architecture, and module contracts remain stale for the
+  proposal.
 - The local package form is undecided; the fleet CI schema currently requires
   at least one Docker image.
-- Internal Git, event, status, approval, and promotion authority is unproved.
+- Shared issue `#3047` and failing-check draft PR `#3060` track internal
+  authority and offline supply, but the capability is unapproved and unproved.
 - Public image/chart endpoints and GitHub-hosted desired state remain in the
-  platform path.
+  live platform path despite that tracked dependency.
 - There is no clean local run, Zot digest/provenance, non-production
   reconciliation, rollback, delayed re-probe, cold-cache test, or
   GitHub-unavailable test.

@@ -5,7 +5,7 @@ schema_version: '1.0'
 sync_id: gbs-verdify-skills-local-ci-2026-07-27
 status: reconciled
 repository: VerdifyConsultancy/verdify-skills
-captured_at: '2026-07-27T18:01:48Z'
+captured_at: '2026-07-27T21:00:36Z'
 source_authority:
   github_is_authoritative: true
   snapshot_is_cache: false
@@ -14,25 +14,25 @@ source_authority:
   limitations:
   - "Current policy still makes GitHub authoritative; #3044 asks North Star planning to replace its load-bearing role with tested internal authority."
   - "The fleet-wide work item is in jvallery/agents while proposed code remains owned by VerdifyConsultancy/verdify-skills PR branches."
-  - "No project-field or cross-repository dependency mutation was required for this strategy-only reconciliation."
+  - "The native #3044 blocked_by #3047 dependency edge was applied and verified; no project-field mutation was required."
   - "Kubernetes, Argo, Zot, forge, runner, secret, and webhook visibility is bounded by current API and RBAC access."
 snapshot:
   snapshot_ref: null
-  captured_at: '2026-07-27T18:01:48Z'
+  captured_at: '2026-07-27T21:00:36Z'
   freshness: live_only
   api_sources:
   - surface: issues
-    source_ref: "live jvallery/agents#3044 and VerdifyConsultancy/verdify-skills issue API"
+    source_ref: "live jvallery/agents#3044, jvallery/agents#3047, and VerdifyConsultancy/verdify-skills issue API"
     captured: true
-    limitation: "The migration issue was created from the direct user request; no child issues exist yet."
+    limitation: "The repository migration and shared platform dependency are open with no assignees; no Verdify Skills implementation child issues exist yet."
   - surface: pulls
-    source_ref: "live VerdifyConsultancy/verdify-skills PR API"
+    source_ref: "live VerdifyConsultancy/verdify-skills PR API and jvallery/agents#3060"
     captured: true
-    limitation: "No pull request is open."
+    limitation: "No Verdify Skills pull request is open; jvallery/agents#3060 is a draft North Star proposal with failing exact-head checks and grants no platform authority."
   - surface: checks
-    source_ref: "live Actions runs and branch/ruleset APIs"
+    source_ref: "live Verdify Skills Actions/branch APIs and exact-head checks for jvallery/agents#3060"
     captured: true
-    limitation: "Current GitHub checks prove only the legacy path."
+    limitation: "Verdify Skills checks prove only the legacy path; the shared platform North Star draft has failing checks and is not merge-ready."
   - surface: workflow_runs
     source_ref: "latest 20 Verdify Skills workflow runs"
     captured: true
@@ -52,15 +52,15 @@ snapshot:
   - surface: projects
     source_ref: "jvallery/agents work board"
     captured: false
-    limitation: "Issue #3044 is sufficient durable backlog authority for this replan."
+    limitation: "Issues #3044 and #3047 plus their native dependency edge are sufficient durable backlog authority for this replan."
   - surface: sub_issues
     source_ref: "jvallery/agents#3044"
     captured: true
     limitation: "No sub-issues exist yet; decomposition is blocked on protected planning."
   - surface: dependencies
-    source_ref: "issue bodies, approved artifacts, and current platform interfaces"
+    source_ref: "live GitHub native dependency API for jvallery/agents#3044 and #3047"
     captured: true
-    limitation: "Cross-repository dependencies are recorded textually pending issue creation."
+    limitation: "The native edge #3044 blocked_by #3047 is present and reciprocal reads agree; it records sequencing only and grants no approval."
   - surface: timeline
     source_ref: "recent workflow runs, releases, and issue updates"
     captured: true
@@ -88,8 +88,7 @@ issue_findings:
   dependencies:
   - "North Star migration lock"
   - "project-definition and architecture refresh"
-  - "internal authority or hard-blocker disposition"
-  - "immutable dependency mirror contract"
+  - "native blocker jvallery/agents#3047 for shared internal authority and immutable dependency mirrors"
   sub_issues: []
   linked_prs: []
   project_refs: []
@@ -97,9 +96,10 @@ issue_findings:
   - "direct user directive"
   - ".agent-workflow/strategy/state-of-union.yaml"
   - "live repository and fleet source probes"
+  - "NSE-20260727-local-delivery-native-dependency-reconciliation"
   github_refs:
   - https://github.com/jvallery/agents/issues/3044
-  required_action: "Run northstar-planning, then decompose into bounded owner-specific issues before sprint planning."
+  required_action: "Complete the North Star gate, retain #3047 as the shared blocker, then decompose only Verdify Skills-owned adoption and acceptance work into bounded issues before sprint planning."
 - issue: 70
   title: "Route engine has no change_class; trivial changes traverse the full lifecycle"
   state: OPEN
@@ -125,7 +125,7 @@ issue_findings:
   milestone: null
   dependencies:
   - "Verdify Skills issue 75"
-  - "local status/check authority from #3044"
+  - "repo-local check/status adoption under #3044, blocked by shared authority #3047"
   sub_issues: []
   linked_prs: []
   project_refs: []
@@ -205,43 +205,42 @@ issue_findings:
   github_refs:
   - https://github.com/VerdifyConsultancy/verdify-skills/issues/121
   required_action: "Treat as a completed absorbed predecessor contract: carry its protected-development and release-only-main outcomes into #3044/WAVE-011 and do not redispatch issue #121."
-- issue: null
-  title: "Internal Git/event/status/approval/promotion authority"
-  state: MISSING
-  classification: missing
-  labels: [risk:critical]
+- issue: 3047
+  title: "[ACP][Platform] Internal Git/event/status authority and offline dependency mirrors for Actions-free repo cells"
+  state: OPEN
+  classification: blocked
+  labels: [agent-fleet, 'priority:p0', 'risk:high', 'area:infra', 'type:task', 'program:agent-control-plane-v3', 'area:agent-control-plane']
   assignees: []
   milestone: null
   dependencies:
-  - "North Star authority contract"
+  - "Agent Platform North Star and architecture authority"
+  - "named platform, source-control, security, SRE, recovery, and finance owner dispositions"
   sub_issues: []
-  linked_prs: []
+  linked_prs:
+  - "jvallery/agents#3060"
   project_refs: []
   evidence_refs:
-  - "GitHub code search returned no forge implementation"
-  - "repo-validate and repo-build clone github.com using agent-github-token"
+  - "NSE-20260727-shared-local-delivery-authority-live-state"
+  - "NSE-20260727-local-delivery-native-dependency-reconciliation"
   github_refs:
-  - https://github.com/jvallery/agents/issues/3044
-  required_action: "Create an Agent Fleet platform issue after the authority interface is approved."
-- issue: null
-  title: "Denied-public cold-cache dependency and chart mirror proof"
-  state: MISSING
-  classification: missing
-  labels: [risk:high]
-  assignees: []
-  milestone: null
-  dependencies:
-  - "platform supply-chain contract"
-  sub_issues: []
-  linked_prs: []
-  project_refs: []
+  - https://github.com/jvallery/agents/issues/3047
+  - https://github.com/jvallery/agents/pull/3060
+  required_action: "Retain #3044 blocked_by #3047, review draft PR #3060 through its own authority path, and create no duplicate authority or offline-supply issue."
+pr_findings:
+- pr: 3060
+  branch: "planning/3047-internal-ci-authority"
+  base_branch: main
+  state: OPEN
+  draft: true
+  linked_issues: [3047]
+  head_sha: 933fac33a7dacbc2bbf170d0e4e1a4dcdf773174
+  checks_status: fail
+  deployment_status: not_applicable
+  finding: "Draft North Star proposal for #3047 has failing exact-head checks; it is neither merge-ready, approved platform authority, nor implementation evidence."
   evidence_refs:
-  - "public canonical image refs in repo-validate and repo-build"
-  - "public argo-helm chart repo in agent-fleet-ci Applications"
-  github_refs:
-  - https://github.com/jvallery/agents/issues/3044
-  required_action: "Create an Agent Fleet issue with immutable local mirrors and denied-egress cold-node acceptance."
-pr_findings: []
+  - https://github.com/jvallery/agents/pull/3060
+  - "live gh pr checks at 2026-07-27T21:00:36Z"
+  - "NSE-20260727-shared-local-delivery-authority-live-state"
 lane_findings: []
 delivery_findings:
 - ref: "origin/dev"
@@ -292,8 +291,9 @@ delivery_findings:
   type: other
   status: missing
   evidence_refs:
-  - "GitHub source search and platform templates"
-  finding: "No verified internal forge/event/status/approval/promotion authority can pass the GitHub-unavailable acceptance test."
+  - "NSE-20260727-shared-local-delivery-authority-live-state"
+  - "jvallery/agents#3047 and draft PR #3060"
+  finding: "Open #3047 and draft PR #3060 track the shared design, but no verified internal forge/event/status/approval/promotion authority can yet pass the GitHub-unavailable acceptance test."
 - ref: "non-production GitOps deployment"
   type: deployment
   status: missing
@@ -324,22 +324,22 @@ actions:
   evidence_refs:
   - ".agent-workflow/strategy/state-of-union.yaml"
 - id: GBSA-003
-  type: create_issue
-  target: "Agent Fleet internal authority dependency"
-  owner: "Agent Fleet controller"
-  status: proposed
-  apply_through: github_issue
+  type: set_dependency
+  target: "jvallery/agents#3044 blocked_by jvallery/agents#3047"
+  owner: ROOT controller
+  status: applied
+  apply_through: github_dependency
   evidence_refs:
-  - "missing forge search result"
-  - "GitHub-bound clone/event/status interfaces"
+  - "NSE-20260727-local-delivery-native-dependency-reconciliation"
 - id: GBSA-004
-  type: create_issue
-  target: "Agent Fleet immutable mirror and denied-public cold-cache dependency"
+  type: no_op
+  target: "Do not create duplicate internal-authority or immutable-mirror issues; jvallery/agents#3047 owns both shared scopes."
   owner: "Agent Fleet controller"
-  status: proposed
-  apply_through: github_issue
+  status: applied
+  apply_through: none
   evidence_refs:
-  - "public image and Helm source references"
+  - "NSE-20260727-shared-local-delivery-authority-live-state"
+  - "NSE-20260727-local-delivery-native-dependency-reconciliation"
 - id: GBSA-005
   type: open_gate
   target: "attended reversible branch/ruleset and legacy-retirement cutover"
@@ -367,5 +367,5 @@ actions:
   - ".agent-workflow/northstar/northstar-artifacts.yaml"
 handoff:
   next_skill: northstar-planning
-  next_mode: review-feedback
-  reason: "Iteration 26 is incorporating the registered independent audit; fresh cross-functional re-review and owner dispositions must close before Jason resolves NSQ-015 through NSQ-020 and the separate final-lock decision."
+  next_mode: human-review
+  reason: "Only after separate exact-final-candidate evidence binds this reconciled packet to three no_changes_required verdicts may stable row-level named-owner dispositions be collected before Jason resolves NSQ-015 through NSQ-020 and the separate final-lock decision."

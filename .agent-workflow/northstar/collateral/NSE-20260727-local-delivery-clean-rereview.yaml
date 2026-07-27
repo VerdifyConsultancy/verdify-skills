@@ -4,7 +4,7 @@ kind: NorthStarEvidenceItem
 schema_version: '1.0'
 id: NSE-20260727-local-delivery-clean-rereview
 reference: northstar://evidence/NSE-20260727-local-delivery-clean-rereview
-title: Verdify Skills iteration 26 clean independent re-review
+title: Verdify Skills iteration 26 earlier-candidate independent re-review
 evidence_type: adversarial_review
 evidence_status: verified
 ingested_at: '2026-07-27T19:53:24Z'
@@ -14,7 +14,8 @@ source:
   copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-clean-rereview-verdify-skills-iteration-26-clean-rereview-20260"
   sha256: dac4008506b781be7db7a2d5e19400d872ea938841cb7e125025df870d289178
 summary: Hash-bound product/business, architecture/delivery/scalability, and security/SRE/audit
-  re-reviews each returned no_changes_required after the iteration-26 audit fixes.
+  re-reviews each returned no_changes_required for an earlier iteration-26 candidate
+  after the initial audit fixes.
 tags:
 - adversarial-review
 - local-delivery
@@ -25,9 +26,11 @@ claims:
 - The hash-bound architecture/delivery/scalability reviewer returned no_changes_required.
 - The hash-bound security/SRE/audit reviewer returned no_changes_required.
 planning_relevance:
-- Closes the independent machine re-review prerequisite and routes the packet to named
-  owner dispositions plus NSQ-015 through NSQ-020 without inferring human approval.
+- Preserves the earlier machine-review result and its exact hashes, but does not
+  establish review readiness for later bytes.
 limitations:
 - This evidence is machine review only and records no human owner disposition, North
   Star lock, release approval, implementation authority, change-gate APPLY, or destructive-action
   authority.
+- Five listed artifacts changed after this review. A later exact-hash review record is
+  required before the current packet can return to human review.

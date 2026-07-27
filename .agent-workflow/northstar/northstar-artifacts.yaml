@@ -6,7 +6,7 @@ project_id: verdify-skills
 status: review_requested
 iteration: 26
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-07-27T19:52:54Z'
+updated_at: '2026-07-27T21:09:51Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   status: review_requested
@@ -52,7 +52,8 @@ product:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-verdify-skills-public-visibility-license
   - NSE-20260727-github-public-repository-license-terms
-  - NSE-20260727-local-delivery-clean-rereview
+  - NSE-20260727-shared-local-delivery-authority-live-state
+  - NSE-20260727-local-delivery-native-dependency-reconciliation
   open_question_ids: [NSQ-009, NSQ-012, NSQ-015, NSQ-016, NSQ-017, NSQ-018, NSQ-019, NSQ-020]
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
@@ -99,7 +100,8 @@ architecture:
   - NSE-20260727-local-delivery-adversarial-audit
   - NSE-20260727-verdify-skills-public-visibility-license
   - NSE-20260727-github-public-repository-license-terms
-  - NSE-20260727-local-delivery-clean-rereview
+  - NSE-20260727-shared-local-delivery-authority-live-state
+  - NSE-20260727-local-delivery-native-dependency-reconciliation
   open_question_ids: [NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-015, NSQ-016, NSQ-017, NSQ-018, NSQ-019, NSQ-020]
 evidence_references:
 - id: NSE-20260623-long-horizon-agent-compounding-learning
@@ -299,7 +301,17 @@ evidence_references:
   used_in: [both, question]
 - id: NSE-20260727-local-delivery-clean-rereview
   reference: northstar://evidence/NSE-20260727-local-delivery-clean-rereview
-  title: Verdify Skills iteration 26 clean independent re-review
+  title: Verdify Skills iteration 26 earlier-candidate independent re-review
+  evidence_status: verified
+  used_in: [question]
+- id: NSE-20260727-shared-local-delivery-authority-live-state
+  reference: northstar://evidence/NSE-20260727-shared-local-delivery-authority-live-state
+  title: Shared Agent Platform local-delivery authority live state
+  evidence_status: observed
+  used_in: [both, question]
+- id: NSE-20260727-local-delivery-native-dependency-reconciliation
+  reference: northstar://evidence/NSE-20260727-local-delivery-native-dependency-reconciliation
+  title: Verdify Skills local-delivery native dependency reconciliation
   evidence_status: verified
   used_in: [both, question]
 cross_links:
@@ -761,6 +773,8 @@ open_questions:
   - NSE-20260727-verdify-skills-local-delivery-inventory
   - NSE-20260727-local-delivery-control-plane-primary-sources
   - NSE-20260727-local-delivery-adversarial-audit
+  - NSE-20260727-shared-local-delivery-authority-live-state
+  - NSE-20260727-local-delivery-native-dependency-reconciliation
   proposed_resolution: Approve only after the exact version passes capability, internal-IdP identity, repository/governance-history import, review/status/protection/audit, upgrade, coordinated-restore, public-mirror, and attended GitHub-unavailable contract tests.
 - id: NSQ-016
   artifact: both
@@ -796,16 +810,19 @@ open_questions:
   status: open
   source_ids:
   - NSE-20260727-local-delivery-adversarial-audit
-  proposed_resolution: Approve because Git push mirroring cannot migrate governance authority; perform the switch only after isolated contract proof, dual-run reconciliation, and attended APPLY.
+  - NSE-20260727-shared-local-delivery-authority-live-state
+  - NSE-20260727-local-delivery-native-dependency-reconciliation
+  proposed_resolution: "Approve because Git push mirroring cannot migrate governance authority; preserve the native #3044 blocked_by #3047 boundary and perform the switch only after isolated contract proof, dual-run reconciliation, and attended APPLY."
 - id: NSQ-019
   artifact: both
-  question: "Approve the complete proposed envelope of one rehearsal and one live repository; 500 admitted events/day and 20/minute burst; ten-minute maximum ordinary event age except authorized replay; two workflows; one release/day; 16 vCPU, 32 GiB, 200 GiB, USD 250/month, four operator-hours/week, and thirty dual-run days; 99.5% monthly availability excluding approved maintenance; 24x7 automated alerting with attended release/cutover windows; 24-hour snapshot and 30-day restore-rehearsal age; 365-day evidence and support-plus-365-day release retention; the stated parity, latency, recovery, mirror, transaction, and outage evidence; a 30-minute delayed re-probe; and fourteen healthy days?"
-  owner: Jason, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner, Skills release owner, and Skills governance owner
+  question: "Approve the complete proposed pilot envelope represented by stable thresholds OE-001 through OE-034 and the applicable-owner mapping in NORTHSTAR_INTERVIEW.md?"
+  owner: OWN-001 through OWN-009
   blocking: true
   status: open
   source_ids:
   - NSE-20260727-local-delivery-adversarial-audit
-  proposed_resolution: Approve every proposed value as the bounded initial operating envelope; any expansion or material breach returns for all affected owner dispositions.
+  - NSE-20260727-shared-local-delivery-authority-live-state
+  proposed_resolution: Require one identity-bound accept, revise, or reject ledger entry for every applicable OWN-*/OE-* pair. Missing assignments or rows, rejections, and conflicting revisions keep the gate open; no generic approval satisfies the envelope.
 - id: NSQ-020
   artifact: both
   question: Approve internal IdP immutable subjects, raw-body event admission plus a durable transaction/effect ledger, minimally scoped trusted status reporting, and separate candidate, trusted validator, critic, integrator, publisher, signer, mirror, GitOps, verifier, approver, and recovery principals as mandatory trust boundaries?
@@ -814,6 +831,7 @@ open_questions:
   status: open
   source_ids:
   - NSE-20260727-local-delivery-adversarial-audit
+  - NSE-20260727-shared-local-delivery-authority-live-state
   proposed_resolution: Approve and reject any provider or implementation that cannot prove these boundaries without granting candidate code a self-certification path.
 learning_capture:
   status: staged
@@ -822,7 +840,7 @@ learning_capture:
   - .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
   open_proposal_ids: [NLP-001, NLP-002, NLP-003, NLP-004, NLP-005, NLP-006, NLP-007]
 review:
-  requested_at: '2026-07-27T18:14:40Z'
+  requested_at: '2026-07-27T21:09:51Z'
   reviewers: [Jason, James, Skills governance owner, Skills release owner, legal/IP owner, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner]
   status: requested
   approvals: []
@@ -830,4 +848,4 @@ review:
 handoff:
   next_skill: northstar-planning
   next_mode: human-review
-  reason: "Hash-bound product/business, architecture/delivery/scalability, and security/SRE/audit re-reviews returned no_changes_required, but the durable North Star gate remains open. Use the ready interview packet to record named owner dispositions, NSQ-015 through NSQ-020, and Jason's separate explicit final-lock phrase; no human approval is inferred."
+  reason: "After NSE-20260727-local-delivery-final-candidate-rereview binds this exact packet and gate to three no_changes_required verdicts, use the ready interview packet to assign every required OWN-* role by immutable subject and authority evidence, record every applicable OWN-*/OE-* disposition without unresolved conflict, resolve NSQ-015 through NSQ-020, and request Jason's separate explicit final-lock phrase. If that evidence is absent or any hash changes, return to adversarial-review; no human approval is inferred."
