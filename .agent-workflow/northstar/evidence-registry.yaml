@@ -4,7 +4,7 @@ kind: NorthStarEvidenceRegistry
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills
 generated_at: '2026-06-23T02:20:21Z'
-updated_at: '2026-07-27T20:40:38Z'
+updated_at: '2026-07-27T22:00:49Z'
 evidence:
 - id: NSE-20260623-agent-platform-control-implementation-be
   reference: northstar://evidence/NSE-20260623-agent-platform-control-implementation-be
@@ -1976,6 +1976,38 @@ evidence:
   planning_relevance:
   - Supports target-control-plane evaluation while leaving compatibility and authority
     decisions to North Star review.
+- id: NSE-20260727-local-delivery-final-candidate-rereview
+  reference: northstar://evidence/NSE-20260727-local-delivery-final-candidate-rereview
+  title: Verdify Skills iteration 26 final-candidate exact re-review
+  evidence_type: adversarial_review
+  evidence_status: verified
+  ingested_at: '2026-07-27T22:00:49Z'
+  item_path: ".agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml"
+  copied_source_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-final-candidate-rereview-verdify-skills-iteration-26-final-candidate-rere"
+  source_uri: session://verdify-skills/iteration-26/final-candidate-exact-rereview
+  source_sha256: f2561502af78d066aaef57937a10ed9d6f465509c9ad8b008d645f126b90711f
+  summary: Three independent exact-byte machine reviewers verified commit 30a10bb9e64d2e1d118c517d6e575ef02899e561
+    and all 14 manifest hashes, then returned no_changes_required without granting
+    human or execution authority.
+  tags:
+  - adversarial-review
+  - exact-candidate
+  - local-delivery
+  - northstar
+  - review-gate
+  claims:
+  - The product/business exact-byte reviewer returned no_changes_required for commit
+    30a10bb9e64d2e1d118c517d6e575ef02899e561.
+  - The architecture/delivery/scalability exact-byte reviewer returned no_changes_required
+    for the same 14-file manifest.
+  - The security/SRE/audit exact-byte reviewer returned no_changes_required for the
+    same 14-file manifest.
+  - All three reviewers independently verified a clean worktree and all 14 SHA-256
+    entries without repository, GitHub, or runtime mutation.
+  planning_relevance:
+  - Satisfies the machine exact-candidate re-review prerequisite before immutable
+    owner assignments, both disposition ledgers, Jason's North Star decisions, and
+    any final-lock request.
 - id: NSE-20260727-local-delivery-native-dependency-reconciliation
   reference: northstar://evidence/NSE-20260727-local-delivery-native-dependency-reconciliation
   title: Verdify Skills local-delivery native dependency reconciliation

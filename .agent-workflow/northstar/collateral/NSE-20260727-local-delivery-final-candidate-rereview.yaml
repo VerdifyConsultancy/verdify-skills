@@ -1,0 +1,43 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-local-delivery-final-candidate-rereview
+reference: northstar://evidence/NSE-20260727-local-delivery-final-candidate-rereview
+title: Verdify Skills iteration 26 final-candidate exact re-review
+evidence_type: adversarial_review
+evidence_status: verified
+ingested_at: '2026-07-27T22:00:49Z'
+source:
+  uri: session://verdify-skills/iteration-26/final-candidate-exact-rereview
+  original_path: "/tmp/verdify-skills-iteration-26-final-candidate-rereview-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-final-candidate-rereview-verdify-skills-iteration-26-final-candidate-rere"
+  sha256: f2561502af78d066aaef57937a10ed9d6f465509c9ad8b008d645f126b90711f
+summary: Three independent exact-byte machine reviewers verified commit 30a10bb9e64d2e1d118c517d6e575ef02899e561
+  and all 14 manifest hashes, then returned no_changes_required without granting human
+  or execution authority.
+tags:
+- adversarial-review
+- exact-candidate
+- local-delivery
+- northstar
+- review-gate
+claims:
+- The product/business exact-byte reviewer returned no_changes_required for commit
+  30a10bb9e64d2e1d118c517d6e575ef02899e561.
+- The architecture/delivery/scalability exact-byte reviewer returned no_changes_required
+  for the same 14-file manifest.
+- The security/SRE/audit exact-byte reviewer returned no_changes_required for the
+  same 14-file manifest.
+- All three reviewers independently verified a clean worktree and all 14 SHA-256 entries
+  without repository, GitHub, or runtime mutation.
+planning_relevance:
+- Satisfies the machine exact-candidate re-review prerequisite before immutable owner
+  assignments, both disposition ledgers, Jason's North Star decisions, and any final-lock
+  request.
+limitations:
+- Machine review assigns no human owner, resolves no NSQ, records no final lock, and
+  authorizes no implementation, protection, credential, deployment, cutover, production,
+  or destructive action.
+- Internal authority, cold-node, GitHub-unavailable, recovery, rollback, capacity,
+  cost, and operator-load acceptance remain unproved.
