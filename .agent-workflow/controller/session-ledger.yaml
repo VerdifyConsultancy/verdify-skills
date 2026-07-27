@@ -1,0 +1,417 @@
+schema_ref: session-ledger.schema.yaml
+kind: SessionLedger
+schema_version: "1.0"
+project_id: verdify-skills
+ledger_id: ledger-verdify-skills-local-delivery-20260727
+status: complete
+generated_at: "2026-07-27T23:05:41Z"
+updated_at: "2026-07-27T23:05:41Z"
+retention:
+  source_policy: "Link authoritative artifacts and external refs; do not copy raw logs."
+  redaction_policy: "Redact secrets, personal data, and private payloads before recording."
+  raw_payload_policy: "Store concise summaries and trusted refs only; raw North Star sources remain in the ignored local evidence store."
+  checksum_algorithm: sha256
+sessions:
+  - session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    parent_session_id: null
+    role: controller
+    executor: codex
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: verdifyconsulta-7d2a
+    started_at: null
+    ended_at: "2026-07-27T23:05:41Z"
+    issue_ids: [3044]
+    lane_id: null
+    wave_id: null
+    branch: planning/2026-07-27-local-ci-migration
+    worktree: /tmp/verdify-skills-router-20260727
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Write the shutdown checkpoint, push all intended refs, reconcile tracking, and leave no hidden work."
+    pr_refs: []
+    artifact_refs:
+      - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+      - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  - session_id: collab-exact-product-business-review
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: critic
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: exact_product_business_review
+    started_at: null
+    ended_at: null
+    issue_ids: [3044]
+    lane_id: null
+    wave_id: null
+    branch: planning/2026-07-27-local-ci-migration
+    worktree: /tmp/verdify-skills-router-20260727
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Return no_changes_required or exact candidate findings without mutation."
+    pr_refs: []
+    artifact_refs:
+      - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  - session_id: collab-final-arch-delivery-review
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: critic
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: final_arch_delivery_review
+    started_at: null
+    ended_at: null
+    issue_ids: [3044]
+    lane_id: null
+    wave_id: null
+    branch: planning/2026-07-27-local-ci-migration
+    worktree: /tmp/verdify-skills-router-20260727
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Return no_changes_required or exact candidate findings without mutation."
+    pr_refs: []
+    artifact_refs:
+      - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  - session_id: collab-final-security-sre-review
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: critic
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: final_security_sre_review
+    started_at: null
+    ended_at: null
+    issue_ids: [3044]
+    lane_id: null
+    wave_id: null
+    branch: planning/2026-07-27-local-ci-migration
+    worktree: /tmp/verdify-skills-router-20260727
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Return no_changes_required or exact candidate findings without mutation."
+    pr_refs: []
+    artifact_refs:
+      - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  - session_id: collab-shutdown-git-audit
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: other
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: shutdown_git_audit
+    started_at: null
+    ended_at: "2026-07-27T22:57:40Z"
+    issue_ids: []
+    lane_id: null
+    wave_id: null
+    branch: main
+    worktree: /workspace/verdify-skills/repo
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Inventory every worktree and unpushed ref without mutation."
+    pr_refs: []
+    artifact_refs:
+      - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+  - session_id: collab-shutdown-github-audit
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: other
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: shutdown_github_audit
+    started_at: null
+    ended_at: "2026-07-27T22:56:10Z"
+    issue_ids: [3044, 3047]
+    lane_id: null
+    wave_id: null
+    branch: main
+    worktree: /workspace/verdify-skills/repo
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Reconcile live GitHub tracking, branch, pull request, and dependency state without mutation."
+    pr_refs:
+      - https://github.com/jvallery/agents/pull/3060
+    artifact_refs:
+      - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+  - session_id: collab-stranded-commit-forensics
+    parent_session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: other
+    executor: codex-collaboration-agent
+    repository: VerdifyConsultancy/verdify-skills
+    status: complete
+    owner: stranded_commit_forensics
+    started_at: null
+    ended_at: "2026-07-27T23:05:41Z"
+    issue_ids: [70, 126]
+    lane_id: null
+    wave_id: null
+    branch: main
+    worktree: /workspace/verdify-skills/repo
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Prove the disposition of every locally unique commit before cleanup."
+    pr_refs:
+      - https://github.com/VerdifyConsultancy/verdify-skills/pull/173
+    artifact_refs:
+      - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+events:
+  - id: LEDGER-EVT-0001
+    sequence: 1
+    occurred_at: "2026-07-27T22:00:49Z"
+    event_type: planning_updated
+    source: verdify/northstar-planning
+    subject: verdify-skills-local-delivery-iteration-26
+    actor:
+      role: planner
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: local-delivery-iteration-26
+      wave_id: null
+      session_ids:
+        - controller-verdifyconsulta-7d2a-20260727-local-delivery
+      issue_ids: [3044]
+      lane_ids: []
+      pr_ids: []
+      deployment_ids: []
+      policy_decision_ids: []
+    refs:
+      artifact_refs:
+        - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
+        - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
+        - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+      evidence_refs:
+        - git:30a10bb9e64d2e1d118c517d6e575ef02899e561
+        - git:985af54e7deb2186c9ebe480b5829706c7d41ed8
+      external_refs:
+        - type: github_issue
+          identifier: jvallery/agents#3044
+          url: https://github.com/jvallery/agents/issues/3044
+    result: passed
+    summary: "The iteration 26 exact candidate and its three-review evidence record were committed without granting human or execution authority."
+    data_summary: null
+    redacted_payload_ref: null
+    previous_event_id: null
+    content_sha256: null
+  - id: LEDGER-EVT-0002
+    sequence: 2
+    occurred_at: "2026-07-27T22:00:49Z"
+    event_type: critic_reviewed
+    source: verdify/adversarial-review
+    subject: git:30a10bb9e64d2e1d118c517d6e575ef02899e561
+    actor:
+      role: controller
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: local-delivery-iteration-26
+      wave_id: null
+      session_ids:
+        - collab-exact-product-business-review
+        - collab-final-arch-delivery-review
+        - collab-final-security-sre-review
+      issue_ids: [3044]
+      lane_ids: []
+      pr_ids: []
+      deployment_ids: []
+      policy_decision_ids: []
+    refs:
+      artifact_refs:
+        - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+      evidence_refs:
+        - git:30a10bb9e64d2e1d118c517d6e575ef02899e561
+      external_refs: []
+    result: passed
+    summary: "All three independent exact-byte reviewers returned no_changes_required for the 14-file candidate manifest."
+    data_summary: "Review did not assign owners, resolve planning questions, approve the North Star, or authorize implementation or cutover."
+    redacted_payload_ref: null
+    previous_event_id: LEDGER-EVT-0001
+    content_sha256: null
+  - id: LEDGER-EVT-0003
+    sequence: 3
+    occurred_at: "2026-07-27T22:55:11Z"
+    event_type: route_decision
+    source: verdify/project-router
+    subject: verdify-skills-lifecycle-route
+    actor:
+      role: controller
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: local-delivery-iteration-26
+      wave_id: null
+      session_ids:
+        - controller-verdifyconsulta-7d2a-20260727-local-delivery
+      issue_ids: [3044, 3047]
+      lane_ids: []
+      pr_ids: []
+      deployment_ids: []
+      policy_decision_ids:
+        - northstar-final-lock
+    refs:
+      artifact_refs:
+        - .agent-workflow/router/route-decision.yaml
+        - .agent-workflow/gates/northstar.yaml
+      evidence_refs: []
+      external_refs:
+        - type: github_issue
+          identifier: jvallery/agents#3044
+          url: https://github.com/jvallery/agents/issues/3044
+        - type: github_issue
+          identifier: jvallery/agents#3047
+          url: https://github.com/jvallery/agents/issues/3047
+    result: blocked
+    summary: "The router selected northstar-planning/human-review because the North Star gate is open."
+    data_summary: null
+    redacted_payload_ref: null
+    previous_event_id: LEDGER-EVT-0002
+    content_sha256: null
+  - id: LEDGER-EVT-0004
+    sequence: 4
+    occurred_at: "2026-07-27T23:05:41Z"
+    event_type: other
+    source: verdify/controller-loop
+    subject: verdify-skills-shutdown-reconciliation
+    actor:
+      role: controller
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: shutdown-20260727
+      wave_id: null
+      session_ids:
+        - collab-shutdown-git-audit
+        - collab-shutdown-github-audit
+        - collab-stranded-commit-forensics
+      issue_ids: [70, 126, 3044, 3047]
+      lane_ids: []
+      pr_ids:
+        - jvallery/agents#3060
+        - VerdifyConsultancy/verdify-skills#173
+      deployment_ids: []
+      policy_decision_ids: []
+    refs:
+      artifact_refs:
+        - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+        - docs/recovery-ledger-2026-07-10.md
+      evidence_refs:
+        - git:16d899152be183a6c3525cd3110c6eb05bd3dd5a
+        - git:202c21b31cce13e11ec8bea35e0e0b75426d5245
+        - git:22f81bdc35e4f1e5a70797624c93bc86bc66056c
+      external_refs:
+        - type: github_issue
+          identifier: VerdifyConsultancy/verdify-skills#70
+          url: https://github.com/VerdifyConsultancy/verdify-skills/issues/70
+        - type: github_issue
+          identifier: VerdifyConsultancy/verdify-skills#126
+          url: https://github.com/VerdifyConsultancy/verdify-skills/issues/126
+        - type: git_commit
+          identifier: archive/2026-07-12-issue-70-dispatch-controller
+          url: https://github.com/VerdifyConsultancy/verdify-skills/commit/16d899152be183a6c3525cd3110c6eb05bd3dd5a
+        - type: git_commit
+          identifier: archive/2026-07-12-issue-70-dispatch-worker
+          url: https://github.com/VerdifyConsultancy/verdify-skills/commit/202c21b31cce13e11ec8bea35e0e0b75426d5245
+        - type: git_commit
+          identifier: released-rescue-commit
+          url: https://github.com/VerdifyConsultancy/verdify-skills/commit/22f81bdc35e4f1e5a70797624c93bc86bc66056c
+    result: passed
+    summary: "All unique Git objects were proven durable before stale leases, branches, and dead worktree registrations were removed."
+    data_summary: "Issue 70 dispatch siblings were archived as non-delivery refs; issue 126 rescue residue was already released and remained GitHub-retrievable."
+    redacted_payload_ref: null
+    previous_event_id: LEDGER-EVT-0003
+    content_sha256: null
+  - id: LEDGER-EVT-0005
+    sequence: 5
+    occurred_at: "2026-07-27T23:05:41Z"
+    event_type: learning_proposed
+    source: verdify/controller-loop
+    subject: verdify-skills-shutdown-learnings
+    actor:
+      role: controller
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: shutdown-20260727
+      wave_id: null
+      session_ids:
+        - controller-verdifyconsulta-7d2a-20260727-local-delivery
+      issue_ids: [70, 3044, 3047]
+      lane_ids: []
+      pr_ids: []
+      deployment_ids: []
+      policy_decision_ids: []
+    refs:
+      artifact_refs:
+        - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+      evidence_refs:
+        - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+      external_refs: []
+    result: planned
+    summary: "Preserve exact review evidence separately from human authority, use native cross-repository dependencies once, and archive stale dispatch seeds without reviving execution authority."
+    data_summary: "A clean status is insufficient for shutdown unless dangling Git objects, stale leases, ignored evidence, and live GitHub tracking are also reconciled."
+    redacted_payload_ref: null
+    previous_event_id: LEDGER-EVT-0004
+    content_sha256: null
+  - id: LEDGER-EVT-0006
+    sequence: 6
+    occurred_at: "2026-07-27T23:05:41Z"
+    event_type: handoff
+    source: verdify/controller-loop
+    subject: verdify-skills-local-delivery-human-review-handoff
+    actor:
+      role: controller
+      name: verdifyconsulta-7d2a
+    session_id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    correlation:
+      trace_id: shutdown-20260727
+      wave_id: null
+      session_ids:
+        - controller-verdifyconsulta-7d2a-20260727-local-delivery
+      issue_ids: [3044, 3047]
+      lane_ids: []
+      pr_ids:
+        - jvallery/agents#3060
+      deployment_ids: []
+      policy_decision_ids:
+        - northstar-final-lock
+    refs:
+      artifact_refs:
+        - .agent-workflow/controller/controller-state.yaml
+        - .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+        - .agent-workflow/gates/northstar.yaml
+      evidence_refs:
+        - git:985af54e7deb2186c9ebe480b5829706c7d41ed8
+      external_refs:
+        - type: github_issue
+          identifier: jvallery/agents#3044
+          url: https://github.com/jvallery/agents/issues/3044
+        - type: github_issue
+          identifier: jvallery/agents#3047
+          url: https://github.com/jvallery/agents/issues/3047
+        - type: github_pr
+          identifier: jvallery/agents#3060
+          url: https://github.com/jvallery/agents/pull/3060
+    result: blocked
+    summary: "The controller is cleanly paused at human review; implementation, deployment, cutover, and retirement remain unauthorized."
+    data_summary: "loop_id=loop-20260727-local-delivery-shutdown; loop_type=outer; status=paused; owner=verdifyconsulta-7d2a; repository=VerdifyConsultancy/verdify-skills; checkpoint=.agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml; objective=preserve reviewed planning and prepare a clean shutdown; last_action=reconciled Git, GitHub, leases, worktrees, notes, and follow-ups; last_error=null; next_prompt=reconstruct from controller state, ledger, checkpoint, gate, issue 3044, and issue 3047, then run project-router and remain in northstar-planning/human-review unless the gate changed."
+    redacted_payload_ref: null
+    previous_event_id: LEDGER-EVT-0005
+    content_sha256: null
+exceptions:
+  - id: LEDGER-EXC-001
+    severity: low
+    statement: "The controller ledger was initialized at shutdown, so precise start and end timestamps for earlier exact-review child sessions were unavailable; canonical task names and committed aggregate evidence are retained."
+    owner: next-repo-controller
+    status: accepted
+    event_ids: [LEDGER-EVT-0002]
+  - id: LEDGER-EXC-002
+    severity: medium
+    statement: "No approved .agent-fleet/loop.yaml, watchdog heartbeat, or always-on controller objective exists on this branch; this checkpoint is a paused human-review handoff and must not be interpreted as an enabled autonomous loop."
+    owner: platform-and-repository-owners
+    status: deferred
+    event_ids: [LEDGER-EVT-0006]
+handoff:
+  next_skill: northstar-planning
+  next_mode: human-review
+  reason: "Resume only from the trusted gate, controller state, checkpoint, live GitHub issues, and exact review evidence; do not infer approval from this ledger."

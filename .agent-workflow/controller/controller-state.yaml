@@ -1,0 +1,56 @@
+schema_ref: controller-state.schema.yaml
+kind: ControllerState
+schema_version: "1.0"
+project_id: verdify-skills
+controller_id: verdifyconsulta-7d2a
+status: paused
+state: HUMAN_REVIEW
+updated_at: "2026-07-27T23:05:41Z"
+current_wave: null
+waves: []
+sessions:
+  - id: controller-verdifyconsulta-7d2a-20260727-local-delivery
+    role: controller
+    executor: codex
+    repository: VerdifyConsultancy/verdify-skills
+    issue: null
+    lane_id: null
+    wave_id: null
+    branch: planning/2026-07-27-local-ci-migration
+    worktree: /tmp/verdify-skills-router-20260727
+    owner: verdifyconsulta-7d2a
+    started_at: null
+    heartbeat_expectations: null
+    heartbeat_deadline_at: null
+    stop_condition: "Pause after a clean, pushed shutdown checkpoint; do not advance the open North Star gate."
+    status: complete
+events:
+  - id: controller-evt-20260727-001
+    occurred_at: "2026-07-27T22:00:49Z"
+    event_type: exact_candidate_review_registered
+    summary: "Three independent exact-byte reviews passed for candidate 30a10bb9e64d2e1d118c517d6e575ef02899e561."
+  - id: controller-evt-20260727-002
+    occurred_at: "2026-07-27T22:55:11Z"
+    event_type: route_decision
+    summary: "The trusted router returned northstar-planning/human-review because the North Star gate remains open."
+  - id: controller-evt-20260727-003
+    occurred_at: "2026-07-27T23:05:41Z"
+    event_type: shutdown_reconciliation
+    summary: "Repository work, archive refs, stale lease metadata, worktrees, local runtime residue, and tracking records were reconciled for shutdown."
+open_gates:
+  - .agent-workflow/gates/northstar.yaml
+  - github://jvallery/agents/issues/3047
+next_actions:
+  - "Collect immutable human assignments for every required OWN-* role."
+  - "Complete the identity-bound NSQ-*/OWN-* and OWN-*/OE-* disposition ledgers, including legal/IP disposition for NSQ-017."
+  - "Have Jason resolve NSQ-015 through NSQ-020 and explicitly approve or reject the iteration 26 final lock."
+  - "After a recorded gate decision, rerun project-router before project definition or architecture work."
+  - "Keep implementation and cutover blocked until the North Star gate is approved and shared platform issue jvallery/agents#3047 is accepted."
+handoff:
+  next_skill: northstar-planning
+  next_mode: human-review
+  reason: "The exact candidate review is complete, but human ownership, disposition ledgers, Jason's decisions, final lock, and the shared platform dependency remain open."
+approval:
+  status: pending
+  approver: Jason
+  approved_at: null

@@ -1,0 +1,114 @@
+kind: ControllerCheckpoint
+schema_version: "1.0"
+checkpoint_id: checkpoint-verdify-skills-local-delivery-shutdown-20260727-0001
+written_at: "2026-07-27T23:05:41Z"
+controller_id: verdifyconsulta-7d2a
+loop_record:
+  loop_id: loop-20260727-local-delivery-shutdown
+  loop_type: outer
+  status: paused
+  owner: verdifyconsulta-7d2a
+  repository: VerdifyConsultancy/verdify-skills
+  issue_refs:
+    - https://github.com/jvallery/agents/issues/3044
+    - https://github.com/jvallery/agents/issues/3047
+    - https://github.com/VerdifyConsultancy/verdify-skills/issues/70
+    - https://github.com/VerdifyConsultancy/verdify-skills/issues/126
+  pull_request_refs:
+    - https://github.com/jvallery/agents/pull/3060
+    - https://github.com/VerdifyConsultancy/gravity/pull/516
+  checkpoint_path: .agent-workflow/controller/checkpoints/verdifyconsulta-7d2a/loop-20260727-local-delivery-shutdown-0001.yaml
+  current_objective: "Preserve the exact-reviewed iteration 26 planning state, reconcile all local and GitHub work, and stop without advancing protected authority."
+  last_action: "Archived stranded dispatch commits, released stale lease state, pruned dead worktree metadata, preserved ignored evidence, and prepared the human-review handoff."
+  last_error: null
+  next_prompt: "Reconstruct controller state and the session ledger; verify the North Star gate, issue 3044, issue 3047, and the planning branch; run project-router; continue only with northstar-planning/human-review unless an authorized gate decision changed the route."
+trusted_refs:
+  controller_state: .agent-workflow/controller/controller-state.yaml
+  session_ledger: .agent-workflow/controller/session-ledger.yaml
+  route_decision: .agent-workflow/router/route-decision.yaml
+  northstar_gate: .agent-workflow/gates/northstar.yaml
+  exact_review_evidence: .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-final-candidate-rereview.yaml
+  evidence_registry: .agent-workflow/northstar/evidence-registry.yaml
+git_state:
+  protected_main:
+    head: 416caf3ff005cdb78b58b7c991351edd627fd00b
+    upstream: origin/main
+    status: clean
+  protected_dev:
+    head: d226b7f244fd4612ab44739fd275b8158e1d9159
+    upstream: origin/dev
+  planning_branch:
+    name: planning/2026-07-27-local-ci-migration
+    last_substantive_head: 30a10bb9e64d2e1d118c517d6e575ef02899e561
+    exact_review_evidence_head: 985af54e7deb2186c9ebe480b5829706c7d41ed8
+    base: d226b7f244fd4612ab44739fd275b8158e1d9159
+    target: dev
+    pull_request: null
+    pull_request_reason: "The North Star gate is open and no approved implementation lane contract exists; creating a delivery PR would imply authority that has not been granted."
+  archived_refs:
+    - branch: archive/2026-07-12-issue-70-dispatch-controller
+      head: 16d899152be183a6c3525cd3110c6eb05bd3dd5a
+      disposition: "Abandoned controller dispatch seed; non-delivery archive only."
+    - branch: archive/2026-07-12-issue-70-dispatch-worker
+      head: 202c21b31cce13e11ec8bea35e0e0b75426d5245
+      disposition: "Abandoned worker dispatch seed; non-delivery archive only."
+  released_rescue:
+    head: 22f81bdc35e4f1e5a70797624c93bc86bc66056c
+    disposition_ref: docs/recovery-ledger-2026-07-10.md
+    github_ref: https://github.com/VerdifyConsultancy/verdify-skills/commit/22f81bdc35e4f1e5a70797624c93bc86bc66056c
+  worktrees_after_cleanup:
+    - /workspace/verdify-skills/repo
+    - /tmp/verdify-skills-router-20260727
+github_state:
+  - ref: https://github.com/jvallery/agents/issues/3044
+    status: open
+    relationship: "Verdify Skills consumer/adoption tracking; natively blocked by issue 3047."
+  - ref: https://github.com/jvallery/agents/issues/3047
+    status: open
+    relationship: "Single shared Agent Control Platform dependency."
+  - ref: https://github.com/jvallery/agents/pull/3060
+    status: open-draft-unstable
+    relationship: "Provider proposal only; not approved implementation or runtime evidence."
+  - ref: https://github.com/VerdifyConsultancy/gravity/pull/516
+    status: open-draft-unstable
+    relationship: "Shared contract proposal only; not approved authority."
+  - ref: https://github.com/VerdifyConsultancy/verdify-skills/issues/70
+    status: open-deferred
+    relationship: "Old dispatch seeds archived; any future work must be replanned after issue 3044."
+  - ref: https://github.com/VerdifyConsultancy/verdify-skills/issues/126
+    status: closed
+    relationship: "CRM/skill-pack rescue was selectively recovered and released in 1.3.0."
+open_gates:
+  - id: northstar-final-lock
+    owner: Jason
+    artifact: .agent-workflow/gates/northstar.yaml
+    status: open
+  - id: shared-platform-capability
+    owner: jvallery/agents#3047
+    artifact: https://github.com/jvallery/agents/issues/3047
+    status: open
+review_and_validation:
+  exact_candidate_manifest_files: 14
+  exact_review_result: no_changes_required
+  exact_reviewers: 3
+  full_test_result_at_evidence_head: passed
+  packed_artifact_sha256_at_evidence_head: 97a58d3c2e1e771d670de424813e40f571d58a35dc0a485e75cfac3a7c8de4b4
+  pre_shutdown_repo_validation: passed
+local_preservation:
+  connector_config: ".mcp.json is pod-local and excluded through .git/info/exclude; no values were copied into tracked artifacts."
+  legacy_checkpoint: ".agent-workflow/loop is a prior machine-local maintenance checkpoint retained and excluded; it is not lifecycle authority."
+  raw_evidence: "Ignored North Star source files were copied from the temporary planning worktree to the persistent root checkout and remain intentionally untracked."
+  removed_residue: "The zero-byte accidental file ]+ was removed."
+follow_ups:
+  - "Collect immutable OWN-* assignments and the two required identity-bound disposition ledgers."
+  - "Resolve NSQ-015 through NSQ-020, including legal/IP confirmation for NSQ-017."
+  - "Obtain Jason's explicit final-lock decision; this checkpoint does not supply it."
+  - "Re-run project-router after the gate decision."
+  - "Keep implementation, credentials, protection changes, deployment, cutover, retirement, and destructive actions blocked until separately authorized."
+  - "Recheck issue 3047 and its provider PRs from live GitHub before using any platform capability."
+learnings:
+  - "A machine no-changes verdict is evidence, not human ownership, final lock, implementation authority, or cutover authority."
+  - "Cross-repository platform scope should have one native dependency edge and one shared owner; consumer repositories record adoption evidence instead of duplicating provider work."
+  - "Shutdown cleanliness requires object reachability, upstream reconciliation, stale lease disposition, worktree pruning, ignored evidence preservation, and live tracking updates—not only an empty porcelain status."
+  - "Superseded dispatch commits should be archived under explicit non-delivery refs rather than recreating a lane branch that could be mistaken for executable authority."
+stop_condition: "Remain paused. Do not advance beyond human review until an authorized North Star decision is recorded and the router returns a different valid route."
