@@ -2,7 +2,7 @@
 
 Status: `ready`
 Generated at: `2026-07-27T18:14:40Z`
-Routed mode: `northstar-interview / question-pack`
+Routed mode: `northstar-planning / human-review`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Product pair: `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
 Architecture pair: `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`

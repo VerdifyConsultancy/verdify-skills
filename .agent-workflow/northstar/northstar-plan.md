@@ -130,7 +130,8 @@ is inferred.
 
 ## Handoff
 
-Next route: `northstar-interview / question-pack`; captured answers return
+Next route: `northstar-planning / human-review`, using
+`NORTHSTAR_INTERVIEW.md` as the ready question pack. Captured answers return
 through `northstar-planning / review-feedback` before any explicit final lock.
 
 No implementation, protection change, credential change, cluster mutation,

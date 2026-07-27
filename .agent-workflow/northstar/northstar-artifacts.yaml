@@ -828,6 +828,6 @@ review:
   approvals: []
   signoff_required_for_downstream: true
 handoff:
-  next_skill: northstar-interview
-  next_mode: question-pack
-  reason: "Hash-bound product/business, architecture/delivery/scalability, and security/SRE/audit re-reviews returned no_changes_required. Named owner dispositions, NSQ-015 through NSQ-020, and Jason's separate explicit final-lock phrase remain open; no human approval is inferred."
+  next_skill: northstar-planning
+  next_mode: human-review
+  reason: "Hash-bound product/business, architecture/delivery/scalability, and security/SRE/audit re-reviews returned no_changes_required, but the durable North Star gate remains open. Use the ready interview packet to record named owner dispositions, NSQ-015 through NSQ-020, and Jason's separate explicit final-lock phrase; no human approval is inferred."
