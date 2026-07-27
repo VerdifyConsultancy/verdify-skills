@@ -1,0 +1,44 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-local-delivery-adversarial-audit
+reference: northstar://evidence/NSE-20260727-local-delivery-adversarial-audit
+title: North Star iteration 26 local-delivery adversarial audit
+evidence_type: adversarial_review
+evidence_status: verified
+ingested_at: '2026-07-27T18:45:25Z'
+source:
+  uri: repo://verdify-skills/northstar-iteration-26-adversarial-audit
+  original_path: "/tmp/verdify-local-delivery-adversarial-audit-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-adversarial-audit-verdify-local-delivery-adversarial-audit-2026072"
+  sha256: '07029ba5da67078f105f95a0a79e4978a31eeeed7c5dc0a7934dca75e9a32867'
+summary: Fresh product/business, architecture/delivery, and security/SRE audits requiring
+  authority-scope, identity, webhook admission, durable ledger, status issuer, release
+  envelope, consumer topology, cold-node, recovery, measurable operating, and sequencing
+  changes before final lock.
+tags:
+- adversarial-review
+- argo
+- delivery
+- forgejo
+- security
+- sre
+- zot
+claims:
+- Git ref mirroring cannot preserve issue, pull-request, review, status, comment,
+  identity, or audit authority and therefore is not control-plane failback.
+- At-least-once event delivery requires a durable transaction/effect ledger and authenticated
+  admission boundary outside candidate execution.
+- Required status authenticity, internal identity, privilege separation, OCI graph
+  completeness, package-consumer topology, cold-node enforcement, and whole-control-plane
+  recovery need explicit contracts before final lock.
+- Cutover acceptance requires measurable thresholds, operating-owner acceptance, cost/capacity
+  bounds, and a non-waivable rule for load-bearing external dependencies.
+planning_relevance:
+- Routes iteration 26 back to northstar-planning review-feedback and defines required
+  changes before another final-lock request.
+limitations:
+- Target components are not deployed, so findings assess design completeness rather
+  than live target vulnerabilities or readiness.
+- Organization-level GitHub controls and live Argo/Zot state remain unreadable.

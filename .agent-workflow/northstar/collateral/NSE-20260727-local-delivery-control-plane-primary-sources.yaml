@@ -1,0 +1,38 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-local-delivery-control-plane-primary-sources
+reference: northstar://evidence/NSE-20260727-local-delivery-control-plane-primary-sources
+title: Local delivery control-plane primary-source research
+evidence_type: external_reference
+evidence_status: observed
+ingested_at: '2026-07-27T18:13:22Z'
+source:
+  uri: https://forgejo.org/docs/latest/
+  original_path: "/tmp/verdify-local-delivery-research-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-local-delivery-control-plane-primary-sources-verdify-local-delivery-research-20260727-md"
+  sha256: 27544e71fd8c79ff0346a13a695e2c32a9ec05bb36fc099e74f8f6c3dc80abd3
+summary: Current Forgejo, Argo Events, and OCI artifact documentation supporting a
+  proposed internal Git/review/status, event-driven CI, and immutable package-artifact
+  architecture.
+tags:
+- argo-events
+- delivery
+- forgejo
+- gitops
+- oci
+claims:
+- Forgejo documents repository mirrors, signed webhooks, protected branches, pull-request
+  reviews, status checks, and CODEOWNERS behavior.
+- Argo Events documents webhook EventSources and Sensors that can submit Argo Workflows.
+- ORAS documents arbitrary multi-file OCI artifacts and referrer graphs for signatures,
+  SBOMs, and attestations.
+planning_relevance:
+- Supports target-control-plane evaluation while leaving compatibility and authority
+  decisions to North Star review.
+limitations:
+- No live internal Forgejo authority was observable, and exact Verdify review/status
+  parity remains unverified.
+- Repository-scoped RBAC prevented inspection of live Argo objects and Zot repository
+  contents.

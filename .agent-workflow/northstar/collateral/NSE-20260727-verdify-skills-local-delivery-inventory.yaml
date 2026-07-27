@@ -1,0 +1,42 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-verdify-skills-local-delivery-inventory
+reference: northstar://evidence/NSE-20260727-verdify-skills-local-delivery-inventory
+title: Verdify Skills local-delivery control inventory
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-27T18:14:10Z'
+source:
+  uri: repo://verdify-skills@d226b7f244fd4612ab44739fd275b8158e1d9159
+  original_path: "/tmp/verdify-local-delivery-inventory-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-verdify-skills-local-delivery-inventory-verdify-local-delivery-inventory-20260727-md"
+  sha256: 22bd43546ffb2323d95173ad8b1dc68eb6616d71d1c5864335b30afdcba75fff
+summary: Read-only repository, GitHub, Kubernetes, Argo, Zot, and Agent Fleet observations
+  identifying the currently observable load-bearing GitHub Actions and public-registry
+  dependency surface plus internal-substrate gaps and access limitations.
+tags:
+- argo
+- current-state
+- delivery
+- github-actions
+- gitops
+- skills
+- zot
+claims:
+- Required branch checks, workflow execution, review/promotion automation, package
+  publication, and releases currently depend on GitHub-hosted control surfaces.
+- Argo CRDs and generic Agent Fleet workflow/event templates exist, but current templates
+  clone GitHub and retain public image dependencies.
+- No live internal Git/review/status authority or repository-specific Zot package
+  artifact was observable with current access.
+- The package-only repository lacks the image and non-production acceptance contract
+  required by the current Agent Fleet CI schema.
+planning_relevance:
+- Defines the migration baseline, hard blockers, exception ledger, parity proof, coexistence,
+  and rollback requirements for North Star iteration 26.
+limitations:
+- Organization-level GitHub controls, live Argo objects, and Zot repository contents
+  were not readable with available permissions.
+- The observation does not approve any target architecture or destructive cutover.

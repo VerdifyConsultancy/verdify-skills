@@ -1,0 +1,31 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-verdify-skills-public-visibility-license
+reference: northstar://evidence/NSE-20260727-verdify-skills-public-visibility-license
+title: Verdify Skills public visibility and package-license observation
+evidence_type: observation
+evidence_status: observed
+ingested_at: '2026-07-27T19:31:19Z'
+source:
+  uri: repo+github://VerdifyConsultancy/verdify-skills@d226b7f244fd4612ab44739fd275b8158e1d9159
+  original_path: "/tmp/verdify-skills-public-visibility-license-observation-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-verdify-skills-public-visibility-license-verdify-skills-public-visibility-license-observa"
+  sha256: 9120abdb1aa1dce52e89c76fa7b0bc8957afca0d47d8f621860735ca7659d907
+summary: Read-only evidence that the repository is PUBLIC while origin/dev package
+  metadata declares UNLICENSED, requiring an explicit proprietary/source-available
+  use and contributor-rights decision.
+tags:
+- current-state
+- licensing
+- public-mirror
+claims:
+- GitHub reports VerdifyConsultancy/verdify-skills visibility as PUBLIC.
+- origin/dev package.json declares license UNLICENSED and version 1.3.0.
+planning_relevance:
+- Corrects current-state wording and grounds NSR/PRQ/NSQ-047 public mirror, eligible-user,
+  and contributor-rights decisions.
+limitations:
+- This read-only observation does not select a license, grant rights, accept external
+  code, or authorize repository/publication changes.

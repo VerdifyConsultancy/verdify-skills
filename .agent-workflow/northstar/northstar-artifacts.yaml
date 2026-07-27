@@ -3,15 +3,15 @@ schema_ref: northstar-artifacts.schema.yaml
 kind: NorthStarArtifacts
 schema_version: '1.0'
 project_id: verdify-skills
-status: approved
-iteration: 25
+status: review_requested
+iteration: 26
 generated_at: '2026-06-23T02:51:16Z'
-updated_at: '2026-07-09T23:28:41Z'
+updated_at: '2026-07-27T19:52:54Z'
 product:
   path: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
-  status: approved
-  summary: Approved iteration 25 product North Star for an internal-first minimal Skills method layer binding four co-equal active pilots under a root-planner outer loop, with capability-negotiated Agent Platform control, governed Orbit personal and engineering context, current Gravity authority and cited API/MCP consumption, trusted atomic publication, ASAP integrated delivery, customer-consulting reuse, and separate North Star-lock versus release authority.
-  section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013, PRODUCT-014]
+  status: review_requested
+  summary: Iteration 26 audit revision retaining the four-project outer-loop model while proposing complete local-delivery independence through capability-qualified Forgejo and portfolio-work authority, internal identity, trusted event admission and a durable effect ledger, signed Zot release envelopes, stable-harness GitOps acceptance, immutable local dependencies, coordinated recovery, measurable coexistence, attended cutover, governed public mirrors, and separately gated retirement.
+  section_ids: [PRODUCT-001, PRODUCT-002, PRODUCT-003, PRODUCT-004, PRODUCT-005, PRODUCT-006, PRODUCT-007, PRODUCT-008, PRODUCT-009, PRODUCT-010, PRODUCT-011, PRODUCT-012, PRODUCT-013, PRODUCT-014, PRODUCT-015]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
@@ -47,12 +47,18 @@ product:
   - NSE-20260709-agents-current-state-audit
   - NSE-20260709-orbit-current-state-audit
   - NSE-20260709-gravity-current-state-audit
-  open_question_ids: [NSQ-009, NSQ-012]
+  - NSE-20260727-verdify-skills-local-delivery-inventory
+  - NSE-20260727-local-delivery-control-plane-primary-sources
+  - NSE-20260727-local-delivery-adversarial-audit
+  - NSE-20260727-verdify-skills-public-visibility-license
+  - NSE-20260727-github-public-repository-license-terms
+  - NSE-20260727-local-delivery-clean-rereview
+  open_question_ids: [NSQ-009, NSQ-012, NSQ-015, NSQ-016, NSQ-017, NSQ-018, NSQ-019, NSQ-020]
 architecture:
   path: .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-  status: approved
-  summary: Approved iteration 25 architecture North Star defining a common PilotProject contract, root-planner outer loop, four pilot ownership domains, capability-negotiated Agent Platform provider interface, policy-governed Orbit connector plane, versioned tenant-scoped Gravity HTTP API plus MCP adapter with citations, minimal no-compatibility Skills graph, exact-artifact atomic package transaction, and customer-scoped consulting expansion through the same contracts.
-  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020, ARCH-021]
+  status: review_requested
+  summary: Iteration 26 audit revision defining capability-qualified Forgejo and IdP authority, provider-neutral portfolio records, raw-body event admission, a durable delivery/effect ledger, persistent event transport, protected status issuers, separated build/publish/sign principals, immutable Zot package subjects and signed release envelopes, stable-harness/fresh-volume Argo CD acceptance, full-boundary cold-node proof, coordinated restore, measurable service objectives, attended cutover, and later exact-target retirement.
+  section_ids: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008, ARCH-009, ARCH-010, ARCH-011, ARCH-012, ARCH-013, ARCH-014, ARCH-015, ARCH-016, ARCH-017, ARCH-018, ARCH-019, ARCH-020, ARCH-021, ARCH-022]
   source_ids:
   - NSE-20260623-walk-transcript-agent-platform-gravity-skills
   - NSE-20260623-cicd-sdlc-agent-orchestration-human-governed-delivery
@@ -88,7 +94,13 @@ architecture:
   - NSE-20260709-agents-current-state-audit
   - NSE-20260709-orbit-current-state-audit
   - NSE-20260709-gravity-current-state-audit
-  open_question_ids: [NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013]
+  - NSE-20260727-verdify-skills-local-delivery-inventory
+  - NSE-20260727-local-delivery-control-plane-primary-sources
+  - NSE-20260727-local-delivery-adversarial-audit
+  - NSE-20260727-verdify-skills-public-visibility-license
+  - NSE-20260727-github-public-repository-license-terms
+  - NSE-20260727-local-delivery-clean-rereview
+  open_question_ids: [NSQ-009, NSQ-010, NSQ-011, NSQ-012, NSQ-013, NSQ-015, NSQ-016, NSQ-017, NSQ-018, NSQ-019, NSQ-020]
 evidence_references:
 - id: NSE-20260623-long-horizon-agent-compounding-learning
   reference: northstar://evidence/NSE-20260623-long-horizon-agent-compounding-learning
@@ -260,6 +272,36 @@ evidence_references:
   title: Gravity current-state audit
   evidence_status: observed
   used_in: [both]
+- id: NSE-20260727-verdify-skills-local-delivery-inventory
+  reference: northstar://evidence/NSE-20260727-verdify-skills-local-delivery-inventory
+  title: Verdify Skills local-delivery control inventory
+  evidence_status: observed
+  used_in: [both, question]
+- id: NSE-20260727-local-delivery-control-plane-primary-sources
+  reference: northstar://evidence/NSE-20260727-local-delivery-control-plane-primary-sources
+  title: Local delivery control-plane primary-source research
+  evidence_status: observed
+  used_in: [both, question]
+- id: NSE-20260727-local-delivery-adversarial-audit
+  reference: northstar://evidence/NSE-20260727-local-delivery-adversarial-audit
+  title: Local delivery product, architecture, security, and SRE adversarial audit
+  evidence_status: verified
+  used_in: [both, question]
+- id: NSE-20260727-verdify-skills-public-visibility-license
+  reference: northstar://evidence/NSE-20260727-verdify-skills-public-visibility-license
+  title: Verdify Skills public visibility and package-license observation
+  evidence_status: observed
+  used_in: [both, question]
+- id: NSE-20260727-github-public-repository-license-terms
+  reference: northstar://evidence/NSE-20260727-github-public-repository-license-terms
+  title: GitHub public-repository license terms
+  evidence_status: verified
+  used_in: [both, question]
+- id: NSE-20260727-local-delivery-clean-rereview
+  reference: northstar://evidence/NSE-20260727-local-delivery-clean-rereview
+  title: Verdify Skills iteration 26 clean independent re-review
+  evidence_status: verified
+  used_in: [both, question]
 cross_links:
 - from_id: PRQ-001
   to_id: ARQ-001
@@ -392,7 +434,7 @@ cross_links:
   relationship: Learning-capture planning wave requires loop-readiness and proposal-routing architecture.
 - from_id: PRQ-022
   to_id: ARQ-021
-  relationship: Optional conversational workflow adapters require lifecycle contract delegation and GitHub authority preservation.
+  relationship: Optional conversational workflow adapters require lifecycle contract delegation and configured-provider authority preservation; GitHub remains authority only before cutover.
 - from_id: SURF-015
   to_id: IFACE-015
   relationship: Optional conversational workflow surface defines the thin adapter interface.
@@ -498,6 +540,72 @@ cross_links:
 - from_id: WAVE-002
   to_id: ARCH-021
   relationship: The first integrated self-building slice proves the four-project architecture and durable root-planner loop.
+- from_id: PRQ-039
+  to_id: ARQ-035
+  relationship: Internal repository, portfolio-work, identity, review, status, and protection independence requires a capability-qualified Forgejo release and coordinated recovery architecture.
+- from_id: PRQ-040
+  to_id: ARQ-041
+  relationship: Repository delivery behavior requires raw-body admission plus a durable transaction/effect ledger beyond Argo controller memory.
+- from_id: PRQ-041
+  to_id: ARQ-037
+  relationship: The exact Verdify release requires an immutable package subject plus one signed complete pre-promotion release envelope; later effects are ledger receipts against its fixed digest.
+- from_id: PRQ-042
+  to_id: ARQ-038
+  relationship: Non-production package acceptance requires a stable harness, fresh-volume pull/verify/install path, and Argo CD sole ownership.
+- from_id: PRQ-043
+  to_id: ARQ-039
+  relationship: Cold-node reproducibility requires internal immutable dependency resolution.
+- from_id: PRQ-044
+  to_id: ARQ-040
+  relationship: Security and governance parity require transport-neutral exact-head identities, least privilege, provenance, and audit.
+- from_id: PRQ-045
+  to_id: ARQ-042
+  relationship: Isolated rehearsal, coexistence, coordinated internal restoration, and attended authority change require a staged migration architecture.
+- from_id: PRQ-046
+  to_id: ARQ-043
+  relationship: External dependency completeness requires an owned, expiring, detectable exception contract.
+- from_id: PRQ-047
+  to_id: ARQ-044
+  relationship: Public output mirrors require an explicit support, contribution, verification, outage, and retirement contract.
+- from_id: PRQ-048
+  to_id: ARQ-045
+  relationship: The local delivery control plane requires an accepted measurable operating and cost envelope.
+- from_id: PRQ-049
+  to_id: ARQ-046
+  relationship: The first implementation graph must integrate or supersede existing exact-package and protected-development work.
+- from_id: SURF-022
+  to_id: IFACE-023
+  relationship: Forgejo authority uses the transport-neutral source, review, status, and protection provider interface.
+- from_id: SURF-023
+  to_id: IFACE-024
+  relationship: Trusted event admission and Argo transport use the admitted repository event interface.
+- from_id: SURF-024
+  to_id: IFACE-025
+  relationship: Zot package publication and approval use the immutable subject and signed release-envelope graph.
+- from_id: SURF-025
+  to_id: IFACE-026
+  relationship: The non-production consumer uses the GitOps acceptance interface.
+- from_id: SURF-026
+  to_id: IFACE-027
+  relationship: External dependencies use the exception-ledger interface.
+- from_id: SURF-027
+  to_id: IFACE-028
+  relationship: Parity, cutover, rollback, observation, and retirement share one human-gated packet.
+- from_id: PRQ-044
+  to_id: IFACE-029
+  relationship: Human and machine authority requires immutable IdP subjects and explicit principal scopes.
+- from_id: PRQ-040
+  to_id: IFACE-030
+  relationship: Event, status, publication, promotion, replay, and recovery idempotency require a durable effect-ledger contract.
+- from_id: PRQ-048
+  to_id: IFACE-031
+  relationship: Capacity, cost, latency, reliability, recovery, and observation thresholds require a machine-readable service-objective contract.
+- from_id: SURF-028
+  to_id: IFACE-029
+  relationship: The delivery identity inventory renders immutable subject and least-privilege principal state for review.
+- from_id: SURF-029
+  to_id: IFACE-031
+  relationship: The delivery service-objective dashboard renders current operating-envelope measurements and breaches.
 open_questions:
 - id: NSQ-001
   artifact: both
@@ -642,6 +750,71 @@ open_questions:
   - NSE-20260709-jason-review-feedback
   - NSE-20260709-orbit-current-state-audit
   proposed_resolution: Orbit covers authorized email, calendars, enterprise documents, transcripts, notes, conversations, meetings, and engineering context. Implementation proceeds through a governed connector plane with tenant, provenance, freshness, classification, ACL, retention, read/write authority, and personal-context/fleet-actuation separation.
+- id: NSQ-015
+  artifact: both
+  question: Approve a capability-qualified supported Forgejo release (v16 is the current candidate) as internal repository authority, with GitHub retained as an output mirror through coexistence and the observation window?
+  owner: Jason
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260623-source-control-migration-local-forges
+  - NSE-20260727-verdify-skills-local-delivery-inventory
+  - NSE-20260727-local-delivery-control-plane-primary-sources
+  - NSE-20260727-local-delivery-adversarial-audit
+  proposed_resolution: Approve only after the exact version passes capability, internal-IdP identity, repository/governance-history import, review/status/protection/audit, upgrade, coordinated-restore, public-mirror, and attended GitHub-unavailable contract tests.
+- id: NSQ-016
+  artifact: both
+  question: Approve a package-specific Zot OCI subject, one signed immutable release envelope, and a stable-harness/fresh-volume GitOps consumer as the authoritative Verdify release and deployed-acceptance model?
+  owner: Jason
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260623-kubernetes-gitops-cicd-cardinality
+  - NSE-20260623-environment-gitops-implementation-best-p
+  - NSE-20260709-verdify-skills-adversarial-review
+  - NSE-20260727-verdify-skills-local-delivery-inventory
+  - NSE-20260727-local-delivery-control-plane-primary-sources
+  - NSE-20260727-local-delivery-adversarial-audit
+  proposed_resolution: Approve. Treat the consumer as an acceptance workload; promote only the signed envelope digest, use a digest-pinned harness whose init path verifies into a fresh volume and whose main path performs a real install, and require Argo CD sole ownership, rollback, and delayed durability proof.
+- id: NSQ-017
+  artifact: both
+  question: Keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub's in-Service public-repository rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use unless separately approved, accept issue/security reports but reject external code until approved CLA or copyright-assignment terms exist, declare freshness/outage/verification/support, and defer licensing, intake, or retirement changes to separate gates?
+  owner: Jason, Skills governance owner, and legal/IP owner
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260727-verdify-skills-local-delivery-inventory
+  - NSE-20260727-local-delivery-adversarial-audit
+  - NSE-20260727-verdify-skills-public-visibility-license
+  - NSE-20260727-github-public-repository-license-terms
+  proposed_resolution: Approve subject to legal/IP confirmation of the exact GitHub-Terms and additional-project-license statement; issue/security input remains non-authoritative, external code remains disabled pending approved contributor-rights terms, and internal recovery, licensing, distribution, and destructive retirement remain separate decisions.
+- id: NSQ-018
+  artifact: both
+  question: Approve migration of repository and portfolio-work authority through provider-neutral work/change IDs, portfolio metadata, imported-history markers, and cross-system links while retaining jvallery/agents#3044 as the GitHub-side migration record until cutover reconciliation?
+  owner: Jason
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260727-local-delivery-adversarial-audit
+  proposed_resolution: Approve because Git push mirroring cannot migrate governance authority; perform the switch only after isolated contract proof, dual-run reconciliation, and attended APPLY.
+- id: NSQ-019
+  artifact: both
+  question: "Approve the complete proposed envelope of one rehearsal and one live repository; 500 admitted events/day and 20/minute burst; ten-minute maximum ordinary event age except authorized replay; two workflows; one release/day; 16 vCPU, 32 GiB, 200 GiB, USD 250/month, four operator-hours/week, and thirty dual-run days; 99.5% monthly availability excluding approved maintenance; 24x7 automated alerting with attended release/cutover windows; 24-hour snapshot and 30-day restore-rehearsal age; 365-day evidence and support-plus-365-day release retention; the stated parity, latency, recovery, mirror, transaction, and outage evidence; a 30-minute delayed re-probe; and fourteen healthy days?"
+  owner: Jason, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner, Skills release owner, and Skills governance owner
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260727-local-delivery-adversarial-audit
+  proposed_resolution: Approve every proposed value as the bounded initial operating envelope; any expansion or material breach returns for all affected owner dispositions.
+- id: NSQ-020
+  artifact: both
+  question: Approve internal IdP immutable subjects, raw-body event admission plus a durable transaction/effect ledger, minimally scoped trusted status reporting, and separate candidate, trusted validator, critic, integrator, publisher, signer, mirror, GitOps, verifier, approver, and recovery principals as mandatory trust boundaries?
+  owner: Jason, security owner, and Agent Platform owner
+  blocking: true
+  status: open
+  source_ids:
+  - NSE-20260727-local-delivery-adversarial-audit
+  proposed_resolution: Approve and reject any provider or implementation that cannot prove these boundaries without granting candidate code a self-certification path.
 learning_capture:
   status: staged
   proposal_paths:
@@ -649,17 +822,12 @@ learning_capture:
   - .agent-workflow/northstar/learning-capture/2026-07-09-adversarial-review-feedback.yaml
   open_proposal_ids: [NLP-001, NLP-002, NLP-003, NLP-004, NLP-005, NLP-006, NLP-007]
 review:
-  requested_at: '2026-07-09T18:48:04Z'
-  reviewers: [Jason, James]
-  status: approved
-  approvals:
-  - reviewer: Jason
-    decision: approved
-    decided_at: '2026-07-09T23:20:09Z'
-    notes: >-
-      Jason explicitly directed the controller to fix #72 and then lock iteration 25; see northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval. Approval covers exactly these ten defaults: adopt every July 9 review recommendation; keep pre-lock safety narrow but require trusted exact-artifact atomic publication and installation; remain proprietary and internal-first without a current community-growth goal; carry no backwards-compatibility obligation and delete deprecated capability after atomic convergence; operate Verdify Skills, Agent Platform, Orbit, and Gravity as four co-equal active pilots under the root planning outer loop; separate Jason-only North Star lock, Jason-or-James release approval, James's npm-publisher role, and independent PR review; use the restarted current Gravity repository and runtime as source truth; expose Gravity through versioned tenant-scoped read-only HTTP plus a consumer MCP adapter with equivalent authorization and resolvable citations; make Orbit both personal assistant and engineering chief of staff across governed authorized personal, enterprise, meeting, conversation, and engineering sources separated from fleet actuation; and move as soon as safely possible without an artificial deadline toward one complete four-project self-building slice and customer-consulting reuse while filing gaps in owning repositories.
-  signoff_required_for_downstream: false
+  requested_at: '2026-07-27T18:14:40Z'
+  reviewers: [Jason, James, Skills governance owner, Skills release owner, legal/IP owner, Agent Platform owner, source-control owner, security owner, SRE owner, backup/recovery owner, finance owner]
+  status: requested
+  approvals: []
+  signoff_required_for_downstream: true
 handoff:
-  next_skill: project-definition
-  next_mode: discovery
-  reason: "Jason approved and locked iteration 25 after #72 integrated; project definition can now turn the four-project product and architecture authority into end-to-end users, requirements, lifecycle coverage, interfaces, operations, relationships, and approval points."
+  next_skill: northstar-interview
+  next_mode: question-pack
+  reason: "Hash-bound product/business, architecture/delivery/scalability, and security/SRE/audit re-reviews returned no_changes_required. Named owner dispositions, NSQ-015 through NSQ-020, and Jason's separate explicit final-lock phrase remain open; no human approval is inferred."

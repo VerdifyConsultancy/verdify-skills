@@ -5,8 +5,8 @@ gate_id: northstar-final-lock
 sprint_id: null
 lane_id: null
 type: northstar
-status: approved
-question: Approve the Verdify Skills product and architecture North Star for the next milestone?
+status: open
+question: With the clean hash-bound cross-functional re-review registered, after every named owner disposition is recorded, resolve NSQ-015 through NSQ-020 and explicitly approve and lock Verdify Skills North Star iteration 26 for the local-delivery independence milestone?
 owner: Jason
 evidence_required:
   - .agent-workflow/northstar/REVIEW_PLAN.md
@@ -14,13 +14,22 @@ evidence_required:
   - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
   - .agent-workflow/northstar/northstar-artifacts.yaml
   - .agent-workflow/northstar/northstar-plan.yaml
-  - .agent-workflow/northstar/collateral/NSE-20260709-jason-iteration-25-final-lock-approval.yaml
+  - .agent-workflow/northstar/NORTHSTAR_INTERVIEW.md
+  - .agent-workflow/northstar/collateral/NSE-20260727-verdify-skills-local-delivery-inventory.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-control-plane-primary-sources.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-adversarial-audit.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260727-verdify-skills-public-visibility-license.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260727-github-public-repository-license-terms.yaml
+  - .agent-workflow/northstar/collateral/NSE-20260727-local-delivery-clean-rereview.yaml
+  - .agent-workflow/strategy/state-of-union.yaml
+  - .agent-workflow/strategy/state-of-union.md
+  - .agent-workflow/strategy/github-backlog-sync.yaml
 allowed_decisions:
   - approved
   - changes_requested
   - rejected
-decision: approved
-rationale: "Jason adopted every July 9 recommendation and ten-answer resolution as the planning default, then separately directed the controller to fix #72 and lock iteration 25. PR #123 integrated the required exact-head review substrate before this lock transaction."
-opened_at: "2026-06-23T03:13:40Z"
-resolved_at: "2026-07-09T23:20:09Z"
+decision:
+rationale: "Iteration 25 remains the protected authority. Iteration 26 proposes capability-qualified Forgejo plus IdP repository/portfolio authority, raw-body admission and a durable effect ledger, trusted status issuers, signed Zot release envelopes, stable-harness GitOps acceptance, full-boundary local dependencies, coordinated internal recovery, measurable coexistence, attended cutover, governed output mirrors, and separately gated retirement or emergency authority transfer."
+opened_at: "2026-07-27T18:14:40Z"
+resolved_at:
 resume_state: project-definition/discovery

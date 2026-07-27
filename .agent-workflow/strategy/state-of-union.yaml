@@ -2,534 +2,515 @@
 schema_ref: state-of-union.schema.yaml
 kind: StateOfUnion
 schema_version: '1.0'
-strategy_id: four-project-autonomous-platform-post-73-2026-07-12
-status: approved
+strategy_id: verdify-skills-local-ci-migration-2026-07-27
+status: blocked
 repository: VerdifyConsultancy/verdify-skills
-baseline_sha: ad2d39926a37a89875ce6b062614d21b6862047b
-assessed_at: '2026-07-12T18:55:00Z'
+baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
+assessed_at: '2026-07-27T18:01:48Z'
 inputs:
 - id: IN-001
-  type: delegated_program_direction
-  location: active goal thread 019f49ac-0732-7e11-a617-942ef35aaa17 and GitHub issue 211
-  summary: Jason authorizes autonomous execution of the issue-backed platform sequence, removal of avoidable human gates, and a lighter evidence-proportionate operating model.
-  evidence_status: reported
+  type: user_directive
+  location: "active goal attachment and https://github.com/jvallery/agents/issues/3044"
+  summary: "Replace every load-bearing GitHub Actions dependency with local k3s Argo Events and Workflows, Zot artifacts, GitOps-only deployment, mirrored dependencies, internal authority, and acceptance proof while preserving the old path until equivalence exists."
+  evidence_status: verified
 - id: IN-002
-  type: approved_north_star
-  location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-  summary: Iteration 25 remains the approved product and architecture authority for the four-project program.
+  type: repository_policy
+  location: AGENTS.md, COMMON_OPERATING_CONTRACT.md, and config/authority-matrix.yaml
+  summary: "Normal work targets dev through issue-backed isolated lanes; production, destructive, protection, credential, and runner-removal actions remain human gated."
   evidence_status: verified
 - id: IN-003
-  type: approved_definition_and_architecture
-  location: .agent-workflow/project/project-definition.yaml and .agent-workflow/architecture/architecture.yaml
-  summary: The current Verdify project definition and architecture remain approved and do not need reopening for this execution sequence.
+  type: approved_north_star
+  location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md, NORTHSTAR_ARCHITECTURE.md, and northstar-artifacts.yaml
+  summary: "Iteration 25 is approved but defines a GitHub-native delivery system and therefore conflicts with the new migration target."
   evidence_status: verified
 - id: IN-004
-  type: terminal_sprint_evidence
-  location: pull requests 213, 214, 217, 218, 223, and 224; .agent-workflow/sprints/2026-07-10-*/terminal-receipt.yaml
-  summary: Issues 135, 215, and 71 are terminal, integrated_unterminated is zero, and protected dev contains every canonical receipt at the assessed baseline.
+  type: approved_project_and_architecture
+  location: .agent-workflow/project/project-definition.yaml and .agent-workflow/architecture/architecture.yaml
+  summary: "The approved definition makes replacement of GitHub and npm a non-goal until a later migration, while the architecture assigns CI to GitHub Actions and distribution to npm and GitHub Releases."
   evidence_status: verified
 - id: IN-005
-  type: live_github_reconciliation
-  location: live Issues, pull requests, checks, and branch protection for Verdify Skills, Agents, Gravity, and Orbit
-  summary: No requested implementation issue has an open linked pull request; the named Stage 0 Agent Platform security stops remain open P0 issues.
+  type: live_github
+  location: VerdifyConsultancy/verdify-skills GitHub API and Actions API
+  summary: "No pull request is open; the latest dev push still ran validate, compliance-selftest, release PR, and delivery-gate Actions workflows, proving Actions remains load-bearing."
   evidence_status: verified
 - id: IN-006
-  type: completed_route_authority
-  location: Verdify Skills issue 71 and pull requests 221 through 224
-  summary: Fail-closed schema and semantic artifact loading, legal producer transitions, and untracked derived route cache passed fresh criticism, exact-head checks, protected-dev integration, and a normal terminal receipt.
+  type: live_fleet_source
+  location: "jvallery/agents at 4bbd5c973c8038f4f28843529cffcfc8d89d9cd9"
+  summary: "Generic repo-validate and repo-build WorkflowTemplates plus Argo Events objects and Zot publication exist, but they clone from GitHub, use GitHub credentials, reference public image/chart sources, and expose no verified internal forge."
   evidence_status: verified
 - id: IN-007
-  type: delivery_authority_incidents
-  location: Verdify Skills issue 70, pull requests 221 through 223, and issue 71 closeout evidence
-  summary: Pull requests 221 and 222 merged before phase-appropriate critic evidence, and pull request 223 used a recorded non-author-review exception; these remain issue 70 authority incidents rather than compliant precedent.
-  evidence_status: verified
-- id: IN-008
-  type: approved_strategic_direction
-  location: northstar://evidence/NSE-20260712-sota-benchmark-2026-07-verdify-skills-vs and recorded comments on issues 211, 70, 76, 12, and 43
-  summary: Jason approved the 2026-07 SOTA benchmark keep/kill/simplify direction on 2026-07-12; issue 70 is elevated above 74 and 75, issue 76 is pulled forward and expanded with the kill list, issue 12 is re-scoped to platform-native dispatch, and issue 43 becomes four loop guardrails.
-  evidence_status: verified
-- id: IN-009
-  type: terminal_sprint_evidence
-  location: pull requests 230 and 231; .agent-workflow/sprints/2026-07-12-issue-73-critic-evidence/terminal/terminal-receipt.yaml
-  summary: Issue 73 is terminal on protected dev with all five checks green at exact critic head S, fresh-critic approve_with_risks, merge f8651209, and receipt merge ad2d3992; vacuous approving evidence can no longer authorize review inbox, merge, or terminalization.
+  type: package_release
+  location: "npm @verdify-cli/cli and GitHub release v1.3.0"
+  summary: "Version 1.3.0 is currently published to npm and GitHub Releases with immutable checksums and provenance assets; no equivalent locally authoritative package release was found."
   evidence_status: verified
 source_freshness:
 - surface: git
-  source_ref: Verdify Skills protected dev at 4fe6ff65338bb129cbfbeb2451cb5a5fa696533d
+  source_ref: origin/dev
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: This strategy refresh does not claim newer source authority in Agents, Gravity, or Orbit.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "Protected dev is d226b7f244fd4612ab44739fd275b8158e1d9159; the root checkout remains on published main and was not modified."
 - surface: github_issues
-  source_ref: live issue API for Verdify Skills, jvallery/agents, VerdifyConsultancy/gravity, and jvallery/orbit
+  source_ref: "live jvallery/agents#3044 and VerdifyConsultancy/verdify-skills issue API"
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: Reconciliation is bounded to the user-authorized sequence and direct dependencies, not the full four-repository backlog.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "The fleet work board is authoritative for this migration; existing Verdify repository issues remain relevant delivery history."
 - surface: github_pull_requests
-  source_ref: live pull request state for the sequenced issues
+  source_ref: "live VerdifyConsultancy/verdify-skills pull request API"
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: Issue 71 pull requests are merged and the remaining requested implementation issues have no open linked pull request at this cutoff.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "No pull request is open."
 - surface: github_checks
-  source_ref: exact-head checks for Verdify Skills pull requests 223 and 224
+  source_ref: "latest 20 Verdify Skills Actions runs"
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: Final implementation, evidence, and normal-receipt checks passed; issue 70 still owns typed merge authority and no-promotion push semantics.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "The latest runs are from 2026-07-12; validate and compliance-selftest passed while delivery-gate failed on the dev push."
+- surface: github_deployments
+  source_ref: "live Verdify Skills deployment and environment API"
+  status: fresh
+  captured_at: '2026-07-27T18:01:21Z'
+  limitation: "Ten records exist only for the npm environment through GitHub Actions; latest deployment 5391635193 succeeded for v1.3.0 and does not prove local non-production Argo reconciliation."
+- surface: github_projects
+  source_ref: "jvallery/agents work board"
+  status: unavailable
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "Issue #3044 is durable backlog authority; project-field mutation was not required for this replan."
 - surface: north_star
-  source_ref: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and NORTHSTAR_ARCHITECTURE.md
-  status: fresh
-  captured_at: '2026-07-10T21:15:06Z'
-  limitation: Owning-repository North Star locks and authority decisions remain governed by their named issues.
+  source_ref: .agent-workflow/northstar
+  status: stale
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "The artifacts are current for iteration 25 but materially conflict with the new local-authority target."
 - surface: project_definition
   source_ref: .agent-workflow/project/project-definition.yaml
-  status: fresh
-  captured_at: '2026-07-10T21:15:06Z'
-  limitation: No cross-repository definition changes are made by this strategy refresh.
+  status: stale
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "ASM-004 and the product non-goals preserve GitHub/npm until an approved migration; #3044 supplies the migration request but the definition has not consumed it."
 - surface: architecture
   source_ref: .agent-workflow/architecture/architecture.yaml and module contracts
-  status: fresh
-  captured_at: '2026-07-10T21:15:06Z'
-  limitation: Provider and external trust contracts are intentionally issue-backed future work.
+  status: stale
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "The runtime topology, storage, integrations, deployment, observability, and release-package contract remain GitHub Actions/npm/GitHub Release specific."
 - surface: sprint_artifacts
-  source_ref: .agent-workflow/sprints and pull request 224 normal receipt
+  source_ref: .agent-workflow/sprints
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: All existing sprint transactions are terminal; the next sprint has not yet been planned.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "All recorded sprint status files are COMPLETE; no approved migration sprint exists."
+- surface: lane_artifacts
+  source_ref: .agent-workflow/sprints
+  status: fresh
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "No issue #3044 lane contract, lease, branch, worktree, session, or PR exists."
 - surface: review_artifacts
-  source_ref: issue 71 S2 fresh critic packet and exact-head critic check
+  source_ref: .agent-workflow/sprints and live pull requests
   status: fresh
-  captured_at: '2026-07-12T18:55:00Z'
-  limitation: This planning-only approval uses Jason's explicit program authority and does not manufacture an additional implementation critic.
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "Historical reviews exist; no migration review packet exists."
 - surface: deployment_runtime
-  source_ref: docs/northstar/autonomous-development-platform-plan-2026-07-10.md runtime ledgers
-  status: stale
-  captured_at: '2026-07-10T14:06:56Z'
-  limitation: No new runtime probe was needed to choose the next Verdify control-plane lane; runtime proof remains mandatory for later runtime-changing work.
+  source_ref: "authorized Kubernetes/Argo/Zot probes from 2026-07-27T17:56:03Z through 18:01:33Z"
+  status: fresh
+  captured_at: '2026-07-27T18:01:33Z'
+  limitation: "The repo controller pod is Ready on an immutable Zot digest, but it is labeled prod; Argo object reads are forbidden, so a verdify-skills Sensor, Workflow run, build digest, Application Synced+Healthy status, and sole ownership remain unproved."
 - surface: logs
-  source_ref: existing four-project diagnostic ledgers
-  status: stale
-  captured_at: '2026-07-10T14:06:56Z'
-  limitation: A single portfolio correlation identifier and seven-day durability evidence do not exist yet.
+  source_ref: "latest GitHub Actions jobs and named repo controller pod logs"
+  status: fresh
+  captured_at: '2026-07-27T18:01:33Z'
+  limitation: "The named controller pod shows no crash/restart evidence; logs and historical Actions jobs do not prove a replacement pipeline."
 - surface: metrics
-  source_ref: existing four-project diagnostic ledgers
-  status: stale
-  captured_at: '2026-07-10T14:06:56Z'
-  limitation: Useful-progress and cross-project outcome metrics remain future acceptance evidence.
-- surface: traces
-  source_ref: four-project correlated transaction
+  source_ref: "migration-specific validation/build/deploy metrics"
   status: missing
   captured_at: null
-  limitation: The transaction is prohibited until all three Stage 0 security stops close.
+  limitation: "No local migration run exists from which to measure duration, result, or durability."
+- surface: traces
+  source_ref: "end-to-end internal event-to-deploy correlation"
+  status: missing
+  captured_at: null
+  limitation: "No correlation record spans internal Git, event, validation, build, promotion, Argo reconciliation, and delayed health."
+- surface: alerts
+  source_ref: "migration-specific CI/deployment alerts"
+  status: unavailable
+  captured_at: '2026-07-27T18:01:33Z'
+  limitation: "The service account cannot list events or alerting resources, and no migration-specific firing or recovery evidence is registered."
+- surface: external_dependency
+  source_ref: "jvallery/agents local CI source, npm, GitHub Releases, public registry and Helm references"
+  status: fresh
+  captured_at: '2026-07-27T18:01:48Z'
+  limitation: "The current platform source still depends on GitHub for clone/events/desired state, public Helm repositories, and canonical public image names on cache miss."
 planning_inventory:
 - artifact_type: north_star
-  location: .agent-workflow/northstar/NORTHSTAR_PRODUCT.md and NORTHSTAR_ARCHITECTURE.md
-  status: current
-  finding: The approved four-project target and authority boundaries remain valid.
-  action: Keep locked; route ordinary delivery through issue-backed lanes.
+  location: .agent-workflow/northstar
+  status: incomplete
+  finding: "Iteration 26 now proposes Forgejo primary authority, Argo event-driven CI, immutable Zot package subjects, GitOps consumer acceptance, local immutable dependencies, coexistence, rollback, and attended cutover; iteration 25 remains protected until Jason locks the revision."
+  action: "Route to northstar-planning/review-feedback for fresh cross-functional re-review and owner dispositions; only then resolve NSQ-015 through NSQ-020 plus the separate final-lock decision before downstream definition work."
 - artifact_type: project_definition
   location: .agent-workflow/project/project-definition.yaml
-  status: current
-  finding: The definition supports the requested delivery program.
-  action: No refresh is required before the next bounded lane.
+  status: stale
+  finding: "Replacing GitHub/npm is explicitly outside current scope except through a later approved migration."
+  action: "Refresh after the North Star locks the new target."
 - artifact_type: architecture
-  location: .agent-workflow/architecture/architecture.yaml
-  status: current
-  finding: Current architecture is sufficient for Verdify control-floor work.
-  action: Resolve provider and cross-project boundaries through the named architecture issues.
+  location: .agent-workflow/architecture/architecture.yaml and decisions
+  status: stale
+  finding: "CI, package storage, release identity, checks, reviews, and delivery observability are assigned to GitHub Actions/npm/GitHub Releases."
+  action: "Define local authorities, package form, platform ownership, GitOps deployment model, rollback, and migration ADRs after product definition."
 - artifact_type: module_contracts
   location: .agent-workflow/modules/contracts
-  status: incomplete
-  finding: Evaluation, provider negotiation, Orbit trust, and Gravity evidence conformance remain issue-backed gaps.
-  action: Implement only after their dependencies are ready.
+  status: stale
+  finding: "Governance-routing, lane-assurance, readiness-integration, quality-enablement, and release-package contracts consume GitHub-specific checks/releases and prohibit cross-owner workflow changes."
+  action: "Revise black-box contracts through architecture-contracts before implementation."
 - artifact_type: state_of_union
   location: .agent-workflow/strategy/state-of-union.yaml
   status: current
-  finding: This refresh records terminal issue 71 delivery and advances the approved sequence without reopening protected intent.
-  action: Merge the planning-only refresh, then route directly to issue 73 sprint planning.
+  finding: "This strategy supersedes the 2026-07-12 issue-70 execution recommendation for the explicit migration priority."
+  action: "Hand off to northstar-planning/review-feedback until the audit revision passes fresh cross-functional review, then prepare northstar-interview."
 - artifact_type: github_backlog_sync
   location: .agent-workflow/strategy/github-backlog-sync.yaml
   status: current
-  finding: Live issue and delivery authority are reconciled for the authorized sequence.
-  action: Refresh at issue, sprint, and cross-project boundaries rather than inserting review gates into deterministic transitions.
+  finding: "Live issue, PR, workflow, release, and migration ownership are reconciled for #3044."
+  action: "Refresh after North Star and architecture decisions split implementation work."
 - artifact_type: sprint_plan
   location: .agent-workflow/sprints
   status: current
-  finding: Every existing transaction has terminal_at set and none remains globally active.
-  action: Create exactly one next sprint for issue 73.
+  finding: "Every recorded sprint is complete and none covers #3044."
+  action: "Do not create a sprint until protected intent and architecture are current and bounded implementation issues exist."
+- artifact_type: lane_contract
+  location: .agent-workflow/sprints
+  status: missing
+  finding: "No migration lane transaction exists."
+  action: "Synthesize lane candidates only in sprint-planning after the planning prerequisites pass."
 - artifact_type: gate
-  location: Agents issues 2884, 2887, and 2906
-  status: blocked
-  finding: All three Stage 0 security stops remain open P0 issues.
-  action: Do not start the four-project vertical slice until all three are closed with runtime proof.
+  location: "jvallery/agents#3044 safety gates"
+  status: incomplete
+  finding: "Protected cutover restrictions are recorded in the issue but no attended cutover or destructive change-gate decision has been authorized."
+  action: "Create typed gates at the owning phase; preserve the existing path."
+- artifact_type: diagnostic_packet
+  location: ".agent-workflow/sprints/<future-sprint>/release/observability-diagnostic-packet.yaml"
+  status: missing
+  finding: "There is no replacement-path runtime packet."
+  action: "Create during release-verification after a non-production candidate exists."
 - artifact_type: documentation
-  location: docs/northstar/autonomous-development-platform-plan-2026-07-10.md
-  status: current
-  finding: The detailed platform plan remains the operating narrative.
-  action: Use this strategy as the concise route authority; do not duplicate the plan into more gates.
+  location: "docs, AGENTS.md, .github/workflows, and fleet CI documentation"
+  status: stale
+  finding: "Repository docs describe GitHub-native delivery; fleet docs disagree about pod-pull versus Argo Events, while current source contains EventBus/EventSource/Sensors."
+  action: "Update authoritative product/architecture first, then operator and migration documentation."
 north_star:
-  goal: Deliver a resumable, evidence-backed autonomous development platform across Verdify Skills, Agent Platform, Gravity, and Orbit, using bounded authority and high-quality outputs without unnecessary process latency.
-  alignment_status: aligned
+  goal: "Deliver a resumable, evidence-backed Verdify lifecycle package and control system with typed authority, isolated execution, exact artifacts, independent assurance, and separately verified outcomes."
+  alignment_status: drift
   source_refs:
   - .agent-workflow/northstar/NORTHSTAR_PRODUCT.md
   - .agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md
-  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
+  - https://github.com/jvallery/agents/issues/3044
 current_state:
-  summary: Issues 135, 215, and 71 are terminal and global routing is truthful. Issue 73 is the sole dependency-ready lane, while the four-project slice remains Stage 0 blocked.
-  lifecycle_state: STATE_OF_UNION_APPROVED
+  summary: "The repository validates and releases through seven checked-in workflow files plus one active dynamic Copilot workflow, npm, and GitHub Releases. All required contexts are bound to the GitHub Actions app and latest jobs used GitHub-hosted runners. The fleet supplies generic Argo validation/build and Zot infrastructure, but this repository is not bound to it; the platform still fetches source/events/desired state from GitHub and no internal forge or package authority is verified."
+  lifecycle_state: PLANNING
   active_sprint: null
   open_gates:
-  - Agents #2884 request-desynchronization containment
-  - Agents #2887 tracked-archive credential containment and disposition
-  - Agents #2906 credential-probe destination containment and live proof
+  - "North Star lock for the GitHub/npm authority migration"
+  - "Attended reversible branch/ruleset requirement cutover"
+  - "Production sync, restart, credential replacement, protection weakening, runner deletion, and webhook retirement"
+  - "Fleet change-gate for destructive Kubernetes mutations"
   delivery_risks:
-  - Approving critic evidence can remain empty, incomplete, duplicated, or disconnected from the lane contract.
-  - Free-text acceptance criteria cannot yet express which lifecycle phase owns their evidence; issue 225 owns the nonblocking schema versioning.
-  - Issue 75 lacks executable fixture, oracle, and runner boundaries.
-  - Cross-project runtime evidence is stale and cannot support a vertical-slice claim.
+  - "Removing Actions before stable local signal and enforcement would erase the current working path."
+  - "A GitHub webhook, GitHub clone URL, GitHub status, or GitHub-hosted desired-state repository cannot pass the required GitHub-unavailable test."
+  - "Canonical public image names with only a warm pull-through cache cannot prove cold-node independence."
+  - "The repository produces a Ruby/Node package, while the current fleet CI schema requires at least one Docker image; the approved local package representation is undecided."
+  - "Adding a non-production workload solely for deployment proof may create product scope unless the planning artifacts define its consumer value and owner."
+  - "ArgoCD prune:false means removing a workload can orphan live objects and requires an explicit cleanup gate."
+  - "Org-level runner groups, ARC scale sets, inherited rulesets, webhooks, secrets, and audit records are outside the present token scope and require an exception-ledger disposition before final retirement claims."
 delivery_health:
   status: degraded
   diagnostic_refs:
-  - docs/northstar/autonomous-development-platform-plan-2026-07-10.md
-  - https://github.com/VerdifyConsultancy/verdify-skills/issues/71
-  deployment_refs: []
+  - "ruby scripts/validate-repo.rb passed on main and dev"
+  - "live GitHub Actions run inventory at 2026-07-27T18:01:48Z"
+  - "jvallery/agents local CI source at 4bbd5c973c8038f4f28843529cffcfc8d89d9cd9"
+  - "authorized Kubernetes/Argo/Zot probe window 2026-07-27T17:56:03Z through 18:01:33Z"
+  deployment_refs:
+  - "platform/gitops/applications/local-staging/agent-fleet-ci.yaml in jvallery/agents"
+  - "GitHub npm deployment 5391635193"
   log_refs:
-  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29133631578
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29204807057
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29204807032
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29204806984
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/29204806975
   telemetry_refs: []
   discovered_health_issues:
   - id: HEALTH-001
-    statement: A protected dev push with no intended main promotion is represented as failed delivery CI, and deterministic receipt auto-merge is not enabled at repository level.
-    severity: medium
-    evidence_refs:
-    - Verdify Skills issue 70
-    - pull request 224 and Actions run 29133631578
-    action: Codify typed no-op promotion state, declared automatic receipt merge authority, and current-transition merge guards in issue 70 without weakening protected implementation gates.
-  - id: HEALTH-002
-    statement: Administrative merge authority can advance protected dev outside the declared evidence transition, and the final issue 71 evidence merge lacked the otherwise-required non-author GitHub approval.
+    statement: "The latest protected dev push still required four GitHub Actions workflow executions and delivery-gate concluded failure."
     severity: high
     evidence_refs:
-    - Verdify Skills issue 70 comment 4940639026
-    - pull requests 221 and 222 premature merges
-    - pull request 223 recorded exception comment 4940829598
-    action: Make merge authorization a machine-verifiable typed transition in issue 70; keep these events as incidents, not precedent.
+    - "Actions runs 29204807057, 29204807032, 29204806984, and 29204806975"
+    action: "Preserve the workflows until local equivalents prove stable names, results, enforcement, and rollback; then use the attended cutover gate."
+  - id: HEALTH-002
+    statement: "Verdify Skills has no .agent-fleet/ci.yaml, Dockerfile, EventSource/Sensor binding, local artifact path, or Argo desired state."
+    severity: high
+    evidence_refs:
+    - "origin/dev tree at d226b7f244fd4612ab44739fd275b8158e1d9159"
+    action: "Define the package/build/deployment contract before implementation and split platform-owned binding work from repo-owned configuration."
+  - id: HEALTH-003
+    statement: "The generic local templates still clone from github.com using agent-github-token and reference public registry/chart authorities."
+    severity: critical
+    evidence_refs:
+    - "workflowtemplate-repo-validate.yaml"
+    - "workflowtemplate-repo-build.yaml"
+    - "agent-fleet-ci Argo Applications"
+    action: "Track internal Git/event/status/approval authority and immutable local mirrors as blocking platform dependencies; do not claim GitHub-unavailable or cold-cache acceptance."
+  - id: HEALTH-004
+    statement: "Main and dev branch protections require only contexts produced by GitHub Actions app 15368, and all observed latest jobs ran on GitHub-hosted ubuntu-latest runners."
+    severity: critical
+    evidence_refs:
+    - "live branch protection API at 2026-07-27T18:01:21Z"
+    - "live Actions jobs API at 2026-07-27T18:01:21Z"
+    action: "Reproduce stable contexts under tested internal authority and change requirements only through the attended reversible cutover."
+  - id: HEALTH-005
+    statement: "Authorized RBAC cannot read live Argo resources or Zot metadata; the named repo pod is healthy but labeled prod and is not migration acceptance evidence."
+    severity: medium
+    evidence_refs:
+    - "kubectl authorization and named-object probes 2026-07-27T17:56:03Z through 18:01:33Z"
+    action: "Obtain scoped read evidence or an owner-produced diagnostic packet before claiming local binding, Synced+Healthy, sole ownership, digest publication, or delayed health."
 issue_inventory:
-- issue: 135
-  title: Reconcile completed sprints left active and unblock global routing
-  state: CLOSED
-  classification: done
-  rationale: Pull requests 213 and 214 made terminal authority deterministic and recovered all six transactions.
-  dependencies: []
-  action: Preserve as completed evidence; do not reopen.
-- issue: 215
-  title: Authenticate GitHub evidence reads in receipt CI
-  state: CLOSED
-  classification: done
-  rationale: Pull requests 217 and 218 delivered authenticated bounded evidence reads and proved a green normal terminal receipt.
-  dependencies:
-  - issue 135 terminal receipt contract
-  action: Preserve as completed evidence; do not reopen.
-- issue: 71
-  title: Route engine routes on unvalidated status strings
-  state: CLOSED
-  classification: done
-  rationale: Pull requests 223 and 224 integrated the independently reviewed route-authority fix and its normal terminal receipt; pull requests 221 and 222 remain recorded premature-merge incidents.
-  dependencies:
-  - issue 215 complete
-  action: Preserve as terminal evidence; issue 70 owns the typed merge-authority incidents.
-- issue: 73
-  title: Empty evidence arrays can satisfy approval
-  state: CLOSED
-  classification: done
-  rationale: Lane issue-73-critic-evidence is terminal; exact critic-to-contract coverage and truthful closeout subsets are enforced fail-closed with a 21-probe hostile matrix; residual denylist-evasion tripwire and schema-description staleness are owned by issues 70 and 225.
-  dependencies:
-  - issue 71 terminal
-  action: Preserve terminal evidence; no further work.
-- issue: 225
-  title: Add lifecycle phases to lane acceptance criteria
-  state: OPEN
-  classification: candidate
-  rationale: Structured phase ownership is required to prevent impossible closeout cycles, but it is separate from the immediate vacuous-critic defect.
-  dependencies:
-  - issue 73 trusted evidence floor
-  action: Preserve as discovered follow-up and reconcile before broad phase-specific contract authoring.
-- issue: 75
-  title: Build an executable eval runner
-  state: OPEN
-  classification: underspecified
-  rationale: Eval packs exist but lack fixture references, oracle format, execution boundary, and CI budget.
-  dependencies:
-  - issue 73 trusted evidence contract
-  action: Clarify the runner contract before dispatch.
-- issue: 74
-  title: Make semantic validation and evals merge-blocking in consumer CI
+- issue: 3044
+  title: "[jvallery/agents] Remove load-bearing GitHub Actions dependencies from verdify-skills"
   state: OPEN
   classification: blocked
-  rationale: Consumer enforcement depends on the final evidence validator and executable eval runner.
+  rationale: "The desired outcome and acceptance evidence are explicit, but approved North Star, project definition, architecture, module contracts, issue decomposition, and protected cutover gates are not current."
   dependencies:
-  - issue 73
-  - issue 75
-  action: Execute after dependencies define stable commands and failure semantics.
-- issue: 43
-  title: Shared bounded agentic-loop control contract
-  state: OPEN
-  classification: underspecified
-  rationale: The intent is valid but the issue cites a stale 19-skill scope and does not yet fix the contract home.
-  dependencies:
-  - trusted transition and evaluation floor
-  action: Refresh scope to the current skill set and establish one common contract before per-skill changes.
+  - "North Star migration lock"
+  - "project-definition refresh"
+  - "architecture and module-contract refresh"
+  - "internal forge/authority decision or explicit hard-blocker disposition"
+  action: "Keep as the umbrella and durable handoff; update it after every lifecycle boundary."
 - issue: 70
-  title: Risk-sensitive fast path and change classes
+  title: "Route engine has no change_class; trivial changes traverse the full lifecycle"
   state: OPEN
-  classification: candidate
-  rationale: The 2026-07-12 elevation comment supplies the approved design parameters; the drafted lane contract compiles them into six bounded surfaces.
-  dependencies:
-  - issue 73 terminal
-  action: Dispatch the issue-70 change-classes lane as the sole ready candidate.
-- issue: 12
-  title: Negotiate Agent Platform capabilities through supported worker adapters
+  classification: deferred
+  rationale: "Previously the sole ready candidate, but it does not own the new user-prioritized CI/authority migration."
+  dependencies: []
+  action: "Preserve without scope contamination and re-evaluate after #3044 planning."
+- issue: 74
+  title: "Semantic validator and eval runner are not merge-blocking in consumer CI"
   state: OPEN
   classification: blocked
-  rationale: The current versioned capability contract is planning-ready, but adapter ownership must be reconciled with Agents issues 2497 and 655.
+  rationale: "Its check-enforcement intent overlaps the replacement path but depends on issue 75 and the new local authority contract."
   dependencies:
-  - Agents Stage 0 security closure
-  - Agents #2497 and #655 scope reconciliation
-  action: Resolve ownership and contract boundaries before implementation.
+  - "Verdify Skills issue 75"
+  - "local check/status authority from #3044"
+  action: "Reconcile as a dependency or child during issue decomposition; do not duplicate its acceptance boundary."
+- issue: 75
+  title: "Build an executable eval runner"
+  state: OPEN
+  classification: underspecified
+  rationale: "A local CI migration does not remove its missing fixture, oracle, execution, and budget definitions."
+  dependencies: []
+  action: "Keep outside the first migration foundation slice unless North Star planning makes it an explicit required check."
 - issue: 116
-  title: One SDLC platform loop-native rollout
+  title: "One SDLC platform loop-native rollout"
   state: OPEN
-  classification: blocked
-  rationale: This remains the rollout umbrella and is not a bounded implementation lane.
+  classification: stale
+  rationale: "The umbrella assumes GitHub-native authority and does not contain the offline, mirror, Argo Events, Zot package, or GitHub-unavailable acceptance boundary."
   dependencies:
-  - issues 43, 70, and 12
-  - Agent Platform authority and security
-  - Gravity and Orbit readiness
-  action: Keep open as umbrella; close only after correlated transaction and durability evidence.
+  - "updated North Star and platform authority contract"
+  action: "Relate but do not merge with #3044 until the refreshed planning artifacts decide ownership."
+- issue: 120
+  title: "[Release safety] Test and publish the exact packed artifact as an atomic, recoverable transaction"
+  state: CLOSED
+  classification: done
+  rationale: "Its exact-package, integrity, atomic publication/install, rollback, and provenance outcomes are completed predecessor contracts that the migration must preserve, not duplicate."
+  dependencies: []
+  action: "Absorb the completed outcomes into #3044/WAVE-011 package and release-envelope contracts; do not redispatch issue #120."
+- issue: 121
+  title: "[Delivery control] Enforce protected dev integration and release-only main promotion"
+  state: CLOSED
+  classification: done
+  rationale: "Its protected-dev integration and release-only-main outcomes are completed predecessor contracts that remain coexistence invariants until attended authority cutover."
+  dependencies:
+  - "completed issue #120 contract"
+  action: "Absorb the completed outcomes into #3044/WAVE-011 protected-development and promotion contracts; do not redispatch issue #121."
 - issue: null
-  title: Agent Platform security and authority sequence
-  state: OPEN
-  classification: blocked
-  rationale: Agents 2884, 2887, and 2906 are open P0 Stage 0 stops; 2890 and 2905 follow.
+  title: "Internal Git, event, status, approval, and promotion authority"
+  state: MISSING
+  classification: missing
+  rationale: "Source and live searches found generic local CI but no verified internal forge/mirror and no GitHub-unavailable end-to-end authority."
   dependencies:
-  - Agents #2884
-  - Agents #2887
-  - Agents #2906
-  action: Execute in the Agents repository before provider or portfolio fan-out.
+  - "platform architecture owner"
+  action: "Create a platform issue after North Star defines the required authority and acceptance interface."
 - issue: null
-  title: Gravity citation and API/MCP readiness
-  state: OPEN
-  classification: blocked
-  rationale: Gravity 407 is bounded; 184 is an acceptance umbrella requiring live authorized citation resolution.
+  title: "Cold-node immutable dependency and chart mirror proof"
+  state: MISSING
+  classification: missing
+  rationale: "Current templates and Argo Applications retain public canonical image and Helm sources; a warm cache is insufficient."
   dependencies:
-  - Gravity #407
-  - Gravity #184
-  action: Execute 407 then close 184 from live evidence.
-- issue: null
-  title: Orbit trust and lifecycle repair
-  state: OPEN
-  classification: blocked
-  rationale: Orbit 193 through 198 and 43 require North Star lock and trust decisions before implementation.
-  dependencies:
-  - Orbit #197
-  - Orbit #193 through #196
-  - Orbit #198
-  - Orbit #43
-  action: Lock authority, resolve trust contracts, repair lifecycle, then integrate Gravity citations.
+  - "platform supply-chain owner"
+  action: "Create a platform issue with denied-egress cold-cache acceptance after architecture fixes the mirror contract."
 gaps:
 - id: GAP-001
-  type: delivery
-  statement: Deterministic merge authority and absent dev-to-main promotion remain represented through manual exceptions and red no-op workflow runs.
-  owner: Verdify Skills issue 70
-  blocking: false
-  apply_through: github_issue
+  type: product_definition
+  statement: "The approved product and North Star treat GitHub/npm as control planes and replacement as a non-goal until a later migration."
+  owner: "northstar-planning and project-definition"
+  blocking: true
+  apply_through: project_definition
 - id: GAP-002
-  type: module_contract
-  statement: Trusted critic evidence is not yet demonstrably non-empty and criterion-complete, and acceptance phases are not yet structured.
-  owner: Verdify Skills issues 73 and 225
-  blocking: false
-  apply_through: github_issue
+  type: architecture
+  statement: "There is no approved local authority, package representation, EventSource/Sensor ownership, Argo Application ownership, or release identity model."
+  owner: architecture-contracts
+  blocking: true
+  apply_through: architecture_contracts
 - id: GAP-003
-  type: delivery
-  statement: Skill eval packs do not yet have one deterministic executable runner or consumer CI enforcement.
-  owner: Verdify Skills issues 75 and 74
-  blocking: false
-  apply_through: github_issue
-- id: GAP-004
   type: module_contract
-  statement: The common bounded-loop and risk-class contract does not yet provide evidence-proportionate fast paths.
-  owner: Verdify Skills issues 43 and 70
-  blocking: false
-  apply_through: github_issue
+  statement: "GitHub-specific checks, reviews, releases, deployments, and prohibited-path ownership are embedded across module contracts."
+  owner: architecture-contracts
+  blocking: true
+  apply_through: architecture_contracts
+- id: GAP-004
+  type: external_dependency
+  statement: "No verified internal forge/mirror can supply Git fetch, events, status/approval, and promotion while GitHub is unavailable."
+  owner: "Agent Fleet platform"
+  blocking: true
+  apply_through: github_dependency
 - id: GAP-005
   type: external_dependency
-  statement: Agent Platform request-desync, archive-secret, and credential-probe security stops remain open.
-  owner: Agents issues 2884, 2887, and 2906
-  blocking: false
+  statement: "Fleet templates and Argo Applications retain public image and Helm sources and GitHub-hosted desired state."
+  owner: "Agent Fleet platform"
+  blocking: true
   apply_through: github_dependency
 - id: GAP-006
-  type: architecture
-  statement: Provider capability negotiation and adapter ownership are unresolved across Verdify and Agent Platform.
-  owner: Verdify issues 12 and 116; Agents issues 2497 and 655
-  blocking: false
-  apply_through: architecture_contracts
+  type: delivery
+  statement: "Verdify Skills has no repo-owned CI spec, package builder image, local stable status mapping, or local promotion workflow."
+  owner: "future issue-backed migration lanes"
+  blocking: true
+  apply_through: sprint_planning
 - id: GAP-007
-  type: evidence
-  statement: Gravity citations and Orbit trust/lifecycle are not ready for a correlated portfolio transaction.
-  owner: Gravity issues 184 and 407; Orbit issues 193-198 and 43
-  blocking: false
-  apply_through: github_dependency
+  type: deployment
+  statement: "No non-production Argo Application, immutable desired-state pin, sole owner, rollback, or delayed health proof exists for this package repository."
+  owner: "future release plan and Agent Fleet GitOps owner"
+  blocking: true
+  apply_through: release_verification
 - id: GAP-008
   type: evidence
-  statement: No single correlation ID, failure-drill suite, or seven-day unattended durability record exists.
-  owner: Verdify issue 116 and owning-project acceptance issues
-  blocking: false
+  statement: "No clean local run, Zot digest/provenance, cold-cache test, GitHub-unavailable test, reconciliation proof, rollback proof, or delayed re-probe exists."
+  owner: release-verification
+  blocking: true
   apply_through: release_verification
 recommended_sequence:
 - id: SEQ-001
-  outcome: Completed terminal sprint authority, authenticated receipt CI, and fail-closed route authority.
-  issue_ids: [135, 215, 71]
+  outcome: "Lock a product and architecture North Star that replaces GitHub/npm load-bearing authority without weakening typed backlog, review, or release invariants."
+  issue_ids: [3044]
   prerequisites:
-  - issue 135 complete
+  - "Issue #3044 remains the durable user directive."
   risks:
-  - Preserve least-privilege token scope and exact check identity in later changes
+  - "Treating a direct implementation request as permission to rewrite protected authority without the required lock."
   depends_on: []
 - id: SEQ-002
-  outcome: Close the trusted evidence floor with exact non-vacuous critic evidence.
-  issue_ids: [73]
+  outcome: "Refresh project definition, architecture ADRs, module contracts, ownership boundaries, local package form, and staged rollback model."
+  issue_ids: [3044]
   prerequisites:
-  - issue 71 terminal
+  - "SEQ-001 locked North Star"
   risks:
-  - Redundant validation process
-  - Vacuous evidence
-  - Nondeterministic or expensive evals
+  - "Cross-repository platform changes can be hidden inside a Verdify Skills lane."
   depends_on: [SEQ-001]
 - id: SEQ-003
-  outcome: Implement evidence-proportionate change classes, replace the loop contract with four guardrails, and execute the expanded simplification pass.
-  issue_ids: [70, 43, 76]
+  outcome: "Reconcile completed #120/#121 outcomes as absorbed predecessor contracts, then decompose #3044 into issue-backed repo, platform, supply-chain, non-production verification, internal-authority, and attended-cutover slices."
+  issue_ids: [3044, 120, 121]
   prerequisites:
-  - trusted evidence floor complete
+  - "SEQ-002 approved contracts"
+  - "Issue #120 exact-package trust and issue #121 protected-development outcomes are mapped once into lane contracts."
   risks:
-  - Overly broad scope across every skill
-  - Fast paths that bypass protected decisions
+  - "One umbrella lane would violate ownership isolation and make rollback unsafe; redispatching closed #120/#121 would duplicate or weaken completed security contracts."
   depends_on: [SEQ-002]
 - id: SEQ-004
-  outcome: Make semantic validation and executable evals merge-blocking for the slimmed core.
-  issue_ids: [75, 74]
+  outcome: "Implement and prove local stable-name validation plus clean package/image build and immutable Zot publication while keeping Actions intact."
+  issue_ids: [3044]
   prerequisites:
-  - simplification pass scoped the surviving skill and schema set
+  - "approved sprint transactions"
+  - "lane contracts cite #120/#121 as completed absorbed predecessors, not active candidate work"
+  - "repo-validate/repo-build compatibility or approved replacements"
   risks:
-  - Nondeterministic or expensive evals
-  - Enforcement against a still-moving skill surface
+  - "Tool images, packages, and source fetch may silently escape to public endpoints."
   depends_on: [SEQ-003]
 - id: SEQ-005
-  outcome: Resolve Agent Platform Stage 0 security and execution authority.
-  issue_ids: [2884, 2887, 2906, 2890, 2905]
+  outcome: "Prove GitOps-only non-production reconciliation, sole desired-state ownership, rollback, delayed health, denied-public cold-cache operation, and GitHub-unavailable authority."
+  issue_ids: [3044]
   prerequisites:
-  - bounded-loop and risk policy available to consumers
+  - "SEQ-004 immutable artifacts"
+  - "platform dependencies deployed through their own change gates"
   risks:
-  - Security stop cannot be cleared from repository evidence alone
-  - Credential history work may require an attended protected operation
+  - "No internal forge currently appears to exist; GitHub-unavailable acceptance may remain a declared hard blocker."
   depends_on: [SEQ-004]
 - id: SEQ-006
-  outcome: Adopt platform-native GitHub dispatch as the default worker adapter; retain Verdify evidence gates around it.
-  issue_ids: [12, 116, 2497, 655]
+  outcome: "Run the attended branch/ruleset cutover and retire only the obsolete workflows, runners, credentials, webhooks, and publication paths whose replacements have equivalent evidence."
+  issue_ids: [3044]
   prerequisites:
-  - Agents 2884, 2887, and 2906 closed
-  - adapter ownership reconciled
+  - "SEQ-005 acceptance evidence"
+  - "explicit attended authority"
   risks:
-  - Contract split across repositories
-  - Issue 116 is an umbrella rather than one lane
+  - "Early retirement removes the only working release path."
   depends_on: [SEQ-005]
-- id: SEQ-007
-  outcome: Make Gravity citations resolve with API/MCP parity and live authorized proof.
-  issue_ids: [407, 184]
-  prerequisites:
-  - provider capability contract stable
-  risks:
-  - Query versus projection hydration decision
-  - Durability interval remains unspecified
-  depends_on: [SEQ-006]
-- id: SEQ-008
-  outcome: Repair Orbit authority, trust, connector, and lifecycle boundaries.
-  issue_ids: [197, 193, 194, 195, 196, 198, 43]
-  prerequisites:
-  - Orbit North Star lock
-  - Gravity citation contract stable
-  risks:
-  - Principal and broker architecture undecided
-  - Retention and history disposition require owner authority
-  depends_on: [SEQ-007]
-- id: SEQ-009
-  outcome: Run one complete four-project transaction with one correlation ID.
-  issue_ids: [116]
-  prerequisites:
-  - Agents 2884, 2887, and 2906 closed with live proof
-  - prior sequence outcomes complete
-  risks:
-  - Merged state may diverge from runtime state
-  - Missing end-to-end provenance
-  depends_on: [SEQ-008]
-- id: SEQ-010
-  outcome: Pass failure drills and seven unattended days before broader autonomy.
-  issue_ids: [116]
-  prerequisites:
-  - one correlated transaction accepted
-  risks:
-  - Silent stalled loops
-  - Expired authority, quota, duplicate wake, or restart failures
-  depends_on: [SEQ-009]
 next_sprint_candidates:
-- outcome: Implement evidence-proportionate change classes and typed merge authority.
-  issue_ids: [70]
-  readiness: ready
-  rationale: Issue 73 is terminal; the approved 2026-07-12 parameters and a validated draft sprint transaction make issue 70 the sole ready candidate.
+- outcome: "Local-CI migration foundation"
+  issue_ids: [3044]
+  readiness: blocked
+  rationale: "The umbrella is directionally ready but protected product/architecture artifacts and bounded issue ownership are stale."
   required_actions:
-  - Add an additive change_class to lane contracts with lightweight and standard classes.
-  - Recognize planning-only and lightweight PR classes deterministically in pr-policy and delivery-gate.
-  - Return a typed no-op promotion success on dev pushes with no expected release PR.
-  - Encode a typed merge-authority table and a protected-path override forcing the full chain.
-  - Record the weekly human sampling sweep and reconcile AGENTS.md with the operating contract.
+  - "Complete North Star planning and lock."
+  - "Refresh project definition and architecture/module contracts."
+  - "Split cross-repository implementation ownership into ready issues."
+  - "Record attended cutover and destructive change gates."
 actions:
 - id: ACT-001
-  type: update_issue
-  target: Verdify Skills issue 71 terminal closeout
+  type: create_issue
+  target: "jvallery/agents#3044"
   owner: ROOT controller
   status: applied
 - id: ACT-002
   type: update_issue
-  target: Verdify Skills issue 73 bounded acceptance reconciliation
+  target: "jvallery/agents#3044 with route, inventory, blockers, and durable handoff"
   owner: ROOT controller
-  status: applied
-- id: ACT-003
-  type: plan_sprint
-  target: Verdify Skills issue 73
-  owner: sprint-planning
   status: proposed
-- id: ACT-004
-  type: set_dependency
-  target: Prohibit four-project slice until Agents 2884, 2887, and 2906 close
-  owner: ROOT controller
-  status: applied
-- id: ACT-005
-  type: update_issue
-  target: Verdify Skills issue 70 proportional automation observations
-  owner: ROOT controller
-  status: applied
-- id: ACT-006
+- id: ACT-003
   type: route
-  target: project-router after this strategy merges to protected dev
+  target: "northstar-planning intake for the local-authority migration"
   owner: ROOT controller
+  status: applied
+- id: ACT-004
+  type: refresh_project_definition
+  target: ".agent-workflow/project/project-definition.yaml after North Star lock"
+  owner: project-definition
+  status: proposed
+- id: ACT-005
+  type: refresh_architecture
+  target: ".agent-workflow/architecture and .agent-workflow/modules/contracts"
+  owner: architecture-contracts
+  status: proposed
+- id: ACT-006
+  type: create_issue
+  target: "Agent Fleet internal Git/event/status/approval/promotion authority"
+  owner: "Agent Fleet controller"
   status: proposed
 - id: ACT-007
   type: create_issue
-  target: Verdify Skills issue 225 lifecycle acceptance-phase schema
+  target: "Agent Fleet immutable local dependency/chart mirrors and denied-public cold-cache proof"
+  owner: "Agent Fleet controller"
+  status: proposed
+- id: ACT-008
+  type: open_gate
+  target: "attended branch/ruleset and legacy-retirement cutover"
+  owner: "repository owner"
+  status: proposed
+- id: ACT-009
+  type: run_diagnostic
+  target: "non-production local CI/build/GitOps/offline/authority acceptance packet"
+  owner: release-verification
+  status: proposed
+- id: ACT-010
+  type: route
+  target: "northstar-planning / review-feedback for iteration 26"
   owner: ROOT controller
   status: applied
 handoff:
-  next_skill: sprint-planning
-  next_mode: lane-transaction
-  reason: Issues 135, 215, 71, and 73 are terminal, the 2026-07-12 SOTA re-sequencing is approved and recorded, issue 70 is the sole ready candidate, and the Stage 0 stop plus approved sequence remain explicit.
+  next_skill: northstar-planning
+  next_mode: review-feedback
+  reason: "The iteration-26 product, architecture, structured plan, loop, review, interview, evidence, and gate artifacts are incorporating the registered audit; fresh product, architecture, security, SRE, and owner dispositions must close before NSQ-015 through NSQ-020 and final lock."
   required_before_handoff:
-  - Merge this strategy refresh to protected dev.
-  - Verify project-router selects sprint-planning for issue 73.
+  - "Preserve existing GitHub Actions, npm, GitHub Release, branch/ruleset, credentials, runners, webhooks, and production state."
+  - "Review NSQ-015 through NSQ-020 and the separate final-lock question in NORTHSTAR_INTERVIEW.md after fresh cross-functional review and owner dispositions close."
+  - "Keep internal-forge and cold-cache claims blocked until direct proof exists."
 approval:
-  status: approved
-  approver: Jason Vallery
-  approved_at: '2026-07-12T18:55:00Z'
+  status: pending
+  approver: null
+  approved_at: null

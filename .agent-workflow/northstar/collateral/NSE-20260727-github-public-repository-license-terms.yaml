@@ -1,0 +1,34 @@
+---
+schema_ref: northstar-evidence-item.schema.yaml
+kind: NorthStarEvidenceItem
+schema_version: '1.0'
+id: NSE-20260727-github-public-repository-license-terms
+reference: northstar://evidence/NSE-20260727-github-public-repository-license-terms
+title: GitHub public-repository license terms
+evidence_type: source_doc
+evidence_status: verified
+ingested_at: '2026-07-27T19:36:07Z'
+source:
+  uri: https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users
+  original_path: "/tmp/github-public-repository-license-terms-observation-20260727.md"
+  copied_path: ".agent-workflow/northstar/collateral/sources/NSE-20260727-github-public-repository-license-terms-github-public-repository-license-terms-observati"
+  sha256: 29bc024647ba30fca22c0cd3d54f62e4d0e29219fb30eb42577cae61468d6ba0
+summary: Official GitHub Terms evidence that a public repository grants platform-level
+  view/use/display/perform/fork rights, so UNLICENSED must be described as no separate
+  off-platform grant rather than no rights at all.
+tags:
+- github
+- licensing
+- public-mirror
+claims:
+- GitHub Terms section D.5 grants users platform-level rights to view, use, display,
+  perform, and reproduce public repository content through Service functionality including
+  forking.
+- Additional rights may be granted by adopting a repository license.
+planning_relevance:
+- Constrains PRQ/NSR/NSQ-047 to distinguish GitHub platform rights from any separate
+  off-platform, package-use, redistribution, derivative-work, or contributor-rights
+  grant.
+limitations:
+- This evidence is not legal advice and does not select or grant a repository/package
+  license.

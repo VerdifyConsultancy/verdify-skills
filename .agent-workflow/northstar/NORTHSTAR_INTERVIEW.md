@@ -1,8 +1,8 @@
 # North Star Interview
 
-Status: `final_lock_recorded`
-Generated at: `2026-07-09T23:28:41Z`
-Routed mode: `northstar-planning / signoff`
+Status: `ready`
+Generated at: `2026-07-27T18:14:40Z`
+Routed mode: `northstar-interview / question-pack`
 Evidence registry: `.agent-workflow/northstar/evidence-registry.yaml`
 Product pair: `.agent-workflow/northstar/NORTHSTAR_PRODUCT.md`
 Architecture pair: `.agent-workflow/northstar/NORTHSTAR_ARCHITECTURE.md`
@@ -10,87 +10,145 @@ Loop record: `.agent-workflow/northstar/northstar-artifacts.yaml`
 
 ## Review Summary
 
-Jason answered every material July 9 interview question, adopted every
-adversarial-review recommendation as the planning default, and then explicitly
-directed the controller to fix #72 and lock iteration 25. The earlier answer
-packet remains registered as
-`northstar://evidence/NSE-20260709-jason-review-feedback`; it is historically
-correct that those ten answers alone were not the lock. The later, separate
-signoff is registered as
-`northstar://evidence/NSE-20260709-jason-iteration-25-final-lock-approval`.
+Iteration 26 is a material authority and delivery-architecture revision. The
+current repository still depends on GitHub for source, issues, pull requests,
+reviews, required statuses, protection, workflow execution, promotion, npm
+publication, deployment records, and GitHub Releases. Generic local Argo
+components exist, but they still clone GitHub and reference public inputs; no
+live internal Git/review/status authority or repository-specific Zot package
+subject was observable.
 
-PR #123 integrated the exact-head review substrate into `dev` before this lock
-transaction began. There are zero P0 or otherwise blocking human questions for
-iteration 25.
+The audit-revised proposal uses a capability-qualified supported Forgejo release
+and internal IdP for repository and portfolio-work authority. Raw-body webhook
+admission and a durable transaction/effect ledger precede Argo Events and
+repository-owned Argo Workflows. A separated publisher and signer create an
+immutable package subject plus one signed complete pre-promotion release
+envelope in Zot; the ledger records every later lifecycle effect against it. A
+stable digest-pinned Argo CD-owned harness verifies into a fresh volume, performs
+a real install, and probes behavior. All executable inputs become internal and
+immutable; coordinated recovery restores the internal authority; GitHub/npm
+remain governed output mirrors unless a later gate separately retires them.
 
-## Resolved Decisions
+Iteration 25 remains the protected authority. No implementation, production
+mutation, protection change, credential change, workflow disablement, public
+package deletion, or authority cutover is authorized by this packet.
+The fresh hash-bound product/business, architecture/delivery/scalability, and
+security/SRE/audit reviewers returned `no_changes_required`. This interview is
+ready for Agent Platform, source-control, security, SRE, backup/recovery,
+finance, Skills release, governance, and legal/IP owner dispositions plus
+Jason's decisions; no approval is inferred.
 
-| Decision ID | Resolution | Planning effect | Evidence |
-| --- | --- | --- | --- |
-| NQI-D001 | Adopt every July 9 recommendation as the planning default. | Iteration 25 is the authority baseline rather than an optional proposal set. | `NSE-20260709-jason-review-feedback` |
-| NQI-D002 | Keep pre-lock safety work narrow, while requiring trusted installation and atomic publication. | Publication uses protected-base validation, exact packed bytes, atomic promotion, and rollback; unrelated features do not hide inside the safety lane. | July 9 feedback and adversarial review |
-| NQI-D003 | Verdify Skills is internal-first; public reference use is possible, but community growth is not a current objective. | Preserve the internal/proprietary posture for this milestone without creating a public compatibility promise. | `NSE-20260709-jason-review-feedback` |
-| NQI-D004 | No backwards compatibility is required; remove deprecated capability. | Consumer convergence ends in deletion, not indefinite aliases, facades, or dual schemas. | `NSE-20260709-jason-review-feedback` |
-| NQI-D005 | Verdify Skills, Agent Platform, Orbit, and Gravity are one integrated set of active pilots. | The root planner coordinates a four-project `PilotProject` portfolio while every project retains its own authority. | all `NSE-20260709-*` project evidence |
-| NQI-D006 | Jason or James may approve Verdify Skills releases; James publishes npm. | Release authority remains distinct from Jason-only North Star lock authority and from PR critic evidence. | `NSE-20260709-jason-review-feedback` |
-| NQI-D007 | The restarted current Gravity repository is active source truth. | Readiness gates trusted consumption and promotion; the prior instance is retired history. | Jason feedback and Gravity audit |
-| NQI-D008 | Gravity exposes a versioned tenant-scoped read-only HTTP API with a consumer-side MCP adapter. | Cited API/MCP parity, identity, typed denials, durability, health, and audit form the evidence boundary. | Jason feedback and Gravity audit |
-| NQI-D009 | Orbit is both personal assistant and engineering chief of staff across authorized personal, enterprise, meeting, conversation, and project context. | Broad information scope is core intent, bounded by separate trust domains, minimum connector scopes, ACL/provenance/freshness, retention, read audit, and human-gated writes. | Jason feedback and Orbit audit |
-| NQI-D010 | Move as soon as safely possible, prove self-building progress, and reuse the platform for customer consulting. | Optimize for the first complete four-project vertical slice; record every verified gap in its owning repository. | `NSE-20260709-jason-review-feedback` |
-| NQI-D011 | Fix #72, then lock iteration 25 and update the interview packet. | #72/PR #123 is integrated; iteration 25 is now approved and hands off to project definition. | `NSE-20260709-jason-iteration-25-final-lock-approval` |
+## Proposed Priorities
 
-## Accepted Foundations
-
-- Deterministic durable controller state remains authoritative over chat.
-- One issue, lane, branch, worktree, worker session, and PR remains the default
-  execution unit; a wave is the integration, deployment, review, and outcome
-  unit.
-- Risk-based human review continues for protected product/architecture,
-  security, privacy, identity, production, destructive, public-interface,
-  material-cost, and exception decisions.
-- Review-ready requires immutable identity, current-head checks, CI/test proof,
-  deployment evidence when applicable, telemetry, risks, rollback, and a fresh
-  critic.
-- Agent Platform dispatch negotiates versioned capabilities and supported
-  worker strategies; runtime adapters are not product identities or authority.
-- Chief-of-staff experiences remain thin facades over governed lifecycle and
-  connector contracts.
-
-## Remaining Nonblocking Owner Work
-
-These are not questions Jason must answer before lock. Each retains a proposed
-default and named owner for project-definition, architecture, security, or
-platform readiness.
-
-| Item | Owner / route | Locked default |
+| Priority | Decision or work | Classification |
 | --- | --- | --- |
-| NSQ-009 learning sources, retention, and redaction | Skills maintainer and security owner | Use explicit research/validation/review evidence plus redacted session summaries; proposal-only output; no scheduled loop without readiness proof. |
-| NSQ-010 namespace naming | Platform and security owner | Use collision-safe owner/repository identity with environment suffixes and validate against Kubernetes and Agent Platform conventions. |
-| NSQ-011 controller model selection | Platform architecture owner | Keep the controller model-neutral and select Codex, Claude, or successors per supported capability and failure mode. |
-| NSQ-012 broader infrastructure-domain authority | Jason, platform owner, and security owner | Grant only named domain agents explicit scoped authority with audit, approval, and rollback; repo agents stay namespace-scoped by default. |
-| NSQ-013 mounts, DNS/routes, and base-image requests | Platform, storage, and networking owners | Use typed platform control requests or PR-reviewed desired state; owning operators approve before mutation. |
-| Orbit sprint-transaction reconciliation | Orbit #198 | Reconcile or terminalize W27B before exact-head dispatch; retain #193-#197 for distinct connector, trust, and North Star work. |
-| Agent Platform legacy sprint reconciliation | Agents #2889 | Designate one active transaction and archive or validate legacy plans before fail-closed routing. |
-| Gravity lifecycle/readiness reconciliation | Gravity #406 | Reconcile current active source, readiness, and exact transaction evidence while #407 retains cited API/MCP parity scope. |
+| P0 | Select the internal authority, signed release-envelope/consumer model, public-mirror posture, repository plus portfolio-work migration scope, bounded operating envelope, and mandatory trust boundaries. | must-decide |
+| P0 | Require Agent Platform, source-control, security, SRE, backup/recovery, finance, Skills release/governance, legal/IP, and fresh product/architecture/security reviewers to return no required changes before asking Jason for final lock. | review gate |
+| P1 | After lock, approve module contracts for identity, governance-history migration, raw event admission, ledger/status, package/envelope, stable consumer, immutable dependencies, coordinated recovery, public support, and attended cutover before implementation dispatch. | should-decide before sprint planning |
+| P1 | Keep organization-level GitHub controls, live Argo/Zot state, IdP and status scope, backup/restore, signing custody, full-boundary cold-node proof, and service measurements in the exception ledger until owner-scoped evidence closes them. | research-needed |
 
-## Remaining Questions For Jason
+## Decisions Ready For Human Review
 
-None for iteration-25 lock.
+| Decision ID | Proposed decision | Effect if accepted |
+| --- | --- | --- |
+| NQI-D012 | Use a capability-qualified supported Forgejo release (v16 is the current candidate) plus internal IdP as internal repository authority; keep GitHub as an output mirror. | Authorizes downstream definition and contract design, not authority cutover. |
+| NQI-D013 | Make a package-specific Zot subject plus signed immutable pre-promotion release envelope the release authority and a stable-harness/fresh-volume Argo CD workload the non-production proof. | Fixes source, policy, package, checksum, test, provenance, SBOM, signature, attestation, and criticism digests; the durable ledger binds later approval, GitOps, consumer, rollback, release, and mirror receipts to that unchanged envelope. |
+| NQI-D014 | Keep npm, GitHub Releases, and GitHub source as best-effort proprietary/source-available output mirrors: preserve GitHub's in-Service public-repository rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use unless separately approved, allow issue/security intake, reject external code until approved CLA/assignment terms exist, and use separate gates for licensing, intake, retirement, or emergency authority transfer. | Separates internal recovery and independence from additional licensing, contributor rights, and public-distribution policy, subject to legal/IP confirmation. |
+| NQI-D015 | Migrate repository and portfolio-work authority through provider-neutral IDs, portfolio metadata, imported-history markers, and cross-system links. | Prevents Git mirroring from being mistaken for governance migration. |
+| NQI-D016 | Use the proposed maximum pilot envelope and measurable parity, latency, recovery, outage, and observation thresholds. | Bounds cost and creates an objective cutover verdict. |
+| NQI-D017 | Require IdP immutable subjects, raw-body event admission, durable effect ledger, trusted status issuer, and separate candidate/validator/publisher/signer/mirror/GitOps principals. | Removes candidate self-certification and replay/partial-effect ambiguity. |
+| NQI-D018 | After a clean re-review and acceptance of D012-D017, explicitly lock iteration 26 as the next-milestone North Star. | Allows project definition, architecture contracts, issue-backed sprint planning, and implementation to consume the proposal. |
 
-Future material changes start a new evidence iteration. The five deferred
-questions above may be answered by their named owners under the locked defaults
-without reopening this North Star unless their answer changes product intent,
-architecture safety, or human authority.
+## Architecture Options And Tradeoffs
+
+### Source, review, and status authority
+
+- **Proposed: capability-qualified supported Forgejo release, GitHub output
+  mirror.** Best current match for local lightweight Git, pull requests, reviews,
+  status checks, branch protection, webhooks, and mirroring. The exact version
+  must prove repository and portfolio-work capability, IdP identity,
+  governance-history migration, scoped trusted statuses, upgrade, audit, and
+  coordinated restore. Git push mirroring does not carry governance records.
+- GitHub primary with local CI only. Smaller immediate change, but fails the
+  stated GitHub-unavailable and no-load-bearing-GitHub outcome.
+- GitLab primary. Rich integrated platform, but overlaps Argo/Agent Platform
+  mechanics, raises operational weight, and has no current deployed substrate
+  in evidence.
+
+### Authoritative package and non-production proof
+
+- **Proposed: package subject plus signed release envelope and stable
+  harness/fresh-volume GitOps consumer.** Proves the exact package installed by
+  real consumers, prevents incomplete referrer graphs from appearing approved,
+  and gives Argo CD a complete signed digest to promote. Requires separated
+  builder/publisher/signer principals and a package-aware acceptance workload.
+- Container image only. Fits the current Agent Fleet CI schema but can be green
+  without proving the package archive or installer consumers receive.
+- Internal npm registry only. Familiar package semantics, but adds another
+  service and does not by itself solve multi-artifact provenance, GitOps
+  promotion, or registry convergence.
+
+### Public mirrors
+
+- **Proposed: retain proprietary/source-available best-effort mirrors.**
+  Reversible and low-risk; mirror failure is visible but non-blocking. Public
+  docs preserve GitHub's in-Service public-repository rights and state that
+  `UNLICENSED` makes no additional project grant beyond GitHub's Terms and
+  applicable law for off-platform/package use, modification, redistribution,
+  or derivatives unless separate written terms apply. Issue and security
+  reports remain open, while external code is rejected until an approved
+  CLA/assignment intake exists. Legal/IP confirms the exact statement.
+  Freshness, outage, verification, support, licensing, intake, and retirement
+  are separately governed. Costs storage and dual-path operations.
+- Retire at authority cutover. Simpler target state, but couples a reversible
+  authority switch to destructive public state removal and weakens rollback.
+
+### Event and status trust
+
+- **Proposed: raw-body admission plus durable ledger and scoped reporter.**
+  Verifies Forgejo HMAC before Argo, survives at-least-once/reordered delivery,
+  records compare-and-set effects and authorized replay, and prevents candidate
+  code from publishing protected success.
+- Argo EventSource/Sensor state only. Fewer components, but does not provide the
+  durable transaction/effect semantics, raw-body trust boundary, or recovery
+  proof required by the audit.
+
+### Operating envelope
+
+- **Proposed: bounded pilot.** One rehearsal and one live repository; 500
+  admitted events/day and 20/minute burst; ten-minute ordinary event age; two
+  concurrent workflows; one release/day; 16 vCPU, 32 GiB, 200 GiB, USD
+  250/month, four operator-hours/week, and thirty dual-run days; 99.5% monthly
+  availability excluding approved maintenance; 24x7 automated alerting with
+  attended release/cutover windows; 24-hour snapshot, 30-day restore rehearsal,
+  365-day evidence, support-plus-365-day release retention, explicit
+  transaction, latency, RPO/RTO, mirror, outage, 30-minute re-probe, and
+  fourteen-day observation thresholds.
+- Unbounded rollout. Faster nominal expansion but no objective finance,
+  capacity, reliability, or “ready to cut over” verdict.
+
+## Interview Questions
+
+| ID | Priority | Question | Proposed default | Options / tradeoffs | Affected IDs | Evidence | Answer shape |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| NSQ-015 | P0 | Approve a capability-qualified supported Forgejo release (v16 is the current candidate) as internal repository authority with GitHub as an output mirror? | Approve D012 only after exact-version capability, IdP, migration, policy, audit, upgrade, coordinated-restore, GitHub-unavailable, and attended-cutover proofs. | Approve; choose another internal forge and require the same contracts; keep GitHub primary, which does not satisfy independence. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `ARQ-035`, `CON-011`, `CON-015` | all applicable 2026-07-27 migration evidence items | `approve default`, `choose alternative`, or `freeform constraint` |
+| NSQ-016 | P0 | Approve the Zot package subject, signed immutable complete pre-promotion envelope, later-effect ledger receipts, and stable-harness/fresh-volume Argo CD consumer as authoritative release and non-production acceptance? | Approve D013; treat the consumer as an acceptance fixture and promote the fixed envelope digest while later effects remain ledger receipts. | Approve; select another internal package authority only with equivalent atomic signed-graph and GitOps proof; image-only does not prove the package. | `PRODUCT-015`, `ARCH-022`, `PRQ-041`, `PRQ-042`, `CON-012` | `NSE-20260709-verdify-skills-adversarial-review`, all three 2026-07-27 technical evidence items | `approve default`, `choose alternative`, or `freeform constraint` |
+| NSQ-017 | P0 | Keep GitHub source, npm, and GitHub Releases as best-effort proprietary/source-available mirrors that preserve GitHub's in-Service rights, make no additional project grant beyond GitHub's Terms and applicable law for off-platform/package use, allow issue/security intake but no external code pending approved CLA/assignment terms, and use later separate licensing/intake/retirement gates? | Approve D014 subject to legal/IP confirmation of the exact rights statement. | Approve the GitHub-Terms-plus-no-additional-project-grant/non-acceptance default; choose and legally approve another license plus contributor-IP process; retire later through a separate attended gate. | `PRODUCT-015`, `ARCH-022`, `PRQ-047`, `ARQ-044` | `NSE-20260727-verdify-skills-local-delivery-inventory`, `NSE-20260727-local-delivery-adversarial-audit`, `NSE-20260727-verdify-skills-public-visibility-license`, `NSE-20260727-github-public-repository-license-terms` | `approve default`, `state approved license/IP terms`, or `state retirement rule` |
+| NSQ-018 | P0 | Approve migration of repository and portfolio-work authority through provider-neutral IDs, portfolio metadata, imported-history markers, and cross-system links while retaining `jvallery/agents#3044` as the GitHub-side migration record until reconciliation? | Approve D015. | Approve; keep the global portfolio on GitHub, which leaves GitHub load-bearing; choose a different internal portfolio authority and define the bridge. | `PRODUCT-015`, `ARCH-022`, `PRQ-039`, `CON-014`, `CON-015` | `NSE-20260727-local-delivery-adversarial-audit` | `approve default`, `choose alternative`, or `freeform constraint` |
+| NSQ-019 | P0 | Approve the complete proposed pilot envelope for repository/event scale and age, compute/storage/spend/operator limits, availability/support, latency, recovery/backup/retention, parity, transaction/outage evidence, 30-minute delayed re-probe, and fourteen-day observation? | Approve D016: one rehearsal and one live repository; 500 events/day and 20/minute burst; ten-minute ordinary event age; two workflows; one release/day; 16 vCPU, 32 GiB, 200 GiB, USD 250/month, four operator-hours/week, thirty dual-run days; 99.5% monthly availability excluding approved maintenance; 24x7 automated alerting with attended release/cutover windows; 24-hour snapshot, 30-day restore rehearsal, 365-day evidence and support-plus-365-day release retention; and all documented parity, latency, recovery, mirror, transaction, outage, delayed-probe, and observation thresholds. | Approve every value; revise named values with affected owner rationale; leave any value unbounded, which blocks objective cutover review. | `PRODUCT-015`, `PRQ-048`, `ARCH-022`, `ARQ-045`, `IFACE-031` | `NSE-20260727-local-delivery-adversarial-audit` | `approve default` or `state each revised threshold` |
+| NSQ-020 | P0 | Approve immutable IdP subjects, raw-body event admission plus durable effect ledger, scoped trusted status reporting, and separated privileged principals as mandatory? | Approve D017 and reject any provider/design that cannot prove the boundary. | Approve; propose an equivalent mechanism with the same adversarial tests; waive, which leaves candidate self-certification/replay risk and is not recommended. | `PRODUCT-015`, `ARCH-022`, `PRQ-040`, `PRQ-044`, `ARQ-036`, `ARQ-040`, `ARQ-041` | `NSE-20260727-local-delivery-adversarial-audit` | `approve default` or `state equivalent controls` |
+| NQI-Q021 | P0 | After the fresh independent re-review returns no required changes and NSQ-015 through NSQ-020 are resolved, do you explicitly approve and lock North Star iteration 26? | Approve D018 only after every prior condition is met. | Approve and lock; request named changes; reject. | all iteration-26 IDs; `northstar-artifacts.yaml`; North Star gate | complete iteration-26 review packet and owner dispositions | exact phrase: `approve and lock iteration 26`, `changes requested: ...`, or `reject: ...` |
 
 ## Answer Capture Rules
 
-- The final lock lives in `northstar-artifacts.yaml`, `northstar-plan.yaml`, and
-  `.agent-workflow/gates/northstar.yaml`, backed by the separate final-lock
-  evidence item.
-- Canonical product and architecture resolutions live in the approved paired
-  markdown artifacts; implementation remains in GitHub Issues and one-lane PRs.
-- Learning proposals remain staged until their configured approval path applies
-  them.
-- A future contradiction or material decision routes through evidence intake
-  and `northstar-planning / review-feedback` as a new iteration; it does not
-  silently mutate iteration 25.
+- Preserve answers as new review-feedback evidence and route them through
+  `northstar-planning / review-feedback`.
+- Interview answers do not themselves record final lock. Only the explicit
+  NQI-Q021 decision, after a clean re-review and owner dispositions, may update `northstar-artifacts.yaml`,
+  `northstar-plan.yaml`, `.agent-workflow/gates/northstar.yaml`, product and
+  architecture status, and downstream handoff.
+- A lock authorizes downstream project definition and architecture contracts;
+  it does not authorize protected settings, production mutation, credential
+  changes, workflow disablement, cutover, or destructive retirement.
+- Any requested alternative forge, package authority, mirror policy, security
+  boundary, or cutover rule starts another artifact-loop revision before lock.
