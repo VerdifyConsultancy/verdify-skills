@@ -1,0 +1,164 @@
+---
+schema_ref: sprint-execution-runbook.schema.yaml
+kind: SprintExecutionRunbook
+schema_version: '1.0'
+runbook_id: exec-2026-07-31-fleet-cicd-e2e
+status: active
+sprint_id: 2026-07-31-fleet-cicd-e2e
+wave_id: wave-2026-07-31-fleet-cicd-e2e
+repository: VerdifyConsultancy/verdify-skills
+prepared_at: '2026-07-31T05:41:46Z'
+controller:
+  session_id: root-fleet-cicd-e2e-20260731
+  owner: root-sprint-orchestrator
+  authority: Coordinate Agent Platform worktree-agent dispatch, answer delegated lane
+    questions, reconcile CI/CD, and stop at protected gates.
+  interfaces:
+  - agent_platform_mcp
+  - github
+  - ci
+  - gitops
+  - telemetry
+  poll_interval_minutes: 5
+  delegation_policy: Full delegated authority inside approved lane contracts; protected
+    decisions remain gated.
+prerequisites:
+  approved_sprint_plan: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/sprint-plan.yaml"
+  approved_lane_contracts:
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
+  wave_release_plan: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/release/wave-release-plan.yaml"
+  platform_readiness: ".agent-workflow/platform/platform-readiness.yaml"
+  open_blockers: []
+platform:
+  mcp_server: agent-fleet
+  api_ref: POST /api/repos/<owner>/<repo>/agents
+  auth_mode: mcp_session
+  required_tools:
+  - name: add_worktree_agent
+    purpose: Dispatch one approved lane worker through the in-pod Agent Platform controller
+      MCP surface.
+    required: true
+  terminal_access:
+    mode: none
+    operator_visible: false
+    attach_refs: []
+  fallback_policy: The platform-first add_worktree_agent attempt failed closed with
+    a connection-refused transport error. Gate local-subagent-fallback-2026-07-31-fleet-cicd-e2e
+    authorizes the packaged subagent-worktree skill for this one lane; all lease,
+    ownership, D/I/E/S, review, and merge gates remain unchanged.
+cadence:
+  poll_interval_minutes: 5
+  heartbeat_timeout_minutes: 15
+  loop_until:
+  - Every required lane has a separate approved dispatch D, implementation I, and
+    closeout-only evidence head E.
+  - A distinct critic agent/session commits only its report as S, required checks
+    succeed, and a repository admin or maintainer other than the PR author has the
+    latest effective APPROVED review on S.
+  - The evidence-only controller branch has packet-only commit P with exact lane S
+    heads, CI, deployment, telemetry, rollback, and questions.
+  - Deployment verification and outcome review are ready for the next role.
+lanes:
+- lane_id: issue-234-fleet-cicd-e2e
+  issue_ids:
+  - 234
+  contract_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
+  branch: lane/234-fleet-cicd-e2e
+  owner: root-fleet-cicd-worker
+  dependency_state: ready
+  platform_session:
+    create_operation_ref: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml"
+    session_id:
+    executor: codex
+    model:
+    effort:
+    status: failed
+  prompt:
+    prompt_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.md"
+    manifest_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.manifest.json"
+    contract_hash: bbc07c4a9b12cc04882fcc1eb82ab6ad05155ee0a7e756acca6a5f74cd25e755
+  terminal:
+    tmux_session:
+    browser_terminal_url:
+    operator_attach_required: false
+  status: planned
+coordination:
+  poll_steps:
+  - Refresh GitHub, lease, session, PR, check, and deployment state.
+  - Observe lane progress through GitHub, PR checks, leases, closeout artifacts, and
+    recorded Agent Platform result refs.
+  - Capture questions, blockers, closeout, and coordination requests from durable
+    lane evidence.
+  - Answer delegated questions or open gates for protected decisions.
+  - Record controller and session-ledger events, then update sprint status.
+  controller_responses:
+  - Answer contract-scoped worker questions.
+  - Dispatch only dependency-ready lanes with no active worker lease or recorded worktree-agent
+    result.
+  - Route scope changes to sprint-planning or architecture-contracts.
+  - Route closeout E to a distinct critic agent/session, then route externally approved
+    S heads to the packet-only review-inbox commit P.
+  coordination_request_policy: Resolve only within approved lane contracts and delegation;
+    route protected changes to gates.
+  escalation_paths: []
+ci_cd:
+  required_checks:
+  - validate
+  - pull-request-policy
+  - compliance / compliance
+  - delivery-policy
+  - critic-gate
+  workflows:
+  - validate
+  - policy
+  - delivery-gate
+  - compliance-selftest
+  merge_policy: Merge or queue each lane PR individually only after a valid D/I/E/S
+    chain, external admin or maintainer approval on S, packet P, and required checks;
+    never merge the controller evidence branch.
+  deployment_trigger: Trigger review deployment only from approved release plan and
+    authorized environment policy.
+  evidence_refs: []
+deployment:
+  target_environment: repository-control-plane
+  namespace:
+  strategy: none
+  approval_required: false
+  rollout_refs:
+  - AGENTS.md
+  - ".github/workflows"
+  - MANIFEST.sha256
+  rollback_refs:
+  - make test
+  - runner-label inventory
+  - live ARC execution
+  - exact-head checks
+review:
+  review_packet_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/review/review-inbox-packet.yaml"
+  human_review_trigger: Packet-only commit P is complete on the evidence-only controller
+    branch with every lane PR's exact S head, external approval, checks, deployment
+    evidence, telemetry, rollback, and open questions.
+  reviewer_visibility: []
+ledger:
+  controller_state_path: ".agent-workflow/controller/controller-state.yaml"
+  session_ledger_path: ".agent-workflow/controller/session-ledger.yaml"
+  required_events:
+  - lane_dispatched
+  - prompt_compiled
+  - worker_status
+  - worker_closeout
+  - critic_reviewed
+  - review_packet_created
+  - ci_observed
+  - deployment_observed
+stop_conditions:
+- Agent Platform add_worktree_agent operation identity is missing or unavailable.
+- A lane session, issue, branch, PR, lease, or contract identity conflicts.
+- A worker asks for protected production, schema, security, migration, or destructive
+  authority.
+- Required CI/CD, review, deployment, telemetry, or rollback evidence cannot be obtained.
+handoff:
+  next_skill: sprint-orchestrator
+  next_mode: platform-dispatch
+  reason: Dispatch dependency-ready lane workers through add_worktree_agent and supervise
+    execution from GitHub and durable evidence.

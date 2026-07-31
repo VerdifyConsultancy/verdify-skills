@@ -1,0 +1,29 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: local-subagent-fallback-2026-07-31-fleet-cicd-e2e
+sprint_id: 2026-07-31-fleet-cicd-e2e
+lane_id: issue-234-fleet-cicd-e2e
+type: policy_exception
+status: approved
+question: May the controller use the packaged subagent-worktree local fallback
+  for this lane after the platform-first add_worktree_agent operation failed closed?
+owner: Jason Vallery
+evidence_required:
+- Approved sprint and lane contract
+- Exact Agent Platform dispatch failure
+- One local lane lease and isolated worktree
+- Unchanged fresh-critic, exact-head check, and non-author approval gates
+allowed_decisions: [approve, reject]
+decision: approve
+rationale: >-
+  Directive fleet-cicd-e2e-2026-07-31 explicitly requires autonomous execution
+  now and authorizes recording blockers rather than waiting. The single
+  platform-first attempt returned `transport-error: <urlopen error [Errno 111]
+  Connection refused>` without creating a resource. The repository-provided
+  subagent-worktree skill is the bounded fallback and does not grant protected,
+  deployment, credential, or destructive authority.
+opened_at: '2026-07-31T05:42:11Z'
+resolved_at: '2026-07-31T05:42:44Z'
+resume_state: READY

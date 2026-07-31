@@ -1,0 +1,20 @@
+{
+  "schema_ref": "compiled-prompt-manifest.schema.yaml",
+  "kind": "CompiledPromptManifest",
+  "schema_version": "1.0",
+  "generated_at": "2026-07-31T05:43:21Z",
+  "role": "worker",
+  "sprint_id": "2026-07-31-fleet-cicd-e2e",
+  "lane_id": "issue-234-fleet-cicd-e2e",
+  "output": "/workspace/verdify-skills/repo/.agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.md",
+  "inputs": {
+    "common_operating_contract": "/workspace/verdify-skills/repo/COMMON_OPERATING_CONTRACT.md",
+    "role_skill": "/workspace/verdify-skills/repo/skills/lane-delivery/SKILL.md",
+    "lane_contract": "/workspace/verdify-skills/repo/.agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
+  },
+  "sha256": {
+    "common_operating_contract": "9a6a84153926aab084afe90f0984a2b39111ec5c942ed6898cd3f95dd1a047ad",
+    "role_skill": "d4710343a91c2bf7939e77de60985e64745eeb289ed5c75cb80b1c17666feb02",
+    "lane_contract": "bbc07c4a9b12cc04882fcc1eb82ab6ad05155ee0a7e756acca6a5f74cd25e755"
+  }
+}

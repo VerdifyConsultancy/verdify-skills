@@ -1,0 +1,111 @@
+---
+schema_ref: agent-platform-control-request.schema.yaml
+kind: AgentPlatformControlRequest
+schema_version: '1.0'
+request_id: apc-2026-07-31-fleet-cicd-e2e-issue-234-fleet-cicd-e2e-add-worktree-agent
+status: blocked
+requested_at: '2026-07-31T05:41:46Z'
+requester:
+  actor: root-sprint-orchestrator
+  role: orchestrator
+  session_id: root-fleet-cicd-e2e-20260731
+  reason: Add the approved lane worker as an Agent Platform worktree agent.
+operation:
+  surface: worktree
+  operation_id: add_worktree_agent
+  method: POST
+  tool_name: add_worktree_agent
+  api_ref: POST /api/repos/<owner>/<repo>/agents
+  mutation_level: dev_write
+  idempotency_key: exec-2026-07-31-fleet-cicd-e2e:issue-234-fleet-cicd-e2e:add-worktree-agent
+target:
+  repository: VerdifyConsultancy/verdify-skills
+  environment: repository-control-plane
+  namespace:
+  branch: lane/234-fleet-cicd-e2e
+  issue_ids:
+  - 234
+  lane_ids:
+  - issue-234-fleet-cicd-e2e
+  pr_refs: []
+  deployment_ids: []
+authorization:
+  auth_mode: mcp_session
+  subject: root-sprint-orchestrator
+  scopes:
+  - agent-platform:worktree-agents:add
+  service_account:
+  subject_access_review_required: false
+  approved_by: Jason Vallery via fleet-cicd-e2e-2026-07-31
+  approved_at: '2026-07-31T05:36:01Z'
+policy:
+  decision: allow
+  policy_decision_id:
+  rules:
+  - Use add_worktree_agent once per dependency-ready approved lane.
+  constraints:
+  - Do not launch local workers as an unstated fallback.
+  - Do not mutate protected or production environments from the worker session.
+  reason: Prepared from the approved sprint execution runbook.
+inputs:
+  artifact_refs:
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/sprint-execution-runbook.yaml"
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.md"
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.manifest.json"
+  - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/release/wave-release-plan.yaml"
+  - ".agent-workflow/platform/platform-readiness.yaml"
+  - ".agent-workflow/controller/session-ledger.yaml"
+  evidence_refs: []
+  parameters_summary: Call add_worktree_agent for lane issue-234-fleet-cicd-e2e on
+    branch lane/234-fleet-cicd-e2e using codex.
+  redacted_payload_ref: "#/inputs/redacted_payload"
+  redacted_payload:
+    operation_id: add_worktree_agent
+    branch: lane/234-fleet-cicd-e2e
+    runtime: codex
+    name: issue-234-fleet-cicd-e2e
+    github_identity: VerdifyConsultancy
+    user: issue-234-fleet-cicd-e2e
+    idempotency_key: exec-2026-07-31-fleet-cicd-e2e:issue-234-fleet-cicd-e2e:add-worktree-agent
+    api_request:
+      method: POST
+      path: "/api/repos/VerdifyConsultancy/verdify-skills/agents"
+      body:
+        worktree: issue-234-fleet-cicd-e2e
+        base_ref: lane/234-fleet-cicd-e2e
+        runtime: codex
+        github_identity: VerdifyConsultancy
+        user: issue-234-fleet-cicd-e2e
+        idempotency_key: exec-2026-07-31-fleet-cicd-e2e:issue-234-fleet-cicd-e2e:add-worktree-agent
+expected_effects:
+  state_changes:
+  - One Agent Platform worktree agent is added for lane issue-234-fleet-cicd-e2e.
+  - The lane lease, prompt, contract, branch, and issue refs are bound to the platform
+    agent.
+  - Agent result refs can be written back to the runbook and session ledger.
+  external_refs_expected:
+  - Agent Platform worktree agent ID
+  - GitHub PR/check refs
+  rollback_or_recovery: If add_worktree_agent fails or identity is ambiguous, mark
+    the lane blocked and route to platform-readiness or a gate.
+result:
+  status: failed
+  executed_at: '2026-07-31T05:42:11Z'
+  executor: agent-fleet MCP add_worktree_agent
+  observed_refs:
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
+  errors:
+  - 'transport-error: <urlopen error [Errno 111] Connection refused>'
+review:
+  human_gate_required: false
+  reviewers:
+  - Jason Vallery via fleet-cicd-e2e-2026-07-31
+  decision: approved
+  decided_at: '2026-07-31T05:36:01Z'
+handoff:
+  next_skill: subagent-worktree
+  next_mode: local-dispatch
+  reason: The platform-first add_worktree_agent attempt failed closed; the approved
+    local-subagent fallback gate preserves the same lane, lease, worktree, and review
+    boundaries.
