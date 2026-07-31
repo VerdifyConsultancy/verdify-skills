@@ -25,7 +25,7 @@ jobs:
         github.event.pull_request.base.ref == 'main')) ||
       (github.event.pull_request == null &&
        github.ref == 'refs/heads/dev')
-    runs-on: ubuntu-latest
+    runs-on: validation-standard
     steps:
       - name: Check out protected-base delivery policy
         if: github.event.pull_request != null
@@ -105,7 +105,7 @@ jobs:
         github.event.pull_request.base.ref == 'main')) ||
       (github.event.pull_request == null &&
        github.ref == 'refs/heads/dev')
-    runs-on: ubuntu-latest
+    runs-on: validation-standard
     steps:
       - name: Check out protected-base gate
         if: github.event.pull_request != null
