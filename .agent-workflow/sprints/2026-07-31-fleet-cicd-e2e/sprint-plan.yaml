@@ -1,0 +1,171 @@
+---
+schema_ref: sprint-plan.schema.yaml
+kind: SprintPlan
+schema_version: '1.0'
+sprint_id: 2026-07-31-fleet-cicd-e2e
+status: approved
+goal: Align repository agent guidance and every directly hosted GitHub Actions job
+  with the live Agent Fleet CI/CD contract, then prove the local, broker-authenticated,
+  and validation-standard ARC loop without bypassing held or destructive platform controls.
+baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone:
+  project:
+issue_ids:
+- 234
+scope:
+- Add the directive-mandated CI/CD section to root AGENTS.md outside the managed
+  Agent Fleet sentinel.
+- Document the rotating exact-repository GitHub App authentication boundary, local
+  validation commands, scheduler rejection semantics, repository delivery disposition,
+  durability evidence, and destructive-action gate.
+- Replace every explicit ubuntu-latest runner assignment with validation-standard
+  while preserving workflow triggers, permissions, jobs, and release behavior.
+- Regenerate the package manifest and run the complete local suite.
+- Push the lane through broker Git authentication, open the issue-backed pull request,
+  and prove that the pushed head executes on a live validation-standard ARC runner.
+- Record literal probes, UTC timestamps, conclusions, the no-build disposition, and
+  a re-probe at least ten minutes after the initial green observation.
+non_goals:
+- Change package behavior, version, npm release semantics, workflow permissions, or
+  required-check names.
+- Add a PAT, print a token, configure repository-local credentials, or broaden cross-repository
+  access.
+- Invoke agent-ci-build when .agent-fleet/ci.yaml is absent, build or push a container
+  in GitHub Actions, or create a container delivery path.
+- Perform GitOps, ArgoCD, Kubernetes, or destructive cluster changes.
+- Treat a scheduler rejection with runner_id=0 and no steps as a source-code defect.
+acceptance_criteria:
+- id: SPR-AC-01
+  statement: AGENTS.md contains the exact titled fleet CI/CD section and covers AUTH,
+    VALIDATE, this repository's image/GitOps disposition, and DISCIPLINE without changing
+    the managed operating-environment briefing.
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  evidence_expected: [AGENTS.md diff, managed-sentinel integrity check]
+- id: SPR-AC-02
+  statement: Every directly hosted workflow job uses runs-on validation-standard,
+    no ubuntu-latest remains, and workflow behavior outside runner selection is unchanged.
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  evidence_expected: [workflow diff, runner-label inventory, workflow syntax validation]
+- id: SPR-AC-03
+  statement: The regenerated manifest and complete local repository suite pass at
+    the implementation head.
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  evidence_expected: [make manifest, make test summary, implementation SHA]
+- id: SPR-AC-04
+  statement: A broker-authenticated push succeeds and the pushed head's validation
+    workflow actually executes on a validation-standard ARC runner with run ID, job
+    runner evidence, and conclusion recorded.
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  evidence_expected: [git push result, Actions run ID, runner name and labels, conclusion]
+- id: SPR-AC-05
+  statement: Green evidence includes UTC timestamps and literal probes and is re-probed
+    at least ten minutes later; the absent image build and GitOps paths are recorded
+    without invoking or bypassing platform controls.
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  evidence_expected: [initial probe ledger, durability re-probe ledger, no-build disposition]
+risks:
+- id: RISK-01
+  severity: high
+  statement: Migrating protected workflow runner labels can stop all repository delivery
+    checks if the live ARC label or scheduler is unavailable.
+  mitigation: Preserve all job semantics, prove actual execution and runner labels
+    on the pushed head, distinguish runner_id=0 scheduler rejection, and do not merge
+    without exact-head evidence.
+- id: RISK-02
+  severity: high
+  statement: A workflow-control-plane change could be integrated without the repository's
+    independent critic and non-author code-owner approval.
+  mitigation: Use the standard D/I/E/S chain, fresh critic worktree, exact-head checks,
+    and commit-bound non-author GitHub approval; report an unavailable reviewer as
+    a blocker rather than bypassing it.
+- id: RISK-03
+  severity: medium
+  statement: Guidance could incorrectly imply a container or GitOps deployment path
+    for this npm-distributed repository.
+  mitigation: Base disposition on the tracked tree and explicitly state that agent-ci-build,
+    registry digest pinning, ArgoCD rollout, and runtime workload verification do not apply.
+lanes:
+- lane_id: issue-234-fleet-cicd-e2e
+  issue_ids: [234]
+  contract_path: .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml
+  branch: lane/234-fleet-cicd-e2e
+  owner: root-fleet-cicd-worker
+  reviewer: fresh-independent-critic
+  summary: Update the fleet CI/CD guidance and runner labels, validate locally, push
+    through broker auth, and capture live ARC plus durability evidence.
+dependency_order:
+- [issue-234-fleet-cicd-e2e]
+deployment_expectations:
+- This repository publishes an npm CLI/skills package and does not ship a container
+  image or own a GitOps-delivered runtime; agent-ci-build and runtime deployment verification
+  are not applicable.
+- The lane changes GitHub Actions scheduling and package-included guidance, so exact-head
+  local validation, ARC execution, independent criticism, and protected-dev integration
+  remain mandatory.
+- No main promotion or npm publication is part of this sprint; the normal generated
+  dev-to-main release flow remains separate.
+review_plan:
+  qa_milestones:
+  - id: QA-01
+    name: Local repository and workflow validation
+    due: at implementation head
+    evidence_expected:
+    - regenerated MANIFEST.sha256
+    - make test summary
+    - no ubuntu-latest inventory
+    - workflow syntax validation
+  - id: QA-02
+    name: Broker push and live ARC proof
+    due: after pull request creation and at least ten minutes after the first green observation
+    evidence_expected:
+    - successful broker-authenticated git push
+    - Actions run and job IDs
+    - validation-standard runner labels and nonzero runner ID
+    - initial and durability probe timestamps and conclusions
+  human_review_milestones:
+  - id: HR-01
+    name: Independent protected-workflow criticism
+    owner: Fresh critic session in a different worktree
+    trigger: Closeout-only evidence head records local, push, ARC, and durability evidence.
+    review_packet_path: .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/review/review-inbox-packet.yaml
+  - id: HR-02
+    name: Commit-bound non-author code-owner approval
+    owner: Repository admin or maintainer other than the PR author
+    trigger: Fresh critic report is committed and exact-head checks pass.
+    review_packet_path: .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/review/review-inbox-packet.yaml
+  user_stories_for_review:
+  - id: US-01
+    statement: As a repository agent, I can follow one accurate fleet CI/CD contract
+      without inventing credentials, runner infrastructure, image builds, or deployment
+      paths.
+    issue_ids: [234]
+    lane_ids: [issue-234-fleet-cicd-e2e]
+    acceptance_refs: [SPR-AC-01, SPR-AC-05]
+  - id: US-02
+    statement: As a delivery owner, I can see that this exact pushed head passed locally
+      and actually ran on the fleet validation-standard ARC lane.
+    issue_ids: [234]
+    lane_ids: [issue-234-fleet-cicd-e2e]
+    acceptance_refs: [SPR-AC-02, SPR-AC-03, SPR-AC-04, SPR-AC-05]
+  reporting_summary:
+    included:
+    - root agent-fleet CI/CD guidance
+    - eight explicit workflow runner-label migrations
+    - package manifest regeneration and full local suite
+    - broker push, ARC execution, and ten-minute durability proof
+    deferred:
+    - issue 233 GitHub client rotation implementation
+    - any container build, GitOps deployment, main promotion, or npm publication
+    - fixed-identity CI broker delivery in jvallery/agents issue 3192
+    ownership:
+    - lane_id: issue-234-fleet-cicd-e2e
+      owner: root-fleet-cicd-worker
+      responsibility: Deliver and prove the bounded guidance and runner migration.
+    next_review: Fresh critic at the closeout-only evidence head, followed by exact-head
+      checks and a non-author code-owner GitHub approval.
+approval:
+  status: approved
+  approver: Jason Vallery via fleet-cicd-e2e-2026-07-31 directive
+  approved_at: '2026-07-31T05:36:01Z'
