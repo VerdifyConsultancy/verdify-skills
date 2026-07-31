@@ -68,11 +68,11 @@ lanes:
   dependency_state: ready
   platform_session:
     create_operation_ref: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml"
-    session_id:
-    executor: codex
+    session_id: worker-codex-issue234-20260731T0543Z
+    executor: codex-local-subagent
     model:
     effort:
-    status: failed
+    status: active
   prompt:
     prompt_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.md"
     manifest_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.manifest.json"
@@ -81,7 +81,7 @@ lanes:
     tmux_session:
     browser_terminal_url:
     operator_attach_required: false
-  status: planned
+  status: dispatched
 coordination:
   poll_steps:
   - Refresh GitHub, lease, session, PR, check, and deployment state.
@@ -100,7 +100,8 @@ coordination:
     S heads to the packet-only review-inbox commit P.
   coordination_request_policy: Resolve only within approved lane contracts and delegation;
     route protected changes to gates.
-  escalation_paths: []
+  escalation_paths:
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
 ci_cd:
   required_checks:
   - validate
@@ -118,7 +119,9 @@ ci_cd:
     never merge the controller evidence branch.
   deployment_trigger: Trigger review deployment only from approved release plan and
     authorized environment policy.
-  evidence_refs: []
+  evidence_refs:
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
 deployment:
   target_environment: repository-control-plane
   namespace:
