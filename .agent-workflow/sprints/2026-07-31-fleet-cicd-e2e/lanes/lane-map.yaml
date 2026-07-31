@@ -1,0 +1,13 @@
+---
+schema_ref: lane-map.schema.yaml
+kind: LaneMap
+schema_version: '1.0'
+sprint_id: 2026-07-31-fleet-cicd-e2e
+lanes:
+- lane_id: issue-234-fleet-cicd-e2e
+  issue_ids: [234]
+  module_contracts: [quality-enablement, release-package]
+  contract_path: .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml
+  parallel_group: 1
+dependency_order:
+- [issue-234-fleet-cicd-e2e]

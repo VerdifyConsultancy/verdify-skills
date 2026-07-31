@@ -1,0 +1,186 @@
+---
+schema_ref: wave-release-plan.schema.yaml
+kind: WaveReleasePlan
+schema_version: '1.0'
+wave_id: wave-2026-07-31-fleet-cicd-e2e
+status: approved
+scope:
+  sprint_id: 2026-07-31-fleet-cicd-e2e
+  issue_ids: [234]
+  lane_ids: [issue-234-fleet-cicd-e2e]
+  northstar_ids: []
+  summary: Integrate accurate Agent Fleet CI/CD guidance and validation-standard
+    runner assignments into protected dev after local, live ARC, durability, critic,
+    and code-owner evidence.
+  non_goals:
+  - main promotion or npm publication
+  - container build or registry push
+  - GitOps, ArgoCD, Kubernetes, or runtime deployment
+  - platform build-hold or credential workaround
+branch_model:
+  model: per_lane_branches
+  base_ref: dev
+  release_ref: dev
+  merge_queue_required: false
+  concurrency_group: verdify-skills-fleet-cicd-e2e
+  decision_notes: One issue-backed control-plane lane targets dev; the generated
+    dev-to-main npm release remains a separate future transaction.
+github:
+  repository: VerdifyConsultancy/verdify-skills
+  milestone: null
+  project: null
+  required_checks: [validate, pull-request-policy, compliance / compliance, delivery-policy,
+    critic-gate]
+  merge_group_checks_required: false
+  environment_protection_required: false
+ci:
+  workflows:
+  - name: validate
+    required: true
+    event_triggers: [pull_request, push]
+    timeout_minutes: 30
+    evidence_expected: [make test, validation-standard runner ID and labels, exact-head conclusion]
+  - name: policy
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [standard lane and PR-template policy]
+  - name: delivery-gate
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [protected-base delivery policy, exact-head critic evidence]
+  - name: compliance-selftest
+    required: true
+    event_triggers: [pull_request]
+    timeout_minutes: 15
+    evidence_expected: [reusable workflow executes on validation-standard]
+  artifacts: [local validation summary, runner inventory, Actions run and job evidence,
+    durability re-probe, D/I/E/S chain]
+  required_events: [pull_request]
+environments:
+- name: repository-control-plane
+  environment_type: review
+  required: true
+  namespace: null
+  url: https://github.com/VerdifyConsultancy/verdify-skills
+  quota_policy: Use only the fleet validation-standard ARC lane; hosted runners are
+    retired by zero-paid policy.
+  limit_policy: No container build, GitOps deployment, or cluster resource is in scope.
+  network_policy: GitHub operations use the in-cluster exact-repository broker paths;
+    cross-repository access fails by design.
+  ttl: null
+  secrets_scope: Rotating in-cluster exact-repository GitHub App token; never print,
+    persist, replace, or broaden it.
+  protection_rules: [fresh critic, exact-head checks, non-author code-owner approval]
+  expected_revision_source: lane/234-fleet-cicd-e2e exact PR head
+gitops:
+  controller: none
+  desired_state_refs: [AGENTS.md, .github/workflows, MANIFEST.sha256]
+  sync_order:
+  - phase: validation
+    wave: 1
+    resource: issue 234 pull request
+    purpose: Prove local suite, broker push, and live validation-standard ARC execution.
+  - phase: durability
+    wave: 2
+    resource: issue 234 evidence head
+    purpose: Re-probe green evidence at least ten minutes later and commit closeout.
+  - phase: review
+    wave: 3
+    resource: issue 234 critic report head
+    purpose: Obtain fresh criticism, exact-head checks, and non-author code-owner approval.
+  reconciliation_checks: [origin/dev baseline, exact PR head, runner ID and labels,
+    check conclusions, protected-dev merge SHA]
+  remediation_policy: Stop and fix forward on any local failure, scheduler rejection,
+    wrong runner label, check drift, critic finding, or missing non-author approval;
+    never bypass credentials or platform controls.
+deployment_strategy:
+  type: none
+  progressive_delivery: false
+  traffic_policy: null
+  steps:
+  - id: STEP-01
+    action: Validate and push the exact implementation head, then observe the pull-request
+      jobs on validation-standard.
+    success_criteria: Local suite passes, broker push succeeds, and live jobs execute
+      steps with nonzero runner IDs and the required label.
+    rollback_trigger: Any local failure, scheduler rejection, wrong runner label,
+      or workflow behavior change outside runner selection.
+  - id: STEP-02
+    action: Re-probe after at least ten minutes, commit closeout-only evidence, and
+      obtain fresh critic plus non-author code-owner review.
+    success_criteria: Evidence remains green and the final exact head satisfies every
+      review and check gate.
+    rollback_trigger: Evidence drift, critic changes requested, check failure, or
+      unavailable commit-bound approval.
+observability:
+  dashboards: [GitHub pull request checks and Actions runs]
+  logs: [make test output, git push result, Actions run and job metadata]
+  metrics: [ubuntu-latest occurrences, validation-standard jobs, test exit status,
+    runner ID, elapsed durability minutes]
+  traces: [directive ID, sprint ID, issue, D/I/E/S SHAs, PR, run and job IDs]
+  runtime_checks: [runner label inventory, full local suite, Actions run and job probes,
+    ten-minute re-probe]
+  missing_telemetry: []
+rollback:
+  ready: true
+  strategy: Revert the single protected-dev merge if the runner migration breaks
+    repository delivery; fix candidates forward before merge.
+  known_good_ref: d226b7f244fd4612ab44739fd275b8158e1d9159
+  procedure: Preserve evidence, stop integration, revert only the issue 234 merge
+    if already integrated, and restore the prior workflow labels through the same
+    reviewed dev flow.
+  validation_steps: [make test, runner-label inventory, live ARC execution, exact-head checks]
+release_health:
+  stabilization_window: Initial green observation through a re-probe at least ten minutes
+    later and final exact-head review
+  signals:
+  - name: local validation
+    source: make test
+    threshold: Exit 0 with manifest and every named suite passing.
+    blocking: true
+  - name: ARC execution
+    source: GitHub Actions run and job APIs
+    threshold: The pushed head executes steps with runner_id greater than zero and
+      the validation-standard label, and required jobs conclude success.
+    blocking: true
+  - name: durability
+    source: timestamped initial and repeated probes
+    threshold: The same exact-head green state is observed at least ten minutes apart.
+    blocking: true
+  - name: review integrity
+    source: critic report, checks, and GitHub reviews
+    threshold: Fresh critic approves, checks are green, and a non-author code-owner
+      APPROVED review matches the final head.
+    blocking: true
+review_handoff:
+  review_inbox_packet_required: true
+  expected_review_packet_path: .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/review/review-inbox-packet.yaml
+  human_test_steps:
+  - Confirm the AGENTS.md section matches the directive and remains outside the managed
+    sentinel.
+  - Confirm the workflow diff changes only eight runner labels.
+  - Inspect local test, broker push, live ARC runner, conclusion, and durability evidence.
+  - Confirm no agent-ci-build, credential workaround, GitOps action, or destructive
+    cluster action occurred.
+  approval_gate: Fresh critic plus a commit-bound APPROVED GitHub review from a repository
+    admin or maintainer other than the PR author.
+risks:
+- id: RISK-01
+  severity: high
+  statement: The validation-standard ARC label may not schedule or may be unavailable
+    for one of the protected workflows.
+  mitigation: Require live nonzero runner evidence and treat runner_id=0 with no steps
+    as a scheduler rejection that blocks integration.
+- id: RISK-02
+  severity: high
+  statement: Protected workflow changes could be merged without independent review.
+  mitigation: Require a fresh critic and exact-head non-author code-owner approval;
+    do not self-approve or self-merge.
+approval:
+  status: approved
+  approver: Jason Vallery via fleet-cicd-e2e-2026-07-31 directive
+  approved_at: '2026-07-31T05:36:01Z'
+prepared_at: '2026-07-31T05:36:01Z'
+planner: root-fleet-cicd-e2e

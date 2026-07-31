@@ -1,0 +1,29 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: plan-approval-2026-07-31-fleet-cicd-e2e
+sprint_id: 2026-07-31-fleet-cicd-e2e
+lane_id:
+type: plan_approval
+status: approved
+question: Approve the completed sprint plan, lane topology, contracts, risks, and
+  exceptions?
+owner: Jason Vallery
+evidence_required:
+- sprint plan
+- lane map
+- lane contracts
+- risk review
+allowed_decisions:
+- approve
+- revise
+- reject
+decision: approve
+rationale: The Jason-authorized fleet-cicd-e2e-2026-07-31 directive explicitly
+  requires autonomous execution now, defines the exact acceptance scope, prohibits
+  credential and platform-control workarounds, and directs blockers to be recorded
+  rather than awaited.
+opened_at: '2026-07-31T05:35:23Z'
+resolved_at: '2026-07-31T05:36:01Z'
+resume_state: READY

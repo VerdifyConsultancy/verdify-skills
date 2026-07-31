@@ -1,0 +1,194 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: '1.0'
+sprint_id: 2026-07-31-fleet-cicd-e2e
+lane_id: issue-234-fleet-cicd-e2e
+title: Fleet CI/CD guidance and validation-standard E2E proof
+status: approved
+issue_ids: [234]
+coupling_justification: null
+objective: Align repository guidance and directly hosted GitHub Actions jobs with
+  the current Agent Fleet CI/CD contract, then prove local validation, broker Git
+  authentication, live validation-standard ARC execution, and ten-minute durability
+  without bypassing held or destructive platform controls.
+desired_outcome: Agents have exact, repository-specific CI/CD instructions; every
+  explicit workflow runner uses validation-standard; the full local suite passes;
+  a branch push proves exact-repo broker auth; and the exact pushed head records a
+  successful live ARC run plus a durability re-probe.
+non_goals:
+- Change package behavior, version, release permissions, triggers, steps, or required-check
+  identities.
+- Implement issue 233 rotating-client changes.
+- Add credentials, attempt cross-repository mutation, or broaden GitHub permissions.
+- Invoke agent-ci-build without .agent-fleet/ci.yaml or create container/GitOps delivery.
+- Perform cluster, ArgoCD, destructive, main-promotion, or npm-publication actions.
+baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
+branch: lane/234-fleet-cicd-e2e
+module_contracts: [quality-enablement, release-package]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [agent-guidance, github-actions-runner-selection, local-ci-evidence]
+  owned_paths:
+  - AGENTS.md
+  - .github/workflows/compliance-gate.yml
+  - .github/workflows/delivery-gate.yml
+  - .github/workflows/policy.yml
+  - .github/workflows/publish-npm.yml
+  - .github/workflows/release-pr.yml
+  - .github/workflows/validate.yml
+  - MANIFEST.sha256
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/closeout/issue-234-fleet-cicd-e2e.closeout.yaml
+  prohibited_paths:
+  - VERSION
+  - package.json
+  - Makefile
+  - lib/**
+  - scripts/**
+  - tests/**
+  - schemas/**
+  - skills/**
+  - config/**
+  - .agent-fleet/**
+  - .agent-workflow/northstar/**
+  - .agent-workflow/project/**
+  - .agent-workflow/architecture/**
+  - .agent-workflow/strategy/**
+  coordination_required_paths: []
+  owned_interfaces:
+  - Root agent operating guidance for Agent Fleet CI/CD.
+  - GitHub Actions runner label selection for all directly hosted jobs.
+  - Package integrity manifest entries for the changed tracked files.
+dependencies:
+  hard: []
+  soft:
+  - lane_id: issue-233-rotating-app-token-consumers
+    coordination: Issue 233 owns code-level rotating-client behavior; this lane documents
+      and probes the platform-provided auth boundary without modifying those consumers.
+acceptance_criteria:
+- id: LANE-AC-01
+  statement: Root AGENTS.md contains one section titled CI/CD in this repo (agent-fleet
+    platform) outside the managed sentinel, covering AUTH, VALIDATE, BUILD/DEPLOY
+    disposition, and DISCIPLINE exactly as scoped by the directive.
+  sprint_acceptance_ids: [SPR-AC-01, SPR-AC-05]
+  evidence_required: [AGENTS.md diff, sentinel checksum or diff proof, content audit]
+- id: LANE-AC-02
+  statement: Guidance names make manifest followed by make test as the exact local
+    edit/test loop, states there is no separate lint target, requires validation-standard,
+    forbids ubuntu-latest, and explains runner_id=0 with no steps as scheduler rejection.
+  sprint_acceptance_ids: [SPR-AC-01, SPR-AC-02, SPR-AC-03]
+  evidence_required: [guidance excerpt, Makefile evidence, literal runner-label probe]
+- id: LANE-AC-03
+  statement: All eight directly hosted jobs use runs-on validation-standard, no ubuntu-latest
+    remains, and no workflow content outside the runner label changes.
+  sprint_acceptance_ids: [SPR-AC-02]
+  evidence_required: [workflow-only diff, runs-on inventory, workflow syntax probe]
+- id: LANE-AC-04
+  statement: MANIFEST.sha256 is regenerated and make test passes at the exact implementation
+    head with a UTC timestamp and summarized test counts or named suite results.
+  sprint_acceptance_ids: [SPR-AC-03]
+  evidence_required: [manifest check output, make test output, implementation SHA, UTC timestamp]
+- id: LANE-AC-05
+  statement: A normal git push through the pod broker succeeds for the exact lane
+    branch without credential output, proving the exact-repository auth plane.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [redacted push result, remote branch, pushed SHA, UTC timestamp]
+- id: LANE-AC-06
+  statement: The pushed head's validation run executes steps on a validation-standard
+    ARC runner with a nonzero runner ID and concludes successfully; run and job IDs,
+    runner name and labels, literal probe, and UTC timestamp are recorded.
+  sprint_acceptance_ids: [SPR-AC-04]
+  evidence_required: [Actions run JSON fields, Actions job JSON fields, validation conclusion]
+- id: LANE-AC-07
+  statement: The green local and live evidence is re-probed at least ten minutes
+    after the initial green observation and remains green, with both timestamps and
+    literal probes recorded.
+  sprint_acceptance_ids: [SPR-AC-05]
+  evidence_required: [initial evidence ledger, durability re-probe ledger, elapsed-time proof]
+- id: LANE-AC-08
+  statement: The repository is recorded as npm-distributed with no container image,
+    .agent-fleet/ci.yaml, or GitOps runtime; agent-ci-build is not invoked, and no credential,
+    build-hold, GitOps, or destructive-action workaround occurs.
+  sprint_acceptance_ids: [SPR-AC-01, SPR-AC-05]
+  evidence_required: [tracked-file inventory, no-build disposition, clean cluster-mutation ledger]
+- id: LANE-AC-09
+  statement: The implementation uses the required PR template, preserves the D/I/E/S
+    chain, receives a fresh critic report, passes exact-head checks, and obtains a
+    commit-bound non-author code-owner approval before integration.
+  sprint_acceptance_ids: [SPR-AC-04, SPR-AC-05]
+  evidence_required: [PR body, closeout, critic report, checks, GitHub review]
+validation_commands:
+- id: repository-validation
+  command: ruby scripts/validate-repo.rb
+  purpose: Validate repository and durable artifact invariants from the trusted source tree.
+  required: true
+- id: manifest-regeneration
+  command: make manifest
+  purpose: Regenerate package integrity hashes after tracked guidance and workflow edits.
+  required: true
+- id: full-suite
+  command: make test
+  purpose: Run the complete canonical local repository test and validation suite.
+  required: true
+- id: runner-label-audit
+  command: rg -n 'runs-on:|ubuntu-latest|validation-standard' .github/workflows AGENTS.md
+  purpose: Prove exact runner assignments and required guidance language without
+    relying on scheduler inference.
+  required: true
+- id: workflow-diff-audit
+  command: git diff --word-diff=porcelain d226b7f244fd4612ab44739fd275b8158e1d9159
+    -- .github/workflows
+  purpose: Prove runner selection is the only workflow behavior changed.
+  required: true
+- id: changed-commit-secret-scan
+  command: gitleaks git --no-banner --redact --log-opts="d226b7f244fd4612ab44739fd275b8158e1d9159..HEAD"
+  purpose: Scan lane commits without exposing detected values.
+  required: true
+required_evidence:
+- Root guidance content and managed-sentinel integrity proof.
+- Exact workflow runner inventory and runner-only diff.
+- Manifest regeneration and full local suite output.
+- Broker-authenticated push evidence with no credential material.
+- Live Actions run and job identity, validation-standard labels, nonzero runner ID,
+  steps, and conclusion.
+- Initial UTC probe and a matching re-probe at least ten minutes later.
+- No-image/no-GitOps disposition and explicit record that agent-ci-build was not attempted.
+- Worker closeout, fresh critic, exact-head checks, commit-bound non-author approval,
+  and protected-dev integration evidence.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+- The live ARC job is scheduler-rejected with runner_id=0 and no steps, or executes
+  on any label other than validation-standard.
+- The runner migration requires changing workflow permissions, triggers, steps, or
+  release semantics.
+- Local validation fails for behavior outside the owned paths.
+- A PAT, broader credential, hand-applied resource, build-hold bypass, or destructive
+  cluster mutation appears necessary.
+- A fresh critic or non-author code-owner approval cannot be obtained for the final
+  exact head.
+definition_of_done:
+- Every acceptance criterion has committed, exact-head evidence and the approved
+  dispatch inputs remain byte-identical to dispatch commit D.
+- MANIFEST.sha256 is current and the complete local suite passes at implementation
+  head I.
+- Broker push, live validation-standard ARC execution, and the ten-minute durability
+  re-probe are recorded at closeout-only evidence head E.
+- A different critic session approves E at critic report head S and every required
+  GitHub check passes on S.
+- A repository admin or maintainer other than the PR author submits a commit-bound
+  APPROVED review matching S before protected-dev integration.
+approval:
+  status: approved
+  approver: Jason Vallery via fleet-cicd-e2e-2026-07-31 directive
+  approved_at: '2026-07-31T05:36:01Z'
