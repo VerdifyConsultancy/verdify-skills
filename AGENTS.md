@@ -55,3 +55,24 @@ Mandatory repository rules:
 - Runtime deployment must be verified separately from merge success.
 
 Run `bin/verdify route --write` when lifecycle position is unclear and `ruby scripts/validate-repo.rb` before changing this skills repository.
+
+## CI/CD in this repo (agent-fleet platform)
+
+- **AUTH:** In this pod, `git` and `gh` use a rotating, exact-repository GitHub
+  App token minted in-cluster. Never add a PAT, and never echo, print, log, or
+  decode a token. Cross-repository access fails by design.
+- **VALIDATE:** The exact local edit/test loop is `make manifest` followed by
+  `make test`; there is no separate lint target. Every directly hosted GitHub
+  Actions job must use `runs-on: validation-standard`, never
+  `runs-on: ubuntu-latest`. Hosted runners are retired under the zero-paid
+  policy. A red check with `runner_id=0` and no steps is a scheduler rejection,
+  not a source bug.
+- **BUILD/DEPLOY disposition:** This repository is npm-distributed and ships no
+  container image; `.agent-fleet/ci.yaml` is absent, and there is no GitOps
+  runtime or delivery declaration. `agent-ci-build` therefore does not apply
+  and must not be invoked. The repository is validation-only on the
+  agent-fleet container/GitOps path, and GitHub Actions never builds or pushes
+  images.
+- **DISCIPLINE:** Every green claim must include a UTC timestamp and the literal
+  probe, then be re-probed at least 10 minutes later. Destructive cluster
+  actions go through the platform change-gate, never through an agent.
