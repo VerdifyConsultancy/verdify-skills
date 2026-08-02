@@ -3,13 +3,13 @@ schema_ref: sprint-execution-runbook.schema.yaml
 kind: SprintExecutionRunbook
 schema_version: '1.0'
 runbook_id: exec-2026-07-31-fleet-cicd-e2e
-status: active
+status: blocked
 sprint_id: 2026-07-31-fleet-cicd-e2e
 wave_id: wave-2026-07-31-fleet-cicd-e2e
 repository: VerdifyConsultancy/verdify-skills
-prepared_at: '2026-07-31T05:41:46Z'
+prepared_at: '2026-08-02T18:24:22Z'
 controller:
-  session_id: root-fleet-cicd-e2e-20260731
+  session_id: root-fleet-cicd-convergence-20260802
   owner: root-sprint-orchestrator
   authority: Coordinate Agent Platform worktree-agent dispatch, answer delegated lane
     questions, reconcile CI/CD, and stop at protected gates.
@@ -28,24 +28,35 @@ prerequisites:
   - ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
   wave_release_plan: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/release/wave-release-plan.yaml"
   platform_readiness: ".agent-workflow/platform/platform-readiness.yaml"
-  open_blockers: []
+  open_blockers:
+  - Exact-head validation attempt 2 (run 30608479935, job 91530886017) remains
+    unclaimed with validation-standard, runner_id 0, and zero steps.
+  - The repository has no .agent-fleet/ci.yaml checks contract; adding it is a
+    material scope change prohibited by the dispatched lane contract and requires
+    a replacement approved transaction.
+  - Service account repo-verdifyconsultancy-verdify-skills-sa cannot create Argo
+    Workflows in agent-fleet-ci, so agent-ci-validate cannot submit even after a
+    checks contract exists.
+  - The required gitleaks executable is absent from the fixed repo-agent runtime.
 platform:
   mcp_server: agent-fleet
   api_ref: POST /api/repos/<owner>/<repo>/agents
   auth_mode: mcp_session
   required_tools:
   - name: add_worktree_agent
-    purpose: Dispatch one approved lane worker through the in-pod Agent Platform controller
-      MCP surface.
-    required: true
+    purpose: Historical dynamic-dispatch surface; the live platform now returns a
+      structured 501 because fixed repo-pod agent kinds replaced dynamic worktrees.
+    required: false
   terminal_access:
     mode: none
     operator_visible: false
     attach_refs: []
   fallback_policy: The platform-first add_worktree_agent attempt failed closed with
-    a connection-refused transport error. Gate local-subagent-fallback-2026-07-31-fleet-cicd-e2e
-    authorizes the packaged subagent-worktree skill for this one lane; all lease,
-    ownership, D/I/E/S, review, and merge gates remain unchanged.
+    a connection-refused transport error and the live surface is now explicitly
+    501-disabled. Gate local-subagent-fallback-2026-07-31-fleet-cicd-e2e authorized
+    the completed local worker session. That expired lease was released at
+    2026-08-02T18:24:22Z; do not redispatch until the CI and scope-change blockers
+    are resolved. All D/I/E/S, review, and merge gates remain unchanged.
 cadence:
   poll_interval_minutes: 5
   heartbeat_timeout_minutes: 15
@@ -65,14 +76,14 @@ lanes:
   contract_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/lanes/contracts/issue-234-fleet-cicd-e2e.contract.yaml"
   branch: lane/234-fleet-cicd-e2e
   owner: root-fleet-cicd-worker
-  dependency_state: ready
+  dependency_state: blocked
   platform_session:
     create_operation_ref: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml"
     session_id: worker-codex-issue234-20260731T0543Z
     executor: codex-local-subagent
     model:
     effort:
-    status: active
+    status: abandoned
   prompt:
     prompt_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.md"
     manifest_path: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/prompts/issue-234-fleet-cicd-e2e.worker.manifest.json"
@@ -81,7 +92,7 @@ lanes:
     tmux_session:
     browser_terminal_url:
     operator_attach_required: false
-  status: dispatched
+  status: blocked
 coordination:
   poll_steps:
   - Refresh GitHub, lease, session, PR, check, and deployment state.
@@ -122,6 +133,8 @@ ci_cd:
   evidence_refs:
   - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml
   - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
+  - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/30608479935
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/234#issuecomment-5159694909
 deployment:
   target_environment: repository-control-plane
   namespace:
@@ -161,7 +174,8 @@ stop_conditions:
   authority.
 - Required CI/CD, review, deployment, telemetry, or rollback evidence cannot be obtained.
 handoff:
-  next_skill: sprint-orchestrator
-  next_mode: platform-dispatch
-  reason: Dispatch dependency-ready lane workers through add_worktree_agent and supervise
-    execution from GitHub and durable evidence.
+  next_skill: platform-readiness
+  next_mode: readiness-gate
+  reason: Restore a claimable validation-standard runner, the standard ci-workflows
+    create capability, and the required scanner/runtime contract before replanning
+    the checks-only repository CI spec and redispatching issue 234.

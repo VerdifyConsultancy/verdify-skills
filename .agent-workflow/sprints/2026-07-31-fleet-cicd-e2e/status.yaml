@@ -3,10 +3,17 @@ schema_ref: status.schema.yaml
 kind: SprintStatus
 schema_version: '1.0'
 sprint_id: 2026-07-31-fleet-cicd-e2e
-state: IMPLEMENTING
-updated_at: '2026-07-31T05:44:18Z'
-active_lanes:
-- issue-234-fleet-cicd-e2e
-blockers: []
-next_action: Monitor local leased worker session worker-codex-issue234-20260731T0543Z
-  for implementation, PR, live ARC, durability, and closeout evidence.
+state: BLOCKED
+updated_at: '2026-08-02T18:24:22Z'
+active_lanes: []
+blockers:
+- Exact-head GitHub Actions jobs request validation-standard but remain unclaimed
+  with runner_id 0 and zero steps.
+- The repo service account cannot create the standard repo-validate Workflow in
+  agent-fleet-ci.
+- Adding the missing checks-only .agent-fleet/ci.yaml is outside the immutable
+  dispatched contract and requires a replacement approved lane transaction.
+- The required gitleaks executable is absent from the repo-agent runtime.
+next_action: Platform owner relays issue 234 evidence to jvallery/agents#3088,
+  restores the runner and scoped CI capability, and then returns issue 234 for a
+  replacement checks-only lane transaction.
