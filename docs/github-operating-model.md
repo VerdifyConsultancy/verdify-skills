@@ -74,9 +74,9 @@ GitHub Free cannot enforce an organization-required immutable workflow, so this
 selective owner gate is the compensating control; it does not add review friction
 to ordinary implementation paths.
 
-Protected `main` requires:
-
-- validation, compliance, candidate-side `delivery-policy`, and `critic-gate`;
+Protected `main` requires these five status contexts — `validate`,
+`compliance / compliance`, `pull-request-policy`, `delivery-policy`, and
+`critic-gate` — plus:
 - one stale-dismissing code-owner approval from `jvallery` or `jrvallery`, who
   must not be the author;
 - strict up-to-date checks;

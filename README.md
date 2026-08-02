@@ -162,8 +162,9 @@ source of truth.
 
 Merging the release PR into `main` publishes that exact version to npm as
 `@verdify-cli/cli@latest`, creates tag `vX.Y.Z`, and creates the GitHub release.
-Direct pushes to `main` are a policy violation once branch protection/rulesets
-are configured.
+Direct pushes to `main` are blocked: `main` protection is configured, with
+`enforce_admins: true`, `allow_force_pushes: false`, `allow_deletions: false`,
+and update restrictions to `jvallery` and `jrvallery`.
 
 ## Release this package
 
@@ -351,7 +352,7 @@ The bootstrapper rejects moving refs such as `main` unless `VERDIFY_ALLOW_MOVING
 
 ## Repository-specific setup still required
 
-Before enforcing code-owner review, replace the commented example in `.github/CODEOWNERS`. Repository administrators should configure rulesets for protected branches with required checks (`validate`, `pull-request-policy`, and `compliance / compliance`), strict up-to-date checks, conversation resolution, no direct pushes, and no force pushes or branch deletion. Every implementation lane also requires a commit-bound `APPROVED` review on the critic-report head from a repository admin or maintainer other than the PR author. The generated `dev -> main` release and package publication remain separately authorized; deployment environments and their approvers remain project-specific.
+`.github/CODEOWNERS` is already effective -- it assigns `@jvallery @jrvallery` over CODEOWNERS itself, `/.github/workflows/**`, `/config/**`, `/lib/verdify*`, `/schemas/**`, and the delivery scripts -- and both branches are already protected. The live configuration is: `main` requires the five contexts `validate`, `compliance / compliance`, `pull-request-policy`, `delivery-policy`, and `critic-gate`, one stale-dismissing code-owner approval, strict up-to-date checks, conversation resolution, `enforce_admins: true`, and no force pushes or branch deletion; `dev` requires the same minus `delivery-policy`, with zero required approvals by design because `critic-gate` carries the evidence requirement there. When configuring a downstream repository, copy those literal context strings -- they are job ids, not workflow display names. Every implementation lane also requires a commit-bound `APPROVED` review on the critic-report head from a repository admin or maintainer other than the PR author. The generated `dev -> main` release and package publication remain separately authorized; deployment environments and their approvers remain project-specific.
 
 ## Skill packs
 
