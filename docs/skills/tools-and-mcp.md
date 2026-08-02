@@ -67,7 +67,9 @@ GitHub Issues are the backlog; PRs/checks/reviews/deployments are delivery truth
   metadata. `Evidence head SHA: pending` is valid only while current head equals
   I. Otherwise I→E may add only the canonical closeout and E→S only the critic
   report. The protected-base `scripts/pr-policy.rb` enforces this as the
-  `policy` check.
+  `pull-request-policy` check. (`policy` is the *workflow* name in
+  `.github/workflows/policy.yml`; the reported status context is the job id
+  `pull-request-policy`.)
 - **Review approval:** the latest effective review from the packet's recorded
   repository admin or maintainer must be `APPROVED` on S; that reviewer must not
   be the PR author. A later commit or later change-request invalidates it.
@@ -75,9 +77,21 @@ GitHub Issues are the backlog; PRs/checks/reviews/deployments are delivery truth
   review packet is the sole path in packet commit P; only canonical
   release/outcome/status evidence may follow. Merge lane PRs individually and
   never use the controller branch as an integration candidate.
-- **Branch protection (recommended):** required checks `validate` + `policy`, ≥1
-  approving review, code-owner review, conversation resolution, no force-push/deletion,
-  merge queue on busy repos.
+- **Branch protection (recommended):** required checks `validate`,
+  `pull-request-policy`, `critic-gate`, and `compliance / compliance`;
+  code-owner review, conversation resolution, no force-push/deletion, merge
+  queue on busy repos.
+
+  Use those literal context strings. A required check must name the **job id**
+  (or `<caller-job> / <called-job>` for a reusable workflow call), never the
+  workflow display name — `policy` and `verdify-compliance` are display names
+  and a branch configured with either would deadlock on a check that never
+  reports.
+
+  On approval count, follow the repository's own model rather than a blanket
+  "≥1": this repo requires one code-owner approval on `main` and deliberately
+  requires **zero** on `dev`, because `critic-gate` carries the evidence
+  requirement there. See `docs/github-operating-model.md`.
 
 Issue creation lives in `issue-triage`; `state-of-union` recommends but does not
 create. See [`../github-operating-model.md`](../github-operating-model.md).
