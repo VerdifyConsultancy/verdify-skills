@@ -7,7 +7,7 @@ status: blocked
 sprint_id: 2026-07-31-fleet-cicd-e2e
 wave_id: wave-2026-07-31-fleet-cicd-e2e
 repository: VerdifyConsultancy/verdify-skills
-prepared_at: '2026-08-02T18:24:22Z'
+prepared_at: '2026-08-02T18:25:52Z'
 controller:
   session_id: root-fleet-cicd-convergence-20260802
   owner: root-sprint-orchestrator
@@ -29,8 +29,9 @@ prerequisites:
   wave_release_plan: ".agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/release/wave-release-plan.yaml"
   platform_readiness: ".agent-workflow/platform/platform-readiness.yaml"
   open_blockers:
-  - Exact-head validation attempt 2 (run 30608479935, job 91530886017) remains
-    unclaimed with validation-standard, runner_id 0, and zero steps.
+  - Exact-head validation attempt 2 (run 30608479935, job 91530886017) was
+    cancelled for cleanup after 6m59s unclaimed with validation-standard,
+    runner_id 0, and zero steps.
   - The repository has no .agent-fleet/ci.yaml checks contract; adding it is a
     material scope change prohibited by the dispatched lane contract and requires
     a replacement approved transaction.

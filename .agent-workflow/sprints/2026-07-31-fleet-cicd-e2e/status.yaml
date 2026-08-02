@@ -4,11 +4,11 @@ kind: SprintStatus
 schema_version: '1.0'
 sprint_id: 2026-07-31-fleet-cicd-e2e
 state: BLOCKED
-updated_at: '2026-08-02T18:24:22Z'
+updated_at: '2026-08-02T18:25:52Z'
 active_lanes: []
 blockers:
-- Exact-head GitHub Actions jobs request validation-standard but remain unclaimed
-  with runner_id 0 and zero steps.
+- Exact-head GitHub Actions attempt 2 was cancelled for cleanup after 6m59s
+  unclaimed with validation-standard, runner_id 0, and zero steps.
 - The repo service account cannot create the standard repo-validate Workflow in
   agent-fleet-ci.
 - Adding the missing checks-only .agent-fleet/ci.yaml is outside the immutable
