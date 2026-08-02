@@ -1,0 +1,180 @@
+---
+schema_ref: platform-readiness.schema.yaml
+kind: PlatformReadiness
+schema_version: '1.0'
+project_id: VerdifyConsultancy/verdify-skills-fleet-cicd-convergence
+status: blocked
+assessed_at: '2026-08-02T18:30:10Z'
+domains:
+- id: PLAT-001
+  domain: Agent Platform project/session API or MCP contract
+  status: fail
+  evidence:
+  - Agent Fleet list_agents returns four fixed controller agents on main.
+  - Live add/remove worktree tool contracts return structured 501 disabled results.
+  - The prior add_worktree_agent control request failed closed and is committed on
+    planning/2026-07-31-fleet-cicd-e2e.
+  gaps:
+  - The rendered briefing still advertises dynamic worktree and secret-inventory
+    surfaces that are disabled or absent.
+  - No broker-owned parent-issue relay exists for exact-repo agents.
+- id: PLAT-002
+  domain: Controller and worktree session lifecycle
+  status: warn
+  evidence:
+  - The approved local fallback created one issue-scoped lane, branch, worktree,
+    worker session, and PR.
+  - The expired issue-234 lease was released and its stale worktree registration
+    removed at 2026-08-02T18:24:22Z.
+  gaps:
+  - Dynamic platform worktrees are descoped, so durable runbooks must describe the
+    fixed-agent/local fallback model accurately.
+- id: PLAT-003
+  domain: Namespace model, quotas, placement, service accounts, and PVCs
+  status: fail
+  evidence:
+  - Service account name is repo-verdifyconsultancy-verdify-skills-sa.
+  - kubectl authorization reports no create access for Workflows in agent-fleet-ci.
+  - Promised own-namespace list access for pods, configmaps, services, and events
+    is absent.
+  gaps:
+  - The standard ci-workflows create/get/list/watch capability is not reconciled.
+  - The rendered own-namespace read contract does not match live RBAC.
+- id: PLAT-004
+  domain: Secrets and credential injection without prompt, log, or source exposure
+  status: warn
+  evidence:
+  - GitHub App references are github-app-installation, repo-agent-standard, enabled,
+    and agent-github-token; values were not read.
+  - Same-repository GitHub operations work and cross-repository access is denied.
+  gaps:
+  - Rendered prose says credential delivery is unavailable while file-backed App
+    authentication is effective.
+  - The promised names-only enumerate_secrets surface is not callable.
+- id: PLAT-005
+  domain: Dev, stage, and production access boundaries
+  status: pass
+  evidence:
+  - Exact-repository GitHub operations succeed while jvallery/agents access is denied.
+  - No stage, production, destructive, or cross-namespace mutation was attempted.
+  gaps: []
+- id: PLAT-006
+  domain: CI/CD, image build, registry, cache, GitOps, and Argo CD flow
+  status: fail
+  evidence:
+  - PR 235 exact-head jobs requested validation-standard and remained at runner_id
+    0 with no steps; retry attempt 2 was cancelled after 6m59s unclaimed.
+  - agent-ci-validate exits 2 because .agent-fleet/ci.yaml is absent.
+  - agent-ci-gate exits 3 because no fleet-ci status exists on main.
+  - The repository has no container, Zot, GitOps, Argo CD, or runtime surface; that
+    no-build/no-deploy disposition is appropriate.
+  gaps:
+  - No claimable validation-standard runner/profile is exposed to this repository.
+  - No checks-only .agent-fleet/ci.yaml is approved in the current lane scope.
+  - The service account cannot submit repo-validate Workflows.
+- id: PLAT-007
+  domain: DNS, ingress, TLS termination, Traefik edge ownership, and edge health
+  status: pass
+  evidence:
+  - Repository, rendered layout, and delivery declarations contain no runtime route
+    or edge target for this npm package.
+  gaps: []
+- id: PLAT-008
+  domain: Authentik SSO boundary
+  status: pass
+  evidence:
+  - Repository, rendered layout, and delivery declarations contain no protected
+    runtime route or Authentik integration for this npm package.
+  gaps: []
+- id: PLAT-009
+  domain: Observability
+  status: fail
+  evidence:
+  - GitHub run and job URLs expose queued/cancelled state and exact SHA.
+  - agent-ci-gate exposes the missing fleet-ci status deterministically.
+  gaps:
+  - Exact-repo App identities cannot read runner registration/profile state.
+  - No self-managed CI status, live runner identity, green conclusion, or T+10
+    durability signal exists.
+- id: PLAT-010
+  domain: Browser terminal access and session ownership
+  status: warn
+  evidence:
+  - Fixed controller agent identities are listed by the live Agent Fleet MCP.
+  - The approved runbook declares terminal access mode none for this lane.
+  gaps:
+  - No browser-terminal or terminal audit evidence is required or available for
+    this checks-only convergence proof.
+- id: PLAT-011
+  domain: Combined review inbox and deployed review evidence
+  status: blocked
+  evidence:
+  - PR 235 is draft and blocked at implementation head I.
+  - E, S, external approval, P, and merge evidence do not exist.
+  gaps:
+  - A review packet cannot be created before live exact-head CI and closeout evidence.
+- id: PLAT-012
+  domain: Session ledger and semantic history handoff
+  status: fail
+  evidence:
+  - The controller runbook and sprint status now record the platform blocker on a
+    pushed planning branch.
+  - Issue 234 and PR 235 carry linked durable evidence.
+  gaps:
+  - Canonical controller-state and session-ledger artifacts are absent for this sprint.
+- id: PLAT-013
+  domain: Non-Gravity pilot scope, rollback plan, and human sign-off
+  status: blocked
+  evidence:
+  - The approved wave plan defines no container or runtime deploy and identifies
+    reverting the unmerged workflow change as the rollback handle.
+  gaps:
+  - Runner, checks-contract, CI-submit RBAC, scanner, critic, and external approval
+    gates prevent a complete pilot.
+- id: PLAT-014
+  domain: Durable loop armed
+  status: blocked
+  evidence:
+  - Agent Fleet exposes four fixed controller agents on main.
+  gaps:
+  - No valid .agent-fleet/loop.yaml or repo-committed iteration prompt exists.
+  - Supervisor-loop, heartbeat, and watchdog readiness were not exposed to this repo.
+minimum_pilot:
+- Replan issue 234 into one replacement lane whose approved scope includes a
+  checks-only .agent-fleet/ci.yaml and the existing runner-label/guidance changes.
+- Validate the exact replacement implementation head locally, including the required
+  redacted gitleaks scan, and push it through exact-repo App authentication.
+- Submit repo-validate through the standard service-account capability and observe
+  a terminal fleet-ci status on the exact SHA.
+- Prove every required GitHub check executes on a real validation-standard runner
+  with nonzero runner identity and terminal success.
+- Record an intentional cancel/failure path, cleanup, rollback handle, and an
+  identical green probe at least ten minutes after the initial green observation.
+- Complete D/I/E/S, non-author commit-bound approval, packet P, and protected-dev
+  integration without any container, Zot, Argo CD, or runtime deployment claim.
+gates_to_open:
+- jvallery/agents#3088 must restore the validation-standard runner/profile and an
+  authorized relay must attach the issue-234 evidence packet.
+- A platform owner must reconcile ci-workflows RBAC for service account name
+  repo-verdifyconsultancy-verdify-skills-sa through the fleet registry/GitOps path.
+- The standard repo-agent/validation image must provide gitleaks or an explicitly
+  approved equivalent scan contract.
+- Issue 234 must receive a replacement approved sprint/lane transaction before
+  .agent-fleet/ci.yaml is added; the dispatched contract may not be edited.
+risks:
+- Merging PR 235 now would make required validation jobs unschedulable.
+- Falling back to ubuntu-latest would violate the requested self-managed-runner proof.
+- Hand-applied RBAC, broader GitHub credentials, or an ad hoc scanner install would
+  create prohibited repository-specific infrastructure or credential snowflakes.
+- Treating the npm package as an image/GitOps workload would manufacture a delivery
+  path the repository does not own.
+handoff:
+  next_skill: platform-readiness
+  next_mode: readiness-gate
+  reason: Re-run the readiness gate after the runner, scoped CI Workflow capability,
+    scanner contract, and parent-issue relay are restored; only then return issue
+    234 to sprint-planning for a replacement checks-only transaction.
+approval:
+  status: approved
+  approver: Jason Vallery via jvallery/agents#3088 estate directive
+  approved_at: '2026-08-02T18:30:10Z'
