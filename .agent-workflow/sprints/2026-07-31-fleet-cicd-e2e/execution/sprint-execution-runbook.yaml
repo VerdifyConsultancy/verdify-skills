@@ -7,7 +7,7 @@ status: blocked
 sprint_id: 2026-07-31-fleet-cicd-e2e
 wave_id: wave-2026-07-31-fleet-cicd-e2e
 repository: VerdifyConsultancy/verdify-skills
-prepared_at: '2026-08-02T18:25:52Z'
+prepared_at: '2026-08-02T18:41:51Z'
 controller:
   session_id: root-fleet-cicd-convergence-20260802
   owner: root-sprint-orchestrator
@@ -39,6 +39,8 @@ prerequisites:
     Workflows in agent-fleet-ci, so agent-ci-validate cannot submit even after a
     checks contract exists.
   - The required gitleaks executable is absent from the fixed repo-agent runtime.
+  - Exact-repository GitHub App scope cannot attach the blocker packet directly to
+    jvallery/agents#3088, and the live platform exposes no broker-owned relay.
 platform:
   mcp_server: agent-fleet
   api_ref: POST /api/repos/<owner>/<repo>/agents
@@ -114,6 +116,7 @@ coordination:
     route protected changes to gates.
   escalation_paths:
   - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/platform-cicd-convergence.yaml
 ci_cd:
   required_checks:
   - validate
@@ -134,8 +137,9 @@ ci_cd:
   evidence_refs:
   - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/execution/control-requests/issue-234-fleet-cicd-e2e-add-worktree-agent.yaml
   - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/local-subagent-fallback.yaml
+  - .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/platform-cicd-convergence.yaml
   - https://github.com/VerdifyConsultancy/verdify-skills/actions/runs/30608479935
-  - https://github.com/VerdifyConsultancy/verdify-skills/issues/234#issuecomment-5159694909
+  - https://github.com/VerdifyConsultancy/verdify-skills/issues/234#issuecomment-5159758143
 deployment:
   target_environment: repository-control-plane
   namespace:

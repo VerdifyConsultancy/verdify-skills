@@ -1,0 +1,36 @@
+---
+schema_ref: human-gate.schema.yaml
+kind: HumanGate
+schema_version: '1.0'
+gate_id: platform-cicd-convergence-2026-08-02
+sprint_id: 2026-07-31-fleet-cicd-e2e
+lane_id: issue-234-fleet-cicd-e2e
+type: platform_readiness
+status: open
+question: Has Agent Fleet restored every standard capability required to resume
+  the issue 234 CI/CD convergence lane without a repository-specific workaround?
+owner: Agent Fleet platform owner via jvallery/agents#3088
+evidence_required:
+- A validation-standard job on the exact approved SHA executes steps on a nonzero
+  runner identity and reaches a terminal conclusion.
+- Service account repo-verdifyconsultancy-verdify-skills-sa can create the standard
+  repo-validate Workflow in agent-fleet-ci through registry-managed RBAC.
+- The standard validation runtime provides gitleaks or an explicitly approved
+  equivalent scan contract.
+- An audited broker-owned relay confirms the issue 234 blocker packet is attached
+  to jvallery/agents#3088.
+- A replacement approved issue 234 sprint/lane transaction includes the checks-only
+  .agent-fleet/ci.yaml scope before implementation resumes.
+allowed_decisions: [ready, still_blocked, supersede]
+decision:
+rationale: >-
+  Independent read-only re-probes from 2026-08-02T18:37:56Z through
+  2026-08-02T18:39:51Z found no changed prerequisite: the last exact-head job
+  remains cancelled with runner_id 0 and zero steps; the runner endpoint remains
+  forbidden; .agent-fleet/ci.yaml is absent on main, dev, and the lane; the service
+  account still cannot create Workflows in agent-fleet-ci; gitleaks is absent; and
+  no cross-repository relay capability exists. No CI retry or platform mutation
+  was attempted.
+opened_at: '2026-08-02T18:41:51Z'
+resolved_at:
+resume_state: PLATFORM_READINESS_GATE

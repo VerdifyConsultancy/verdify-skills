@@ -4,7 +4,7 @@ kind: PlatformReadiness
 schema_version: '1.0'
 project_id: VerdifyConsultancy/verdify-skills-fleet-cicd-convergence
 status: blocked
-assessed_at: '2026-08-02T18:30:10Z'
+assessed_at: '2026-08-02T18:41:51Z'
 domains:
 - id: PLAT-001
   domain: Agent Platform project/session API or MCP contract
@@ -14,6 +14,8 @@ domains:
   - Live add/remove worktree tool contracts return structured 501 disabled results.
   - The prior add_worktree_agent control request failed closed and is committed on
     planning/2026-07-31-fleet-cicd-e2e.
+  - A 2026-08-02T18:39:26Z live layout re-probe still exposed only the four fixed
+    controllers and no relay, runner profile, CI, registry, or Argo fields.
   gaps:
   - The rendered briefing still advertises dynamic worktree and secret-inventory
     surfaces that are disabled or absent.
@@ -37,6 +39,8 @@ domains:
   - kubectl authorization reports no create access for Workflows in agent-fleet-ci.
   - Promised own-namespace list access for pods, configmaps, services, and events
     is absent.
+  - Independent authorization re-probes through 2026-08-02T18:39:51Z reproduced
+    the same create denial without submitting a Workflow or changing RBAC.
   gaps:
   - The standard ci-workflows create/get/list/watch capability is not reconciled.
   - The rendered own-namespace read contract does not match live RBAC.
@@ -64,6 +68,8 @@ domains:
   evidence:
   - PR 235 exact-head jobs requested validation-standard and remained at runner_id
     0 with no steps; retry attempt 2 was cancelled after 6m59s unclaimed.
+  - A 2026-08-02T18:37:56Z GitHub re-probe found no newer run and no queued or
+    in-progress job; all five PR checks remain cancelled.
   - agent-ci-validate exits 2 because .agent-fleet/ci.yaml is absent.
   - agent-ci-gate exits 3 because no fleet-ci status exists on main.
   - The repository has no container, Zot, GitOps, Argo CD, or runtime surface; that
@@ -153,6 +159,7 @@ minimum_pilot:
 - Complete D/I/E/S, non-author commit-bound approval, packet P, and protected-dev
   integration without any container, Zot, Argo CD, or runtime deployment claim.
 gates_to_open:
+- The canonical open gate is .agent-workflow/sprints/2026-07-31-fleet-cicd-e2e/gates/platform-cicd-convergence.yaml.
 - jvallery/agents#3088 must restore the validation-standard runner/profile and an
   authorized relay must attach the issue-234 evidence packet.
 - A platform owner must reconcile ci-workflows RBAC for service account name
