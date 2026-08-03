@@ -50,7 +50,9 @@ def verify_installed_root!(root)
   skill_files = Dir[root.join("skills/*/SKILL.md")].sort
   fail!("expected 28 installed skills, found #{skill_files.length}") unless skill_files.length == 28
   skill_files.each do |path|
-    metadata_version = File.read(path)[/^  version: ["']([^"']+)["']$/, 1]
+    # Metadata is an ASCII subset of UTF-8. Read bytes so verification does not
+    # inherit a US-ASCII external encoding from a minimal CI container locale.
+    metadata_version = File.binread(path)[/^  version: ["']([^"']+)["']$/, 1]
     fail!("#{Pathname.new(path).relative_path_from(root)} metadata.version is not #{version}") unless metadata_version == version
   end
 

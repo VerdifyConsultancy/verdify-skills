@@ -31,7 +31,7 @@ npm install --ignore-scripts --no-audit --no-fund --prefix "$TOOL" "$TARBALL" > 
 PACKAGE_ROOT="$TOOL/node_modules/@verdify-cli/cli"
 CLI="$TOOL/node_modules/.bin/verdify"
 [[ -x "$CLI" ]]
-npm test --prefix "$PACKAGE_ROOT" > "$TMP/installed-test.log"
+LC_ALL=C LANG=C npm test --prefix "$PACKAGE_ROOT" > "$TMP/installed-test.log"
 [[ "$($CLI --version)" == "1.3.0" ]]
 $CLI pack list --json > "$TMP/installed-packs.json"
 ruby -rjson -e 'd=JSON.parse(File.read(ARGV.fetch(0))); abort unless d["count"] == 6' "$TMP/installed-packs.json"
