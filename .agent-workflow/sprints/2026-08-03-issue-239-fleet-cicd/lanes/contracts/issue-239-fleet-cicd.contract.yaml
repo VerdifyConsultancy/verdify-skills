@@ -1,0 +1,132 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-08-03-issue-239-fleet-cicd
+lane_id: issue-239-fleet-cicd
+title: Adopt the managed Agent Fleet CI/CD contract
+status: approved
+issue_ids: [239]
+coupling_justification: null
+objective: >-
+  Land the centrally rendered Agent Fleet CI/CD instructions and validation
+  definition in Verdify Skills, while preserving the repository's standard
+  dev-to-main trusted-publishing release route.
+desired_outcome: >-
+  The Verdify Skills repo agent can validate the exact candidate revision from
+  its own pod, contributors have durable managed instructions, and the eventual
+  dev-to-main release requires npm trusted publishing rather than a long-lived
+  package token.
+non_goals:
+  - Publish a package or create a GitHub release as part of validation.
+  - Change VERSION, package metadata, protected-branch policy, or release workflow behavior.
+  - Add a repo-specific runner, credential, deployment script, or permission exception.
+baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
+branch: fleet/ci-cd-contract-block
+module_contracts: [quality-enablement, release-package]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [managed-fleet-guidance, repository-validation, package-release-guidance]
+  owned_paths:
+    - .agent-fleet/ci.yaml
+    - AGENTS.md
+    - CLAUDE.md
+    - MANIFEST.sha256
+    - scripts/verify-npm-tarball.rb
+    - tests/test_npm_install.sh
+  prohibited_paths:
+    - .github/**
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+    - schemas/**
+    - lib/**
+    - skills/**
+  coordination_required_paths: []
+  owned_interfaces:
+    - The platform-managed guidance sentinels in AGENTS.md and CLAUDE.md.
+    - The repo-local validation command declared in .agent-fleet/ci.yaml.
+    - The packed npm artifact verification invoked by the repository test suite.
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: >-
+      AGENTS.md, CLAUDE.md, and .agent-fleet/ci.yaml contain the centrally
+      rendered managed contract without changing repository-owned guidance
+      outside the managed sentinels.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [managed guidance diff, generated contract guard]
+  - id: LANE-AC-02
+    statement: >-
+      The complete repository validation, manifest verification, npm install
+      test, and packed-artifact verification pass in a clean UTF-8 environment.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [full suite result, manifest result, package verification result]
+  - id: LANE-AC-03
+    statement: >-
+      Durable guidance describes the standard dev-to-main external release as
+      npm trusted publishing and explicitly forbids a long-lived npm token.
+    sprint_acceptance_ids: [SPR-AC-03]
+    evidence_required: [release guidance assertions, repository delivery policy result]
+  - id: LANE-AC-04
+    statement: >-
+      The Verdify Skills repo pod submits and completes the managed validation
+      workflow against the exact implementation revision.
+    sprint_acceptance_ids: [SPR-AC-04]
+    evidence_required: [exact revision, workflow name, successful conclusion]
+  - id: LANE-AC-05
+    statement: >-
+      Validation proves the release route is available but does not invoke npm
+      publication, tag creation, GitHub release creation, or a deployment.
+    sprint_acceptance_ids: [SPR-AC-05]
+    evidence_required: [validation-only workflow record, no-release scope proof]
+validation_commands:
+  - id: full-suite
+    command: LANG=C.UTF-8 LC_ALL=C.UTF-8 make test
+    purpose: Run repository, lifecycle, package, policy, and release-contract validation.
+    required: true
+  - id: manifest-verification
+    command: make manifest-check
+    purpose: Prove tracked package content matches MANIFEST.sha256.
+    required: true
+  - id: diff-verification
+    command: git diff --check d226b7f244fd4612ab44739fd275b8158e1d9159..HEAD
+    purpose: Reject whitespace and patch-integrity errors.
+    required: true
+  - id: exact-pod-validation
+    command: agent-ci-validate --repo-dir <detached-exact-head-worktree> --revision <implementation-sha> --submit --wait --timeout 1800
+    purpose: Prove the managed validation contract from the Verdify Skills repo pod.
+    required: true
+required_evidence:
+  - Exact dispatch, implementation, evidence, and critic-report revisions.
+  - Full clean-tree repository validation and manifest verification.
+  - Successful exact-head repo-pod workflow identity and timestamps.
+  - Explicit available-but-not-invoked evidence for external npm release.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The managed contract requires a repo-specific runner, credential, or permission exception.
+  - Exact-head validation attempts to publish, tag, release, or deploy.
+  - Trusted publishing cannot remain scoped to the existing dev-to-main release route.
+definition_of_done:
+  - The approved dispatch artifact remains byte-identical through implementation.
+  - All acceptance criteria have exact-head worker and independent critic evidence.
+  - Required pull-request checks pass at the critic-report head.
+  - The implementation merges to dev through the repository's normal reviewed lane.
+  - The standard dev-to-main release path subsequently lands the durable contract on main without a throwaway publication.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-08-02T18:02:33Z"
