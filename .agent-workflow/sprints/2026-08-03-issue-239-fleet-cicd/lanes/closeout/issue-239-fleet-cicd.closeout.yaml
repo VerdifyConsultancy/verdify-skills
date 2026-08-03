@@ -1,0 +1,83 @@
+---
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-08-03-issue-239-fleet-cicd
+lane_id: issue-239-fleet-cicd
+status: ready_for_critic
+issue_ids: [239]
+pull_request: 240
+baseline_sha: d226b7f244fd4612ab44739fd275b8158e1d9159
+implementation_head_sha: 0786e2f5ba4355ec249987b2103689bec769bfe3
+validated_head_sha: 0786e2f5ba4355ec249987b2103689bec769bfe3
+contract_hash: 96db677a3484113082aaeefa4b89ccf4d29976b1b779bddd3d163dc710476581
+changed_paths:
+  - .agent-fleet/ci.yaml
+  - AGENTS.md
+  - CLAUDE.md
+  - MANIFEST.sha256
+  - scripts/verify-npm-tarball.rb
+  - tests/test_npm_install.sh
+validation_results:
+  - id: full-suite
+    command: LANG=C.UTF-8 LC_ALL=C.UTF-8 make test
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-03T18:03:20Z"
+    artifact: Makefile
+  - id: manifest-verification
+    command: make manifest-check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-03T18:03:20Z"
+    artifact: MANIFEST.sha256
+  - id: diff-verification
+    command: git diff --check d226b7f244fd4612ab44739fd275b8158e1d9159..0786e2f5ba4355ec249987b2103689bec769bfe3
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-03T18:03:20Z"
+    artifact: null
+  - id: exact-pod-validation
+    command: agent-ci-validate --repo-dir <detached-0786e2f5-worktree> --revision 0786e2f5ba4355ec249987b2103689bec769bfe3 --submit --wait --timeout 1800
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-03T18:08:11Z"
+    artifact: repo-validate-verdify-skills-2dppb
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [full-suite, manifest-verification]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [full-suite, manifest-verification]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [full-suite]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [exact-pod-validation]
+    assessment: satisfied
+  - criterion_id: LANE-AC-05
+    evidence_ids: [exact-pod-validation, diff-verification]
+    assessment: satisfied
+discovered_issues: []
+residual_risks:
+  - >-
+    The durable managed contract is on the repository integration branch after
+    this PR merges; default branch main receives it only through a subsequent
+    intentional dev-to-main package release.
+  - >-
+    The live repo controller remains bound to main until the standard central
+    runtime_policy.controller_branch change is merged and reconciled.
+worktree_clean: true
+worker_agent: codex-root-issue-3507-worker
+worker_session_id: codex-root-019fc3a1-c62c-72e1-8fef-b4a37861dd86
+completed_at: "2026-08-03T18:08:20Z"
+limitations:
+  - >-
+    This lane proves the external npm release route is available but does not
+    invoke npm publication, create a tag, create a GitHub release, or deploy a
+    package.
+  - >-
+    Fresh independent critic evidence, exact report-head GitHub checks, merge
+    to dev, and the later default-branch release are downstream steps and are
+    not claimed by this worker closeout.
