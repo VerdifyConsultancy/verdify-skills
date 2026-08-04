@@ -352,8 +352,47 @@ git(fleet_repo, "commit", "-qm", "refresh the managed contract")
 fleet_head = git(fleet_repo, "rev-parse", "HEAD")
 fleet_event = File.join(tmp, "fleet.json")
 fleet_body = "## Outcome\n\nManaged contract span refreshed.\n\n## Evidence\n\n`make test` passed locally.\n"
+fleet_reviews = File.join(tmp, "fleet-reviews.json")
+fleet_approval = lambda do |login, commit_sha, id: 1|
+  { "id" => id, "state" => "APPROVED", "commit_id" => commit_sha, "submitted_at" => "2026-08-04T12:00:00Z", "user" => { "login" => login, "type" => "User" } }
+end
 event(fleet_event, head: fleet_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
-run_gate(root, fleet_event, fleet_repo)
+
+# Regression (round-2 critic finding): confinement alone is not enough.
+# CODEOWNERS + require_code_owner_reviews does NOT itself require an
+# approval on a zero-review-count branch -- it only auto-requests a
+# reviewer, proven by this repo's own merge history (PRs #213/#230/#222
+# merged into dev touching CODEOWNERS-protected paths with zero reviews).
+# A confined, correctly-labelled diff with no review must still be rejected.
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync PR without an owner review was not rejected"
+end
+
+# A review from the PR author does not count (mirrors the release route).
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("worker", fleet_head)]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync self-approval was not rejected"
+end
+
+# A review from someone who is not an allowed owner does not count.
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("random-contributor", fleet_head)]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync non-owner approval was not rejected"
+end
+
+# An unresolved change-request from one owner blocks the route even when
+# another owner has approved.
+File.write(fleet_reviews, JSON.generate([
+  fleet_approval.call("jvallery", fleet_head),
+  { "id" => 2, "state" => "CHANGES_REQUESTED", "commit_id" => fleet_head, "submitted_at" => "2026-08-04T12:01:00Z", "user" => { "login" => "jrvallery", "type" => "User" } }
+]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("change-request")
+  raise "fleet-contract-sync unresolved change-request was not rejected"
+end
+
+# Confinement AND a genuine current-head owner approval together pass.
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("jvallery", fleet_head)]))
+run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews)
 
 File.write(File.join(fleet_repo, "app.rb"), "puts :smuggled\n")
 git(fleet_repo, "add", "app.rb")

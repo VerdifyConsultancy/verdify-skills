@@ -16,9 +16,19 @@ module Verdify
   #
   # This check bounds *where* a labelled pull request may write; it says
   # nothing about the semantic safety of *what* it writes there (the
-  # sentinel span content, and the .agent-fleet/ci.yaml command it
-  # declares, are both still gated by a human: see .github/CODEOWNERS,
-  # which protects these exact paths so this route is never zero-review).
+  # sentinel span content and the .agent-fleet/ci.yaml command it declares
+  # are not evaluated at all). Adding the managed paths to .github/CODEOWNERS
+  # does NOT by itself require a human review before merge -- this repo's
+  # dev branch runs required_approving_review_count: 0, and
+  # require_code_owner_reviews only auto-requests an owner as a reviewer,
+  # it does not block merging without their approval (proven by this repo's
+  # own history: PRs #213/#230/#222 merged into dev touching CODEOWNERS-
+  # protected paths with zero reviews). The actual human gate for this
+  # route is scripts/delivery-gate.rb's own current-head APPROVED-review
+  # requirement from a non-author allowed owner (mirroring what it already
+  # requires for the dev -> main release route) -- see the fleet_contract_sync
+  # branch there. This class has no opinion on review state; it only
+  # answers the confinement question.
   class ManagedContractDiff
     SENTINEL_BEGIN = "<!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
     SENTINEL_END = "<!-- END agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
@@ -107,7 +117,18 @@ module Verdify
     # disables that quoting entirely and gives raw bytes; `core.quotePath
     # =false` is set defensively even though `-z` already implies it.
     def changed_paths
-      output = repo.git("-c", "core.quotePath=false", "diff", "--name-status", "-z", "#{base_sha}...#{head_sha}").first
+      # Force ASCII-8BIT before splitting: a path is not guaranteed to be
+      # valid UTF-8 (a filesystem allows arbitrary bytes), and Open3's
+      # default external encoding tags this output UTF-8 regardless. Given
+      # invalid bytes, String#split on a UTF-8-tagged string raises
+      # ArgumentError ("invalid byte sequence in UTF-8") before this method
+      # even returns -- unlike the content-level checks below, there is no
+      # later guard that could catch it. Splitting on a single-byte NUL
+      # never needs character decoding, so ASCII-8BIT is always safe here;
+      # the resulting path strings still compare correctly against the
+      # ASCII-only ALLOWED_PATHS literals (Ruby treats an ASCII-only string
+      # as encoding-compatible with any other encoding).
+      output = repo.git("-c", "core.quotePath=false", "diff", "--name-status", "-z", "#{base_sha}...#{head_sha}").first.b
       tokens = output.split("\0")
       entries = []
       i = 0

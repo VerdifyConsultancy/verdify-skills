@@ -363,7 +363,7 @@ class ManagedContractDiffTest < Minitest::Test
   # must never escape #evaluate -- it has to surface as an ordinary,
   # collected error the caller can print and rescue Verdify::Error around,
   # not an exception the CLI scripts don't catch.
-  def test_invalid_utf8_does_not_raise
+  def test_invalid_utf8_content_does_not_raise
     repo, dir, base = build_baseline
     write(dir, "AGENTS.md", agents_md("v2").b + "\xFF\xFE\x00binary".b)
     git(dir, "add", "AGENTS.md")
@@ -375,6 +375,36 @@ class ManagedContractDiffTest < Minitest::Test
     refute result.confined?
     assert(result.errors.any? { |e| e.include?("not valid UTF-8") },
            "expected an explicit invalid-UTF-8 error, not a raised exception: #{result.errors}")
+  end
+
+  # Regression (round-2 critic finding): a *path*, not just file content,
+  # can contain an invalid UTF-8 byte sequence. `changed_paths` used to call
+  # `output.split("\0")` on a string Ruby tags UTF-8 by default, which
+  # raises ArgumentError before the method even returns -- there is no
+  # later guard that could catch it, unlike the content-level checks. A
+  # normal filesystem/`git add` cannot produce this, so it is crafted
+  # directly with plumbing, matching how the critic reproduced it.
+  def test_invalid_utf8_in_path_does_not_raise
+    repo, dir, base = build_baseline
+    blob_out, blob_err, blob_status = Open3.capture3("git", "-C", dir, "hash-object", "-w", "--stdin", stdin_data: "arbitrary\n")
+    raise "git hash-object failed: #{blob_err}" unless blob_status.success?
+
+    blob_sha = blob_out.strip
+    bad_path = "AGENTS\xFF.md".b
+    _, index_err, index_status = Open3.capture3("git", "-C", dir, "update-index", "--add", "--cacheinfo", "100644,#{blob_sha},#{bad_path}")
+    raise "git update-index failed: #{index_err}" unless index_status.success?
+
+    tree = git(dir, "write-tree")
+    parent = git(dir, "rev-parse", "HEAD")
+    head_out, head_err, head_status = Open3.capture3("git", "-C", dir, "commit-tree", tree, "-p", parent, "-m", "invalid utf-8 path")
+    raise "git commit-tree failed: #{head_err}" unless head_status.success?
+
+    head = head_out.strip
+    git(dir, "update-ref", "HEAD", head)
+
+    result = nil
+    assert_silent_of_exception { result = evaluate(repo, base, head) }
+    refute result.confined?, "expected the invalid-UTF-8 path to be rejected as out of scope"
   end
 
   def assert_silent_of_exception
