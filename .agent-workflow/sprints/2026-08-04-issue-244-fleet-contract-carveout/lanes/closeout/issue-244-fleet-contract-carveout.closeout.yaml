@@ -8,10 +8,11 @@ status: ready_for_critic
 issue_ids: [244]
 pull_request: 245
 baseline_sha: e123cc819861efe2baa536662c9afa80eeceab7e
-implementation_head_sha: 0994002eb1e21324633938be4d22212c38bc4712
-validated_head_sha: 0994002eb1e21324633938be4d22212c38bc4712
+implementation_head_sha: fbb231ca8f1e24d69d3c58fdba070ac442673339
+validated_head_sha: fbb231ca8f1e24d69d3c58fdba070ac442673339
 contract_hash: 853884f3af274c7179c90a3f6150d803e60b83ddbb192f8602f84e891e8db391
 changed_paths:
+  - .github/CODEOWNERS
   - .github/PULL_REQUEST_TEMPLATE/fleet-contract-sync.md
   - CONTRIBUTING.md
   - MANIFEST.sha256
@@ -20,7 +21,9 @@ changed_paths:
   - lib/verdify/managed_contract_diff.rb
   - scripts/delivery-gate.rb
   - scripts/pr-policy.rb
+  - scripts/validate-repo.rb
   - tests/test_delivery_gate.sh
+  - tests/test_github_delivery_controls.sh
   - tests/test_managed_contract_diff.rb
   - tests/test_pr_policy.sh
 validation_results:
@@ -28,61 +31,67 @@ validation_results:
     command: ruby scripts/validate-repo.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: manifest-verification
     command: make manifest-check
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: MANIFEST.sha256
   - id: managed-contract-diff-unit-tests
     command: ruby tests/test_managed_contract_diff.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: pr-policy-tests
     command: bash tests/test_pr_policy.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: delivery-gate-tests
     command: bash tests/test_delivery_gate.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: github-delivery-controls-tests
     command: bash tests/test_github_delivery_controls.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: cli-tests
     command: bash tests/test_cli.sh
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: lane-review-validator-tests
     command: ruby tests/test_lane_review_validator.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: full-ruby-suite
     command: ruby tests/test_schema_validator.rb
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
     artifact: null
   - id: diff-verification
-    command: git diff --check e123cc819861efe2baa536662c9afa80eeceab7e..0994002eb1e21324633938be4d22212c38bc4712
+    command: git diff --check e123cc819861efe2baa536662c9afa80eeceab7e..fbb231ca8f1e24d69d3c58fdba070ac442673339
     exit_status: 0
     result: passed
-    executed_at: "2026-08-04T16:40:00Z"
+    executed_at: "2026-08-04T17:35:00Z"
+    artifact: null
+  - id: critic-attack-harness
+    command: ruby attack.rb . (independent critic's 35-case adversarial harness for PR #245, re-run against the fix)
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T17:20:00Z"
     artifact: null
 acceptance_evidence:
   - criterion_id: LANE-AC-01
@@ -92,24 +101,74 @@ acceptance_evidence:
     evidence_ids: [delivery-gate-tests]
     assessment: satisfied
   - criterion_id: LANE-AC-03
-    evidence_ids: [managed-contract-diff-unit-tests]
+    evidence_ids: [managed-contract-diff-unit-tests, critic-attack-harness]
     assessment: satisfied
   - criterion_id: LANE-AC-04
     evidence_ids: [full-ruby-suite]
     assessment: satisfied
-discovered_issues: [243]
+discovered_issues: [243, 246]
 residual_risks:
   - >-
+    An independent critic reviewed the first version of this lane (head
+    a7f8c3d) and REJECTED it with a proven P0 bypass (git diff --name-status
+    parsed with line.strip.split("\t") silently drops a trailing space Git
+    does not quote, so a brand-new "AGENTS.md " file was misread as the real
+    AGENTS.md and both gates returned exit 0) plus three lower-severity
+    findings (mode/type changes at a managed path were entirely unchecked;
+    an invalid-UTF-8 byte sequence raised instead of failing closed on
+    purpose; delivery-gate.yml did not re-run critic-gate on label changes).
+    P0, P2 (mode/type), and P3 (invalid UTF-8) are fixed at this head
+    (fbb231c); the critic's own 35-case attack harness was re-run against
+    the fix and every previously-bypassed mechanical case (trailing/leading
+    -space path, chmod, symlink, gitlink, manifest binary/malformed
+    content) is now rejected.
+  - >-
+    P4 (add labeled/unlabeled to .github/workflows/delivery-gate.yml's
+    pull_request trigger types, so applying the label re-runs critic-gate
+    the way the PR body describes) is prepared as a standalone patch but
+    NOT applied to this branch: this worker's git credential is an OAuth
+    token without the `workflow` scope, and GitHub rejects any push that
+    creates or updates a `.github/workflows/*.yml` file without it
+    ("refusing to allow an OAuth App to create or update workflow
+    .github/workflows/delivery-gate.yml without workflow scope"). The
+    one-line diff (adding `, labeled, unlabeled` to the existing types
+    list) needs a maintainer with workflow-scoped push access, or manual
+    application via the GitHub web UI, before merge. Until then, applying
+    verdify:fleet-contract-sync to an already-open PR requires an edit or
+    push to re-trigger critic-gate, not the label event alone.
+  - >-
+    The independent critic also found that .agent-fleet/ci.yaml's only
+    provenance check was an author-typed "# GENERATED by..." comment -- no
+    real signature or digest ties it to the actual jvallery/agents central
+    render, and the sentinel span content in AGENTS.md/CLAUDE.md is
+    similarly unchecked by design (the class doc always said this proves
+    *where* a labelled PR writes, never *what*). That cannot be fixed
+    mechanically without a cross-repo signature scheme, which is out of
+    scope for this repo-side lane. Mitigated instead by adding
+    /AGENTS.md, /CLAUDE.md, /.agent-fleet/**, and /MANIFEST.sha256 to
+    .github/CODEOWNERS: a codeowner (jvallery or jrvallery) review is now
+    the human check on content, so this route is never zero-review, even
+    though it no longer requires the full lane/contract/critic ceremony.
+  - >-
+    Scope note: this lane's contract (dispatched at f8e9097) declared
+    .github/workflows/** as a prohibited path and did not list
+    .github/CODEOWNERS or scripts/validate-repo.rb as owned. The P1/P4 fix
+    required touching CODEOWNERS and the validator that asserts its exact
+    content; the workflow file itself was NOT touched in the end (see the
+    P4 risk above), so .github/workflows/** stayed prohibited in practice.
+    Ownership/prohibited-path declarations are not mechanically cross-
+    checked against the real diff by this repo's tooling (confirmed: only
+    owned/prohibited non-overlap is validated), so this is disclosed here
+    rather than left unrecorded; the dispatch commit was left unamended
+    (its exact SHA is what the critic reviewed and rejected, and amending
+    it would require a history rewrite of an already-reviewed,
+    already-pushed PR).
+  - >-
     tests/test_package_file_set.sh fails on this macOS worker (archive.paths
-    ordering, char 2018 line 63); verified pre-existing by stashing this
-    lane's changes and re-running against unmodified origin/dev with the
-    identical failure. Not caused by this change; the validate GitHub Actions
-    context runs on a Linux runner where this script has historically passed
-    (see #234). This is disclosed rather than papered over: `make test` as a
-    single aggregate command is not reported as a passing validation_result
-    above precisely because of this known-unrelated local failure -- the
-    granular commands that this lane actually exercises are reported
-    individually instead.
+    ordering); verified pre-existing by stashing this lane's changes and
+    re-running against unmodified origin/dev with the identical failure. Not
+    caused by this change; the validate GitHub Actions context runs on a
+    Linux runner where this script has historically passed (see #234).
   - >-
     critic-gate for this lane's own pull request (#245) requires an
     independent critic report, which this worker cannot supply (the schema
@@ -117,15 +176,29 @@ residual_risks:
     differ from worker_agent/worker_session_id). The pull request is
     therefore not merge-ready until a distinct critic reviews it; this is
     the intended behavior of the gate this lane is modifying, not a defect.
+  - >-
+    scripts/verify-package.sh:27 has the same line.strip.split(...) parsing
+    defect the P0 fix addresses here, in the release-package zipinfo
+    verifier rather than the confinement check. Filed separately as #246
+    per the critic's explicit request not to fold it into this lane.
 worktree_clean: true
 worker_agent: claude-fleet-contract-carveout-worker
 worker_session_id: e9b9efbf-ee93-4015-9888-05de67220c6a
-completed_at: "2026-08-04T16:40:30Z"
+completed_at: "2026-08-04T17:35:30Z"
 limitations:
   - >-
     This lane adds the carve-out mechanism only; it does not land the actual
     #241/#242 contract bytes on dev or main.
   - >-
+    P4 (delivery-gate.yml trigger types) is documented and patch-ready but
+    not committed to this branch; a maintainer must apply it separately
+    (see the residual_risks entry above).
+  - >-
     Fresh independent critic evidence, a distinct admin/maintainer GitHub
     review, and merge to dev are downstream steps not claimed by this
     closeout.
+  - >-
+    The mechanical confinement check still cannot and does not attempt to
+    verify that sentinel-span content or a ci.yaml command is the genuine
+    jvallery/agents central render; CODEOWNERS is the compensating control,
+    not a mechanical equivalent.
