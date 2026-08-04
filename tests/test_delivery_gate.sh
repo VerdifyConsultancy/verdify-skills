@@ -251,7 +251,7 @@ def build_receipt_chain(root, directory)
   { base: base, head: git(directory, "rev-parse", "HEAD"), report: report, merge: merge_sha, checks: checks }
 end
 
-def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills")
+def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills", labels: [])
   repository = { "full_name" => "VerdifyConsultancy/verdify-skills" }
   payload = {
     "number" => 456,
@@ -259,7 +259,8 @@ def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/tes
     "pull_request" => {
       "number" => 456, "state" => "open", "body" => body, "user" => { "login" => author },
       "base" => { "ref" => base, "sha" => base_sha, "repo" => { "full_name" => base_repo } },
-      "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } }
+      "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } },
+      "labels" => labels.map { |name| { "name" => name } }
     }
   }
   File.write(path, JSON.pretty_generate(payload))
@@ -328,6 +329,48 @@ stdout, stderr, status = Open3.capture3(
 )
 raise "valid receipt PR policy failed: #{stdout}\n#{stderr}" unless status.success?
 event(dev_event, head: chain[:head], body: body)
+
+# verdify:fleet-contract-sync: the only pull-request class exempt from the
+# lane/contract/critic-report requirement above, and only once
+# Verdify::ManagedContractDiff mechanically proves the diff is confined to
+# the managed contract surface (jvallery/agents#3577, #3044). The label
+# alone never substitutes for that proof.
+fleet_repo = File.join(tmp, "fleet-contract")
+FileUtils.mkdir_p(fleet_repo)
+git(fleet_repo, "init", "-q", "-b", "main")
+git(fleet_repo, "config", "user.name", "Verdify Test")
+git(fleet_repo, "config", "user.email", "verdify-test@example.invalid")
+fleet_begin = "<!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
+fleet_end = "<!-- END agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
+File.write(File.join(fleet_repo, "AGENTS.md"), "# Repo\n\nOwned prose.\n\n#{fleet_begin}\nOld contract v1.\n#{fleet_end}\n")
+git(fleet_repo, "add", "AGENTS.md")
+git(fleet_repo, "commit", "-qm", "baseline with an already-adopted contract")
+fleet_base = git(fleet_repo, "rev-parse", "HEAD")
+File.write(File.join(fleet_repo, "AGENTS.md"), "# Repo\n\nOwned prose.\n\n#{fleet_begin}\nNew contract v2.\n#{fleet_end}\n")
+git(fleet_repo, "add", "AGENTS.md")
+git(fleet_repo, "commit", "-qm", "refresh the managed contract")
+fleet_head = git(fleet_repo, "rev-parse", "HEAD")
+fleet_event = File.join(tmp, "fleet.json")
+fleet_body = "## Outcome\n\nManaged contract span refreshed.\n\n## Evidence\n\n`make test` passed locally.\n"
+event(fleet_event, head: fleet_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
+run_gate(root, fleet_event, fleet_repo)
+
+File.write(File.join(fleet_repo, "app.rb"), "puts :smuggled\n")
+git(fleet_repo, "add", "app.rb")
+git(fleet_repo, "commit", "-qm", "smuggles a code change under the fleet label")
+fleet_smuggle_head = git(fleet_repo, "rev-parse", "HEAD")
+event(fleet_event, head: fleet_smuggle_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("changed paths outside the managed contract")
+  raise "fleet-contract-sync PR touching an out-of-scope path was not rejected"
+end
+
+# Without the label, the exact same confined diff still requires the full
+# lane/contract/critic chain: the mechanical check only ever stands in for
+# that chain when the label opts into it, never as a general dev bypass.
+event(fleet_event, head: fleet_head, body: fleet_body, base_sha: fleet_base, labels: [])
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("dev critic gate requires exact lane and contract metadata")
+  raise "unlabelled confined diff was not held to the full lane contract"
+end
 
 File.write(File.join(valid_repo, "post-report.txt"), "stale\n")
 git(valid_repo, "add", "post-report.txt")

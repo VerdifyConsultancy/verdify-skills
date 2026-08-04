@@ -155,30 +155,51 @@ else
         unless unterminated.empty?
           errors << "integrated sprint(s) require terminal receipts before another implementation can merge: #{unterminated.join(', ')}"
         end
-        lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-        contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-        unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
-          errors << "dev critic gate requires exact lane and contract metadata"
-        else
-          contract_path = candidate.root.join(contract_relative)
-          sprint_root = contract_path.dirname.parent.parent
-          closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
-          critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
-          if !critic_path.file?
-            errors << "current head does not contain the canonical critic report"
+
+        pr_labels = Array(pull_request["labels"]).map { |label| label.is_a?(Hash) ? label["name"].to_s : label.to_s }
+        fleet_contract_sync_label = config.dig("managed_fleet_contract", "label").to_s
+        fleet_contract_sync_label = "verdify:fleet-contract-sync" if fleet_contract_sync_label.empty?
+        fleet_contract_sync = pr_labels.include?(fleet_contract_sync_label)
+
+        if fleet_contract_sync
+          # The only pull-request class exempt from the lane/contract/critic
+          # chain below, and only once Verdify::ManagedContractDiff mechanically
+          # proves the diff touches nothing but the managed contract surface
+          # (jvallery/agents#3577, #3044). A pull request that carries the
+          # label but fails that proof is rejected here, never silently
+          # re-routed into the lane path below.
+          if !(full_sha?(base_sha) && candidate.commit_exists?(base_sha))
+            errors << "fleet contract sync requires an existing base commit to verify diff confinement"
           else
-            validator = Verdify::LaneReviewValidator.new(
-              repo: candidate,
-              contract_path: contract_path,
-              closeout_path: closeout_path,
-              critic_path: critic_path
-            )
-            result = validator.validate_critic(tip_sha: head_sha)
-            status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
-            errors.concat(status.errors)
-            expected_pull_request = pull_request["number"] || event["number"]
-            if status.critic && status.critic["pull_request"] != expected_pull_request
-              errors << "critic report pull request does not match the event"
+            confinement = Verdify::ManagedContractDiff.evaluate(repo: candidate, base_sha: base_sha, head_sha: head_sha)
+            errors.concat(confinement.errors)
+          end
+        else
+          lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+          contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+          unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
+            errors << "dev critic gate requires exact lane and contract metadata"
+          else
+            contract_path = candidate.root.join(contract_relative)
+            sprint_root = contract_path.dirname.parent.parent
+            closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
+            critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
+            if !critic_path.file?
+              errors << "current head does not contain the canonical critic report"
+            else
+              validator = Verdify::LaneReviewValidator.new(
+                repo: candidate,
+                contract_path: contract_path,
+                closeout_path: closeout_path,
+                critic_path: critic_path
+              )
+              result = validator.validate_critic(tip_sha: head_sha)
+              status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
+              errors.concat(status.errors)
+              expected_pull_request = pull_request["number"] || event["number"]
+              if status.critic && status.critic["pull_request"] != expected_pull_request
+                errors << "critic report pull request does not match the event"
+              end
             end
           end
         end
