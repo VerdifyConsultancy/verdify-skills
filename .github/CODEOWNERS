@@ -10,3 +10,12 @@
 /scripts/github-delivery-controls.rb @jvallery @jrvallery
 /scripts/pr-policy.rb @jvallery @jrvallery
 /scripts/validate-repo.rb @jvallery @jrvallery
+# The managed agent-fleet CI/CD contract surface: the verdify:fleet-contract-sync
+# carve-out (Verdify::ManagedContractDiff) proves only *where* a labelled PR
+# writes, never that its content is the genuine central render, so these paths
+# stay owned -- a codeowner review is the actual human check on what a
+# contract-sync PR's sentinel span or .agent-fleet/ci.yaml command contains.
+/AGENTS.md @jvallery @jrvallery
+/CLAUDE.md @jvallery @jrvallery
+/.agent-fleet/** @jvallery @jrvallery
+/MANIFEST.sha256 @jvallery @jrvallery

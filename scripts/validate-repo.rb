@@ -48,7 +48,11 @@ PROTECTED_CODEOWNER_LINES = [
   "/scripts/delivery-gate.rb @jvallery @jrvallery",
   "/scripts/github-delivery-controls.rb @jvallery @jrvallery",
   "/scripts/pr-policy.rb @jvallery @jrvallery",
-  "/scripts/validate-repo.rb @jvallery @jrvallery"
+  "/scripts/validate-repo.rb @jvallery @jrvallery",
+  "/AGENTS.md @jvallery @jrvallery",
+  "/CLAUDE.md @jvallery @jrvallery",
+  "/.agent-fleet/** @jvallery @jrvallery",
+  "/MANIFEST.sha256 @jvallery @jrvallery"
 ].freeze
 DELIVERY_OWNER_RESTRICTIONS = {
   "users" => %w[jvallery jrvallery],
@@ -760,7 +764,7 @@ class RepoValidator
     codeowners = ROOT.join(".github/CODEOWNERS")
     owner_lines = codeowners.file? ? codeowners.read.lines.map(&:strip).reject { |line| line.empty? || line.start_with?("#") } : []
     unless owner_lines == PROTECTED_CODEOWNER_LINES
-      error(codeowners, "must protect exactly CODEOWNERS, all workflows, config, Verdify policy libraries/schemas, and delivery-control scripts with jvallery and jrvallery while leaving ordinary lane paths unowned")
+      error(codeowners, "must protect exactly CODEOWNERS, all workflows, config, Verdify policy libraries/schemas, delivery-control scripts, and the managed agent-fleet CI/CD contract surface with jvallery and jrvallery while leaving ordinary lane paths unowned")
     end
   end
 
