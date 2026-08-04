@@ -3,7 +3,7 @@ name: delivery-gate
 on:
   pull_request:
     branches: [dev, main]
-    types: [opened, edited, synchronize, reopened, ready_for_review]
+    types: [opened, edited, synchronize, reopened, ready_for_review, labeled, unlabeled]
   pull_request_review:
     types: [submitted, edited, dismissed]
   push:
