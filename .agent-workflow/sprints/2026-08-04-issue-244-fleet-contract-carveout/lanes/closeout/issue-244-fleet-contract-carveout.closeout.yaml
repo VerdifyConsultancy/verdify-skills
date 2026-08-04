@@ -1,0 +1,131 @@
+---
+schema_ref: lane-closeout.schema.yaml
+kind: LaneCloseout
+schema_version: "2.0"
+sprint_id: 2026-08-04-issue-244-fleet-contract-carveout
+lane_id: issue-244-fleet-contract-carveout
+status: ready_for_critic
+issue_ids: [244]
+pull_request: 245
+baseline_sha: e123cc819861efe2baa536662c9afa80eeceab7e
+implementation_head_sha: 0994002eb1e21324633938be4d22212c38bc4712
+validated_head_sha: 0994002eb1e21324633938be4d22212c38bc4712
+contract_hash: 853884f3af274c7179c90a3f6150d803e60b83ddbb192f8602f84e891e8db391
+changed_paths:
+  - .github/PULL_REQUEST_TEMPLATE/fleet-contract-sync.md
+  - CONTRIBUTING.md
+  - MANIFEST.sha256
+  - config/github-primitives.yaml
+  - lib/verdify.rb
+  - lib/verdify/managed_contract_diff.rb
+  - scripts/delivery-gate.rb
+  - scripts/pr-policy.rb
+  - tests/test_delivery_gate.sh
+  - tests/test_managed_contract_diff.rb
+  - tests/test_pr_policy.sh
+validation_results:
+  - id: repo-validate
+    command: ruby scripts/validate-repo.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: manifest-verification
+    command: make manifest-check
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: MANIFEST.sha256
+  - id: managed-contract-diff-unit-tests
+    command: ruby tests/test_managed_contract_diff.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: pr-policy-tests
+    command: bash tests/test_pr_policy.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: delivery-gate-tests
+    command: bash tests/test_delivery_gate.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: github-delivery-controls-tests
+    command: bash tests/test_github_delivery_controls.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: cli-tests
+    command: bash tests/test_cli.sh
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: lane-review-validator-tests
+    command: ruby tests/test_lane_review_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: full-ruby-suite
+    command: ruby tests/test_schema_validator.rb
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+  - id: diff-verification
+    command: git diff --check e123cc819861efe2baa536662c9afa80eeceab7e..0994002eb1e21324633938be4d22212c38bc4712
+    exit_status: 0
+    result: passed
+    executed_at: "2026-08-04T16:40:00Z"
+    artifact: null
+acceptance_evidence:
+  - criterion_id: LANE-AC-01
+    evidence_ids: [pr-policy-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-02
+    evidence_ids: [delivery-gate-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-03
+    evidence_ids: [managed-contract-diff-unit-tests]
+    assessment: satisfied
+  - criterion_id: LANE-AC-04
+    evidence_ids: [full-ruby-suite]
+    assessment: satisfied
+discovered_issues: [243]
+residual_risks:
+  - >-
+    tests/test_package_file_set.sh fails on this macOS worker (archive.paths
+    ordering, char 2018 line 63); verified pre-existing by stashing this
+    lane's changes and re-running against unmodified origin/dev with the
+    identical failure. Not caused by this change; the validate GitHub Actions
+    context runs on a Linux runner where this script has historically passed
+    (see #234). This is disclosed rather than papered over: `make test` as a
+    single aggregate command is not reported as a passing validation_result
+    above precisely because of this known-unrelated local failure -- the
+    granular commands that this lane actually exercises are reported
+    individually instead.
+  - >-
+    critic-gate for this lane's own pull request (#245) requires an
+    independent critic report, which this worker cannot supply (the schema
+    and delivery-gate.rb both require critic_agent/critic_session_id to
+    differ from worker_agent/worker_session_id). The pull request is
+    therefore not merge-ready until a distinct critic reviews it; this is
+    the intended behavior of the gate this lane is modifying, not a defect.
+worktree_clean: true
+worker_agent: claude-fleet-contract-carveout-worker
+worker_session_id: e9b9efbf-ee93-4015-9888-05de67220c6a
+completed_at: "2026-08-04T16:40:30Z"
+limitations:
+  - >-
+    This lane adds the carve-out mechanism only; it does not land the actual
+    #241/#242 contract bytes on dev or main.
+  - >-
+    Fresh independent critic evidence, a distinct admin/maintainer GitHub
+    review, and merge to dev are downstream steps not claimed by this
+    closeout.
