@@ -19,7 +19,7 @@ Mandatory repository rules:
 Use `bin/verdify route --write` to reconstruct the next lifecycle step.
 
 <!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->
-<!-- agent-fleet:contract-digest sha256:7a4df1965712fb0421f0b2d7c021eb384d5e364e1df3c08f9a633673c1828a34 -->
+<!-- agent-fleet:contract-digest sha256:1be8e784d0e14418e12634db95bc01048164b0040b35a87c1aa8ae08275739d2 -->
 ## CI/CD contract — `VerdifyConsultancy/verdify-skills`
 
 This block is **rendered centrally** by `jvallery/agents` from `control-plane/agent-fleet-control/registry/repos/gh-1275486978.yaml` (`scripts/render_repo_guidance.py`).
@@ -63,11 +63,14 @@ gh pr checks <n> --repo VerdifyConsultancy/verdify-skills
 gh api repos/VerdifyConsultancy/verdify-skills/commits/<sha>/check-runs
 ```
 
-**There is no required check on this repo, and there cannot be one.** Measured 2026-08-02: the branch-protection API returns `403 Upgrade to GitHub Pro or make this repository public` — this is a private repo on a **Free-tier organisation**, where branch protection does not exist at any configuration.
+**A required check blocks merge on this repo.** The context(s) that must be green on the head commit:
 
-VerdifyConsultancy is on the GitHub Free plan, so this private repository cannot enforce required status checks. The repo agent must run the exact in-cluster validation and must not merge red.
+- `validate`
+- `compliance / compliance`
+- `pull-request-policy`
+- `critic-gate`
 
-So "enforced" here means exactly this: **the check runs, it is visible on the PR, and the repo agent does not merge red.** It does not mean anything will stop you. Treat a red or absent check as if merging were blocked — because nothing else will. Do not write `enforced` about this repo in any ledger; the honest word is `advisory`.
+New contract-managed contexts are namespaced `fleet-ci/<trust-class>/<check-name>` (e.g. `fleet-ci/validation/unit`); the `fleet-ci/` prefix is reserved for them.
 
 **A red check in this estate frequently means the job never ran.** Before you believe either colour, look at the run's `steps` and `runner_name`. Classify every failure before retrying: a *code-failure* is yours to fix and retrying it without a diff is prohibited; an *infra-failure* (runner pickup timeout, image pull) may be retried.
 
