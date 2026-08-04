@@ -1,0 +1,154 @@
+---
+schema_ref: lane-contract.schema.yaml
+kind: LaneContract
+schema_version: "1.0"
+sprint_id: 2026-08-04-issue-244-fleet-contract-carveout
+lane_id: issue-244-fleet-contract-carveout
+title: Add a mechanically-confined carve-out for centrally-rendered fleet contract PRs
+status: approved
+issue_ids: [244]
+coupling_justification: null
+objective: >-
+  Give a specific, labelled pull-request class a route into dev that does not
+  require the full lane-contract/critic-report chain, restricted to pull
+  requests whose diff is mechanically proven to touch only the managed
+  agent-fleet CI/CD contract surface (the sentinel-delimited span in
+  AGENTS.md/CLAUDE.md, the generated .agent-fleet/ci.yaml, and MANIFEST.sha256),
+  so future centrally-rendered contract refreshes from jvallery/agents land
+  without re-deriving this exception each time.
+desired_outcome: >-
+  scripts/pr-policy.rb and scripts/delivery-gate.rb both recognize the
+  verdify:fleet-contract-sync label and require only a mechanical
+  diff-confinement proof (never an honor-system label check) before exempting
+  a dev-targeted pull request from the full lane/contract/critic-report
+  requirement; a pull request that carries the label but changes anything
+  outside the managed surface is rejected outright, never silently downgraded
+  to a weaker contract. The release route (dev -> main) is unaffected and
+  cannot be demoted by this or any other label.
+non_goals:
+  - Change what content is allowed inside the managed sentinel span (that
+    remains jvallery/agents's central-render responsibility).
+  - Land the actual #241/#242 contract bytes as part of this lane.
+  - Resolve the broader documentation-accuracy findings tracked in #237.
+  - Change branch protection required-check names or counts.
+baseline_sha: e123cc819861efe2baa536662c9afa80eeceab7e
+branch: chore/agents-3577-fleet-contract-sync-carveout
+module_contracts: [quality-enablement, release-package]
+worktree_policy:
+  one_coding_session_per_worktree: true
+  lock_required: true
+lease_policy:
+  worker_ttl_hours: 24
+  critic_ttl_hours: 8
+runtime_namespace:
+  strategy: derived_at_dispatch
+ownership:
+  domains: [pull-request-policy, delivery-gate, repository-validation]
+  owned_paths:
+    - scripts/pr-policy.rb
+    - scripts/delivery-gate.rb
+    - lib/verdify.rb
+    - lib/verdify/managed_contract_diff.rb
+    - config/github-primitives.yaml
+    - .github/PULL_REQUEST_TEMPLATE/fleet-contract-sync.md
+    - CONTRIBUTING.md
+    - tests/test_pr_policy.sh
+    - tests/test_delivery_gate.sh
+    - tests/test_managed_contract_diff.rb
+    - MANIFEST.sha256
+  prohibited_paths:
+    - AGENTS.md
+    - CLAUDE.md
+    - .agent-fleet/ci.yaml
+    - .github/workflows/**
+    - schemas/**
+    - skills/**
+    - VERSION
+    - package.json
+    - CHANGELOG.md
+  coordination_required_paths: []
+  owned_interfaces:
+    - The verdify:fleet-contract-sync exemption path in scripts/pr-policy.rb.
+    - The verdify:fleet-contract-sync exemption path in scripts/delivery-gate.rb.
+    - The Verdify::ManagedContractDiff mechanical confinement check.
+dependencies:
+  hard: []
+  soft: []
+acceptance_criteria:
+  - id: LANE-AC-01
+    statement: >-
+      A pull request labelled verdify:fleet-contract-sync and targeting dev is
+      evaluated by pull-request-policy against a reduced (Outcome + Evidence)
+      contract instead of the full lane-contract sections, but only after a
+      mechanical check proves its diff is confined to the managed contract
+      surface; a dev -> main release pull request is never demoted by this or
+      any label.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [pr-policy unit tests, delivery-gate unit tests]
+  - id: LANE-AC-02
+    statement: >-
+      A pull request labelled verdify:fleet-contract-sync and targeting dev is
+      exempted by critic-gate from the lane/contract/critic-report requirement
+      only after the same mechanical confinement check passes; a pull request
+      carrying the label whose diff touches any path outside the managed
+      surface, duplicates or removes a sentinel, or drops the generated-file
+      header is rejected, not downgraded.
+    sprint_acceptance_ids: [SPR-AC-01]
+    evidence_required: [delivery-gate unit tests]
+  - id: LANE-AC-03
+    statement: >-
+      Verdify::ManagedContractDiff is unit tested directly for the confined
+      case, the out-of-scope-path case, the outside-sentinel-edit case, the
+      duplicated/missing/reordered sentinel case, and the missing
+      generated-file-header case.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [tests/test_managed_contract_diff.rb result]
+  - id: LANE-AC-04
+    statement: >-
+      The new pull-request class is documented in CONTRIBUTING.md and has a
+      dedicated PR template, so a future contract refresh can use it without
+      re-deriving the mechanism.
+    sprint_acceptance_ids: [SPR-AC-02]
+    evidence_required: [CONTRIBUTING.md diff, PR template file]
+validation_commands:
+  - id: full-suite
+    command: make test
+    purpose: Run repository, lifecycle, package, policy, and release-contract validation.
+    required: true
+  - id: manifest-verification
+    command: make manifest-check
+    purpose: Prove tracked package content matches MANIFEST.sha256.
+    required: true
+  - id: pr-policy-tests
+    command: bash tests/test_pr_policy.sh
+    purpose: Exercise the new fleet-contract-sync path in pull-request-policy directly.
+    required: true
+  - id: delivery-gate-tests
+    command: bash tests/test_delivery_gate.sh
+    purpose: Exercise the new fleet-contract-sync path in critic-gate directly.
+    required: true
+required_evidence:
+  - Exact dispatch, implementation, and evidence revisions.
+  - Full clean-tree repository validation and manifest verification.
+  - Passing and failing (mislabelled) confinement fixtures in both gate test suites.
+git_policy:
+  pull_request_required: true
+  github_checks_required: true
+  self_merge_allowed: false
+  clean_worktree_required: true
+escalation_conditions:
+  - The mechanical confinement check cannot be made to fail closed on a
+    duplicated, reordered, or missing sentinel pair.
+  - The carve-out would need to trust unauthenticated PR title/body text
+    rather than a label (a privileged, permission-gated GitHub primitive).
+  - Delivering this lane would require weakening critic-gate or
+    pull-request-policy for any pull request outside the new labelled class.
+definition_of_done:
+  - The approved dispatch artifact remains byte-identical through implementation.
+  - All acceptance criteria have exact-head worker evidence.
+  - Required pull-request checks other than critic-gate pass at the reported head.
+  - An independent critic supplies the critic report before this lane merges to dev.
+approval:
+  status: approved
+  approver: Jason Vallery
+  approved_at: "2026-08-04T15:35:00Z"
