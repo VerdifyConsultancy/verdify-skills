@@ -79,8 +79,10 @@ receipt_pr = !receipt_markers.empty? || !receipt_marker_comments.empty? || !rece
 # Mode selection, in precedence order:
 # 1. release: the generated dev -> main release PR (decided by refs; labels cannot demote it);
 # 2. terminal receipt: generated evidence-only completion on dev;
-# 3. lightweight: an exempt-labelled PR using the reduced contract;
-# 4. standard: the full implementation-lane contract.
+# 3. fleet contract sync: a labelled PR whose diff is mechanically proven
+#    confined to the managed agent-fleet CI/CD contract surface;
+# 4. lightweight: an exempt-labelled PR using the reduced contract;
+# 5. standard: the full implementation-lane contract.
 development_branch = config.dig("release_branch_flow", "development_branch") || "dev"
 release_branch = config.dig("release_branch_flow", "release_branch") || "main"
 configured_repository = config.dig("release_branch_flow", "repository").to_s
@@ -102,9 +104,32 @@ elsif !base_ref.to_s.empty? && base_ref != development_branch && !release_refs
 end
 exempt_labels = Array(config["lightweight_pull_request_labels"])
 exempt_labels = %w[verdify:policy-exempt type:docs type:chore] if exempt_labels.empty?
-lightweight = !release_pr && !receipt_pr && labels.any? { |label| exempt_labels.include?(label) }
+fleet_contract_sync_label = config.dig("managed_fleet_contract", "label").to_s
+fleet_contract_sync_label = "verdify:fleet-contract-sync" if fleet_contract_sync_label.empty?
+# Unlike exempt_labels above, this label is never sufficient on its own: it
+# only changes which check the diff is judged against (a mechanical
+# confinement proof instead of the full lane contract), never whether the
+# diff is checked at all.
+fleet_contract_sync = !release_pr && !receipt_pr && labels.include?(fleet_contract_sync_label)
+lightweight = !release_pr && !receipt_pr && !fleet_contract_sync && labels.any? { |label| exempt_labels.include?(label) }
 lane = nil
 contract = nil
+
+if fleet_contract_sync
+  if candidate_repo.nil?
+    errors << "fleet contract sync requires a repository checkout to verify diff confinement"
+  elsif !(base_sha && head_sha && candidate_repo.commit_exists?(base_sha) && candidate_repo.commit_exists?(head_sha))
+    errors << "fleet contract sync requires existing base and head commits"
+  else
+    begin
+      errors << "checked-out repository head does not match pull request head" unless candidate_repo.head_sha == head_sha
+      confinement = Verdify::ManagedContractDiff.evaluate(repo: candidate_repo, base_sha: base_sha, head_sha: head_sha)
+      errors.concat(confinement.errors)
+    rescue Verdify::Error => e
+      errors << "could not validate fleet contract sync diff confinement: #{e.message}"
+    end
+  end
+end
 
 if lightweight && options[:repo]
   begin
@@ -220,6 +245,13 @@ elsif receipt_pr
   # The exact marker, branch, base, path set, receipt documents, controller
   # evidence, merged lanes, and trusted checks are validated above. Receipts do
   # not create another implementation lane or critic cycle.
+elsif fleet_contract_sync
+  # Reduced contract for a mechanically-confined managed contract refresh:
+  # outcome + evidence only. Diff confinement is validated above and is what
+  # actually stands in for the full lane contract, not this body shape.
+  %w[Outcome Evidence].each do |section|
+    errors << "missing required section: ## #{section}" unless body.match?(/^##\s+#{Regexp.escape(section)}\s*$/i)
+  end
 elsif lightweight
   # Reduced contract for docs/chore/exempt PRs: outcome + evidence only.
   %w[Outcome Evidence].each do |section|
@@ -248,7 +280,7 @@ if release_pr
   errors << "Current head SHA must be a 40-character commit SHA" unless reported_head
 elsif receipt_pr
   # The event base/head and receipt marker provide the immutable PR binding.
-elsif lightweight
+elsif fleet_contract_sync || lightweight
   errors << "reported head SHA does not match the pull request head" if reported_head && head_sha && reported_head != head_sha
 else
   errors << "Baseline SHA must be a 40-character commit SHA" unless reported_baseline
@@ -262,7 +294,7 @@ else
 end
 errors << "base and head SHA are identical" if base_sha && head_sha && base_sha == head_sha
 
-if !release_pr && !receipt_pr && !lightweight && options[:repo] && implementation_head && evidence_head && reported_head && reported_baseline && lane && contract
+if !release_pr && !receipt_pr && !fleet_contract_sync && !lightweight && options[:repo] && implementation_head && evidence_head && reported_head && reported_baseline && lane && contract
   begin
     repo = Verdify::GitRepository.new(options[:repo])
     errors << "checked-out repository head does not match pull request head" unless repo.head_sha == head_sha
@@ -334,6 +366,8 @@ if errors.empty?
            "release"
          elsif receipt_pr
            "terminal receipt"
+         elsif fleet_contract_sync
+           "fleet contract sync"
          else
            "implementation"
          end

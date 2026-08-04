@@ -19,6 +19,7 @@ labels:
   - {name: "verdify:deployment-ready", color: "0052CC", description: "Integrated revision is ready for authorized deployment"}
   - {name: "verdify:verified", color: "0E8A16", description: "Runtime outcome was independently verified"}
   - {name: "verdify:policy-exempt", color: "C5DEF5", description: "Explicitly approved repository-policy exception"}
+  - {name: "verdify:fleet-contract-sync", color: "5C2D91", description: "Centrally-rendered agent-fleet CI/CD contract refresh, mechanically confined to the managed sentinel spans"}
   - {name: "risk:high", color: "D93F0B", description: "High delivery or operational risk"}
   - {name: "risk:critical", color: "B60205", description: "Critical risk requiring explicit human control"}
 project_fields:
@@ -42,6 +43,19 @@ lightweight_pull_request_labels:
   - "verdify:policy-exempt"
   - "type:docs"
   - "type:chore"
+# A pull request carrying this label is judged solely on a mechanical proof
+# (Verdify::ManagedContractDiff) that its diff is confined to the managed
+# agent-fleet CI/CD contract surface -- never on the label alone. Distinct
+# from lightweight_pull_request_labels above: this is not an honor-system
+# exemption, it is the only pull-request class exempt from critic-gate's
+# lane/contract/critic-report requirement on dev (jvallery/agents#3577,
+# #3044). A dev -> main release pull request is never demoted by this or any
+# other label, regardless of precedence.
+managed_fleet_contract:
+  label: "verdify:fleet-contract-sync"
+  sentinel_guarded_files: ["AGENTS.md", "CLAUDE.md"]
+  generated_files: [".agent-fleet/ci.yaml"]
+  manifest_file: "MANIFEST.sha256"
 release_branch_flow:
   development_branch: dev
   release_branch: main

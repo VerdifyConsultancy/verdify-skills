@@ -48,6 +48,35 @@ def latest_effective_reviews(reviews)
   end
 end
 
+# Shared by the dev -> main release route and the dev fleet-contract-sync
+# route: both need a real, current-head, non-author GitHub review from an
+# allowed owner -- not merely a CODEOWNERS auto-request. (Confirmed against
+# this repo's own history: with required_approving_review_count: 0,
+# require_code_owner_reviews only auto-requests an owner as a reviewer; it
+# does not block a merge without their approval. PRs #213/#230/#222 merged
+# into dev touching CODEOWNERS-protected paths with zero reviews.) This is
+# the one place that requirement is mechanically enforced for either route.
+def owner_approval_errors(reviews, head_sha:, author:, allowed_approvers:, requirement:)
+  errors = []
+  latest = latest_effective_reviews(reviews)
+  unresolved = latest.values.select { |review| review["state"].to_s.upcase == "CHANGES_REQUESTED" }
+  unless unresolved.empty?
+    errors << "an effective change-request review remains unresolved: #{unresolved.filter_map { |review| review.dig('user', 'login') }.sort.join(', ')}"
+  end
+  approval = latest.values.find do |review|
+    login = review.dig("user", "login").to_s.downcase
+    type = review.dig("user", "type").to_s
+    allowed_approvers.include?(login) &&
+      login != author &&
+      type == "User" &&
+      !login.end_with?("[bot]") &&
+      review["state"].to_s.upcase == "APPROVED" &&
+      review["commit_id"] == head_sha
+  end
+  errors << "#{requirement} requires a current-head APPROVED review by #{allowed_approvers.join(' or ')} other than the author" unless approval
+  errors
+end
+
 config = YAML.safe_load(File.read(options[:config]), permitted_classes: [], aliases: false)
 flow = config.fetch("release_branch_flow")
 development_branch = flow.fetch("development_branch")
@@ -155,30 +184,57 @@ else
         unless unterminated.empty?
           errors << "integrated sprint(s) require terminal receipts before another implementation can merge: #{unterminated.join(', ')}"
         end
-        lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-        contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
-        unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
-          errors << "dev critic gate requires exact lane and contract metadata"
-        else
-          contract_path = candidate.root.join(contract_relative)
-          sprint_root = contract_path.dirname.parent.parent
-          closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
-          critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
-          if !critic_path.file?
-            errors << "current head does not contain the canonical critic report"
+
+        pr_labels = Array(pull_request["labels"]).map { |label| label.is_a?(Hash) ? label["name"].to_s : label.to_s }
+        fleet_contract_sync_label = config.dig("managed_fleet_contract", "label").to_s
+        fleet_contract_sync_label = "verdify:fleet-contract-sync" if fleet_contract_sync_label.empty?
+        fleet_contract_sync = pr_labels.include?(fleet_contract_sync_label)
+
+        if fleet_contract_sync
+          # The only pull-request class exempt from the lane/contract/critic
+          # chain below, and only once BOTH conditions hold: (a)
+          # Verdify::ManagedContractDiff mechanically proves the diff touches
+          # nothing but the managed contract surface (jvallery/agents#3577,
+          # #3044), and (b) a current-head APPROVED review from a non-author
+          # allowed owner is present (see owner_approval_errors above --
+          # CODEOWNERS alone does not enforce this on a zero-review-count
+          # branch). A pull request that carries the label but fails either
+          # check is rejected here, never silently re-routed into the lane
+          # path below.
+          if !(full_sha?(base_sha) && candidate.commit_exists?(base_sha))
+            errors << "fleet contract sync requires an existing base commit to verify diff confinement"
           else
-            validator = Verdify::LaneReviewValidator.new(
-              repo: candidate,
-              contract_path: contract_path,
-              closeout_path: closeout_path,
-              critic_path: critic_path
-            )
-            result = validator.validate_critic(tip_sha: head_sha)
-            status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
-            errors.concat(status.errors)
-            expected_pull_request = pull_request["number"] || event["number"]
-            if status.critic && status.critic["pull_request"] != expected_pull_request
-              errors << "critic report pull request does not match the event"
+            confinement = Verdify::ManagedContractDiff.evaluate(repo: candidate, base_sha: base_sha, head_sha: head_sha)
+            errors.concat(confinement.errors)
+          end
+          reviews = options[:reviews] ? load_json(options[:reviews], "reviews") : []
+          errors.concat(owner_approval_errors(reviews, head_sha: head_sha, author: author, allowed_approvers: allowed_release_approvers, requirement: "fleet contract sync"))
+        else
+          lane_id = body[/^- Lane:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+          contract_relative = body[/^- Contract:\s*`?([^`\n]+)`?\s*$/i, 1]&.strip
+          unless lane_id.to_s.match?(/\A[a-z0-9][a-z0-9-]*\z/) && contract_relative.to_s.match?(%r{\A\.agent-workflow/sprints/[^/]+/lanes/contracts/[^/]+\.contract\.ya?ml\z})
+            errors << "dev critic gate requires exact lane and contract metadata"
+          else
+            contract_path = candidate.root.join(contract_relative)
+            sprint_root = contract_path.dirname.parent.parent
+            closeout_path = sprint_root.join("lanes/closeout/#{lane_id}.closeout.yaml")
+            critic_path = sprint_root.join("critic/#{lane_id}.critic.yaml")
+            if !critic_path.file?
+              errors << "current head does not contain the canonical critic report"
+            else
+              validator = Verdify::LaneReviewValidator.new(
+                repo: candidate,
+                contract_path: contract_path,
+                closeout_path: closeout_path,
+                critic_path: critic_path
+              )
+              result = validator.validate_critic(tip_sha: head_sha)
+              status = validator.validate_critic_status(result: result, pull_request_head_sha: head_sha)
+              errors.concat(status.errors)
+              expected_pull_request = pull_request["number"] || event["number"]
+              if status.critic && status.critic["pull_request"] != expected_pull_request
+                errors << "critic report pull request does not match the event"
+              end
             end
           end
         end
@@ -191,22 +247,7 @@ else
         errors << "main critic gate accepts only the same-repository dev-to-main release route"
       end
       reviews = options[:reviews] ? load_json(options[:reviews], "reviews") : []
-      latest = latest_effective_reviews(reviews)
-      unresolved = latest.values.select { |review| review["state"].to_s.upcase == "CHANGES_REQUESTED" }
-      unless unresolved.empty?
-        errors << "an effective change-request review remains unresolved: #{unresolved.filter_map { |review| review.dig('user', 'login') }.sort.join(', ')}"
-      end
-      approval = latest.values.find do |review|
-        login = review.dig("user", "login").to_s.downcase
-        type = review.dig("user", "type").to_s
-        allowed_release_approvers.include?(login) &&
-          login != author &&
-          type == "User" &&
-          !login.end_with?("[bot]") &&
-          review["state"].to_s.upcase == "APPROVED" &&
-          review["commit_id"] == head_sha
-      end
-      errors << "main requires a current-head APPROVED review by jvallery or jrvallery other than the author" unless approval
+      errors.concat(owner_approval_errors(reviews, head_sha: head_sha, author: author, allowed_approvers: allowed_release_approvers, requirement: "main"))
     else
       errors << "delivery gate accepts only dev integration or main release pull requests"
     end

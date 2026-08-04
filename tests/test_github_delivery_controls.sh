@@ -63,6 +63,14 @@ ruby -ryaml -e '
     scripts/validate-repo.rb
   ]
   protected_paths.each { |path| abort "unowned protected path: #{path}" unless matcher.call(path)&.last == owner_logins }
+  # The managed agent-fleet CI/CD contract surface must stay CODEOWNERS-owned:
+  # the verdify:fleet-contract-sync carve-out (Verdify::ManagedContractDiff)
+  # only proves *where* a labelled PR writes, never that its content is the
+  # genuine central render, so a codeowner review is the actual human check
+  # on a contract-sync PR sentinel span or .agent-fleet/ci.yaml command.
+  %w[AGENTS.md CLAUDE.md .agent-fleet/ci.yaml MANIFEST.sha256].each do |path|
+    abort "unowned managed contract path: #{path}" unless matcher.call(path)&.last == owner_logins
+  end
   %w[README.md docs/guide.md skills/example/SKILL.md implementation.txt].each do |path|
     abort "ordinary lane path unexpectedly owned: #{path}" if matcher.call(path)
   end
